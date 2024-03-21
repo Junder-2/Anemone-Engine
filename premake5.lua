@@ -1,3 +1,5 @@
+include "premakeDependencies.lua"
+
 workspace "NP-Engine"
     architecture "x64"
 
@@ -26,12 +28,12 @@ project "Engine"
 
     includedirs
     {
-        "%{prj.name}/vendor/SDL2-2.30.1/include"
+        "%{IncludeDir.SDL2}"
     }
 
     libdirs
     {
-        "%{prj.name}/vendor/SDL2-2.30.1/lib/x64"
+        "%{LibraryDir.SDL2}"
     }
 
     links
@@ -76,7 +78,7 @@ project "Sandbox"
 
     includedirs
     {
-        "%{prj.name}/vendor/SDL2-2.30.1/include",
+        "%{IncludeDir.SDL2}",
         "Engine/src"
     }
 
