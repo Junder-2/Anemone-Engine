@@ -42,7 +42,7 @@ project "Engine"
     }
 
     filter "system:windows"
-        staticruntime "On"
+        staticruntime "on"
         systemversion "latest"
 
         defines
@@ -57,15 +57,16 @@ project "Engine"
 
     filter "configurations:Debug"
         defines "NP_DEBUG"
-        symbols "On"
+        symbols "on"
 
     filter "configurations:Release"
-        optimize "On"
+        optimize "on"
 
 project "Sandbox"
     location "Sandbox"
     kind "ConsoleApp"
     language "C++"
+    cppdialect "C++20"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-intermediate/" .. outputdir .. "/%{prj.name}")
@@ -88,13 +89,12 @@ project "Sandbox"
     }
 
     filter "system:windows"
-        cppdialect "C++20"
-        staticruntime "On"
+        staticruntime "on"
         systemversion "latest"
 
     filter "configurations:Debug"
         defines "NP_DEBUG"
-        symbols "On"
+        symbols "on"
 
     filter "configurations:Release"
-        optimize "On"
+        optimize "on"
