@@ -52,7 +52,8 @@ project "Engine"
 
         postbuildcommands
         {
-            ("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/Sandbox/\"")
+            ("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/Sandbox/\""),
+            ("{COPY} \"%{LibraryDir.SDL2}/SDL2.dll\" \"../bin/" .. outputdir .. "/Sandbox/\"")
         }
 
     filter "configurations:Debug"
