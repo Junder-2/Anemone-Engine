@@ -117,8 +117,9 @@ namespace Engine
         SDL_Event windowEvent;
         while(SDL_PollEvent(&windowEvent))
         {
-            if(windowEvent.type == SDL_QUIT)
+            switch (windowEvent.type)
             {
+            case SDL_QUIT:
                 shouldQuit = true;
                 break;
             }
