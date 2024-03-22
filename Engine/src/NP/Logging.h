@@ -8,18 +8,19 @@
 #pragma warning(pop)
 
 namespace Engine
-{    
+{
     class NP_API Logging
     {
     public:
-        static void Init(const std::string& appName = "APP");
+        static void InitEngine();
+        static void InitApp(const std::string& appName = "APP");
 
-        inline static std::shared_ptr<spdlog::logger>& GetEngineLogger() { return engineLogger; }
-        inline static std::shared_ptr<spdlog::logger>& GetAppLogger() { return appLogger; }
+        inline static std::shared_ptr<spdlog::logger>& GetEngineLogger() { return _engineLogger; }
+        inline static std::shared_ptr<spdlog::logger>& GetAppLogger() { return _appLogger; }
     private:
-        static std::shared_ptr<spdlog::logger> engineLogger;
-        static std::shared_ptr<spdlog::logger> appLogger;
-    };   
+        static std::shared_ptr<spdlog::logger> _engineLogger;
+        static std::shared_ptr<spdlog::logger> _appLogger;
+    };
 }
 
 // Engine log macros

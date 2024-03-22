@@ -5,17 +5,20 @@
 
 namespace Engine
 {
-    std::shared_ptr<spdlog::logger> Logging::engineLogger;
-    std::shared_ptr<spdlog::logger> Logging::appLogger;
+    std::shared_ptr<spdlog::logger> Logging::_engineLogger;
+    std::shared_ptr<spdlog::logger> Logging::_appLogger;
 
-    void Logging::Init(const std::string& appName)
+    void Logging::InitEngine()
     {
         spdlog::set_pattern("%^[%n %T] %v%$");
-        
-        engineLogger = spdlog::stdout_color_mt("ENGINE");
-        engineLogger->set_level(spdlog::level::trace);
 
-        appLogger = spdlog::stdout_color_mt(appName);
-        appLogger->set_level(spdlog::level::trace);
+        _engineLogger = spdlog::stdout_color_mt("ENGINE");
+        _engineLogger->set_level(spdlog::level::trace);
+    }
+
+    void Logging::InitApp(const std::string& appName)
+    {
+        _appLogger = spdlog::stdout_color_mt(appName);
+        _appLogger->set_level(spdlog::level::trace);
     }
 }
