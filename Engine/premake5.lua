@@ -1,5 +1,4 @@
 project "Engine"
-    location "Engine"
     kind "SharedLib" --Engine will be DLL
     language "C++"
     cppdialect "C++20"
@@ -7,6 +6,9 @@ project "Engine"
 
     targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
     objdir ("%{wks.location}/bin-intermediate/" .. outputdir .. "/%{prj.name}")
+
+    pchheader "nppch.h"
+    pchsource "src/nppch.cpp"
 
     files
     {
