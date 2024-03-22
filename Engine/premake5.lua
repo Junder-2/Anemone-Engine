@@ -29,13 +29,15 @@ project "Engine"
 
     libdirs
     {
-        "%{LibraryDir.SDL2}"
+        "%{LibraryDir.SDL2}",
+        "%{LibraryDir.Vulkan}",
     }
 
     links
     {
         "SDL2",
-        "ImGui"
+        "ImGui",
+        "vulkan-1"
     }
 
     filter "system:windows"

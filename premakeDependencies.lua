@@ -19,3 +19,4 @@ IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
 -- Library Directories
 LibraryDir = {}
 LibraryDir["SDL2"] = "%{External.SDL2}/lib/x64"
+LibraryDir["Vulkan"] = "%{VULKAN_SDK}/Lib/"
