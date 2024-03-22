@@ -19,7 +19,8 @@ project "Sandbox"
         "%{IncludeDir.SDL2}",
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.GLM}",
-        "%{wks.location}/Engine/src"
+        "%{IncludeDir.VulkanSDK}",
+        "%{wks.location}/Engine/src",
     }
 
     links
