@@ -20,7 +20,7 @@ project "Engine"
 
     includedirs
     {
-        "vendor/spdlog/include",
+        "%{IncludeDir.spdlog}",
         "%{IncludeDir.SDL2}",
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.GLM}",
