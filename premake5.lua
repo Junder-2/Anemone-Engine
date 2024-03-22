@@ -3,6 +3,11 @@ include "premakeDependencies.lua"
 workspace "NP-Engine"
     architecture "x64"
 
+    defines
+    {
+        "SPDLOG_USE_STD_FORMAT"
+    }
+
     configurations
     {
         "Debug",
