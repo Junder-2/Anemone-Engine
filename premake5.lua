@@ -12,7 +12,7 @@ workspace "NP-Engine"
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 group "Dependencies"
-    include "Engine/vendor/imgui-1.90.4"
+    include "Engine/vendor/imgui"
 group ""
 
 group "Core"

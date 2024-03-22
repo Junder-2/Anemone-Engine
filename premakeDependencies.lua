@@ -4,7 +4,7 @@ VULKAN_SDK = os.getenv("VULKAN_SDK")
 
 External = {}
 External["SDL2"] = "%{wks.location}/Engine/vendor/SDL2"
-External["ImGui"] = "%{wks.location}/Engine/vendor/imgui-1.90.4"
+External["ImGui"] = "%{wks.location}/Engine/vendor/imgui"
 External["GLM"] = "%{wks.location}/Engine/vendor/GLM"
 External["spdlog"] = "%{wks.location}/Engine/vendor/spdlog"
 
