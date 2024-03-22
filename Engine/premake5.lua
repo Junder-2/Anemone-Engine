@@ -22,6 +22,7 @@ project "Engine"
         "%{IncludeDir.SDL2}",
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.GLM}",
+        "%{IncludeDir.VulkanSDK}",
     }
 
     libdirs
