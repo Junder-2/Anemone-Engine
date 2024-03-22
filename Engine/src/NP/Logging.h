@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include "Core.h"
 
 //solves warnings
@@ -14,7 +12,7 @@ namespace Engine
     class NP_API Logging
     {
     public:
-        static void Init();
+        static void Init(const std::string& appName = "APP");
 
         inline static std::shared_ptr<spdlog::logger>& GetEngineLogger() { return engineLogger; }
         inline static std::shared_ptr<spdlog::logger>& GetAppLogger() { return appLogger; }

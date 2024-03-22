@@ -5,3 +5,5 @@
 #else
     #define NP_API __declspec(dllimport)
 #endif
+
+#include "Logging.h"

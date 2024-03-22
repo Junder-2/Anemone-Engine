@@ -4,20 +4,15 @@
 class Sandbox : public Engine::Application
 {
 public:
-    Sandbox() { }
+    Sandbox(const Engine::ApplicationSpecification& specification) : Application(specification) { }
     ~Sandbox() { }
 };
 
-int main(int arg, char* argv[])
+Engine::Application* Engine::CreateApplication()
 {
-    Engine::Logging::Init();
-
-    NP_ENGINE_LOG_INFO("Engine Start");
-    NP_LOG_INFO("App Start");
+    ApplicationSpecification spec;
+    spec.Name = "Sandbox";
+    spec.LogName = "SANDBOX";
     
-    Sandbox* app = new Sandbox();
-    app->Run();
-    delete app;
-    
-    return 1;
+    return new Sandbox(spec);
 }
