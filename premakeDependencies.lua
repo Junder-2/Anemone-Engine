@@ -12,6 +12,7 @@ External["spdlog"] = "%{wks.location}/Engine/vendor/spdlog"
 IncludeDir = {}
 IncludeDir["SDL2"] = "%{External.SDL2}/include"
 IncludeDir["ImGui"] = "%{External.ImGui}"
+IncludeDir["GLM"] = "%{External.GLM}"
 IncludeDir["spdlog"] = "%{External.spdlog}/include"
 IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
 
