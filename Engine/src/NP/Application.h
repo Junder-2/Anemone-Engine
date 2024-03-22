@@ -33,6 +33,7 @@ namespace Engine
 
         static Application* _appInstance;
 
+        Uint64 _lastTimeStamp;
         LayerStack _layerStack;
     };
 

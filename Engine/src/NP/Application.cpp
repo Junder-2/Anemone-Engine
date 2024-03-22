@@ -1,6 +1,8 @@
 ﻿#include "nppch.h"
 #include "Application.h"
 
+#include <SDL_timer.h>
+
 #include "Layer.h"
 
 namespace Engine
@@ -20,9 +22,15 @@ namespace Engine
     {
         while (_isRunning)
         {
+            const Uint64 timeStamp = SDL_GetPerformanceCounter();
+            const Uint64 timeStep = timeStamp - _lastTimeStamp;
+            _lastTimeStamp = timeStamp;
+
+            float deltaTime = timeStep / static_cast<float>(SDL_GetPerformanceFrequency());
+
             for (Layer* layer : _layerStack)
             {
-                layer->OnUpdate(0);
+                layer->OnUpdate(deltaTime);
             }
             //todo frame yap
 
