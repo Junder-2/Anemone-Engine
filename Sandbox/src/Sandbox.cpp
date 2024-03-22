@@ -10,6 +10,11 @@ public:
 
 int main(int arg, char* argv[])
 {
+    Engine::Logging::Init();
+
+    NP_ENGINE_LOG_INFO("Engine Start");
+    NP_LOG_INFO("App Start");
+    
     Sandbox* app = new Sandbox();
     app->Run();
     delete app;

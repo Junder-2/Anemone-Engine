@@ -34,6 +34,7 @@ project "Engine"
     {
         "%{IncludeDir.SDL2}",
         "%{IncludeDir.ImGui}"
+        "%{prj.name}/vendor/spdlog/include"
     }
 
     libdirs
@@ -88,6 +89,7 @@ project "Sandbox"
     {
         "%{IncludeDir.SDL2}",
         "%{IncludeDir.ImGui}",
+        "%{wks.location}/Engine/vendor/spdlog/include",
         "Engine/src"
     }
 
