@@ -19,7 +19,7 @@ project "Sandbox"
         "%{wks.location}/Engine/vendor/spdlog/include",
         "%{IncludeDir.SDL2}",
         "%{IncludeDir.ImGui}",
-        "Engine/src"
+        "%{wks.location}/Engine/src"
     }
 
     links
