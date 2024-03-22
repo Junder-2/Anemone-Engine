@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Core.h"
+#include "LayerStack.h"
 
 namespace Engine
 {
@@ -9,7 +10,7 @@ namespace Engine
         std::string Name = "NP Application";
         std::string LogName = "NP APP";
     };
-    
+
     class NP_API Application
     {
     public:
@@ -26,6 +27,8 @@ namespace Engine
         bool isRunning = true;
 
         static Application* appInstance;
+
+        LayerStack _layerStack;
     };
 
     Application* CreateApplication();

@@ -1,10 +1,12 @@
 ﻿#include "nppch.h"
 #include "Application.h"
 
+#include "Layer.h"
+
 namespace Engine
 {
     Application* Application::appInstance = nullptr;
-    
+
     Application::Application(const ApplicationSpecification& specification) : appSpec(specification)
     {
         appInstance = this;
@@ -16,7 +18,10 @@ namespace Engine
     {
         while (isRunning)
         {
-            
+            for (Layer* layer : _layerStack)
+            {
+                layer->OnUpdate(0);
+            }
         }
     }
 }
