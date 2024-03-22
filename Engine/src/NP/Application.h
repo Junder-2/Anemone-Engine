@@ -2,10 +2,11 @@
 
 #include "Core.h"
 #include "LayerStack.h"
+#include "Window.h"
 
 namespace Engine
 {
-    struct ApplicationSpecification
+    struct NP_API ApplicationSpecification
     {
         std::string Name = "NP Application";
         std::string LogName = "NP APP";
@@ -16,17 +17,21 @@ namespace Engine
     public:
         Application(const ApplicationSpecification& specification);
         virtual ~Application();
+
         void Run();
 
-        static Application& Get() { return *appInstance; }
+        Window& GetWindowContext() { return *_windowContext; }
 
-        const ApplicationSpecification& GetAppSpecification() const { return appSpec; }
+        static Application& Get() { return *_appInstance; }
+
+        const ApplicationSpecification& GetAppSpecification() const { return _appSpec; }
 
     private:
-        ApplicationSpecification appSpec;
-        bool isRunning = true;
+        ApplicationSpecification _appSpec;
+        std::unique_ptr<Window> _windowContext;
+        bool _isRunning = true;
 
-        static Application* appInstance;
+        static Application* _appInstance;
 
         LayerStack _layerStack;
     };

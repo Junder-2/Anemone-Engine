@@ -5,23 +5,28 @@
 
 namespace Engine
 {
-    Application* Application::appInstance = nullptr;
+    Application* Application::_appInstance = nullptr;
 
-    Application::Application(const ApplicationSpecification& specification) : appSpec(specification)
+    Application::Application(const ApplicationSpecification& specification) : _appSpec(specification)
     {
-        appInstance = this;
+        _appInstance = this;
+
+        _windowContext = Window::Create(WindowProperties(_appSpec.Name));
     }
 
     Application::~Application() = default;
 
     void Application::Run()
     {
-        while (isRunning)
+        while (_isRunning)
         {
             for (Layer* layer : _layerStack)
             {
                 layer->OnUpdate(0);
             }
+            //todo frame yap
+
+            _isRunning = _windowContext->OnUpdate();
         }
     }
 }
