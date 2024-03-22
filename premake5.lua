@@ -11,6 +11,10 @@ workspace "NP-Engine"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+group "Dependencies"
+    include "Engine/vendor/imgui-1.90.4"
+group ""
+
 project "Engine"
     location "Engine"
     kind "SharedLib" --Engine will be DLL
@@ -28,7 +32,8 @@ project "Engine"
 
     includedirs
     {
-        "%{IncludeDir.SDL2}"
+        "%{IncludeDir.SDL2}",
+        "%{IncludeDir.ImGui}"
     }
 
     libdirs
@@ -38,7 +43,8 @@ project "Engine"
 
     links
     {
-        "SDL2"
+        "SDL2",
+        "ImGui"
     }
 
     filter "system:windows"
@@ -81,6 +87,7 @@ project "Sandbox"
     includedirs
     {
         "%{IncludeDir.SDL2}",
+        "%{IncludeDir.ImGui}",
         "Engine/src"
     }
 
