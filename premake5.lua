@@ -33,7 +33,7 @@ project "Engine"
     includedirs
     {
         "%{IncludeDir.SDL2}",
-        "%{IncludeDir.ImGui}"
+        "%{IncludeDir.ImGui}",
         "%{prj.name}/vendor/spdlog/include"
     }
 
