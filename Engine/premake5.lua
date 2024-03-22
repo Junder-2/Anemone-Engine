@@ -11,7 +11,9 @@ project "Engine"
     files
     {
         "src/**.h",
-        "src/**.cpp"
+        "src/**.cpp",
+        "vendor/GLM/glm/**.hpp",
+        "vendor/GLM/glm/**.inl",
     }
 
     includedirs
@@ -19,6 +21,7 @@ project "Engine"
         "vendor/spdlog/include",
         "%{IncludeDir.SDL2}",
         "%{IncludeDir.ImGui}",
+        "%{IncludeDir.GLM}",
     }
 
     libdirs
