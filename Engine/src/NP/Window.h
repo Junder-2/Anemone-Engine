@@ -1,4 +1,5 @@
 #pragma once
+#include <SDL_video.h>
 
 //#include "SDL.h"
 //#include "vulkan/vulkan_core.h"
@@ -33,13 +34,13 @@ namespace Engine
         bool IsVSync() const { return  _windowData.VSync; }
         uint32_t GetWidth() const { return _windowData.Width; }
         uint32_t GetHeight() const { return _windowData.Height; }
-        //SDL_Window* GetWindowContext() const { return _windowContext; }
+        SDL_Window* GetWindowContext() const { return _windowContext; }
 
     private:
         void Init(const WindowProperties& props);
         void Shutdown();
     private:
-        //SDL_Window* _windowContext;
+        SDL_Window* _windowContext;
         //VkDevice _vkDevice;
         //VkInstance _vkInstance;
 

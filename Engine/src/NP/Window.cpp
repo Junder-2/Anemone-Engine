@@ -1,6 +1,8 @@
 #include "nppch.h"
 #include "Window.h"
 
+#include <SDL.h>
+
 namespace Engine
 {
     Window::Window(const WindowProperties& props)
@@ -16,7 +18,7 @@ namespace Engine
 
     void Window::Init(const WindowProperties& props)
     {
-        /* NP_ENGINE_LOG_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
+        /* NP_ENGINE_LOG_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height)*/
 
         if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER))
         {
@@ -25,7 +27,7 @@ namespace Engine
 
         _windowContext = SDL_CreateWindow(props.Title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowData.Width, _windowData.Height, SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN);
 
-        uint32_t extensionCount;
+        /*uint32_t extensionCount;
         const char** extensionNames = 0;
         SDL_Vulkan_GetInstanceExtensions(_windowContext, &extensionCount, nullptr);
         extensionNames = new const char *[extensionCount];
@@ -107,9 +109,7 @@ namespace Engine
 
     bool Window::OnUpdate()
     {
-        return true;
-
-        /*bool shouldQuit = false;
+        bool shouldQuit = false;
 
         SDL_Event windowEvent;
         while(SDL_PollEvent(&windowEvent))
@@ -121,7 +121,7 @@ namespace Engine
             }
         }
 
-        return !shouldQuit;*/
+        return !shouldQuit;
     }
 
     void Window::Shutdown()
@@ -129,8 +129,8 @@ namespace Engine
         // vkDestroyDevice(_vkDevice, nullptr);
         // vkDestroyInstance(_vkInstance, nullptr);
         // SDL_Vulkan_UnloadLibrary();
-        //SDL_DestroyWindow(_windowContext);
-        //SDL_Quit();
+        SDL_DestroyWindow(_windowContext);
+        SDL_Quit();
     }
 
     void Window::SetVSync(const bool enabled)
