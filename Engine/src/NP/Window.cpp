@@ -2,6 +2,8 @@
 #include "Window.h"
 
 #include <SDL.h>
+#include <SDL_vulkan.h>
+#include <vulkan/vulkan.h>
 
 namespace Engine
 {
@@ -25,9 +27,10 @@ namespace Engine
             NP_ENGINE_LOG_ERROR("Could not init sdl");
         }
 
+        SDL_Vulkan_LoadLibrary(nullptr);
         _windowContext = SDL_CreateWindow(props.Title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowData.Width, _windowData.Height, SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN);
 
-        /*uint32_t extensionCount;
+        uint32_t extensionCount;
         const char** extensionNames = 0;
         SDL_Vulkan_GetInstanceExtensions(_windowContext, &extensionCount, nullptr);
         extensionNames = new const char *[extensionCount];
@@ -104,7 +107,7 @@ namespace Engine
         vkGetDeviceQueue(_vkDevice, graphicsQueueIndex, 0, &graphicsQueue);
 
         VkQueue presentQueue;
-        vkGetDeviceQueue(_vkDevice, presentQueueIndex, 0, &presentQueue); */
+        vkGetDeviceQueue(_vkDevice, presentQueueIndex, 0, &presentQueue);
     }
 
     bool Window::OnUpdate()
@@ -126,9 +129,9 @@ namespace Engine
 
     void Window::Shutdown()
     {
-        // vkDestroyDevice(_vkDevice, nullptr);
-        // vkDestroyInstance(_vkInstance, nullptr);
-        // SDL_Vulkan_UnloadLibrary();
+        vkDestroyDevice(_vkDevice, nullptr);
+        vkDestroyInstance(_vkInstance, nullptr);
+        SDL_Vulkan_UnloadLibrary();
         SDL_DestroyWindow(_windowContext);
         SDL_Quit();
     }

@@ -1,5 +1,7 @@
 #pragma once
 #include <SDL_video.h>
+#include <SDL_vulkan.h>
+#include <vulkan/vulkan_core.h>
 
 //#include "SDL.h"
 //#include "vulkan/vulkan_core.h"
@@ -41,8 +43,8 @@ namespace Engine
         void Shutdown();
     private:
         SDL_Window* _windowContext;
-        //VkDevice _vkDevice;
-        //VkInstance _vkInstance;
+        VkDevice _vkDevice;
+        VkInstance _vkInstance;
 
         WindowProperties _windowData;
     };
