@@ -1,5 +1,5 @@
 project "Engine"
-    kind "SharedLib" --Engine will be DLL
+    kind "StaticLib" --Engine will be DLL
     language "C++"
     cppdialect "C++20"
     staticruntime "on"
@@ -50,7 +50,6 @@ project "Engine"
 
         postbuildcommands
         {
-            ("{COPY} %{cfg.buildtarget.relpath} \"%{wks.location}/bin/" .. outputdir .. "/Sandbox/\""),
             ("{COPY} \"%{LibraryDir.SDL2}/SDL2.dll\" \"%{wks.location}/bin/" .. outputdir .. "/Sandbox/\"")
         }
 
