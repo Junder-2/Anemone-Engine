@@ -1,9 +1,13 @@
 ﻿#pragma once
 
-#ifdef NP_BUILD_DLL
-    #define NP_API __declspec(dllexport)
+#if NP_DYNAMIC_LINK
+    #ifdef NP_BUILD_DLL
+        #define NP_API __declspec(dllexport)
+    #else
+        #define NP_API __declspec(dllimport)
+    #endif
 #else
-    #define NP_API __declspec(dllimport)
+    #define NP_API
 #endif
 
 #include "Logging.h"
