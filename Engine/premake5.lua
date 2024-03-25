@@ -16,6 +16,8 @@ project "Engine"
         "src/**.cpp",
         "vendor/GLM/glm/**.hpp",
         "vendor/GLM/glm/**.inl",
+        "vendor/imgui/backends/**.h",
+        "vendor/imgui/backends/**.cpp",
     }
 
     includedirs
@@ -23,6 +25,7 @@ project "Engine"
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.SDL2}",
         "%{IncludeDir.ImGui}",
+        "%{IncludeDir.ImGui}/backends",
         "%{IncludeDir.GLM}",
         "%{IncludeDir.VulkanSDK}",
     }
