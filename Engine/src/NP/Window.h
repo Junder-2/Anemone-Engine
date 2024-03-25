@@ -63,8 +63,6 @@ namespace Engine
 
     private:
         SDL_Window* _windowContext;
-        VkDevice _vkDevice;
-        VkInstance _vkInstance;
 
         WindowProperties _windowData;
 
