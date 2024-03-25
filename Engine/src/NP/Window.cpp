@@ -117,10 +117,6 @@ namespace Engine
 
         // Rendering
         ImGui::Render();
-        SDL_RenderSetScale(_renderer, _io->DisplayFramebufferScale.x, _io->DisplayFramebufferScale.y);
-        SDL_SetRenderDrawColor(_renderer, (Uint8)(_clearColor.x * 255), (Uint8)(_clearColor.y * 255), (Uint8)(_clearColor.z * 255), (Uint8)(_clearColor.w * 255));
-        SDL_RenderClear(_renderer);
-        SDL_RenderPresent(_renderer);
     }
 
     void Window::Shutdown()
@@ -133,7 +129,6 @@ namespace Engine
         CleanupVulkanWindow();
         CleanupVulkan();
 
-        SDL_DestroyRenderer(_renderer);
         SDL_DestroyWindow(_windowContext);
         SDL_Quit();
     }
