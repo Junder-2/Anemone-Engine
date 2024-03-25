@@ -48,6 +48,8 @@ namespace Engine
     private:
         void Init(const WindowProperties& props);
         void Shutdown();
+
+        static void CheckVKResult(VkResult err);
     private:
         SDL_Window* _windowContext;
         SDL_Renderer* _renderer;

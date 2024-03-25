@@ -143,6 +143,15 @@ namespace Engine
         _windowData.VSync = enabled;
     }
 
+    void Window::CheckVKResult(VkResult err)
+    {
+        if (err == 0)
+            return;
+        NP_ENGINE_LOG_ERROR("Vulkan Error: VkResult = {0}", (int)err);
+        if (err < 0)
+            abort();
+    }
+
     std::unique_ptr<Window> Window::Create(const WindowProperties& props)
     {
         return std::make_unique<Window>(props);
