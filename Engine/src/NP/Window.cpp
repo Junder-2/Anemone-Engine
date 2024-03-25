@@ -128,7 +128,7 @@ namespace Engine
     void Window::Shutdown()
     {
         // Cleanup
-        const VkResult err = vkDeviceWaitIdle(_device);
+        const VkResult err = vkDeviceWaitIdle(g_Device);
         CheckVKResult(err);
         CleanupImGui();
 
@@ -232,14 +232,15 @@ namespace Engine
 
     void Window::CleanupVulkanWindow()
     {
+        ImGui_ImplVulkanH_DestroyWindow(g_Instance, g_Device, &g_MainWindowData, g_Allocator);
     }
 
     void Window::CleanupVulkan()
     {
-        //vkDestroyDescriptorPool(_device, g_DescriptorPool, g_Allocator);
+        vkDestroyDescriptorPool(g_Device, g_DescriptorPool, g_Allocator);
 
-        //vkDestroyDevice(_device, g_Allocator);
-        //vkDestroyInstance(g_Instance, g_Allocator);
+        vkDestroyDevice(g_Device, g_Allocator);
+        vkDestroyInstance(g_Instance, g_Allocator);
     }
 
     std::unique_ptr<Window> Window::Create(const WindowProperties& props)
