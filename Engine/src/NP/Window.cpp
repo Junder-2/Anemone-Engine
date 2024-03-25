@@ -42,6 +42,17 @@ namespace Engine
         const ImVector<const char*> extensions = GetAvailableExtensions(_windowContext);
         CreateVulkanInstance(extensions);
 
+        VkSurfaceKHR surface;
+        if (SDL_Vulkan_CreateSurface(_windowContext, g_Instance, &surface) == 0)
+        {
+            NP_ENGINE_LOG_ERROR("Could not create Vulkan surface.\n");
+        }
+
+        int w, h;
+        SDL_GetWindowSize(_windowContext, &w, &h);
+        ImGui_ImplVulkanH_Window* wd = &g_MainWindowData;
+        SetupVulkanWindow(wd, surface, w, h);
+
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
