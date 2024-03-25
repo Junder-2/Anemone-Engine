@@ -10,7 +10,9 @@ project "Sandbox"
     files
     {
         "src/**.h",
-        "src/**.cpp"
+        "src/**.cpp",
+        "%{wks.location}/Engine/vendor/imgui/backends/imgui_impl_sdl2.cpp",
+        "%{wks.location}/Engine/vendor/imgui/backends/imgui_impl_vulkan.cpp",
     }
 
     includedirs
@@ -18,6 +20,7 @@ project "Sandbox"
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.SDL2}",
         "%{IncludeDir.ImGui}",
+        "%{IncludeDir.ImGui}/backends",
         "%{IncludeDir.GLM}",
         "%{IncludeDir.VulkanSDK}",
         "%{wks.location}/Engine/src",
