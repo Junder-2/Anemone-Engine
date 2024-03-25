@@ -42,6 +42,9 @@ namespace Engine
         const ImVector<const char*> extensions = GetAvailableExtensions(_windowContext);
         CreateVulkanInstance(extensions);
 
+        // Select Physical Device (GPU)
+        g_PhysicalDevice = SelectPhysicalDevice();
+
         VkSurfaceKHR surface;
         if (SDL_Vulkan_CreateSurface(_windowContext, g_Instance, &surface) == 0)
         {
@@ -261,6 +264,35 @@ namespace Engine
         createInfo.ppEnabledExtensionNames = extensions.Data;
         err = vkCreateInstance(&createInfo, g_Allocator, &g_Instance);
         CheckVKResult(err);
+    }
+
+    VkPhysicalDevice Window::SelectPhysicalDevice()
+    {
+        uint32_t gpuCount;
+        VkResult err = vkEnumeratePhysicalDevices(g_Instance, &gpuCount, nullptr);
+        CheckVKResult(err);
+        IM_ASSERT(gpuCount > 0);
+
+        ImVector<VkPhysicalDevice> gpus;
+        gpus.resize(gpuCount);
+        err = vkEnumeratePhysicalDevices(g_Instance, &gpuCount, gpus.Data);
+        CheckVKResult(err);
+
+        // If a number >1 of GPUs got reported, find discrete GPU if present, or use first one available. This covers
+        // most common cases (multi-gpu/integrated+dedicated graphics). Handling more complicated setups (multiple
+        // dedicated GPUs) is out of scope of this sample. - example_sdl2_vulkan
+        for (const VkPhysicalDevice& device : gpus)
+        {
+            VkPhysicalDeviceProperties properties;
+            vkGetPhysicalDeviceProperties(device, &properties);
+            if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+                return device;
+        }
+
+        // Use first GPU (Integrated) is a Discrete one is not available.
+        if (gpuCount > 0)
+            return gpus[0];
+        return VK_NULL_HANDLE;
     }
 
     void Window::SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height)
