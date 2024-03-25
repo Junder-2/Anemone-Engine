@@ -34,8 +34,8 @@ namespace Engine
             NP_ENGINE_LOG_ERROR("Could not create SDL window.");
         }
 
-        SDL_Renderer* renderer = SDL_CreateRenderer(_windowContext, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
-        if (renderer == nullptr)
+        _renderer = SDL_CreateRenderer(_windowContext, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+        if (_renderer == nullptr)
         {
             NP_ENGINE_LOG_ERROR("Could not create SDL renderer.");
         }
@@ -52,8 +52,8 @@ namespace Engine
         //ImGui::StyleColorsLight();
 
         // Setup Platform/Renderer backends
-        ImGui_ImplSDL2_InitForSDLRenderer(_windowContext, renderer);
-        ImGui_ImplSDLRenderer2_Init(renderer);
+        ImGui_ImplSDL2_InitForSDLRenderer(_windowContext, _renderer);
+        ImGui_ImplSDLRenderer2_Init(_renderer);
     }
 
     bool Window::OnUpdate()
