@@ -82,6 +82,8 @@ namespace Engine
         inline static VkPhysicalDevice g_PhysicalDevice = VK_NULL_HANDLE;
         inline static VkDevice g_Device = VK_NULL_HANDLE;
         inline static uint32_t g_QueueFamily = (uint32_t)-1;
+        inline static VkQueue g_Queue = VK_NULL_HANDLE;
+        inline static VkPipelineCache g_PipelineCache = VK_NULL_HANDLE;
         inline static VkDescriptorPool g_DescriptorPool = VK_NULL_HANDLE;
 
         // ImGui

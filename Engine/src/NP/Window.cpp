@@ -63,6 +63,25 @@ namespace Engine
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
         //ImGui::StyleColorsLight();
+
+        // Setup Platform/Renderer backends
+        ImGui_ImplSDL2_InitForVulkan(_windowContext);
+        ImGui_ImplVulkan_InitInfo initInfo = {};
+        initInfo.Instance = g_Instance;
+        initInfo.PhysicalDevice = g_PhysicalDevice;
+        initInfo.Device = g_Device;
+        initInfo.QueueFamily = g_QueueFamily;
+        initInfo.Queue = g_Queue;
+        initInfo.PipelineCache = g_PipelineCache;
+        initInfo.DescriptorPool = g_DescriptorPool;
+        initInfo.RenderPass = wd->RenderPass;
+        initInfo.Subpass = 0;
+        initInfo.MinImageCount = g_MinImageCount;
+        initInfo.ImageCount = wd->ImageCount;
+        initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+        initInfo.Allocator = g_Allocator;
+        initInfo.CheckVkResultFn = CheckVKResult;
+        ImGui_ImplVulkan_Init(&initInfo);
     }
 
     void Window::OnUpdate()
