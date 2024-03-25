@@ -37,7 +37,7 @@ namespace Engine
         SDL_Renderer* renderer = SDL_CreateRenderer(_windowContext, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
         if (renderer == nullptr)
         {
-            SDL_Log("Could not create SDL renderer!");
+            NP_ENGINE_LOG_ERROR("Could not create SDL renderer.");
         }
 
         // Setup Dear ImGui context
