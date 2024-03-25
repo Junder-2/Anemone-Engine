@@ -4,6 +4,9 @@
 #include <SDL.h>
 #include <SDL_vulkan.h>
 #include <vulkan/vulkan.h>
+#include <imgui.h>
+#include <imgui_impl_sdl2.h>
+#include <imgui_impl_sdlrenderer2.h>
 
 namespace Engine
 {
@@ -40,6 +43,21 @@ namespace Engine
         {
             SDL_Log("Could not create SDL renderer!");
         }
+
+        // Setup Dear ImGui context
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO(); (void)io;
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
+
+        // Setup Dear ImGui style
+        ImGui::StyleColorsDark();
+        //ImGui::StyleColorsLight();
+
+        // Setup Platform/Renderer backends
+        ImGui_ImplSDL2_InitForSDLRenderer(_windowContext, renderer);
+        ImGui_ImplSDLRenderer2_Init(renderer);
     }
 
     bool Window::OnUpdate()
