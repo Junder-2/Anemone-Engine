@@ -197,6 +197,11 @@ namespace Engine
         ImVector<const char*> extensions;
         extensions.resize(extensionCount);
         SDL_Vulkan_GetInstanceExtensions(window, &extensionCount, extensions.Data);
+
+        if (enableValidationLayers) {
+            extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+        }
+
         return extensions;
     }
 
