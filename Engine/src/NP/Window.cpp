@@ -56,7 +56,6 @@ namespace Engine
 
         // Setup Platform/Renderer backends
         ImGui_ImplSDL2_InitForSDLRenderer(_windowContext, _renderer);
-        ImGui_ImplSDLRenderer2_Init(_renderer);
     }
 
     void Window::OnUpdate()
@@ -82,7 +81,6 @@ namespace Engine
             }
         }
 
-        ImGui_ImplSDLRenderer2_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
@@ -126,13 +124,11 @@ namespace Engine
         SDL_RenderSetScale(_renderer, _io->DisplayFramebufferScale.x, _io->DisplayFramebufferScale.y);
         SDL_SetRenderDrawColor(_renderer, (Uint8)(_clearColor.x * 255), (Uint8)(_clearColor.y * 255), (Uint8)(_clearColor.z * 255), (Uint8)(_clearColor.w * 255));
         SDL_RenderClear(_renderer);
-        ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData());
         SDL_RenderPresent(_renderer);
     }
 
     void Window::Shutdown()
     {
-        ImGui_ImplSDLRenderer2_Shutdown();
         ImGui_ImplSDL2_Shutdown();
         ImGui::DestroyContext();
 
