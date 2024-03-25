@@ -56,19 +56,26 @@ namespace Engine
         ImGui_ImplSDLRenderer2_Init(_renderer);
     }
 
-    bool Window::OnUpdate()
+    void Window::OnUpdate()
     {
-        bool shouldQuit = false;
-
-        SDL_Event windowEvent;
-        while(SDL_PollEvent(&windowEvent))
+        SDL_Event event;
+        while(SDL_PollEvent(&event))
         {
-            ImGui_ImplSDL2_ProcessEvent(&windowEvent);
-            switch (windowEvent.type)
+            ImGui_ImplSDL2_ProcessEvent(&event);
+            switch (event.type)
             {
             case SDL_QUIT:
-                shouldQuit = true;
+                if(WindowCloseDelegate) WindowCloseDelegate();
                 break;
+            case SDL_WINDOWEVENT:
+                const auto windowEvent = event.window;
+                if(event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+                {
+                    _windowData.Width = windowEvent.data1;
+                    _windowData.Height = windowEvent.data2;
+
+                    if(WindowResizeDelegate) WindowResizeDelegate(_windowData.Width, _windowData.Height);
+                }
             }
         }
 
@@ -118,8 +125,6 @@ namespace Engine
         SDL_RenderClear(_renderer);
         ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData());
         SDL_RenderPresent(_renderer);
-
-        return !shouldQuit;
     }
 
     void Window::Shutdown()
