@@ -27,7 +27,7 @@ namespace Engine
 
         if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER))
         {
-            NP_ENGINE_LOG_ERROR("Could not init sdl");
+            NP_ENGINE_LOG_ERROR("Could not initialize SDL.");
         }
 
         SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_VULKAN | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
