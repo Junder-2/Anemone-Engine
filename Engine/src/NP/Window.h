@@ -55,6 +55,7 @@ namespace Engine
         // Vulkan
         static void CheckVKResult(VkResult err);
         bool CheckValidationLayers();
+        static void CreateVulkanInstance(const ImVector<const char*>& extensions);
         static void CleanupVulkanWindow();
         static void CleanupVulkan();
 

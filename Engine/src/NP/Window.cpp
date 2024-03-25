@@ -188,6 +188,26 @@ namespace Engine
         return true;
     }
 
+    void Window::CreateVulkanInstance(const ImVector<const char*>& extensions)
+    {
+        VkResult err;
+
+        VkInstanceCreateInfo createInfo = {};
+        createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+
+        uint32_t propertiesCount;
+        vkEnumerateInstanceExtensionProperties(nullptr, &propertiesCount, nullptr);
+        ImVector<VkExtensionProperties> properties;
+        properties.resize(propertiesCount);
+        err = vkEnumerateInstanceExtensionProperties(nullptr, &propertiesCount, properties.Data);
+        CheckVKResult(err);
+
+        createInfo.enabledExtensionCount = (uint32_t)extensions.Size;
+        createInfo.ppEnabledExtensionNames = extensions.Data;
+        err = vkCreateInstance(&createInfo, g_Allocator, &g_Instance);
+        CheckVKResult(err);
+    }
+
     void Window::CleanupVulkanWindow()
     {
         //ImGui_ImplVulkanH_DestroyWindow(g_Instance, _device, &g_MainWindowData, g_Allocator);
