@@ -1,4 +1,5 @@
 #pragma once
+#include <imgui_impl_vulkan.h>
 #include <SDL_render.h>
 #include <SDL_video.h>
 #include <SDL_vulkan.h>
@@ -68,7 +69,6 @@ namespace Engine
         WindowProperties _windowData;
 
         // Vulkan
-        inline static VkDevice _device = VK_NULL_HANDLE;
         #ifdef NDEBUG
             static constexpr bool enableValidationLayers = false;
         #else
@@ -77,6 +77,14 @@ namespace Engine
         inline const static std::vector<const char*> validationLayers = {
             "VK_LAYER_KHRONOS_validation"
         };
+
+        inline static VkAllocationCallbacks* g_Allocator = nullptr;
+        inline static VkInstance g_Instance = VK_NULL_HANDLE;
+        inline static VkDevice g_Device = VK_NULL_HANDLE;
+        inline static VkDescriptorPool g_DescriptorPool = VK_NULL_HANDLE;
+
+        // ImGui
+        inline static ImGui_ImplVulkanH_Window g_MainWindowData;
 
         ImGuiIO* _io;
         bool _showDemoWindow = true;
