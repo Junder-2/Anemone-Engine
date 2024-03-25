@@ -112,23 +112,22 @@ namespace Engine
 
     void Window::OnUpdate()
     {
-        SDL_Event windowEvent;
-        while(SDL_PollEvent(&windowEvent))
+        SDL_Event event;
+        while(SDL_PollEvent(&event))
         {
-            switch (windowEvent.type)
+            switch (event.type)
             {
             case SDL_QUIT:
                 if(WindowCloseDelegate) WindowCloseDelegate();
                 break;
             case SDL_WINDOWEVENT:
-                int newWidth, newHeight;
-                SDL_GetWindowSize(_windowContext, &newWidth, &newHeight);
-                if(newWidth != _windowData.Width || newHeight != _windowData.Height)
+                const auto windowEvent = event.window;
+                if(event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
                 {
-                    _windowData.Width = newWidth;
-                    _windowData.Height = newHeight;
+                    _windowData.Width = windowEvent.data1;
+                    _windowData.Height = windowEvent.data2;
 
-                    if(WindowResizeDelegate) WindowResizeDelegate(newWidth, newHeight);
+                    if(WindowResizeDelegate) WindowResizeDelegate(_windowData.Width, _windowData.Height);
                 }
             }
         }
