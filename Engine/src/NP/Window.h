@@ -69,6 +69,11 @@ namespace Engine
 
         // Vulkan
         inline static VkDevice _device = VK_NULL_HANDLE;
+        #ifdef NDEBUG
+            static constexpr bool enableValidationLayers = false;
+        #else
+            static constexpr bool enableValidationLayers = true;
+        #endif
         inline const static std::vector<const char*> validationLayers = {
             "VK_LAYER_KHRONOS_validation"
         };

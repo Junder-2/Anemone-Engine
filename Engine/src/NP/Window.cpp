@@ -209,6 +209,21 @@ namespace Engine
         err = vkEnumerateInstanceExtensionProperties(nullptr, &propertiesCount, properties.Data);
         CheckVKResult(err);
 
+        // Validation layers
+        createInfo.enabledLayerCount = 0;
+        if (enableValidationLayers)
+        {
+            if (CheckValidationLayers())
+            {
+                createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+                createInfo.ppEnabledLayerNames = validationLayers.data();
+            }
+            else
+            {
+                NP_ENGINE_LOG_ERROR("Vulkan Error: One or more of the requested validation layers are unavailable.");
+            }
+        }
+
         createInfo.enabledExtensionCount = (uint32_t)extensions.Size;
         createInfo.ppEnabledExtensionNames = extensions.Data;
         err = vkCreateInstance(&createInfo, g_Allocator, &g_Instance);
@@ -217,7 +232,6 @@ namespace Engine
 
     void Window::CleanupVulkanWindow()
     {
-        //ImGui_ImplVulkanH_DestroyWindow(g_Instance, _device, &g_MainWindowData, g_Allocator);
     }
 
     void Window::CleanupVulkan()
