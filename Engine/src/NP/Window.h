@@ -54,7 +54,7 @@ namespace Engine
 
         // Vulkan
         static void CheckVKResult(VkResult err);
-        bool CheckValidationLayers();
+        static bool CheckValidationLayers();
         static void CreateVulkanInstance(const ImVector<const char*>& extensions);
         static void CleanupVulkanWindow();
         static void CleanupVulkan();
@@ -69,7 +69,7 @@ namespace Engine
 
         // Vulkan
         inline static VkDevice _device = VK_NULL_HANDLE;
-        const std::vector<const char*> _validationLayers = {
+        inline const static std::vector<const char*> validationLayers = {
             "VK_LAYER_KHRONOS_validation"
         };
 
