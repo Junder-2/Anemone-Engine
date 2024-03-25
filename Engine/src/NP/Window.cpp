@@ -63,6 +63,7 @@ namespace Engine
         SDL_Event windowEvent;
         while(SDL_PollEvent(&windowEvent))
         {
+            ImGui_ImplSDL2_ProcessEvent(&windowEvent);
             switch (windowEvent.type)
             {
             case SDL_QUIT:
