@@ -16,8 +16,8 @@ project "Engine"
         "src/**.cpp",
         "vendor/GLM/glm/**.hpp",
         "vendor/GLM/glm/**.inl",
-        "vendor/imgui/backends/**.h",
-        "vendor/imgui/backends/**.cpp",
+        "vendor/imgui/backends/imgui_impl_sdl2.cpp",
+        "vendor/imgui/backends/imgui_impl_sdlrenderer2.cpp",
     }
 
     includedirs
@@ -42,6 +42,9 @@ project "Engine"
         "ImGui",
         "vulkan-1"
     }
+
+    filter "files:vendor/imgui/backends/**.cpp or files:vendor/imgui/backends/**.h"
+        flags { "NoPCH" }
 
     filter "system:windows"
         systemversion "latest"
