@@ -168,14 +168,15 @@ namespace Engine
     {
         uint32_t layerCount;
         vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-        std::vector<VkLayerProperties> availableLayers(layerCount);
-        vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+        ImVector<VkLayerProperties> layers;
+        layers.resize(layerCount);
+        vkEnumerateInstanceLayerProperties(&layerCount, layers.Data);
 
-        for (const char* layerName : _validationLayers)
+        for (const char* layerName : validationLayers)
         {
             bool layerFound = false;
 
-            for (const auto& layerProps : availableLayers)
+            for (const VkLayerProperties& layerProps : layers)
             {
                 if (strcmp(layerProps.layerName, layerName) == 0)
                 {
