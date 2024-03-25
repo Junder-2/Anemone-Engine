@@ -1,7 +1,10 @@
 #pragma once
+#include <SDL_render.h>
 #include <SDL_video.h>
 #include <SDL_vulkan.h>
 #include <vulkan/vulkan_core.h>
+
+#include "imgui.h"
 
 //#include "SDL.h"
 //#include "vulkan/vulkan_core.h"
@@ -43,10 +46,16 @@ namespace Engine
         void Shutdown();
     private:
         SDL_Window* _windowContext;
+        SDL_Renderer* _renderer;
         VkDevice _vkDevice;
         VkInstance _vkInstance;
 
         WindowProperties _windowData;
+
+        ImGuiIO& _io;
+        bool _showDemoWindow = true;
+        bool _showAnotherWindow = false;
+        ImVec4 _clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     };
 
 }
