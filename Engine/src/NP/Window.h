@@ -49,7 +49,11 @@ namespace Engine
         void Init(const WindowProperties& props);
         void Shutdown();
 
+        // Vulkan
         static void CheckVKResult(VkResult err);
+        static void CleanupVulkanWindow();
+        static void CleanupVulkan();
+
     private:
         SDL_Window* _windowContext;
         SDL_Renderer* _renderer;
@@ -57,6 +61,9 @@ namespace Engine
         VkInstance _vkInstance;
 
         WindowProperties _windowData;
+
+        // Vulkan
+        inline static VkDevice _device = VK_NULL_HANDLE;
 
         ImGuiIO* _io;
         bool _showDemoWindow = true;

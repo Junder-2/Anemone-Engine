@@ -129,8 +129,15 @@ namespace Engine
 
     void Window::Shutdown()
     {
+        // Cleanup
+        const VkResult err = vkDeviceWaitIdle(_device);
+        CheckVKResult(err);
+        ImGui_ImplVulkan_Shutdown();
         ImGui_ImplSDL2_Shutdown();
         ImGui::DestroyContext();
+
+        CleanupVulkanWindow();
+        CleanupVulkan();
 
         SDL_DestroyRenderer(_renderer);
         SDL_DestroyWindow(_windowContext);
@@ -143,6 +150,7 @@ namespace Engine
         _windowData.VSync = enabled;
     }
 
+    // Vulkan
     void Window::CheckVKResult(VkResult err)
     {
         if (err == 0)
@@ -150,6 +158,19 @@ namespace Engine
         NP_ENGINE_LOG_ERROR("Vulkan Error: VkResult = {0}", (int)err);
         if (err < 0)
             abort();
+    }
+
+    void Window::CleanupVulkanWindow()
+    {
+        //ImGui_ImplVulkanH_DestroyWindow(g_Instance, _device, &g_MainWindowData, g_Allocator);
+    }
+
+    void Window::CleanupVulkan()
+    {
+        //vkDestroyDescriptorPool(_device, g_DescriptorPool, g_Allocator);
+
+        //vkDestroyDevice(_device, g_Allocator);
+        //vkDestroyInstance(g_Instance, g_Allocator);
     }
 
     std::unique_ptr<Window> Window::Create(const WindowProperties& props)
