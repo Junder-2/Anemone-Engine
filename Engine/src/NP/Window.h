@@ -55,6 +55,7 @@ namespace Engine
 
         // Vulkan
         static void CheckVKResult(VkResult err);
+        static ImVector<const char*> GetAvailableExtensions(SDL_Window* window);
         static bool CheckValidationLayers();
         static void CreateVulkanInstance(const ImVector<const char*>& extensions);
         static void CleanupVulkanWindow();

@@ -37,11 +37,7 @@ namespace Engine
             NP_ENGINE_LOG_ERROR("Could not create SDL window.");
         }
 
-        uint32_t extensionCount = 0;
-        SDL_Vulkan_GetInstanceExtensions(_windowContext, &extensionCount, nullptr);
-        ImVector<const char*> extensions;
-        extensions.resize(extensionCount);
-        SDL_Vulkan_GetInstanceExtensions(_windowContext, &extensionCount, extensions.Data);
+        const ImVector<const char*> extensions = GetAvailableExtensions(_windowContext);
         CreateVulkanInstance(extensions);
 
         // Setup Dear ImGui context
@@ -162,6 +158,16 @@ namespace Engine
         NP_ENGINE_LOG_ERROR("Vulkan Error: VkResult = {0}", (int)err);
         if (err < 0)
             abort();
+    }
+
+    ImVector<const char*> Window::GetAvailableExtensions(SDL_Window* window)
+    {
+        uint32_t extensionCount = 0;
+        SDL_Vulkan_GetInstanceExtensions(window, &extensionCount, nullptr);
+        ImVector<const char*> extensions;
+        extensions.resize(extensionCount);
+        SDL_Vulkan_GetInstanceExtensions(window, &extensionCount, extensions.Data);
+        return extensions;
     }
 
     bool Window::CheckValidationLayers()
