@@ -2,9 +2,6 @@
 #include "Window.h"
 
 #include <SDL.h>
-#include <SDL_vulkan.h>
-#include <vulkan/vulkan.h>
-#include <imgui.h>
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_sdlrenderer2.h>
 
@@ -30,7 +27,6 @@ namespace Engine
             NP_ENGINE_LOG_ERROR("Could not init sdl");
         }
 
-        SDL_Vulkan_LoadLibrary(nullptr);
         SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
         _windowContext = SDL_CreateWindow(props.Title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowData.Width, _windowData.Height, windowFlags);
         if (_windowContext == nullptr)
@@ -80,9 +76,6 @@ namespace Engine
 
     void Window::Shutdown()
     {
-        vkDestroyDevice(_vkDevice, nullptr);
-        vkDestroyInstance(_vkInstance, nullptr);
-        SDL_Vulkan_UnloadLibrary();
         SDL_DestroyWindow(_windowContext);
         SDL_Quit();
     }
