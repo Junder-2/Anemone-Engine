@@ -220,7 +220,7 @@ namespace Engine
             }
             else
             {
-                NP_ENGINE_LOG_ERROR("Vulkan Error: One or more of the requested validation layers are unavailable.");
+                NP_ENGINE_LOG_WARN("Vulkan Error: Creating instance without validation layers since one or more are unavailable.");
             }
         }
 
