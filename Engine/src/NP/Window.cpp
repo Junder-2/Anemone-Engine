@@ -37,11 +37,6 @@ namespace Engine
             NP_ENGINE_LOG_ERROR("Could not create SDL window.");
         }
 
-        _renderer = SDL_CreateRenderer(_windowContext, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
-        if (_renderer == nullptr)
-        {
-            NP_ENGINE_LOG_ERROR("Could not create SDL renderer.");
-        }
 
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
@@ -53,9 +48,6 @@ namespace Engine
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
         //ImGui::StyleColorsLight();
-
-        // Setup Platform/Renderer backends
-        ImGui_ImplSDL2_InitForSDLRenderer(_windowContext, _renderer);
     }
 
     void Window::OnUpdate()
