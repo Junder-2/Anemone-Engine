@@ -37,6 +37,12 @@ namespace Engine
             NP_ENGINE_LOG_ERROR("Could not create SDL window.");
         }
 
+        uint32_t extensionCount = 0;
+        SDL_Vulkan_GetInstanceExtensions(_windowContext, &extensionCount, nullptr);
+        ImVector<const char*> extensions;
+        extensions.resize(extensionCount);
+        SDL_Vulkan_GetInstanceExtensions(_windowContext, &extensionCount, extensions.Data);
+        CreateVulkanInstance(extensions);
 
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
