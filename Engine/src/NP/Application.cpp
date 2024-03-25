@@ -14,6 +14,9 @@ namespace Engine
         _appInstance = this;
 
         _windowContext = Window::Create(WindowProperties(_appSpec.Name));
+
+        _windowContext->WindowCloseDelegate += MakeDelegate(this, &Application::Shutdown);
+        _windowContext->WindowResizeDelegate += MakeDelegate(this, &Application::OnResize);
     }
 
     Application::~Application() = default;
@@ -34,7 +37,17 @@ namespace Engine
             }
             //todo frame yap
 
-            _isRunning = _windowContext->OnUpdate();
+            _windowContext->OnUpdate();
         }
+    }
+
+    void Application::Shutdown()
+    {
+        _isRunning = false;
+    }
+
+    void Application::OnResize(int width, int height)
+    {
+        NP_ENGINE_LOG_INFO("new size {0}, {1}", width, height);
     }
 }

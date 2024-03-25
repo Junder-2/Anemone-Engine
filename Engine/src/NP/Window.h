@@ -3,6 +3,8 @@
 #include <SDL_vulkan.h>
 #include <vulkan/vulkan_core.h>
 
+#include "Delegate/Delegate.h"
+
 //#include "SDL.h"
 //#include "vulkan/vulkan_core.h"
 
@@ -30,13 +32,16 @@ namespace Engine
         Window(const WindowProperties& props);
         ~Window();
 
-        bool OnUpdate();
+        void OnUpdate();
         void SetVSync(bool enabled);
 
         bool IsVSync() const { return  _windowData.VSync; }
         uint32_t GetWidth() const { return _windowData.Width; }
         uint32_t GetHeight() const { return _windowData.Height; }
         SDL_Window* GetWindowContext() const { return _windowContext; }
+
+        MulticastDelegate<void()> WindowCloseDelegate;
+        MulticastDelegate<void(int width, int height)> WindowResizeDelegate;
 
     private:
         void Init(const WindowProperties& props);

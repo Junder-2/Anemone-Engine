@@ -28,7 +28,7 @@ namespace Engine
         }
 
         SDL_Vulkan_LoadLibrary(nullptr);
-        _windowContext = SDL_CreateWindow(props.Title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowData.Width, _windowData.Height, SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN);
+        _windowContext = SDL_CreateWindow(props.Title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowData.Width, _windowData.Height, SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
 
         uint32_t extensionCount;
         const char** extensionNames = 0;
@@ -110,22 +110,28 @@ namespace Engine
         vkGetDeviceQueue(_vkDevice, presentQueueIndex, 0, &presentQueue);
     }
 
-    bool Window::OnUpdate()
+    void Window::OnUpdate()
     {
-        bool shouldQuit = false;
-
         SDL_Event windowEvent;
         while(SDL_PollEvent(&windowEvent))
         {
             switch (windowEvent.type)
             {
             case SDL_QUIT:
-                shouldQuit = true;
+                if(WindowCloseDelegate) WindowCloseDelegate();
                 break;
+            case SDL_WINDOWEVENT:
+                int newWidth, newHeight;
+                SDL_GetWindowSize(_windowContext, &newWidth, &newHeight);
+                if(newWidth != _windowData.Width || newHeight != _windowData.Height)
+                {
+                    _windowData.Width = newWidth;
+                    _windowData.Height = newHeight;
+
+                    if(WindowResizeDelegate) WindowResizeDelegate(newWidth, newHeight);
+                }
             }
         }
-
-        return !shouldQuit;
     }
 
     void Window::Shutdown()

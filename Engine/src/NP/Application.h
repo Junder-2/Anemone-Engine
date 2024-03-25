@@ -19,6 +19,8 @@ namespace Engine
         virtual ~Application();
 
         void Run();
+        void Shutdown();
+        void OnResize(int width, int height);
 
         Window& GetWindowContext() { return *_windowContext; }
 
