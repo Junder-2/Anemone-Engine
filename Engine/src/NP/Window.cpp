@@ -25,6 +25,7 @@ namespace Engine
     {
         NP_ENGINE_LOG_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
+        // SDL
         if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER))
         {
             NP_ENGINE_LOG_ERROR("Could not initialize SDL.");
@@ -37,6 +38,7 @@ namespace Engine
             NP_ENGINE_LOG_ERROR("Could not create SDL window.");
         }
 
+        // Vulkan
         const ImVector<const char*> extensions = GetAvailableExtensions(_windowContext);
         CreateVulkanInstance(extensions);
 
