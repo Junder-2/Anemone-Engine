@@ -43,9 +43,9 @@ namespace Engine
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
-        _io = ImGui::GetIO(); (void)_io;
-        _io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
-        _io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
+        _io = &ImGui::GetIO(); (void)_io;
+        _io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+        _io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
@@ -97,7 +97,7 @@ namespace Engine
         ImGui::SameLine();
         ImGui::Text("counter = %d", counter);
 
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / _io.Framerate, _io.Framerate);
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / _io->Framerate, _io->Framerate);
         ImGui::End();
 
         // 3. Show another simple window.
@@ -112,7 +112,7 @@ namespace Engine
 
         // Rendering
         ImGui::Render();
-        SDL_RenderSetScale(_renderer, _io.DisplayFramebufferScale.x, _io.DisplayFramebufferScale.y);
+        SDL_RenderSetScale(_renderer, _io->DisplayFramebufferScale.x, _io->DisplayFramebufferScale.y);
         SDL_SetRenderDrawColor(_renderer, (Uint8)(_clearColor.x * 255), (Uint8)(_clearColor.y * 255), (Uint8)(_clearColor.z * 255), (Uint8)(_clearColor.w * 255));
         SDL_RenderClear(_renderer);
         ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData());
