@@ -158,6 +158,36 @@ namespace Engine
             abort();
     }
 
+    bool Window::CheckValidationLayers()
+    {
+        uint32_t layerCount;
+        vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+        std::vector<VkLayerProperties> availableLayers(layerCount);
+        vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+        for (const char* layerName : _validationLayers)
+        {
+            bool layerFound = false;
+
+            for (const auto& layerProps : availableLayers)
+            {
+                if (strcmp(layerProps.layerName, layerName) == 0)
+                {
+                    layerFound = true;
+                    break;
+                }
+            }
+
+            if (!layerFound)
+            {
+                 return false;
+            }
+        }
+
+        // Every layer is supported.
+        return true;
+    }
+
     void Window::CleanupVulkanWindow()
     {
         //ImGui_ImplVulkanH_DestroyWindow(g_Instance, _device, &g_MainWindowData, g_Allocator);

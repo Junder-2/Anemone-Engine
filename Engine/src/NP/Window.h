@@ -54,6 +54,7 @@ namespace Engine
 
         // Vulkan
         static void CheckVKResult(VkResult err);
+        bool CheckValidationLayers();
         static void CleanupVulkanWindow();
         static void CleanupVulkan();
 
@@ -67,6 +68,9 @@ namespace Engine
 
         // Vulkan
         inline static VkDevice _device = VK_NULL_HANDLE;
+        const std::vector<const char*> _validationLayers = {
+            "VK_LAYER_KHRONOS_validation"
+        };
 
         ImGuiIO* _io;
         bool _showDemoWindow = true;
