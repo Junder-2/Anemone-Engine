@@ -132,9 +132,7 @@ namespace Engine
         // Cleanup
         const VkResult err = vkDeviceWaitIdle(_device);
         CheckVKResult(err);
-        ImGui_ImplVulkan_Shutdown();
-        ImGui_ImplSDL2_Shutdown();
-        ImGui::DestroyContext();
+        CleanupImGui();
 
         CleanupVulkanWindow();
         CleanupVulkan();
@@ -148,6 +146,14 @@ namespace Engine
     {
         //todo
         _windowData.VSync = enabled;
+    }
+
+    // ImGui
+    void Window::CleanupImGui()
+    {
+        ImGui_ImplVulkan_Shutdown();
+        ImGui_ImplSDL2_Shutdown();
+        ImGui::DestroyContext();
     }
 
     // Vulkan

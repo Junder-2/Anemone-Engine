@@ -49,6 +49,9 @@ namespace Engine
         void Init(const WindowProperties& props);
         void Shutdown();
 
+        // ImGui
+        static void CleanupImGui();
+
         // Vulkan
         static void CheckVKResult(VkResult err);
         static void CleanupVulkanWindow();
