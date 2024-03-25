@@ -58,6 +58,7 @@ namespace Engine
         static ImVector<const char*> GetAvailableExtensions(SDL_Window* window);
         static bool CheckValidationLayers();
         static void CreateVulkanInstance(const ImVector<const char*>& extensions);
+        static void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height);
         static void CleanupVulkanWindow();
         static void CleanupVulkan();
 
@@ -78,11 +79,14 @@ namespace Engine
 
         inline static VkAllocationCallbacks* g_Allocator = nullptr;
         inline static VkInstance g_Instance = VK_NULL_HANDLE;
+        inline static VkPhysicalDevice g_PhysicalDevice = VK_NULL_HANDLE;
         inline static VkDevice g_Device = VK_NULL_HANDLE;
+        inline static uint32_t g_QueueFamily = (uint32_t)-1;
         inline static VkDescriptorPool g_DescriptorPool = VK_NULL_HANDLE;
 
         // ImGui
         inline static ImGui_ImplVulkanH_Window g_MainWindowData;
+        inline static uint32_t g_MinImageCount = 2;
 
         ImGuiIO* _io;
         bool _showDemoWindow = true;
