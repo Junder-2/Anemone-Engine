@@ -79,7 +79,7 @@ namespace Engine
         initInfo.ImageCount = wd->ImageCount;
         initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
         initInfo.Allocator = g_Allocator;
-        initInfo.CheckVkResultFn = CheckVKResult;
+        initInfo.CheckVkResultFn = CheckVkResult;
         ImGui_ImplVulkan_Init(&initInfo);
     }
 
@@ -152,7 +152,7 @@ namespace Engine
     {
         // Cleanup
         const VkResult err = vkDeviceWaitIdle(g_Device);
-        CheckVKResult(err);
+        CheckVkResult(err);
         CleanupImGui();
 
         CleanupVulkanWindow();
@@ -177,7 +177,7 @@ namespace Engine
     }
 
     // Vulkan
-    void Window::CheckVKResult(VkResult err)
+    void Window::CheckVkResult(VkResult err)
     {
         if (err == 0)
             return;
@@ -263,7 +263,7 @@ namespace Engine
         ImVector<VkExtensionProperties> properties;
         properties.resize(propertiesCount);
         err = vkEnumerateInstanceExtensionProperties(nullptr, &propertiesCount, properties.Data);
-        CheckVKResult(err);
+        CheckVkResult(err);
 
         // Validation layers
         createInfo.enabledLayerCount = 0;
@@ -288,20 +288,20 @@ namespace Engine
         createInfo.enabledExtensionCount = (uint32_t)extensions.Size;
         createInfo.ppEnabledExtensionNames = extensions.Data;
         err = vkCreateInstance(&createInfo, g_Allocator, &g_Instance);
-        CheckVKResult(err);
+        CheckVkResult(err);
     }
 
     VkPhysicalDevice Window::SelectPhysicalDevice()
     {
         uint32_t gpuCount;
         VkResult err = vkEnumeratePhysicalDevices(g_Instance, &gpuCount, nullptr);
-        CheckVKResult(err);
+        CheckVkResult(err);
         IM_ASSERT(gpuCount > 0);
 
         ImVector<VkPhysicalDevice> gpus;
         gpus.resize(gpuCount);
         err = vkEnumeratePhysicalDevices(g_Instance, &gpuCount, gpus.Data);
-        CheckVKResult(err);
+        CheckVkResult(err);
 
         // If a number >1 of GPUs got reported, find discrete GPU if present, or use first one available. This covers
         // most common cases (multi-gpu/integrated+dedicated graphics). Handling more complicated setups (multiple
@@ -394,7 +394,7 @@ namespace Engine
         }
 
         VkResult err = vkCreateDevice(g_PhysicalDevice, &createInfo, g_Allocator, &g_Device);
-        CheckVKResult(err);
+        CheckVkResult(err);
         vkGetDeviceQueue(g_Device, g_QueueFamily.GraphicsFamily.value(), 0, &g_Queue);
     }
 
@@ -413,7 +413,7 @@ namespace Engine
         poolInfo.pPoolSizes = poolSizes;
 
         VkResult err = vkCreateDescriptorPool(g_Device, &poolInfo, g_Allocator, &g_DescriptorPool);
-        CheckVKResult(err);
+        CheckVkResult(err);
     }
 
     void Window::SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height)
@@ -470,7 +470,7 @@ namespace Engine
         PopulateDebugMessengerCreateInfo(createInfo);
 
         VkResult err = CreateDebugUtilsMessengerEXT(g_Instance, &createInfo, nullptr, &g_DebugMessenger);
-        CheckVKResult(err);
+        CheckVkResult(err);
     }
 
     void Window::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)

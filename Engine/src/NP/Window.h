@@ -85,7 +85,7 @@ namespace Engine
         static void CleanupImGui();
 
         // Vulkan
-        static void CheckVKResult(VkResult err);
+        static void CheckVkResult(VkResult err);
 
         static void SetupVulkan(SDL_Window* window);
 
