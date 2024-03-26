@@ -384,6 +384,24 @@ namespace Engine
         vkGetDeviceQueue(g_Device, g_QueueFamily.GraphicsFamily.value(), 0, &g_Queue);
     }
 
+    void Window::CreateDescriptorPool()
+    {
+        VkDescriptorPoolSize poolSizes[] =
+        {
+            { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1 },
+        };
+
+        VkDescriptorPoolCreateInfo poolInfo = {};
+        poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+        poolInfo.maxSets = 1;
+        poolInfo.poolSizeCount = (uint32_t)IM_ARRAYSIZE(poolSizes);
+        poolInfo.pPoolSizes = poolSizes;
+
+        VkResult err = vkCreateDescriptorPool(g_Device, &poolInfo, g_Allocator, &g_DescriptorPool);
+        CheckVKResult(err);
+    }
+
     void Window::SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height)
     {
         wd->Surface = surface;

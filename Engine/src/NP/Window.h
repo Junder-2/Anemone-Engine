@@ -98,6 +98,8 @@ namespace Engine
 
         static void CreateLogicalDevice();
 
+        static void CreateDescriptorPool();
+
         static void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height);
 
         static void CleanupVulkanWindow();
