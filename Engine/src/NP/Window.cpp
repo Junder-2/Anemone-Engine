@@ -518,6 +518,32 @@ namespace Engine
         }
     }
 
+    // TODO: Figure out what most of this code does.
+    void Window::RevealFrame(ImGui_ImplVulkanH_Window* wd)
+    {
+        if (g_SwapChainRebuild) return;
+
+        VkSemaphore renderCompleteSemaphore = wd->FrameSemaphores[wd->SemaphoreIndex].RenderCompleteSemaphore;
+
+        VkPresentInfoKHR info = {};
+        info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        info.waitSemaphoreCount = 1;
+        info.pWaitSemaphores = &renderCompleteSemaphore;
+        info.swapchainCount = 1;
+        info.pSwapchains = &wd->Swapchain;
+        info.pImageIndices = &wd->FrameIndex;
+
+        VkResult err = vkQueuePresentKHR(g_Queue, &info);
+        if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR)
+        {
+            g_SwapChainRebuild = true;
+            return;
+        }
+        CheckVkResult(err);
+
+        wd->SemaphoreIndex = (wd->SemaphoreIndex + 1) % wd->SemaphoreCount; // Now we can use the next set of semaphores
+    }
+
     void Window::CleanupVulkanWindow()
     {
         ImGui_ImplVulkanH_DestroyWindow(g_Instance, g_Device, &g_MainWindowData, g_Allocator);

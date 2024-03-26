@@ -106,6 +106,7 @@ namespace Engine
         static void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height);
 
         inline static void RenderFrame(ImGui_ImplVulkanH_Window* wd, ImDrawData* draw_data);
+        inline static void RevealFrame(ImGui_ImplVulkanH_Window* wd);
 
         static void CleanupVulkanWindow();
         static void CleanupVulkan();
