@@ -165,6 +165,10 @@ namespace Engine
         const bool isMinimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
         if (!isMinimized)
         {
+            g_MainWindowData.ClearValue.color.float32[0] = _clearColor.x * _clearColor.w;
+            g_MainWindowData.ClearValue.color.float32[1] = _clearColor.y * _clearColor.w;
+            g_MainWindowData.ClearValue.color.float32[2] = _clearColor.z * _clearColor.w;
+            g_MainWindowData.ClearValue.color.float32[3] = _clearColor.w;
             RenderFrame(&g_MainWindowData, drawData);
             RevealFrame(&g_MainWindowData);
         }
