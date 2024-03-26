@@ -379,7 +379,7 @@ namespace Engine
             createInfo.enabledLayerCount = 0;
         }
 
-        VkResult err = vkCreateDevice(g_PhysicalDevice, &createInfo, nullptr, &g_Device);
+        VkResult err = vkCreateDevice(g_PhysicalDevice, &createInfo, g_Allocator, &g_Device);
         CheckVKResult(err);
         vkGetDeviceQueue(g_Device, g_QueueFamily.GraphicsFamily.value(), 0, &g_Queue);
     }
