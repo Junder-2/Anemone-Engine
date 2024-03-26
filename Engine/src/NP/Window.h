@@ -48,6 +48,16 @@ namespace Engine
         }
     };
 
+    struct QueueFamilyIndices
+    {
+        std::optional<uint32_t> GraphicsFamily;
+
+        bool HasFamily() const
+        {
+            return GraphicsFamily.has_value();
+        }
+    };
+
     class NP_API Window
     {
     public:
@@ -83,6 +93,8 @@ namespace Engine
         static VkPhysicalDevice SelectPhysicalDevice();
         static bool IsDeviceCompatible(const VkPhysicalDevice& device);
         static int GetDeviceScore(const VkPhysicalDevice& device);
+
+        static QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
 
         static void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height);
 

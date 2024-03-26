@@ -320,6 +320,28 @@ namespace Engine
         return 0;
     }
 
+    QueueFamilyIndices Window::FindQueueFamilies(VkPhysicalDevice device)
+    {
+        QueueFamilyIndices indices;
+
+        uint32_t queueCount;
+        vkGetPhysicalDeviceQueueFamilyProperties(g_PhysicalDevice, &queueCount, nullptr);
+        ImVector<VkQueueFamilyProperties> queueFamilies;
+        queueFamilies.resize(queueCount);
+        vkGetPhysicalDeviceQueueFamilyProperties(g_PhysicalDevice, &queueCount, queueFamilies.Data);
+
+        for (uint32_t i = 0; i < queueCount; i++)
+        {
+            if (queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+            {
+                indices.GraphicsFamily = i;
+                break;
+            }
+        }
+
+        return indices;
+    }
+
     void Window::SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height)
     {
         wd->Surface = surface;
