@@ -87,7 +87,7 @@ namespace Engine
 
     void Window::OnUpdate(float deltaTime)
     {
-        InputManager* inputManager = Application::Get().GetInputManager();
+        InputManager* inputManager = &Application::Get().GetInputManager();
         inputManager->OnUpdate();
 
         SDL_Event event;
