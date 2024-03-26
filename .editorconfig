@@ -9,3 +9,9 @@ insert_final_newline = false
 trim_trailing_whitespace = true
 indent_style = space
 indent_size = 4
+
+# ReSharper properties
+resharper_cpp_case_block_braces = next_line
+resharper_cpp_wrap_lines = false
+resharper_indent_preprocessor_directives = normal
+resharper_indent_switch_labels = true
