@@ -162,8 +162,12 @@ namespace Engine
         // Rendering
         ImGui::Render();
         ImDrawData* drawData = ImGui::GetDrawData();
-        RenderFrame(&g_MainWindowData, drawData);
-        RevealFrame(&g_MainWindowData);
+        const bool isMinimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
+        if (!isMinimized)
+        {
+            RenderFrame(&g_MainWindowData, drawData);
+            RevealFrame(&g_MainWindowData);
+        }
     }
 
     void Window::Shutdown()
