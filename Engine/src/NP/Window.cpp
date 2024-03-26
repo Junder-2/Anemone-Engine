@@ -296,9 +296,7 @@ namespace Engine
         // dedicated GPUs) is out of scope of this sample. - example_sdl2_vulkan
         for (const VkPhysicalDevice& device : gpus)
         {
-            VkPhysicalDeviceProperties properties;
-            vkGetPhysicalDeviceProperties(device, &properties);
-            if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+            if (IsDeviceCompatible(device))
                 return device;
         }
 
@@ -306,6 +304,20 @@ namespace Engine
         if (gpuCount > 0)
             return gpus[0];
         return VK_NULL_HANDLE;
+    }
+
+    // TODO: Add more checks for features we depend on.
+    bool Window::IsDeviceCompatible(const VkPhysicalDevice& device)
+    {
+        VkPhysicalDeviceProperties properties;
+        vkGetPhysicalDeviceProperties(device, &properties);
+        return properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
+    }
+
+    // TODO: Compute score based on available memory, supported types, max texture sizes etc.
+    int Window::GetDeviceScore(const VkPhysicalDevice& device)
+    {
+        return 0;
     }
 
     void Window::SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height)
