@@ -161,6 +161,9 @@ namespace Engine
 
         // Rendering
         ImGui::Render();
+        ImDrawData* drawData = ImGui::GetDrawData();
+        RenderFrame(&g_MainWindowData, drawData);
+        RevealFrame(&g_MainWindowData);
     }
 
     void Window::Shutdown()
