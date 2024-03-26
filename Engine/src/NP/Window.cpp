@@ -106,6 +106,7 @@ namespace Engine
             }
         }
 
+        ImGui_ImplVulkan_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
