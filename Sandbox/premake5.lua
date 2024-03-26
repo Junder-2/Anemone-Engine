@@ -40,3 +40,6 @@ project "Sandbox"
 
     filter "configurations:Release"
         optimize "on"
+
+    filter "configurations:Dist"
+        optimize "on"

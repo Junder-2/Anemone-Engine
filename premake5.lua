@@ -4,15 +4,16 @@ workspace "NP-Engine"
     architecture "x64"
     startproject "Sandbox"
 
-    defines
-    {
-        "SPDLOG_USE_STD_FORMAT"
-    }
-
     configurations
     {
         "Debug",
-        "Release"
+        "Release",
+        "Dist"
+    }
+
+    defines
+    {
+        "SPDLOG_USE_STD_FORMAT"
     }
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"

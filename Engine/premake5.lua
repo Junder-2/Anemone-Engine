@@ -65,3 +65,8 @@ project "Engine"
 
     filter "configurations:Release"
         optimize "on"
+        symbols "on"
+
+    filter "configurations:Dist"
+        optimize "on"
+        symbols "off"
