@@ -42,6 +42,8 @@ namespace Engine
         const ImVector<const char*> extensions = GetAvailableExtensions(_windowContext);
         CreateVulkanInstance(extensions);
 
+        SetupDebugMessenger();
+
         // Select Physical Device (GPU)
         g_PhysicalDevice = SelectPhysicalDevice();
 
@@ -159,6 +161,7 @@ namespace Engine
         CheckVKResult(err);
         CleanupImGui();
 
+        if (enableValidationLayers) DestroyDebugUtilsMessengerEXT(g_Instance, g_DebugMessenger, nullptr);
         CleanupVulkanWindow();
         CleanupVulkan();
 
@@ -252,12 +255,17 @@ namespace Engine
 
         // Validation layers
         createInfo.enabledLayerCount = 0;
+        createInfo.pNext = nullptr;
+        VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo = {};
         if (enableValidationLayers)
         {
             if (CheckValidationLayers())
             {
                 createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
                 createInfo.ppEnabledLayerNames = validationLayers.data();
+
+                PopulateDebugMessengerCreateInfo(debugCreateInfo);
+                createInfo.pNext = &debugCreateInfo;
             }
             else
             {
@@ -342,6 +350,59 @@ namespace Engine
 
         vkDestroyDevice(g_Device, g_Allocator);
         vkDestroyInstance(g_Instance, g_Allocator);
+    }
+
+    void Window::SetupDebugMessenger()
+    {
+        if (!enableValidationLayers) return;
+
+        VkDebugUtilsMessengerCreateInfoEXT createInfo;
+        PopulateDebugMessengerCreateInfo(createInfo);
+
+        VkResult err = CreateDebugUtilsMessengerEXT(g_Instance, &createInfo, nullptr, &g_DebugMessenger);
+        CheckVKResult(err);
+    }
+
+    void Window::PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo)
+    {
+        createInfo = {};
+        createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+        createInfo.messageSeverity =
+              VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
+            | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
+            | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+        createInfo.messageType =
+            VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
+            | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
+            | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+        createInfo.pfnUserCallback = DebugCallback;
+        createInfo.pUserData = nullptr;
+    }
+
+    VkBool32 Window::DebugCallback(
+        VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+        VkDebugUtilsMessageTypeFlagsEXT messageType,
+        const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+        void* pUserData)
+    {
+        if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+        {
+            NP_ENGINE_LOG_ERROR("Validation layer: {0}", pCallbackData->pMessage);
+        }
+        else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+        {
+            NP_ENGINE_LOG_WARN("Validation layer: {0}", pCallbackData->pMessage);
+        }
+        //else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
+        //{
+        //    NP_ENGINE_LOG_INFO("Validation layer: {0}", pCallbackData->pMessage);
+        //}
+        //else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT)
+        //{
+        //    NP_ENGINE_LOG_INFO("Validation layer: {0}", pCallbackData->pMessage);
+        //}
+
+        return VK_FALSE;
     }
 
     std::unique_ptr<Window> Window::Create(const WindowProperties& props)

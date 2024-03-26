@@ -11,6 +11,27 @@
 //#include "SDL.h"
 //#include "vulkan/vulkan_core.h"
 
+// Proxy functions
+inline VkResult CreateDebugUtilsMessengerEXT(
+    VkInstance instance,
+    const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+    const VkAllocationCallbacks* pAllocator,
+    VkDebugUtilsMessengerEXT* pDebugMessenger)
+{
+    auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+    if (func != nullptr)
+        return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
+
+    return VK_ERROR_EXTENSION_NOT_PRESENT;
+}
+
+inline void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator) {
+    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+    if (func != nullptr) {
+        func(instance, debugMessenger, pAllocator);
+    }
+}
+
 namespace Engine
 {
     struct NP_API WindowProperties
@@ -60,8 +81,17 @@ namespace Engine
         static void CreateVulkanInstance(const ImVector<const char*>& extensions);
         static VkPhysicalDevice SelectPhysicalDevice();
         static void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height);
+
         static void CleanupVulkanWindow();
         static void CleanupVulkan();
+
+        static void SetupDebugMessenger();
+        static void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
+        static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
+            VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+            VkDebugUtilsMessageTypeFlagsEXT messageType,
+            const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+            void* pUserData);
 
     private:
         SDL_Window* _windowContext;
@@ -80,6 +110,7 @@ namespace Engine
 
         inline static VkAllocationCallbacks* g_Allocator = nullptr;
         inline static VkInstance g_Instance = VK_NULL_HANDLE;
+        inline static VkDebugUtilsMessengerEXT g_DebugMessenger;
         inline static VkPhysicalDevice g_PhysicalDevice = VK_NULL_HANDLE;
         inline static VkDevice g_Device = VK_NULL_HANDLE;
         inline static uint32_t g_QueueFamily = (uint32_t)-1;
