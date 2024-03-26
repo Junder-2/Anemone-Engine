@@ -134,20 +134,20 @@ namespace Engine
             "VK_LAYER_KHRONOS_validation"
         };
 
-        inline static VkAllocationCallbacks* g_Allocator = nullptr;
-        inline static VkInstance g_Instance = VK_NULL_HANDLE;
-        inline static VkDebugUtilsMessengerEXT g_DebugMessenger;
-        inline static VkPhysicalDevice g_PhysicalDevice = VK_NULL_HANDLE;
-        inline static VkDevice g_Device = VK_NULL_HANDLE;
-        inline static QueueFamilyIndices g_QueueFamily = (QueueFamilyIndices)-1;
-        inline static VkQueue g_Queue = VK_NULL_HANDLE;
-        inline static VkPipelineCache g_PipelineCache = VK_NULL_HANDLE;
-        inline static VkDescriptorPool g_DescriptorPool = VK_NULL_HANDLE;
+        inline static VkAllocationCallbacks* _allocator = nullptr;
+        inline static VkInstance _instance = VK_NULL_HANDLE;
+        inline static VkDebugUtilsMessengerEXT _debugMessenger;
+        inline static VkPhysicalDevice _physicalDevice = VK_NULL_HANDLE;
+        inline static VkDevice _device = VK_NULL_HANDLE;
+        inline static QueueFamilyIndices _queueFamily = (QueueFamilyIndices)-1;
+        inline static VkQueue _queue = VK_NULL_HANDLE;
+        inline static VkPipelineCache _pipelineCache = VK_NULL_HANDLE;
+        inline static VkDescriptorPool _descriptorPool = VK_NULL_HANDLE;
 
         // ImGui
-        inline static ImGui_ImplVulkanH_Window g_MainWindowData;
-        inline static uint32_t g_MinImageCount = 2;
-        inline static bool g_SwapChainRebuild = false;
+        inline static ImGui_ImplVulkanH_Window _mainWindowData;
+        inline static uint32_t _minImageCount = 2;
+        inline static bool _swapChainRebuild = false;
 
         ImGuiIO* _io;
         bool _showDemoWindow = true;

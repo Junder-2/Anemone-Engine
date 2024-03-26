@@ -42,14 +42,14 @@ namespace Engine
         SetupVulkan(_windowContext);
 
         VkSurfaceKHR surface;
-        if (SDL_Vulkan_CreateSurface(_windowContext, g_Instance, &surface) == 0)
+        if (SDL_Vulkan_CreateSurface(_windowContext, _instance, &surface) == 0)
         {
             NP_ENGINE_LOG_ERROR("Could not create Vulkan surface.\n");
         }
 
         int w, h;
         SDL_GetWindowSize(_windowContext, &w, &h);
-        ImGui_ImplVulkanH_Window* wd = &g_MainWindowData;
+        ImGui_ImplVulkanH_Window* wd = &_mainWindowData;
         SetupVulkanWindow(wd, surface, w, h);
 
         // Setup Dear ImGui context
@@ -66,19 +66,19 @@ namespace Engine
         // Setup Platform/Renderer backends
         ImGui_ImplSDL2_InitForVulkan(_windowContext);
         ImGui_ImplVulkan_InitInfo initInfo = {};
-        initInfo.Instance = g_Instance;
-        initInfo.PhysicalDevice = g_PhysicalDevice;
-        initInfo.Device = g_Device;
-        initInfo.QueueFamily = g_QueueFamily.GraphicsFamily.value();
-        initInfo.Queue = g_Queue;
-        initInfo.PipelineCache = g_PipelineCache;
-        initInfo.DescriptorPool = g_DescriptorPool;
+        initInfo.Instance = _instance;
+        initInfo.PhysicalDevice = _physicalDevice;
+        initInfo.Device = _device;
+        initInfo.QueueFamily = _queueFamily.GraphicsFamily.value();
+        initInfo.Queue = _queue;
+        initInfo.PipelineCache = _pipelineCache;
+        initInfo.DescriptorPool = _descriptorPool;
         initInfo.RenderPass = wd->RenderPass;
         initInfo.Subpass = 0;
-        initInfo.MinImageCount = g_MinImageCount;
+        initInfo.MinImageCount = _minImageCount;
         initInfo.ImageCount = wd->ImageCount;
         initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
-        initInfo.Allocator = g_Allocator;
+        initInfo.Allocator = _allocator;
         initInfo.CheckVkResultFn = CheckVkResult;
         ImGui_ImplVulkan_Init(&initInfo);
     }
@@ -107,16 +107,16 @@ namespace Engine
         }
 
         // Resize swap chain?
-        if (g_SwapChainRebuild)
+        if (_swapChainRebuild)
         {
             int width, height;
             SDL_GetWindowSize(_windowContext, &width, &height);
             if (width > 0 && height > 0)
             {
-                ImGui_ImplVulkan_SetMinImageCount(g_MinImageCount);
-                ImGui_ImplVulkanH_CreateOrResizeWindow(g_Instance, g_PhysicalDevice, g_Device, &g_MainWindowData, g_QueueFamily.GraphicsFamily.value(), g_Allocator, width, height, g_MinImageCount);
-                g_MainWindowData.FrameIndex = 0;
-                g_SwapChainRebuild = false;
+                ImGui_ImplVulkan_SetMinImageCount(_minImageCount);
+                ImGui_ImplVulkanH_CreateOrResizeWindow(_instance, _physicalDevice, _device, &_mainWindowData, _queueFamily.GraphicsFamily.value(), _allocator, width, height, _minImageCount);
+                _mainWindowData.FrameIndex = 0;
+                _swapChainRebuild = false;
             }
         }
 
@@ -165,19 +165,19 @@ namespace Engine
         const bool isMinimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
         if (!isMinimized)
         {
-            g_MainWindowData.ClearValue.color.float32[0] = _clearColor.x * _clearColor.w;
-            g_MainWindowData.ClearValue.color.float32[1] = _clearColor.y * _clearColor.w;
-            g_MainWindowData.ClearValue.color.float32[2] = _clearColor.z * _clearColor.w;
-            g_MainWindowData.ClearValue.color.float32[3] = _clearColor.w;
-            RenderFrame(&g_MainWindowData, drawData);
-            RevealFrame(&g_MainWindowData);
+            _mainWindowData.ClearValue.color.float32[0] = _clearColor.x * _clearColor.w;
+            _mainWindowData.ClearValue.color.float32[1] = _clearColor.y * _clearColor.w;
+            _mainWindowData.ClearValue.color.float32[2] = _clearColor.z * _clearColor.w;
+            _mainWindowData.ClearValue.color.float32[3] = _clearColor.w;
+            RenderFrame(&_mainWindowData, drawData);
+            RevealFrame(&_mainWindowData);
         }
     }
 
     void Window::Shutdown()
     {
         // Cleanup
-        const VkResult err = vkDeviceWaitIdle(g_Device);
+        const VkResult err = vkDeviceWaitIdle(_device);
         CheckVkResult(err);
         CleanupImGui();
 
@@ -220,9 +220,9 @@ namespace Engine
         SetupDebugMessenger();
 
         // Select Physical Device (GPU)
-        g_PhysicalDevice = SelectPhysicalDevice();
+        _physicalDevice = SelectPhysicalDevice();
 
-        g_QueueFamily = FindQueueFamilies(g_PhysicalDevice);
+        _queueFamily = FindQueueFamilies(_physicalDevice);
 
         // Create Logical Device (with 1 queue)
         CreateLogicalDevice();
@@ -313,20 +313,20 @@ namespace Engine
 
         createInfo.enabledExtensionCount = (uint32_t)extensions.Size;
         createInfo.ppEnabledExtensionNames = extensions.Data;
-        err = vkCreateInstance(&createInfo, g_Allocator, &g_Instance);
+        err = vkCreateInstance(&createInfo, _allocator, &_instance);
         CheckVkResult(err);
     }
 
     VkPhysicalDevice Window::SelectPhysicalDevice()
     {
         uint32_t gpuCount;
-        VkResult err = vkEnumeratePhysicalDevices(g_Instance, &gpuCount, nullptr);
+        VkResult err = vkEnumeratePhysicalDevices(_instance, &gpuCount, nullptr);
         CheckVkResult(err);
         IM_ASSERT(gpuCount > 0);
 
         ImVector<VkPhysicalDevice> gpus;
         gpus.resize(gpuCount);
-        err = vkEnumeratePhysicalDevices(g_Instance, &gpuCount, gpus.Data);
+        err = vkEnumeratePhysicalDevices(_instance, &gpuCount, gpus.Data);
         CheckVkResult(err);
 
         // If a number >1 of GPUs got reported, find discrete GPU if present, or use first one available. This covers
@@ -387,7 +387,7 @@ namespace Engine
         constexpr float priority = 1.0f;
         VkDeviceQueueCreateInfo queueCreateInfo = {};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        queueCreateInfo.queueFamilyIndex = g_QueueFamily.GraphicsFamily.value();
+        queueCreateInfo.queueFamilyIndex = _queueFamily.GraphicsFamily.value();
         queueCreateInfo.queueCount = 1;
         queueCreateInfo.pQueuePriorities = &priority;
 
@@ -419,9 +419,9 @@ namespace Engine
             createInfo.enabledLayerCount = 0;
         }
 
-        VkResult err = vkCreateDevice(g_PhysicalDevice, &createInfo, g_Allocator, &g_Device);
+        VkResult err = vkCreateDevice(_physicalDevice, &createInfo, _allocator, &_device);
         CheckVkResult(err);
-        vkGetDeviceQueue(g_Device, g_QueueFamily.GraphicsFamily.value(), 0, &g_Queue);
+        vkGetDeviceQueue(_device, _queueFamily.GraphicsFamily.value(), 0, &_queue);
     }
 
     void Window::CreateDescriptorPool()
@@ -438,7 +438,7 @@ namespace Engine
         poolInfo.poolSizeCount = (uint32_t)IM_ARRAYSIZE(poolSizes);
         poolInfo.pPoolSizes = poolSizes;
 
-        VkResult err = vkCreateDescriptorPool(g_Device, &poolInfo, g_Allocator, &g_DescriptorPool);
+        VkResult err = vkCreateDescriptorPool(_device, &poolInfo, _allocator, &_descriptorPool);
         CheckVkResult(err);
     }
 
@@ -448,7 +448,7 @@ namespace Engine
 
         // Check for WSI support
         VkBool32 res;
-        vkGetPhysicalDeviceSurfaceSupportKHR(g_PhysicalDevice, g_QueueFamily.GraphicsFamily.value(), wd->Surface, &res);
+        vkGetPhysicalDeviceSurfaceSupportKHR(_physicalDevice, _queueFamily.GraphicsFamily.value(), wd->Surface, &res);
         if (res != VK_TRUE)
         {
             NP_ENGINE_LOG_ERROR("Error no WSI support on physical device 0\n");
@@ -457,7 +457,7 @@ namespace Engine
         // Select Surface Format
         constexpr VkFormat requestSurfaceImageFormat[] = { VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_R8G8B8A8_UNORM, VK_FORMAT_B8G8R8_UNORM, VK_FORMAT_R8G8B8_UNORM };
         constexpr VkColorSpaceKHR requestSurfaceColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
-        wd->SurfaceFormat = ImGui_ImplVulkanH_SelectSurfaceFormat(g_PhysicalDevice, wd->Surface, requestSurfaceImageFormat, (size_t)IM_ARRAYSIZE(requestSurfaceImageFormat), requestSurfaceColorSpace);
+        wd->SurfaceFormat = ImGui_ImplVulkanH_SelectSurfaceFormat(_physicalDevice, wd->Surface, requestSurfaceImageFormat, (size_t)IM_ARRAYSIZE(requestSurfaceImageFormat), requestSurfaceColorSpace);
 
         // Select Present Mode
         #ifdef APP_UNLIMITED_FRAME_RATE
@@ -465,12 +465,12 @@ namespace Engine
         #else
             VkPresentModeKHR present_modes[] = { VK_PRESENT_MODE_FIFO_KHR };
         #endif
-        wd->PresentMode = ImGui_ImplVulkanH_SelectPresentMode(g_PhysicalDevice, wd->Surface, &present_modes[0], IM_ARRAYSIZE(present_modes));
+        wd->PresentMode = ImGui_ImplVulkanH_SelectPresentMode(_physicalDevice, wd->Surface, &present_modes[0], IM_ARRAYSIZE(present_modes));
         //NP_ENGINE_LOG_INFO("Vulkan Info: Selected PresentMode = {0}", wd->PresentMode);
 
         // Create SwapChain, RenderPass, Framebuffer, etc.
-        IM_ASSERT(g_MinImageCount >= 2);
-        ImGui_ImplVulkanH_CreateOrResizeWindow(g_Instance, g_PhysicalDevice, g_Device, wd, g_QueueFamily.GraphicsFamily.value(), g_Allocator, width, height, g_MinImageCount);
+        IM_ASSERT(_minImageCount >= 2);
+        ImGui_ImplVulkanH_CreateOrResizeWindow(_instance, _physicalDevice, _device, wd, _queueFamily.GraphicsFamily.value(), _allocator, width, height, _minImageCount);
     }
 
     // TODO: Figure out what most of this code does.
@@ -478,24 +478,24 @@ namespace Engine
     {
         VkSemaphore image_acquired_semaphore  = wd->FrameSemaphores[wd->SemaphoreIndex].ImageAcquiredSemaphore;
         VkSemaphore render_complete_semaphore = wd->FrameSemaphores[wd->SemaphoreIndex].RenderCompleteSemaphore;
-        VkResult err = vkAcquireNextImageKHR(g_Device, wd->Swapchain, UINT64_MAX, image_acquired_semaphore, VK_NULL_HANDLE, &wd->FrameIndex);
+        VkResult err = vkAcquireNextImageKHR(_device, wd->Swapchain, UINT64_MAX, image_acquired_semaphore, VK_NULL_HANDLE, &wd->FrameIndex);
         if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR)
         {
-            g_SwapChainRebuild = true;
+            _swapChainRebuild = true;
             return;
         }
         CheckVkResult(err);
 
         ImGui_ImplVulkanH_Frame* fd = &wd->Frames[wd->FrameIndex];
         {
-            err = vkWaitForFences(g_Device, 1, &fd->Fence, VK_TRUE, UINT64_MAX); // Wait indefinitely instead of periodically checking
+            err = vkWaitForFences(_device, 1, &fd->Fence, VK_TRUE, UINT64_MAX); // Wait indefinitely instead of periodically checking
             CheckVkResult(err);
 
-            err = vkResetFences(g_Device, 1, &fd->Fence);
+            err = vkResetFences(_device, 1, &fd->Fence);
             CheckVkResult(err);
         }
         {
-            err = vkResetCommandPool(g_Device, fd->CommandPool, 0);
+            err = vkResetCommandPool(_device, fd->CommandPool, 0);
             CheckVkResult(err);
 
             VkCommandBufferBeginInfo info = {};
@@ -538,7 +538,7 @@ namespace Engine
 
             err = vkEndCommandBuffer(fd->CommandBuffer);
             CheckVkResult(err);
-            err = vkQueueSubmit(g_Queue, 1, &info, fd->Fence);
+            err = vkQueueSubmit(_queue, 1, &info, fd->Fence);
             CheckVkResult(err);
         }
     }
@@ -546,7 +546,7 @@ namespace Engine
     // TODO: Figure out what most of this code does.
     void Window::RevealFrame(ImGui_ImplVulkanH_Window* wd)
     {
-        if (g_SwapChainRebuild) return;
+        if (_swapChainRebuild) return;
 
         VkSemaphore renderCompleteSemaphore = wd->FrameSemaphores[wd->SemaphoreIndex].RenderCompleteSemaphore;
 
@@ -558,10 +558,10 @@ namespace Engine
         info.pSwapchains = &wd->Swapchain;
         info.pImageIndices = &wd->FrameIndex;
 
-        VkResult err = vkQueuePresentKHR(g_Queue, &info);
+        VkResult err = vkQueuePresentKHR(_queue, &info);
         if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR)
         {
-            g_SwapChainRebuild = true;
+            _swapChainRebuild = true;
             return;
         }
         CheckVkResult(err);
@@ -571,17 +571,17 @@ namespace Engine
 
     void Window::CleanupVulkanWindow()
     {
-        ImGui_ImplVulkanH_DestroyWindow(g_Instance, g_Device, &g_MainWindowData, g_Allocator);
+        ImGui_ImplVulkanH_DestroyWindow(_instance, _device, &_mainWindowData, _allocator);
     }
 
     void Window::CleanupVulkan()
     {
-        if (enableValidationLayers) DestroyDebugUtilsMessengerEXT(g_Instance, g_DebugMessenger, nullptr);
+        if (enableValidationLayers) DestroyDebugUtilsMessengerEXT(_instance, _debugMessenger, nullptr);
 
-        vkDestroyDescriptorPool(g_Device, g_DescriptorPool, g_Allocator);
+        vkDestroyDescriptorPool(_device, _descriptorPool, _allocator);
 
-        vkDestroyDevice(g_Device, g_Allocator);
-        vkDestroyInstance(g_Instance, g_Allocator);
+        vkDestroyDevice(_device, _allocator);
+        vkDestroyInstance(_instance, _allocator);
     }
 
     void Window::SetupDebugMessenger()
@@ -591,7 +591,7 @@ namespace Engine
         VkDebugUtilsMessengerCreateInfoEXT createInfo;
         PopulateDebugMessengerCreateInfo(createInfo);
 
-        VkResult err = CreateDebugUtilsMessengerEXT(g_Instance, &createInfo, nullptr, &g_DebugMessenger);
+        VkResult err = CreateDebugUtilsMessengerEXT(_instance, &createInfo, nullptr, &_debugMessenger);
         CheckVkResult(err);
     }
 
