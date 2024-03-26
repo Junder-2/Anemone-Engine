@@ -358,7 +358,6 @@ namespace Engine
 
     void Window::CreateLogicalDevice()
     {
-
         constexpr float priority = 1.0f;
         VkDeviceQueueCreateInfo queueCreateInfo = {};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -376,8 +375,14 @@ namespace Engine
 
         createInfo.pEnabledFeatures = &deviceFeatures;
 
-        createInfo.enabledExtensionCount = 0;
+        // Extensions
+        ImVector<const char*> deviceExtensions;
+        deviceExtensions.push_back("VK_KHR_swapchain");
 
+        createInfo.enabledExtensionCount = (uint32_t)deviceExtensions.Size;
+        createInfo.ppEnabledExtensionNames = deviceExtensions.Data;
+
+        // Layers
         if (enableValidationLayers)
         {
             createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
