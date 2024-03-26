@@ -39,16 +39,7 @@ namespace Engine
         }
 
         // Vulkan
-        const ImVector<const char*> extensions = GetAvailableExtensions(_windowContext);
-        CreateVulkanInstance(extensions);
-
-        SetupDebugMessenger();
-
-        // Select Physical Device (GPU)
-        g_PhysicalDevice = SelectPhysicalDevice();
-
-        // Create Logical Device (with 1 queue)
-        CreateLogicalDevice();
+        SetupVulkan(_windowContext);
 
         VkSurfaceKHR surface;
         if (SDL_Vulkan_CreateSurface(_windowContext, g_Instance, &surface) == 0)
@@ -193,6 +184,23 @@ namespace Engine
         NP_ENGINE_LOG_ERROR("Vulkan Error: VkResult = {0}", (int)err);
         if (err < 0)
             abort();
+    }
+
+    void Window::SetupVulkan(SDL_Window* window)
+    {
+        const ImVector<const char*> extensions = GetAvailableExtensions(window);
+        CreateVulkanInstance(extensions);
+
+        SetupDebugMessenger();
+
+        // Select Physical Device (GPU)
+        g_PhysicalDevice = SelectPhysicalDevice();
+
+        // Create Logical Device (with 1 queue)
+        CreateLogicalDevice();
+
+        // Create Descriptor Pool
+        CreateDescriptorPool();
     }
 
     ImVector<const char*> Window::GetAvailableExtensions(SDL_Window* window)
