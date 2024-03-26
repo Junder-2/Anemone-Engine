@@ -1,8 +1,6 @@
 #pragma once
 #include <imgui_impl_vulkan.h>
-#include <SDL_render.h>
 #include <SDL_video.h>
-#include <SDL_vulkan.h>
 #include <vulkan/vulkan_core.h>
 
 #include "imgui.h"
@@ -66,7 +64,7 @@ namespace Engine
         Window(const WindowProperties& props);
         ~Window();
 
-        void OnUpdate();
+        void OnUpdate(float deltaTime);
         void SetVSync(bool enabled);
 
         bool IsVSync() const { return  _windowData.VSync; }

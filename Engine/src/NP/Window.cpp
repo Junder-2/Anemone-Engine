@@ -83,7 +83,7 @@ namespace Engine
         ImGui_ImplVulkan_Init(&initInfo);
     }
 
-    void Window::OnUpdate()
+    void Window::OnUpdate(float deltaTime)
     {
         SDL_Event event;
         while(SDL_PollEvent(&event))
@@ -91,11 +91,11 @@ namespace Engine
             ImGui_ImplSDL2_ProcessEvent(&event);
             switch (event.type)
             {
-            case SDL_QUIT:
-                if(WindowCloseDelegate) WindowCloseDelegate();
+                case SDL_QUIT:
+                    if(WindowCloseDelegate) WindowCloseDelegate();
                 break;
-            case SDL_WINDOWEVENT:
-                const auto windowEvent = event.window;
+                case SDL_WINDOWEVENT:
+                    const auto windowEvent = event.window;
                 if(event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
                 {
                     _windowData.Width = windowEvent.data1;
