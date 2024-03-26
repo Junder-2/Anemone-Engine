@@ -196,6 +196,8 @@ namespace Engine
         // Select Physical Device (GPU)
         g_PhysicalDevice = SelectPhysicalDevice();
 
+        g_QueueFamily = FindQueueFamilies(g_PhysicalDevice);
+
         // Create Logical Device (with 1 queue)
         CreateLogicalDevice();
 
@@ -356,7 +358,6 @@ namespace Engine
 
     void Window::CreateLogicalDevice()
     {
-        g_QueueFamily = FindQueueFamilies(g_PhysicalDevice);
 
         constexpr float priority = 1.0f;
         VkDeviceQueueCreateInfo queueCreateInfo = {};
