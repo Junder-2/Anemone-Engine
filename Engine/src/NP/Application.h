@@ -3,6 +3,7 @@
 #include "Core.h"
 #include "LayerStack.h"
 #include "Window.h"
+#include "Input/InputManager.h"
 
 namespace Engine
 {
@@ -21,8 +22,12 @@ namespace Engine
         void Run();
         void Shutdown();
         void OnResize(int width, int height);
+        void OnKeyTest(InputValue inputValue);
+        void OnMouseKeyTest(MouseButtonValue inputValue);
+        void OnMouseMoveTest(MouseMoveValue inputValue);
 
-        Window& GetWindowContext() { return *_windowContext; }
+        Window& GetWindowContext() const { return *_windowContext; }
+        InputManager* GetInputManager() const { return _inputManager.get(); }
 
         static Application& Get() { return *_appInstance; }
 
@@ -31,6 +36,7 @@ namespace Engine
     private:
         ApplicationSpecification _appSpec;
         std::unique_ptr<Window> _windowContext;
+        std::unique_ptr<InputManager> _inputManager;
         bool _isRunning = true;
 
         static Application* _appInstance;

@@ -1,9 +1,11 @@
 ﻿#include "nppch.h"
 #include "Application.h"
 
+#include <SDL_keycode.h>
 #include <SDL_timer.h>
 
 #include "Layer.h"
+#include "Input/InputManager.h"
 
 namespace Engine
 {
@@ -14,9 +16,15 @@ namespace Engine
         _appInstance = this;
 
         _windowContext = Window::Create(WindowProperties(_appSpec.Name));
+        _inputManager = InputManager::Create();
 
         _windowContext->WindowCloseDelegate += MakeDelegate(this, &Application::Shutdown);
         _windowContext->WindowResizeDelegate += MakeDelegate(this, &Application::OnResize);
+
+        // input testing
+        // GetInputManager()->BindKeyboardTrigger(SDLK_o, MakeDelegate(this, &Application::OnKeyTest));
+        // GetInputManager()->BindMouseButtonAction(MakeDelegate(this, &Application::OnMouseKeyTest));
+        // GetInputManager()->BindMouseMoveAction(MakeDelegate(this, &Application::OnMouseMoveTest));
     }
 
     Application::~Application() = default;
@@ -37,7 +45,7 @@ namespace Engine
             }
             //todo frame yap
 
-            _windowContext->OnUpdate();
+            _windowContext->OnUpdate(deltaTime);
         }
     }
 
@@ -49,5 +57,22 @@ namespace Engine
     void Application::OnResize(int width, int height)
     {
         NP_ENGINE_LOG_INFO("new size {0}, {1}", width, height);
+    }
+
+    void Application::OnKeyTest(InputValue inputValue)
+    {
+        NP_ENGINE_LOG_INFO("pressed O {0}", inputValue.GetRawValue());
+    }
+
+    void Application::OnMouseKeyTest(MouseButtonValue inputValue)
+    {
+        NP_ENGINE_LOG_INFO("pressed mouse key {0}, with state {1}", inputValue.GetCurrentButtonIndex(), (int)inputValue.GetTriggerState());
+    }
+
+    void Application::OnMouseMoveTest(MouseMoveValue inputValue)
+    {
+        auto pos = inputValue.GetMousePos();
+        auto delta = inputValue.GetMouseDelta();
+        NP_ENGINE_LOG_INFO("moved mouse pos:({0}, {1}), delta:({2}, {3})", pos.x, pos.y, delta.x, delta.y);
     }
 }

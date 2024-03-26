@@ -8,6 +8,8 @@
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_vulkan.h>
 
+#include "Application.h"
+
 namespace Engine
 {
     Window::Window(const WindowProperties& props)
@@ -85,6 +87,9 @@ namespace Engine
 
     void Window::OnUpdate(float deltaTime)
     {
+        InputManager* inputManager = Application::Get().GetInputManager();
+        inputManager->OnUpdate();
+
         SDL_Event event;
         while(SDL_PollEvent(&event))
         {
@@ -103,6 +108,20 @@ namespace Engine
 
                     if(WindowResizeDelegate) WindowResizeDelegate(_windowData.Width, _windowData.Height);
                 }
+                continue;
+                case SDL_KEYDOWN:
+                case SDL_KEYUP:
+                    if(event.key.repeat != 0) continue;
+                    inputManager->ProcessKey(event.key.keysym.sym, event.type == SDL_KEYDOWN);
+                continue;
+                case SDL_MOUSEBUTTONDOWN:
+                case SDL_MOUSEBUTTONUP:
+                    // sdl button index starts at 1
+                    inputManager->ProcessMouseButton(event.button.button-1, event.type == SDL_MOUSEBUTTONDOWN);
+                continue;
+                case SDL_MOUSEMOTION:
+                    inputManager->ProcessMouseMovement((float)event.motion.x/(float)_windowData.Width, (float)event.motion.y/(float)_windowData.Height, deltaTime);
+                continue;
             }
         }
 
