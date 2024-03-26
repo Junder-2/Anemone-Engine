@@ -78,7 +78,7 @@ namespace Engine
         initInfo.Instance = g_Instance;
         initInfo.PhysicalDevice = g_PhysicalDevice;
         initInfo.Device = g_Device;
-        initInfo.QueueFamily = g_QueueFamily;
+        initInfo.QueueFamily = g_QueueFamily.GraphicsFamily.value();
         initInfo.Queue = g_Queue;
         initInfo.PipelineCache = g_PipelineCache;
         initInfo.DescriptorPool = g_DescriptorPool;
@@ -348,12 +348,12 @@ namespace Engine
 
     void Window::CreateLogicalDevice()
     {
-        const QueueFamilyIndices familyIndex = FindQueueFamilies(g_PhysicalDevice);
+        g_QueueFamily = FindQueueFamilies(g_PhysicalDevice);
 
         constexpr float priority = 1.0f;
         VkDeviceQueueCreateInfo queueCreateInfo = {};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        queueCreateInfo.queueFamilyIndex = familyIndex.GraphicsFamily.value();
+        queueCreateInfo.queueFamilyIndex = g_QueueFamily.GraphicsFamily.value();
         queueCreateInfo.queueCount = 1;
         queueCreateInfo.pQueuePriorities = &priority;
 
@@ -381,7 +381,7 @@ namespace Engine
 
         VkResult err = vkCreateDevice(g_PhysicalDevice, &createInfo, nullptr, &g_Device);
         CheckVKResult(err);
-        vkGetDeviceQueue(g_Device, g_QueueFamily, 0, &g_Queue);
+        vkGetDeviceQueue(g_Device, g_QueueFamily.GraphicsFamily.value(), 0, &g_Queue);
     }
 
     void Window::SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height)
@@ -390,7 +390,7 @@ namespace Engine
 
         // Check for WSI support
         VkBool32 res;
-        vkGetPhysicalDeviceSurfaceSupportKHR(g_PhysicalDevice, g_QueueFamily, wd->Surface, &res);
+        vkGetPhysicalDeviceSurfaceSupportKHR(g_PhysicalDevice, g_QueueFamily.GraphicsFamily.value(), wd->Surface, &res);
         if (res != VK_TRUE)
         {
             NP_ENGINE_LOG_ERROR("Error no WSI support on physical device 0\n");
@@ -412,7 +412,7 @@ namespace Engine
 
         // Create SwapChain, RenderPass, Framebuffer, etc.
         IM_ASSERT(g_MinImageCount >= 2);
-        ImGui_ImplVulkanH_CreateOrResizeWindow(g_Instance, g_PhysicalDevice, g_Device, wd, g_QueueFamily, g_Allocator, width, height, g_MinImageCount);
+        ImGui_ImplVulkanH_CreateOrResizeWindow(g_Instance, g_PhysicalDevice, g_Device, wd, g_QueueFamily.GraphicsFamily.value(), g_Allocator, width, height, g_MinImageCount);
     }
 
     void Window::CleanupVulkanWindow()
