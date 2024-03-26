@@ -161,7 +161,6 @@ namespace Engine
         CheckVKResult(err);
         CleanupImGui();
 
-        if (enableValidationLayers) DestroyDebugUtilsMessengerEXT(g_Instance, g_DebugMessenger, nullptr);
         CleanupVulkanWindow();
         CleanupVulkan();
 
@@ -383,6 +382,8 @@ namespace Engine
 
     void Window::CleanupVulkan()
     {
+        if (enableValidationLayers) DestroyDebugUtilsMessengerEXT(g_Instance, g_DebugMessenger, nullptr);
+
         vkDestroyDescriptorPool(g_Device, g_DescriptorPool, g_Allocator);
 
         vkDestroyDevice(g_Device, g_Allocator);
