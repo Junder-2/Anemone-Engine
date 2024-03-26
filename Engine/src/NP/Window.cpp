@@ -47,6 +47,9 @@ namespace Engine
         // Select Physical Device (GPU)
         g_PhysicalDevice = SelectPhysicalDevice();
 
+        // Create Logical Device (with 1 queue)
+        CreateLogicalDevice();
+
         VkSurfaceKHR surface;
         if (SDL_Vulkan_CreateSurface(_windowContext, g_Instance, &surface) == 0)
         {
@@ -342,6 +345,44 @@ namespace Engine
         }
 
         return indices;
+    }
+
+    void Window::CreateLogicalDevice()
+    {
+        const QueueFamilyIndices familyIndex = FindQueueFamilies(g_PhysicalDevice);
+
+        constexpr float priority = 1.0f;
+        VkDeviceQueueCreateInfo queueCreateInfo = {};
+        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueCreateInfo.queueFamilyIndex = familyIndex.GraphicsFamily.value();
+        queueCreateInfo.queueCount = 1;
+        queueCreateInfo.pQueuePriorities = &priority;
+
+        VkPhysicalDeviceFeatures deviceFeatures = {};
+
+        VkDeviceCreateInfo createInfo = {};
+        createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+
+        createInfo.pQueueCreateInfos = &queueCreateInfo;
+        createInfo.queueCreateInfoCount = 1;
+
+        createInfo.pEnabledFeatures = &deviceFeatures;
+
+        createInfo.enabledExtensionCount = 0;
+
+        if (enableValidationLayers)
+        {
+            createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+            createInfo.ppEnabledLayerNames = validationLayers.data();
+        }
+        else
+        {
+            createInfo.enabledLayerCount = 0;
+        }
+
+        VkResult err = vkCreateDevice(g_PhysicalDevice, &createInfo, nullptr, &g_Device);
+        CheckVKResult(err);
+        vkGetDeviceQueue(g_Device, g_QueueFamily, 0, &g_Queue);
     }
 
     void Window::SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height)
