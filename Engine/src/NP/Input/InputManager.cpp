@@ -11,13 +11,15 @@ namespace Engine
         return std::make_unique<InputManager>();
     }
 
-    InputManager::InputManager()
-    {
-
-    }
+    InputManager::InputManager() = default;
 
     InputManager::~InputManager()
     {
+        for (auto it = _keyboardInputActions.begin(); it != _keyboardInputActions.end(); ++it)
+        {
+            delete it->second;
+        }
+
         _keyboardInputActions.clear();
     }
 

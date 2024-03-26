@@ -5,7 +5,11 @@ namespace Engine
 {
     MouseInputAction::MouseInputAction() = default;
 
-    MouseInputAction::~MouseInputAction() = default;
+    MouseInputAction::~MouseInputAction()
+    {
+        _buttonInputDelegate.Clear();
+        _moveInputDelegate.Clear();
+    }
 
     void MouseInputAction::PopulateMoveInput(const float x, const float y, const float deltaTime)
     {
