@@ -311,7 +311,10 @@ namespace Engine
     {
         VkPhysicalDeviceProperties properties;
         vkGetPhysicalDeviceProperties(device, &properties);
-        return properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
+
+        const bool isDiscrete = properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU;
+        const bool hasFamily = FindQueueFamilies(device).HasFamily();
+        return isDiscrete && hasFamily;
     }
 
     // TODO: Compute score based on available memory, supported types, max texture sizes etc.
