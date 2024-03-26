@@ -448,6 +448,76 @@ namespace Engine
         ImGui_ImplVulkanH_CreateOrResizeWindow(g_Instance, g_PhysicalDevice, g_Device, wd, g_QueueFamily.GraphicsFamily.value(), g_Allocator, width, height, g_MinImageCount);
     }
 
+    // TODO: Figure out what most of this code does.
+    void Window::RenderFrame(ImGui_ImplVulkanH_Window* wd, ImDrawData* draw_data)
+    {
+        VkSemaphore image_acquired_semaphore  = wd->FrameSemaphores[wd->SemaphoreIndex].ImageAcquiredSemaphore;
+        VkSemaphore render_complete_semaphore = wd->FrameSemaphores[wd->SemaphoreIndex].RenderCompleteSemaphore;
+        VkResult err = vkAcquireNextImageKHR(g_Device, wd->Swapchain, UINT64_MAX, image_acquired_semaphore, VK_NULL_HANDLE, &wd->FrameIndex);
+        if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR)
+        {
+            g_SwapChainRebuild = true;
+            return;
+        }
+        CheckVkResult(err);
+
+        ImGui_ImplVulkanH_Frame* fd = &wd->Frames[wd->FrameIndex];
+        {
+            err = vkWaitForFences(g_Device, 1, &fd->Fence, VK_TRUE, UINT64_MAX); // Wait indefinitely instead of periodically checking
+            CheckVkResult(err);
+
+            err = vkResetFences(g_Device, 1, &fd->Fence);
+            CheckVkResult(err);
+        }
+        {
+            err = vkResetCommandPool(g_Device, fd->CommandPool, 0);
+            CheckVkResult(err);
+
+            VkCommandBufferBeginInfo info = {};
+            info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+            info.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+            err = vkBeginCommandBuffer(fd->CommandBuffer, &info);
+            CheckVkResult(err);
+        }
+        {
+            VkRenderPassBeginInfo info = {};
+            info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+            info.renderPass = wd->RenderPass;
+            info.framebuffer = fd->Framebuffer;
+            info.renderArea.extent.width = wd->Width;
+            info.renderArea.extent.height = wd->Height;
+            info.clearValueCount = 1;
+            info.pClearValues = &wd->ClearValue;
+
+            vkCmdBeginRenderPass(fd->CommandBuffer, &info, VK_SUBPASS_CONTENTS_INLINE);
+        }
+
+        // Record dear imgui primitives into command buffer.
+        ImGui_ImplVulkan_RenderDrawData(draw_data, fd->CommandBuffer);
+
+        // Submit command buffer
+        vkCmdEndRenderPass(fd->CommandBuffer);
+        {
+            VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+            VkSubmitInfo info = {};
+            info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+            info.waitSemaphoreCount = 1;
+            info.pWaitSemaphores = &image_acquired_semaphore;
+            info.pWaitDstStageMask = &waitStage;
+            info.commandBufferCount = 1;
+            info.pCommandBuffers = &fd->CommandBuffer;
+            info.signalSemaphoreCount = 1;
+            info.pSignalSemaphores = &render_complete_semaphore;
+
+            err = vkEndCommandBuffer(fd->CommandBuffer);
+            CheckVkResult(err);
+            err = vkQueueSubmit(g_Queue, 1, &info, fd->Fence);
+            CheckVkResult(err);
+        }
+    }
+
     void Window::CleanupVulkanWindow()
     {
         ImGui_ImplVulkanH_DestroyWindow(g_Instance, g_Device, &g_MainWindowData, g_Allocator);

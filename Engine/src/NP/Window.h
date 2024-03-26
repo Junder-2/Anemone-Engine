@@ -105,6 +105,8 @@ namespace Engine
 
         static void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height);
 
+        inline static void RenderFrame(ImGui_ImplVulkanH_Window* wd, ImDrawData* draw_data);
+
         static void CleanupVulkanWindow();
         static void CleanupVulkan();
 
@@ -144,6 +146,7 @@ namespace Engine
         // ImGui
         inline static ImGui_ImplVulkanH_Window g_MainWindowData;
         inline static uint32_t g_MinImageCount = 2;
+        inline static bool g_SwapChainRebuild = false;
 
         ImGuiIO* _io;
         bool _showDemoWindow = true;
