@@ -22,9 +22,9 @@ namespace Engine
         _windowContext->WindowResizeDelegate += MakeDelegate(this, &Application::OnResize);
 
         // input testing
-        GetInputManager().BindKeyboardTrigger(SDLK_o, MakeDelegate(this, &Application::OnKeyTest));
-        GetInputManager().BindMouseButtonAction(MakeDelegate(this, &Application::OnMouseKeyTest));
-        GetInputManager().BindMouseMoveAction(MakeDelegate(this, &Application::OnMouseMoveTest));
+        // GetInputManager().BindKeyboardTrigger(SDLK_o, MakeDelegate(this, &Application::OnKeyTest));
+        // GetInputManager().BindMouseButtonAction(MakeDelegate(this, &Application::OnMouseKeyTest));
+        // GetInputManager().BindMouseMoveAction(MakeDelegate(this, &Application::OnMouseMoveTest));
     }
 
     Application::~Application() = default;
