@@ -11,23 +11,27 @@ namespace Engine
         _moveInputDelegate.Clear();
     }
 
-    void MouseInputAction::PopulateMoveInput(const float x, const float y, const float deltaTime)
+    bool MouseInputAction::PopulateMoveInput(const float x, const float y, const float deltaTime)
     {
         const glm::vec2 prevMousePos = _moveValue.GetMousePos();
         _moveValue.SetMousePos(x, y);
         _moveValue.SetMouseDelta((x - prevMousePos.x)*deltaTime, (y - prevMousePos.y)*deltaTime);
 
         if(_moveInputDelegate) _moveInputDelegate(_moveValue);
+
+        return true;
     }
 
-    void MouseInputAction::PopulateButtonInput(const int buttonIndex, const TriggerState newState)
+    bool MouseInputAction::PopulateButtonInput(const int buttonIndex, const TriggerState newState)
     {
         _buttonValue.SetTriggerState(buttonIndex, newState);
 
         if(_buttonInputDelegate) _buttonInputDelegate(_buttonValue);
+
+        return true;
     }
 
-    void MouseInputAction::UpdateAction()
+    void MouseInputAction::ProcessAction()
     {
         _moveValue.SetMouseDelta(0, 0);
 

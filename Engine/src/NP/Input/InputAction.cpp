@@ -3,16 +3,25 @@
 
 namespace Engine
 {
-    void InputAction::PopulateInput(const int input)
+    bool InputAction::PopulateInput(const int input)
     {
-        if (_inputValue.GetRawValue() == input) return;
+        if (_inputValue.GetRawValue() == input) return false;
 
         _inputValue = input;
 
         if (_inputDelegate) _inputDelegate(_inputValue);
+
+        return false;
     }
 
-    void InputTrigger::UpdateAction()
+    bool InputTrigger::PopulateInput(const int input)
+    {
+        InputAction::PopulateInput(input);
+
+        return true;
+    }
+
+    bool InputTrigger::ProcessAction()
     {
         switch (_inputValue.GetTriggerState())
         {
@@ -22,5 +31,7 @@ namespace Engine
             case TriggerStopped:
                 _inputValue = TriggerNone;
         }
+
+        return false;
     }
 }
