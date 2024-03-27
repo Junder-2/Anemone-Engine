@@ -15,5 +15,5 @@ int main(int argc, char* argv[])
 	app->Run();
 	delete app;
 
-	return 0; // Non-zero is abnormal.
+	return NPNoError;
 }

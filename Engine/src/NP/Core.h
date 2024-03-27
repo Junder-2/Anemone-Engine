@@ -11,3 +11,8 @@
 #endif
 
 #include "Logging.h"
+
+typedef enum NPErrorCode
+{
+    NPNoError = 0,
+};
