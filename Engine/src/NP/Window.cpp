@@ -128,7 +128,6 @@ namespace Engine
         ImGui::Text("counter = %d", counter);
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / _io->Framerate, _io->Framerate);
-        ImGui::Text("Engine %.3f ms/frame", deltaTime * 1000.f);
         ImGui::End();
 
         // 3. Show another simple window.
@@ -176,7 +175,7 @@ namespace Engine
                 case SDL_KEYDOWN:
                 case SDL_KEYUP:
                     if(event.key.repeat != 0) continue;
-                inputManager->ProcessKey(event.key.keysym.sym, event.type == SDL_KEYDOWN);
+                    inputManager->ProcessKey(event.key.keysym.sym, event.type == SDL_KEYDOWN);
                 continue;
                 case SDL_MOUSEBUTTONDOWN:
                 case SDL_MOUSEBUTTONUP:
