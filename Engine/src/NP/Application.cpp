@@ -79,8 +79,7 @@ namespace Engine
 
     void Application::OnMouseMoveTest(MouseMoveValue inputValue)
     {
-        auto pos = inputValue.GetMousePos();
-        auto delta = inputValue.GetMouseDelta();
-        NP_ENGINE_LOG_INFO("moved mouse pos:({0}, {1}), delta:({2}, {3})", pos.x, pos.y, delta.x, delta.y);
+        // spdlog formatting not working use explicit glm::to_string
+        NP_ENGINE_LOG_TRACE("moved mouse pos:({0}), delta:({1})", glm::to_string(inputValue.GetMousePos()), glm::to_string(inputValue.GetMouseDelta()));
     }
 }

@@ -2,6 +2,9 @@
 
 #include "Core.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/string_cast.hpp"
+
 //solves warnings
 #pragma warning(push, 0)
 #include <spdlog/spdlog.h>
@@ -15,8 +18,8 @@ namespace Engine
         static void InitEngine();
         static void InitApp(const std::string& appName = "APP");
 
-        inline static std::shared_ptr<spdlog::logger>& GetEngineLogger() { return _engineLogger; }
-        inline static std::shared_ptr<spdlog::logger>& GetAppLogger() { return _appLogger; }
+        static std::shared_ptr<spdlog::logger>& GetEngineLogger() { return _engineLogger; }
+        static std::shared_ptr<spdlog::logger>& GetAppLogger() { return _appLogger; }
     private:
         static std::shared_ptr<spdlog::logger> _engineLogger;
         static std::shared_ptr<spdlog::logger> _appLogger;
