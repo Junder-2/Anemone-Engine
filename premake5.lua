@@ -1,7 +1,7 @@
 include "premakeDependencies.lua"
 
 workspace "NP-Engine"
-    architecture "x64"
+    architecture "x86_64"
     startproject "Sandbox"
 
     configurations
