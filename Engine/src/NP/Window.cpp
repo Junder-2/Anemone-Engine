@@ -128,12 +128,10 @@ namespace Engine
         // Resize swap chain?
         if (_swapChainRebuild)
         {
-            int width, height;
-            SDL_GetWindowSize(_windowContext, &width, &height);
-            if (width > 0 && height > 0)
+            if (_windowData.Width > 0 && _windowData.Height > 0)
             {
                 ImGui_ImplVulkan_SetMinImageCount(_minImageCount);
-                ImGui_ImplVulkanH_CreateOrResizeWindow(_instance, _physicalDevice, _device, &_mainWindowData, _queueFamily.GraphicsFamily.value(), _allocator, width, height, _minImageCount);
+                ImGui_ImplVulkanH_CreateOrResizeWindow(_instance, _physicalDevice, _device, &_mainWindowData, _queueFamily.GraphicsFamily.value(), _allocator, _windowData.Width, _windowData.Height, _minImageCount);
                 _mainWindowData.FrameIndex = 0;
                 _swapChainRebuild = false;
             }
