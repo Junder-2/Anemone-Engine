@@ -56,7 +56,8 @@ project "Engine"
 
         postbuildcommands
         {
-            ("{COPY} \"%{LibraryDir.SDL2}/SDL2.dll\" \"%{wks.location}/bin/" .. outputdir .. "/Sandbox/\"")
+            ("{COPY} \"%{LibraryDir.SDL2}/SDL2.dll\" \"%{wks.location}/bin/" .. outputdir .. "/Sandbox/\""),
+            ("{COPY} \"%{LibraryDir.SDL2}/SDL2.dll\" \"%{wks.location}/bin/" .. outputdir .. "/Editor/\"")
         }
 
     filter "configurations:Debug"
