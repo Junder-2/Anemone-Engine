@@ -47,6 +47,13 @@ namespace Engine
             //todo frame yap
 
             _windowContext->OnUpdate(deltaTime);
+
+            // auto pressed = GetInputManager().GetKeyTriggerState(SDLK_o);
+            //
+            // if(pressed != TriggerNone)
+            // {
+            //     NP_ENGINE_LOG_INFO("O key state {0}", (int)pressed);
+            // }
         }
     }
 
