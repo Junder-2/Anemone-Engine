@@ -87,43 +87,7 @@ namespace Engine
 
     void Window::OnUpdate(float deltaTime)
     {
-        InputManager* inputManager = &Application::Get().GetInputManager();
-        inputManager->OnUpdate();
-
-        SDL_Event event;
-        while(SDL_PollEvent(&event))
-        {
-            ImGui_ImplSDL2_ProcessEvent(&event);
-            switch (event.type)
-            {
-                case SDL_QUIT:
-                    if(WindowCloseDelegate) WindowCloseDelegate();
-                break;
-                case SDL_WINDOWEVENT:
-                    const auto windowEvent = event.window;
-                if(event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-                {
-                    _windowData.Width = windowEvent.data1;
-                    _windowData.Height = windowEvent.data2;
-
-                    if(WindowResizeDelegate) WindowResizeDelegate(_windowData.Width, _windowData.Height);
-                }
-                continue;
-                case SDL_KEYDOWN:
-                case SDL_KEYUP:
-                    if(event.key.repeat != 0) continue;
-                    inputManager->ProcessKey(event.key.keysym.sym, event.type == SDL_KEYDOWN);
-                continue;
-                case SDL_MOUSEBUTTONDOWN:
-                case SDL_MOUSEBUTTONUP:
-                    // sdl button index starts at 1
-                    inputManager->ProcessMouseButton(event.button.button-1, event.type == SDL_MOUSEBUTTONDOWN);
-                continue;
-                case SDL_MOUSEMOTION:
-                    inputManager->ProcessMouseMovement((float)event.motion.x/(float)_windowData.Width, (float)event.motion.y/(float)_windowData.Height, deltaTime);
-                continue;
-            }
-        }
+        ProcessEvents(deltaTime);
 
         // Resize swap chain?
         if (_swapChainRebuild)
@@ -164,6 +128,7 @@ namespace Engine
         ImGui::Text("counter = %d", counter);
 
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / _io->Framerate, _io->Framerate);
+        ImGui::Text("Engine %.3f ms/frame", deltaTime * 1000.f);
         ImGui::End();
 
         // 3. Show another simple window.
@@ -188,6 +153,56 @@ namespace Engine
             _mainWindowData.ClearValue.color.float32[3] = _clearColor.w;
             RenderFrame(&_mainWindowData, drawData);
             RevealFrame(&_mainWindowData);
+        }
+    }
+
+    void Window::ProcessEvents(float deltaTime)
+    {
+        InputManager* inputManager = &Application::Get().GetInputManager();
+        inputManager->OnUpdate();
+
+        SDL_Event event;
+        while(SDL_PollEvent(&event))
+        {
+            ImGui_ImplSDL2_ProcessEvent(&event);
+            switch (event.type)
+            {
+                case SDL_QUIT:
+                    if(WindowCloseDelegate) WindowCloseDelegate();
+                break;
+                case SDL_WINDOWEVENT:
+                    ProcessWindowEvent(event.window, deltaTime);
+                continue;
+                case SDL_KEYDOWN:
+                case SDL_KEYUP:
+                    if(event.key.repeat != 0) continue;
+                inputManager->ProcessKey(event.key.keysym.sym, event.type == SDL_KEYDOWN);
+                continue;
+                case SDL_MOUSEBUTTONDOWN:
+                case SDL_MOUSEBUTTONUP:
+                    // sdl button index starts at 1
+                    inputManager->ProcessMouseButton(event.button.button-1, event.type == SDL_MOUSEBUTTONDOWN);
+                continue;
+                case SDL_MOUSEMOTION:
+                    inputManager->ProcessMouseMovement((float)event.motion.x/(float)_windowData.Width, (float)event.motion.y/(float)_windowData.Height, deltaTime);
+                continue;
+            }
+        }
+    }
+
+    void Window::ProcessWindowEvent(const SDL_WindowEvent& windowEvent, float deltaTime)
+    {
+        switch (windowEvent.event)
+        {
+            case SDL_WINDOWEVENT_RESIZED:
+            case SDL_WINDOWEVENT_SIZE_CHANGED:
+                if(_windowData.Width != windowEvent.data1 || _windowData.Height != windowEvent.data2) break;
+
+                _windowData.Width = windowEvent.data1;
+                _windowData.Height = windowEvent.data2;
+
+                if(WindowResizeDelegate) WindowResizeDelegate(_windowData.Width, _windowData.Height);
+            break;
         }
     }
 

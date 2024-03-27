@@ -1,5 +1,6 @@
 #pragma once
 #include <imgui_impl_vulkan.h>
+#include <SDL_events.h>
 #include <SDL_video.h>
 #include <vulkan/vulkan_core.h>
 
@@ -78,6 +79,9 @@ namespace Engine
     private:
         void Init(const WindowProperties& props);
         void Shutdown();
+
+        void ProcessEvents(float deltaTime);
+        void ProcessWindowEvent(const SDL_WindowEvent& windowEvent, float deltaTime);
 
         // ImGui
         static void CleanupImGui();
