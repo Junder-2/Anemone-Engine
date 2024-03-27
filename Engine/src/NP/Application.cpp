@@ -19,7 +19,7 @@ namespace Engine
         _inputManager = InputManager::Create();
 
         _windowContext->WindowCloseDelegate += MakeDelegate(this, &Application::Shutdown);
-        _windowContext->WindowResizeDelegate += MakeDelegate(this, &Application::OnResize);
+        _windowContext->WindowResizeDelegate += MakeDelegate(this, &Application::OnResizeTest);
 
         // input testing
         // GetInputManager().RegisterKeyboardTrigger(SDLK_o);
@@ -55,7 +55,7 @@ namespace Engine
         _isRunning = false;
     }
 
-    void Application::OnResize(int width, int height)
+    void Application::OnResizeTest(int width, int height)
     {
         NP_ENGINE_LOG_INFO("new size {0}, {1}", width, height);
     }
