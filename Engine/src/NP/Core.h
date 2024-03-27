@@ -12,7 +12,7 @@
 
 #include "Logging.h"
 
-typedef enum NPErrorCode
+typedef enum
 {
     NPNoError = 0,
-};
+} NPErrorCode;
