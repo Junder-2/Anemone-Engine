@@ -8,29 +8,29 @@ namespace Engine
     struct InputValue
     {
     public:
-        int GetRawValue() const
+        int GetIntValue() const
         {
-            return _value;
+            return static_cast<int>(_value);
         }
 
-        TriggerState GetTriggerState()
+        TriggerState GetTriggerState() const
         {
-            return static_cast<TriggerState>(_value);
+            return static_cast<TriggerState>(GetIntValue());
         }
 
         float GetAxis() const
         {
-            return static_cast<float>(_value) / 32767.f;
+            return _value;
         }
 
-        InputValue& operator=(const int rhs)
+        InputValue& operator=(const float rhs)
         {
             _value = rhs;
             return *this;
         }
 
     protected:
-        int _value = 0;
+        float _value = 0;
     };
 
     class InputAction
@@ -41,7 +41,7 @@ namespace Engine
 
         template <class TClass>
         void BindAction(DelegateMember<TClass, void(InputValue)> delegateMember);
-        virtual bool PopulateInput(int input);
+        virtual bool PopulateInput(float input);
         virtual bool ProcessAction() = 0;
 
         InputValue GetInputValue() const { return _inputValue; }
@@ -54,11 +54,14 @@ namespace Engine
     class InputTrigger : public InputAction
     {
     public:
-        InputTrigger() = default;
-        ~InputTrigger() override = default;
-
-        bool PopulateInput(int input) override;
+        bool PopulateInput(float input) override;
         bool ProcessAction() override;
+    };
+
+    class InputAxis : public InputAction
+    {
+    public:
+        bool PopulateInput(float input) override;
     };
 
     template <class TClass>

@@ -3,9 +3,9 @@
 
 namespace Engine
 {
-    bool InputAction::PopulateInput(const int input)
+    bool InputAction::PopulateInput(const float input)
     {
-        if (_inputValue.GetRawValue() == input) return false;
+        if (_inputValue.GetIntValue() == (int)input) return false;
 
         _inputValue = input;
 
@@ -14,7 +14,7 @@ namespace Engine
         return false;
     }
 
-    bool InputTrigger::PopulateInput(const int input)
+    bool InputTrigger::PopulateInput(const float input)
     {
         InputAction::PopulateInput(input);
 
@@ -31,6 +31,19 @@ namespace Engine
             case TriggerStopped:
                 _inputValue = TriggerNone;
         }
+
+        return false;
+    }
+
+    bool InputAxis::PopulateInput(const float input)
+    {
+        float axisInput = (input / 32767);
+
+        if (_inputValue.GetAxis() == axisInput) return false;
+
+        _inputValue = axisInput;
+
+        if (_inputDelegate) _inputDelegate(_inputValue);
 
         return false;
     }

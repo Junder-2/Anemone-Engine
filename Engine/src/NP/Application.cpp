@@ -62,7 +62,7 @@ namespace Engine
 
     void Application::OnKeyTest(InputValue inputValue)
     {
-        NP_ENGINE_LOG_INFO("pressed O {0}", inputValue.GetRawValue());
+        NP_ENGINE_LOG_INFO("pressed O {0}", inputValue.GetIntValue());
     }
 
     void Application::OnMouseKeyTest(MouseButtonValue inputValue)
