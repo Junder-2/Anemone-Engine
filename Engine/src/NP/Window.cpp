@@ -224,7 +224,7 @@ namespace Engine
     // Vulkan
     void Window::CheckVkResult(VkResult err)
     {
-        if (err == 0)
+        if (err == VK_SUCCESS)
             return;
         NP_ENGINE_LOG_ERROR("Vulkan Error: VkResult = {0}", (int)err);
         if (err < 0)
