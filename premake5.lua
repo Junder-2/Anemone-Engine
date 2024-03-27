@@ -26,6 +26,10 @@ group "Core"
     include "Engine"
 group ""
 
+group "Tools"
+    include "Editor"
+group ""
+
 group "Misc"
     include "Sandbox"
 group ""
