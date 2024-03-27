@@ -39,8 +39,10 @@ project "Editor"
         symbols "on"
 
     filter "configurations:Release"
-        symbols "on"
+        defines "NP_RELEASE"
         optimize "on"
+        symbols "on"
 
     filter "configurations:Dist"
+        defines "NP_DIST"
         optimize "on"

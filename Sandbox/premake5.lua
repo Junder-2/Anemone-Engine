@@ -39,7 +39,9 @@ project "Sandbox"
         symbols "on"
 
     filter "configurations:Release"
+        defines "NP_RELEASE"
         optimize "on"
 
     filter "configurations:Dist"
+        defines "NP_DIST"
         optimize "on"
