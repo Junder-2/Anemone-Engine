@@ -16,7 +16,7 @@ workspace "NP-Engine"
         "SPDLOG_USE_STD_FORMAT"
     }
 
-outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+OutputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 group "Dependencies"
     include "Engine/vendor/imgui"

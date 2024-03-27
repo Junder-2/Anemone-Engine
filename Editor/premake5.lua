@@ -4,8 +4,8 @@ project "Editor"
     cppdialect "C++20"
     staticruntime "on"
 
-    targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("%{wks.location}/bin-intermediate/" .. outputdir .. "/%{prj.name}")
+    targetdir ("%{wks.location}/bin/" .. OutputDir .. "/%{prj.name}")
+    objdir ("%{wks.location}/bin-intermediate/" .. OutputDir .. "/%{prj.name}")
 
     files
     {

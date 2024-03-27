@@ -4,8 +4,8 @@ project "Engine"
     cppdialect "C++20"
     staticruntime "on"
 
-    targetdir ("%{wks.location}/bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("%{wks.location}/bin-intermediate/" .. outputdir .. "/%{prj.name}")
+    targetdir ("%{wks.location}/bin/" .. OutputDir .. "/%{prj.name}")
+    objdir ("%{wks.location}/bin-intermediate/" .. OutputDir .. "/%{prj.name}")
 
     pchheader "nppch.h"
     pchsource "src/nppch.cpp"
@@ -56,8 +56,8 @@ project "Engine"
 
         postbuildcommands
         {
-            ("{COPY} \"%{LibraryDir.SDL2}/SDL2.dll\" \"%{wks.location}/bin/" .. outputdir .. "/Sandbox/\""),
-            ("{COPY} \"%{LibraryDir.SDL2}/SDL2.dll\" \"%{wks.location}/bin/" .. outputdir .. "/Editor/\"")
+            ("{COPY} \"%{LibraryDir.SDL2}/SDL2.dll\" \"%{wks.location}/bin/" .. OutputDir .. "/Sandbox/\""),
+            ("{COPY} \"%{LibraryDir.SDL2}/SDL2.dll\" \"%{wks.location}/bin/" .. OutputDir .. "/Editor/\"")
         }
 
     filter "configurations:Debug"
