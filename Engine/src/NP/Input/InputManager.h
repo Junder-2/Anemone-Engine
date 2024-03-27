@@ -1,5 +1,7 @@
 #pragma once
 
+#include <queue>
+
 #include "InputAction.h"
 #include "MouseInputAction.h"
 #include "../Delegate/Delegate.h"
@@ -13,6 +15,8 @@ namespace Engine
 
         InputManager();
         ~InputManager();
+
+        void RegisterKeyboardTrigger(int keyCode);
 
         template <class TClass>
         void BindKeyboardTrigger(int keyCode, DelegateMember<TClass, void(InputValue)> delegateMember);
@@ -35,7 +39,9 @@ namespace Engine
 
     private:
         std::map<int, InputAction*> _keyboardInputActions {};
+        std::queue<int> _dirtyKeys {};
         MouseInputAction _mouseInputAction {};
+        bool _dirtyMouse = false;
     };
 
     template <class TClass>

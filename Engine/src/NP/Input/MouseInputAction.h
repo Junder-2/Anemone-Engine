@@ -68,9 +68,9 @@ namespace Engine
         void BindMoveAction(DelegateMember<TClass, void(MouseMoveValue)> delegateMember);
         template <class TClass>
         void BindButtonAction(DelegateMember<TClass, void(MouseButtonValue)> delegateMember);
-        void UpdateAction();
-        void PopulateMoveInput(float x, float y, float deltaTime);
-        void PopulateButtonInput(int buttonIndex, TriggerState newState);
+        bool PopulateMoveInput(float x, float y, float deltaTime);
+        bool PopulateButtonInput(int buttonIndex, TriggerState newState);
+        void ProcessAction();
 
         MouseMoveValue GetMoveValue() const { return _moveValue; }
         MouseButtonValue GetButtonValue() const { return _buttonValue; }

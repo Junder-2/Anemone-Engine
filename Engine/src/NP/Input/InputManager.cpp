@@ -23,30 +23,57 @@ namespace Engine
         _keyboardInputActions.clear();
     }
 
+    void InputManager::RegisterKeyboardTrigger(const int keyCode)
+    {
+        if (_keyboardInputActions.contains(keyCode)) return;
+
+        InputTrigger* newInputAction = new InputTrigger();
+
+        _keyboardInputActions.insert_or_assign(keyCode, newInputAction);
+    }
+
     void InputManager::OnUpdate()
     {
-        for (auto it = _keyboardInputActions.begin(); it != _keyboardInputActions.end(); ++it)
+        if(_dirtyMouse)
         {
-            it->second->UpdateAction();
+            _mouseInputAction.ProcessAction();
+        }
+
+        if(!_dirtyKeys.empty())
+        {
+            std::queue<int> dirtyKeysCopy;
+            std::swap(_dirtyKeys, dirtyKeysCopy);
+
+            while(!dirtyKeysCopy.empty())
+            {
+                int keyCode = dirtyKeysCopy.front();
+                if(_keyboardInputActions[keyCode]->ProcessAction())
+                {
+                    _dirtyKeys.push(keyCode);
+                }
+                dirtyKeysCopy.pop();
+            }
         }
     }
 
     void InputManager::ProcessKey(const int keyCode, const bool press)
     {
-        if (_keyboardInputActions.contains(keyCode))
+        if (!_keyboardInputActions.contains(keyCode)) return;
+
+        if(_keyboardInputActions[keyCode]->PopulateInput(press ? TriggerStarted : TriggerStopped))
         {
-            _keyboardInputActions[keyCode]->PopulateInput(press ? TriggerStarted : TriggerStopped);
+            _dirtyKeys.push(keyCode);
         }
     }
 
     void InputManager::ProcessMouseMovement(const float xPos, const float yPos, const float deltaTime)
     {
-        _mouseInputAction.PopulateMoveInput(xPos, yPos, deltaTime);
+        _dirtyMouse = _mouseInputAction.PopulateMoveInput(xPos, yPos, deltaTime);
     }
 
     void InputManager::ProcessMouseButton(const int index, const bool press)
     {
-        _mouseInputAction.PopulateButtonInput(index, press ? TriggerStarted : TriggerStopped);
+        _dirtyMouse = _mouseInputAction.PopulateButtonInput(index, press ? TriggerStarted : TriggerStopped);
     }
 
     TriggerState InputManager::GetKeyTriggerState(int keyCode)

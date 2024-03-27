@@ -41,8 +41,8 @@ namespace Engine
 
         template <class TClass>
         void BindAction(DelegateMember<TClass, void(InputValue)> delegateMember);
-        virtual void UpdateAction() = 0;
-        void PopulateInput(int input);
+        virtual bool PopulateInput(int input);
+        virtual bool ProcessAction() = 0;
 
         InputValue GetInputValue() const { return _inputValue; }
 
@@ -57,7 +57,8 @@ namespace Engine
         InputTrigger() = default;
         ~InputTrigger() override = default;
 
-        void UpdateAction() override;
+        bool PopulateInput(int input) override;
+        bool ProcessAction() override;
     };
 
     template <class TClass>
