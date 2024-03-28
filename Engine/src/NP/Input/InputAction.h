@@ -1,7 +1,7 @@
 #pragma once
 
 #include "InputTypes.h"
-#include "../Delegate/Delegate.h"
+#include "../Delegate/Delegate.h" // todo: add to include directory
 
 namespace Engine
 {
