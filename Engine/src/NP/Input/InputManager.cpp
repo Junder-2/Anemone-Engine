@@ -60,7 +60,7 @@ namespace Engine
     {
         if (!_keyboardInputActions.contains(keyCode)) return;
 
-        if(_keyboardInputActions[keyCode]->PopulateInput(press ? TriggerStarted : TriggerStopped))
+        if(_keyboardInputActions[keyCode]->PopulateInput((float)(press ? TriggerStarted : TriggerStopped)))
         {
             _dirtyKeys.push(keyCode);
         }
