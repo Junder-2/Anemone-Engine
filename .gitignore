@@ -41,3 +41,5 @@ Intermediates/
 # Directories
 Engine/vendor/VulkanSDK
 Engine/vendor/SDL2-2.30.1/docs
+
+*imgui.ini
