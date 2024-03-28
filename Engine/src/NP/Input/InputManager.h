@@ -28,7 +28,7 @@ namespace Engine
         void OnUpdate();
         void ProcessKey(int keyCode, bool press);
         void ProcessMouseMovement(float xPos, float yPos, float deltaTime);
-        void ProcessMouseButton(int index, bool press);
+        void ProcessMouseButton(int index, bool press, bool isDoubleClick = false);
 
         TriggerState GetKeyTriggerState(int keyCode);
 

@@ -71,9 +71,9 @@ namespace Engine
         _dirtyMouse = _mouseInputAction.PopulateMoveInput(xPos, yPos, deltaTime);
     }
 
-    void InputManager::ProcessMouseButton(const int index, const bool press)
+    void InputManager::ProcessMouseButton(const int index, const bool press, const bool isDoubleClick /*= false */)
     {
-        _dirtyMouse = _mouseInputAction.PopulateButtonInput(index, press ? TriggerStarted : TriggerStopped);
+        _dirtyMouse = _mouseInputAction.PopulateButtonInput(index, press ? TriggerStarted : TriggerStopped, isDoubleClick);
     }
 
     TriggerState InputManager::GetKeyTriggerState(int keyCode)

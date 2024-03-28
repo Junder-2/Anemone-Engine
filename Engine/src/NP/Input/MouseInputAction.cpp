@@ -22,9 +22,9 @@ namespace Engine
         return true;
     }
 
-    bool MouseInputAction::PopulateButtonInput(const int buttonIndex, const TriggerState newState)
+    bool MouseInputAction::PopulateButtonInput(const int buttonIndex, const TriggerState newState, const bool isDoubleClick /*= false */)
     {
-        _buttonValue.SetTriggerState(buttonIndex, newState);
+        _buttonValue.SetTriggerState(buttonIndex, newState, isDoubleClick);
 
         if(_buttonInputDelegate) _buttonInputDelegate(_buttonValue);
 
@@ -35,7 +35,7 @@ namespace Engine
     {
         _moveValue.SetMouseDelta(0, 0);
 
-        for (int i = 0; i < MouseButtonValue::indexLength; ++i)
+        for (int i = 0; i < MOUSE_BUTTON_MAX; ++i)
         {
             switch (_buttonValue.GetTriggerState(i))
             {

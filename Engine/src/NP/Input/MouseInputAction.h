@@ -30,32 +30,44 @@ namespace Engine
 
     struct MouseButtonValue
     {
-        static constexpr int indexLength = 3;
-
         int GetCurrentButtonIndex() const
         {
             return _lastIndex;
         }
 
+        bool GetIsDoubleClick() const
+        {
+            return _isDoubleClick;
+        }
+
+        uint16_t GetRawButtonStates() const
+        {
+            return _buttonStates;
+        }
+
         TriggerState GetTriggerState() const
         {
-            return _button[_lastIndex];
+            return GetTriggerStateFromMouseButtonState(_buttonStates, _lastIndex);
         }
 
         TriggerState GetTriggerState(const int index) const
         {
-            return _button[std::min(index, indexLength-1)];
+            return GetTriggerStateFromMouseButtonState(_buttonStates, index);
         }
 
-        void SetTriggerState(const int index, const TriggerState newState)
+        void SetTriggerState(const int index, const TriggerState newState, const bool isDoubleClick = false)
         {
-            _lastIndex = std::min(index, indexLength-1);
-            _button[_lastIndex] = newState;
+            _isDoubleClick = isDoubleClick;
+            _lastIndex = std::min(index, MOUSE_BUTTON_MAX-1);
+            //Clear and add new state to button
+            _buttonStates &= ~GetMouseButtonMaskFromMouseButton(index);
+            _buttonStates |= GetMouseButtonStateFromMouseButton(newState, index);
         }
 
     private:
         int _lastIndex = 0;
-        TriggerState _button[indexLength] = {};
+        bool _isDoubleClick = false;
+        uint16_t _buttonStates = 0;
     };
 
     class MouseInputAction
@@ -69,7 +81,7 @@ namespace Engine
         template <class TClass>
         void BindButtonAction(DelegateMember<TClass, void(MouseButtonValue)> delegateMember);
         bool PopulateMoveInput(float x, float y, float deltaTime);
-        bool PopulateButtonInput(int buttonIndex, TriggerState newState);
+        bool PopulateButtonInput(int buttonIndex, TriggerState newState, bool isDoubleClick = false);
         void ProcessAction();
 
         MouseMoveValue GetMoveValue() const { return _moveValue; }
