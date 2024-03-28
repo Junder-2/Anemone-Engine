@@ -10,5 +10,23 @@
 
 namespace Engine
 {
-    
+    VulkanContext::VulkanContext(SDL_Window* windowHandle) : _windowHandle(windowHandle)
+    {
+
+    }
+
+    void VulkanContext::Init()
+    {
+
+    }
+
+    void VulkanContext::SwapBuffers()
+    {
+
+    }
+
+    void VulkanContext::Cleanup()
+    {
+
+    }
 }
