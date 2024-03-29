@@ -44,17 +44,6 @@ namespace Engine
         // Vulkan
         SetupVulkan(_windowContext);
 
-        VkSurfaceKHR surface;
-        if (SDL_Vulkan_CreateSurface(_windowContext, _instance, &surface) == 0)
-        {
-            NP_ENGINE_LOG_ERROR("Could not create Vulkan surface.\n");
-        }
-
-        int w, h;
-        SDL_GetWindowSize(_windowContext, &w, &h);
-        ImGui_ImplVulkanH_Window* wd = &_mainWindowData;
-        SetupVulkanWindow(wd, surface, w, h);
-
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -248,6 +237,17 @@ namespace Engine
     {
         const std::vector<const char*> extensions = GetAvailableExtensions(window);
         CreateVulkanInstance(extensions);
+
+        VkSurfaceKHR surface;
+        if (SDL_Vulkan_CreateSurface(window, _instance, &surface) == 0)
+        {
+            NP_ENGINE_LOG_ERROR("Could not create Vulkan surface.\n");
+        }
+
+        int w, h;
+        SDL_GetWindowSize(window, &w, &h);
+        ImGui_ImplVulkanH_Window* wd = &_mainWindowData;
+        SetupVulkanWindow(wd, surface, w, h);
 
         // Select Physical Device (GPU)
         _physicalDevice = SelectPhysicalDevice();
