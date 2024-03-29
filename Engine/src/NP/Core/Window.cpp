@@ -323,6 +323,7 @@ namespace Engine
         vkb::Result<vkb::Instance> vkbResult = builder
             .set_engine_name("NP")
             .set_app_name("Sandbox")
+            .require_api_version(1, 3, 0)
 
             .enable_extensions(extensions)
 
