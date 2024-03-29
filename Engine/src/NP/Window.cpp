@@ -179,9 +179,8 @@ namespace Engine
                     inputManager->ProcessKey(event.key.keysym.sym, event.type == SDL_KEYDOWN);
                 continue;
                 case SDL_MOUSEBUTTONDOWN:
-                case SDL_MOUSEBUTTONUP:
-                    // sdl button index starts at 1
-                    inputManager->ProcessMouseButton(event.button.button-1, event.type == SDL_MOUSEBUTTONDOWN);
+                    case SDL_MOUSEBUTTONUP:
+                    inputManager->ProcessMouseButton(MOUSE_BUTTON_TO_SDL_MOUSE_BUTTON(event.button.button), event.type == SDL_MOUSEBUTTONDOWN, event.button.clicks == 2);
                 continue;
                 case SDL_MOUSEMOTION:
                     inputManager->ProcessMouseMovement((float)event.motion.x/(float)_windowData.Width, (float)event.motion.y/(float)_windowData.Height, deltaTime);

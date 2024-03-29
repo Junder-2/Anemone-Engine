@@ -1,6 +1,7 @@
 ﻿#include "nppch.h"
 #include "Application.h"
 
+#include <bitset>
 #include <SDL_keycode.h>
 #include <SDL_timer.h>
 
@@ -74,7 +75,8 @@ namespace Engine
 
     void Application::OnMouseKeyTest(MouseButtonValue inputValue)
     {
-        NP_ENGINE_LOG_INFO("pressed mouse key {0}, with state {1}", inputValue.GetCurrentButtonIndex(), (int)inputValue.GetTriggerState());
+        NP_ENGINE_LOG_INFO("pressed mouse key {0}, with state {1}, is doubleclick {2}", inputValue.GetCurrentButtonIndex(), (int)inputValue.GetTriggerState(), inputValue.GetIsDoubleClick());
+        NP_ENGINE_LOG_INFO("Raw mouse button state {0}", std::bitset<16>(inputValue.GetRawButtonStates()).to_string());
     }
 
     void Application::OnMouseMoveTest(MouseMoveValue inputValue)
