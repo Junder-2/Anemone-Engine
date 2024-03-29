@@ -3,6 +3,6 @@
 #include <memory>
 #include <string>
 
-#include "NP/Logging.h"
+#include "NP/Core/Logging.h"
 
-#include "NP/Core.h"
+#include "NP/Core/Core.h"
