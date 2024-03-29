@@ -23,8 +23,8 @@ namespace Engine
         _windowContext->WindowResizeDelegate += MakeDelegate(this, &Application::OnResizeTest);
 
         // input testing
-        // GetInputManager().RegisterKeyboardTrigger(KeyCode::KeyCode0);
-        // GetInputManager().BindKeyboardTrigger(SDLK_o, MakeDelegate(this, &Application::OnKeyTest));
+        // GetInputManager().RegisterKeyboardTrigger(KeyCode0);
+        // GetInputManager().BindKeyboardTrigger(KeyCodeO, MakeDelegate(this, &Application::OnKeyTest));
         // GetInputManager().BindMouseButtonAction(MakeDelegate(this, &Application::OnMouseKeyTest));
         // GetInputManager().BindMouseMoveAction(MakeDelegate(this, &Application::OnMouseMoveTest));
     }
@@ -49,7 +49,7 @@ namespace Engine
 
             _windowContext->OnUpdate(deltaTime);
 
-            // auto pressed = GetInputManager().GetKeyTriggerState(SDLK_o);
+            // auto pressed = GetInputManager().GetKeyTriggerState(KeyCode0);
             //
             // if(pressed != TriggerNone)
             // {
