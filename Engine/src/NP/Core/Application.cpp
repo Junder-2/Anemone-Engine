@@ -2,11 +2,11 @@
 #include "Application.h"
 
 #include <bitset>
-#include <SDL_keycode.h>
+
 #include <SDL_timer.h>
 
 #include "Layer.h"
-#include "Input/InputManager.h"
+#include "../Input/InputManager.h"
 
 namespace Engine
 {
@@ -23,8 +23,8 @@ namespace Engine
         _windowContext->WindowResizeDelegate += MakeDelegate(this, &Application::OnResizeTest);
 
         // input testing
-        // GetInputManager().RegisterKeyboardTrigger(SDLK_o);
-        // GetInputManager().BindKeyboardTrigger(SDLK_o, MakeDelegate(this, &Application::OnKeyTest));
+        // GetInputManager().RegisterKeyboardTrigger(KeyCode0);
+        // GetInputManager().BindKeyboardTrigger(KeyCodeO, MakeDelegate(this, &Application::OnKeyTest));
         // GetInputManager().BindMouseButtonAction(MakeDelegate(this, &Application::OnMouseKeyTest));
         // GetInputManager().BindMouseMoveAction(MakeDelegate(this, &Application::OnMouseMoveTest));
     }
@@ -49,7 +49,7 @@ namespace Engine
 
             _windowContext->OnUpdate(deltaTime);
 
-            // auto pressed = GetInputManager().GetKeyTriggerState(SDLK_o);
+            // auto pressed = GetInputManager().GetKeyTriggerState(KeyCode0);
             //
             // if(pressed != TriggerNone)
             // {

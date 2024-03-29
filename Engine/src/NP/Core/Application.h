@@ -3,7 +3,7 @@
 #include "Core.h"
 #include "LayerStack.h"
 #include "Window.h"
-#include "Input/InputManager.h"
+#include "../Input/InputManager.h"
 
 namespace Engine
 {

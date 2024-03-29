@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-#include "NP/Application.h"
-#include "NP/Logging.h"
-#include "NP/Window.h"
+#include "NP/Core/Application.h"
+#include "NP/Core/Logging.h"
+#include "NP/Core/Window.h"
 
 #include "NP/Input/InputManager.h"
 
-#include "NP/EntryPoint.h"
+#include "NP/Core/EntryPoint.h"
