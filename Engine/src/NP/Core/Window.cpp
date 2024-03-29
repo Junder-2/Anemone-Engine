@@ -324,6 +324,8 @@ namespace Engine
             .set_engine_name("NP")
             .set_app_name("Sandbox")
 
+            .enable_extensions(extensions)
+
             .request_validation_layers(enableValidationLayers)
             .set_debug_messenger_severity(debugMessageSeverityFlags)
             .set_debug_messenger_type(debugMessageTypeFlags)
