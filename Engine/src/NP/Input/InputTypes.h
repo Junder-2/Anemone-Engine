@@ -1,4 +1,5 @@
 #pragma once
+#include "../Utilities/CommonUtilities.h"
 
 namespace Engine
 {
