@@ -28,6 +28,7 @@ project "Engine"
         "%{IncludeDir.ImGui}/backends",
         "%{IncludeDir.GLM}",
         "%{IncludeDir.VulkanSDK}",
+        "%{IncludeDir.VkBootstrap}",
     }
 
     libdirs
