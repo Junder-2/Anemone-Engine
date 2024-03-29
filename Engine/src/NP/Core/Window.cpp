@@ -7,6 +7,7 @@
 #include <imgui.h>
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_vulkan.h>
+#include <VkBootstrap.h>
 
 #include "Application.h"
 
@@ -248,8 +249,6 @@ namespace Engine
         const ImVector<const char*> extensions = GetAvailableExtensions(window);
         CreateVulkanInstance(extensions);
 
-        SetupDebugMessenger();
-
         // Select Physical Device (GPU)
         _physicalDevice = SelectPhysicalDevice();
 
@@ -310,42 +309,33 @@ namespace Engine
 
     void Window::CreateVulkanInstance(const ImVector<const char*>& extensions)
     {
-        VkResult err;
+        VkDebugUtilsMessageSeverityFlagBitsEXT debugMessageSeverityFlags = (VkDebugUtilsMessageSeverityFlagBitsEXT)(
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT);
+        VkDebugUtilsMessageTypeFlagBitsEXT debugMessageTypeFlags = (VkDebugUtilsMessageTypeFlagBitsEXT)(
+            VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT);
 
-        VkInstanceCreateInfo createInfo = {};
-        createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+        vkb::InstanceBuilder builder;
 
-        uint32_t propertiesCount;
-        vkEnumerateInstanceExtensionProperties(nullptr, &propertiesCount, nullptr);
-        ImVector<VkExtensionProperties> properties;
-        properties.resize(propertiesCount);
-        err = vkEnumerateInstanceExtensionProperties(nullptr, &propertiesCount, properties.Data);
-        CheckVkResult(err);
+        vkb::Result<vkb::Instance> vkbResult = builder
+            .set_engine_name("NP")
+            .set_app_name("Sandbox")
 
-        // Validation layers
-        createInfo.enabledLayerCount = 0;
-        createInfo.pNext = nullptr;
-        VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo = {};
-        if (enableValidationLayers)
-        {
-            if (CheckValidationLayers())
-            {
-                createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-                createInfo.ppEnabledLayerNames = validationLayers.data();
+            .request_validation_layers(enableValidationLayers)
+            .set_debug_messenger_severity(debugMessageSeverityFlags)
+            .set_debug_messenger_type(debugMessageTypeFlags)
+            .set_debug_callback(DebugCallback)
 
-                PopulateDebugMessengerCreateInfo(debugCreateInfo);
-                createInfo.pNext = &debugCreateInfo;
-            }
-            else
-            {
-                NP_ENGINE_LOG_WARN("Vulkan Error: Creating instance without validation layers since one or more are unavailable.");
-            }
-        }
+            .set_allocation_callbacks(_allocator)
+            .build();
 
-        createInfo.enabledExtensionCount = (uint32_t)extensions.Size;
-        createInfo.ppEnabledExtensionNames = extensions.Data;
-        err = vkCreateInstance(&createInfo, _allocator, &_instance);
-        CheckVkResult(err);
+        vkb::Instance vkbInstance = vkbResult.value();
+
+        _instance = vkbInstance.instance;
+        _debugMessenger = vkbInstance.debug_messenger;
     }
 
     VkPhysicalDevice Window::SelectPhysicalDevice()
