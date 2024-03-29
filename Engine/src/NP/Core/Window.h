@@ -79,9 +79,9 @@ namespace Engine
 
         static void SetupVulkan(SDL_Window* window);
 
-        static ImVector<const char*> GetAvailableExtensions(SDL_Window* window);
+        static std::vector<const char*> GetAvailableExtensions(SDL_Window* window);
         static bool CheckValidationLayers();
-        static void CreateVulkanInstance(const ImVector<const char*>& extensions);
+        static void CreateVulkanInstance(const std::vector<const char*>& extensions);
 
         static VkPhysicalDevice SelectPhysicalDevice();
         static bool IsDeviceCompatible(const VkPhysicalDevice& device);

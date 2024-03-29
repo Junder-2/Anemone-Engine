@@ -246,7 +246,7 @@ namespace Engine
 
     void Window::SetupVulkan(SDL_Window* window)
     {
-        const ImVector<const char*> extensions = GetAvailableExtensions(window);
+        const std::vector<const char*> extensions = GetAvailableExtensions(window);
         CreateVulkanInstance(extensions);
 
         // Select Physical Device (GPU)
@@ -261,15 +261,15 @@ namespace Engine
         CreateDescriptorPool();
     }
 
-    ImVector<const char*> Window::GetAvailableExtensions(SDL_Window* window)
+    std::vector<const char*> Window::GetAvailableExtensions(SDL_Window* window)
     {
         uint32_t extensionCount = 0;
         SDL_Vulkan_GetInstanceExtensions(window, &extensionCount, nullptr);
-        ImVector<const char*> extensions;
-        extensions.resize(extensionCount);
-        SDL_Vulkan_GetInstanceExtensions(window, &extensionCount, extensions.Data);
+        std::vector<const char*> extensions(extensionCount);
+        SDL_Vulkan_GetInstanceExtensions(window, &extensionCount, extensions.data());
 
-        if (enableValidationLayers) {
+        if (enableValidationLayers)
+        {
             extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
         }
 
@@ -307,7 +307,7 @@ namespace Engine
         return true;
     }
 
-    void Window::CreateVulkanInstance(const ImVector<const char*>& extensions)
+    void Window::CreateVulkanInstance(const std::vector<const char*>& extensions)
     {
         VkDebugUtilsMessageSeverityFlagBitsEXT debugMessageSeverityFlags = (VkDebugUtilsMessageSeverityFlagBitsEXT)(
             VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
