@@ -203,7 +203,6 @@ namespace Engine
         CheckVkResult(err);
         CleanupImGui();
 
-        CleanupVulkanWindow();
         CleanupVulkan();
 
         SDL_DestroyWindow(_windowContext);
