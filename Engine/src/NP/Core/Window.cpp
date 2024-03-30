@@ -240,16 +240,11 @@ namespace Engine
         _instance = vkbInstance.instance;
         _debugMessenger = vkbInstance.debug_messenger;
 
-        VkSurfaceKHR surface;
-        if (SDL_Vulkan_CreateSurface(window, _instance, &surface) == 0)
+        if (SDL_Vulkan_CreateSurface(window, _instance, &_surface) == 0)
         {
             NP_ENGINE_LOG_ERROR("Could not create Vulkan surface.\n");
         }
 
-        int w, h;
-        SDL_GetWindowSize(window, &w, &h);
-        ImGui_ImplVulkanH_Window* wd = &_mainWindowData;
-        SetupVulkanWindow(wd, surface, w, h);
 
         // Select Physical Device (GPU)
         _physicalDevice = SelectPhysicalDevice();
@@ -258,6 +253,11 @@ namespace Engine
 
         // Create Logical Device (with 1 queue)
         CreateLogicalDevice();
+
+        int w, h;
+        SDL_GetWindowSize(window, &w, &h);
+        ImGui_ImplVulkanH_Window* wd = &_mainWindowData;
+        SetupVulkanWindow(wd, _surface, w, h);
 
         // Create Descriptor Pool
         CreateDescriptorPool();

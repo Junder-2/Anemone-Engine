@@ -125,6 +125,7 @@ namespace Engine
         inline static VkAllocationCallbacks* _allocator = nullptr;
         inline static VkInstance _instance = VK_NULL_HANDLE;
         inline static VkDebugUtilsMessengerEXT _debugMessenger;
+        inline static VkSurfaceKHR _surface;
         inline static VkPhysicalDevice _physicalDevice = VK_NULL_HANDLE;
         inline static VkDevice _device = VK_NULL_HANDLE;
         inline static QueueFamilyIndices _queueFamily = (QueueFamilyIndices)-1;
