@@ -27,6 +27,7 @@ project "Engine"
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.ImGui}/backends",
         "%{IncludeDir.GLM}",
+        "%{IncludeDir.entt}",
         "%{IncludeDir.VulkanSDK}",
     }
 
