@@ -663,13 +663,11 @@ namespace Engine
         wd->SemaphoreIndex = (wd->SemaphoreIndex + 1) % wd->SemaphoreCount; // Now we can use the next set of semaphores
     }
 
-    void Window::CleanupVulkanWindow()
-    {
-        ImGui_ImplVulkanH_DestroyWindow(_instance, _device, &_mainWindowData, _allocator);
-    }
-
     void Window::CleanupVulkan()
     {
+        // Calls vkDestroyPipeline, vkDestroyRenderPass, vkDestroySwapchainKHR and vkDestroySurfaceKHR.
+        ImGui_ImplVulkanH_DestroyWindow(_instance, _device, &_mainWindowData, _allocator);
+
         vkDestroyDescriptorPool(_device, _descriptorPool, _allocator);
 
         vkDestroyDevice(_device, _allocator);

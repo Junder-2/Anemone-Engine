@@ -100,7 +100,6 @@ namespace Engine
         inline static void RenderFrame(ImGui_ImplVulkanH_Window* wd, ImDrawData* draw_data);
         inline static void RevealFrame(ImGui_ImplVulkanH_Window* wd);
 
-        static void CleanupVulkanWindow();
         static void CleanupVulkan();
 
         static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
