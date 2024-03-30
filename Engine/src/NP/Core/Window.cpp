@@ -246,9 +246,11 @@ namespace Engine
             NP_ENGINE_LOG_ERROR("Could not create Vulkan surface.\n");
         }
 
+        const vkb::PhysicalDevice physicalDevice = SelectVkbPhysicalDevice(_surface, vkbInstance);
+        _physicalDevice = physicalDevice.physical_device;
 
         // Select Physical Device (GPU)
-        _physicalDevice = SelectPhysicalDevice();
+        //_physicalDevice = SelectPhysicalDevice();
 
         _queueFamily = FindQueueFamilies(_physicalDevice);
 
@@ -339,6 +341,37 @@ namespace Engine
             .build();
 
         return vkbResult.value();
+    }
+
+    vkb::PhysicalDevice Window::SelectVkbPhysicalDevice(VkSurfaceKHR surface, vkb::Instance instance)
+    {
+        // Vulkan 1.3 features.
+        VkPhysicalDeviceVulkan13Features features = {};
+        features.dynamicRendering = true;
+        features.synchronization2 = true;
+
+        // Vulkan 1.2 features.
+        VkPhysicalDeviceVulkan12Features features12 = {};
+        features12.bufferDeviceAddress = true;
+        features12.descriptorIndexing = true;
+
+        // Use VkBootstrap to select a gpu.
+        // We want a gpu that can write to the SDL surface and supports vulkan 1.3 with the correct features.
+        vkb::PhysicalDeviceSelector selector{ instance };
+        vkb::PhysicalDevice physicalDevice = selector
+            .set_minimum_version(1, 3)
+
+            .set_required_features_13(features)
+            .set_required_features_12(features12)
+
+            .prefer_gpu_device_type(vkb::PreferredDeviceType::discrete)
+            .add_required_extension("VK_KHR_swapchain")
+
+            .set_surface(surface)
+            .select()
+            .value();
+
+        return physicalDevice;
     }
 
     VkPhysicalDevice Window::SelectPhysicalDevice()

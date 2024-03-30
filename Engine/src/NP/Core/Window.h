@@ -82,6 +82,7 @@ namespace Engine
         static bool CheckValidationLayers();
 
         static vkb::Instance CreateVkbInstance(const std::vector<const char*>& extensions);
+        static vkb::PhysicalDevice SelectVkbPhysicalDevice(VkSurfaceKHR surface, vkb::Instance instance);
 
         static VkPhysicalDevice SelectPhysicalDevice();
         static bool IsDeviceCompatible(const VkPhysicalDevice& device);
