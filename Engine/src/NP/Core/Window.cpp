@@ -600,7 +600,7 @@ namespace Engine
 
     void Window::CleanupVulkan()
     {
-        if (enableValidationLayers) DestroyDebugUtilsMessengerEXT(_instance, _debugMessenger, nullptr);
+        if (enableValidationLayers) vkb::destroy_debug_utils_messenger(_instance, _debugMessenger, _allocator);
 
         vkDestroyDescriptorPool(_device, _descriptorPool, _allocator);
 
