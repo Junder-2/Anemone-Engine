@@ -26,6 +26,7 @@ namespace Engine
     };
 }
 
+#ifndef NP_DIST
 // Engine log macros
 #define NP_ENGINE_LOG_TRACE(...)    ::Engine::Logging::GetEngineLogger()->trace(__VA_ARGS__)
 #define NP_ENGINE_LOG_INFO(...)     ::Engine::Logging::GetEngineLogger()->info(__VA_ARGS__)
@@ -39,3 +40,16 @@ namespace Engine
 #define NP_LOG_WARN(...)          ::Engine::Logging::GetAppLogger()->warn(__VA_ARGS__)
 #define NP_LOG_ERROR(...)         ::Engine::Logging::GetAppLogger()->error(__VA_ARGS__)
 #define NP_LOG_CRITICAL(...)      ::Engine::Logging::GetAppLogger()->critical(__VA_ARGS__)
+#else
+#define NP_ENGINE_LOG_TRACE(...)
+#define NP_ENGINE_LOG_INFO(...)
+#define NP_ENGINE_LOG_WARN(...)
+#define NP_ENGINE_LOG_ERROR(...)
+#define NP_ENGINE_LOG_CRITICAL(...)
+
+#define NP_LOG_TRACE(...)
+#define NP_LOG_INFO(...)
+#define NP_LOG_WARN(...)
+#define NP_LOG_ERROR(...)
+#define NP_LOG_CRITICAL(...)
+#endif
