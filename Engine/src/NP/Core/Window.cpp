@@ -56,6 +56,7 @@ namespace Engine
         //ImGui::StyleColorsLight();
 
         // Setup Platform/Renderer backends
+        ImGui_ImplVulkanH_Window* wd = &_mainWindowData;
         ImGui_ImplSDL2_InitForVulkan(_windowContext);
         ImGui_ImplVulkan_InitInfo initInfo = {};
         initInfo.Instance = _instance;
