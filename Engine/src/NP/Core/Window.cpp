@@ -568,7 +568,7 @@ namespace Engine
     }
 
     // TODO: Figure out what most of this code does.
-    void Window::RenderFrame(ImGui_ImplVulkanH_Window* wd, ImDrawData* draw_data)
+    void Window::RenderFrame(ImGui_ImplVulkanH_Window* wd, ImDrawData* drawData)
     {
         VkSemaphore image_acquired_semaphore  = wd->FrameSemaphores[wd->SemaphoreIndex].ImageAcquiredSemaphore;
         VkSemaphore render_complete_semaphore = wd->FrameSemaphores[wd->SemaphoreIndex].RenderCompleteSemaphore;
@@ -613,7 +613,7 @@ namespace Engine
         }
 
         // Record dear imgui primitives into command buffer.
-        ImGui_ImplVulkan_RenderDrawData(draw_data, fd->CommandBuffer);
+        ImGui_ImplVulkan_RenderDrawData(drawData, fd->CommandBuffer);
 
         // Submit command buffer
         vkCmdEndRenderPass(fd->CommandBuffer);
