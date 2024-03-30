@@ -23,6 +23,7 @@ project "Editor"
         "%{IncludeDir.ImGui}/backends",
         "%{IncludeDir.GLM}",
         "%{IncludeDir.VulkanSDK}",
+        "%{IncludeDir.entt}",
         "%{wks.location}/Engine/src",
     }
 
