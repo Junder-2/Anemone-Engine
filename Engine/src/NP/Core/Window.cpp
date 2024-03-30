@@ -670,11 +670,11 @@ namespace Engine
 
     void Window::CleanupVulkan()
     {
-        if (enableValidationLayers) vkb::destroy_debug_utils_messenger(_instance, _debugMessenger, _allocator);
-
         vkDestroyDescriptorPool(_device, _descriptorPool, _allocator);
 
         vkDestroyDevice(_device, _allocator);
+
+        if (enableValidationLayers) vkb::destroy_debug_utils_messenger(_instance, _debugMessenger, _allocator);
         vkDestroyInstance(_instance, _allocator);
     }
 
