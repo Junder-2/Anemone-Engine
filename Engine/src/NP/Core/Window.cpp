@@ -554,11 +554,11 @@ namespace Engine
 
         // Select Present Mode
         #ifdef APP_UNLIMITED_FRAME_RATE
-            VkPresentModeKHR present_modes[] = { VK_PRESENT_MODE_MAILBOX_KHR, VK_PRESENT_MODE_IMMEDIATE_KHR, VK_PRESENT_MODE_FIFO_KHR };
+            VkPresentModeKHR presentModes[] = { VK_PRESENT_MODE_MAILBOX_KHR, VK_PRESENT_MODE_IMMEDIATE_KHR, VK_PRESENT_MODE_FIFO_KHR };
         #else
-            VkPresentModeKHR present_modes[] = { VK_PRESENT_MODE_FIFO_KHR };
+            VkPresentModeKHR presentModes[] = { VK_PRESENT_MODE_FIFO_KHR };
         #endif
-        wd->PresentMode = ImGui_ImplVulkanH_SelectPresentMode(_physicalDevice, wd->Surface, &present_modes[0], IM_ARRAYSIZE(present_modes));
+        wd->PresentMode = ImGui_ImplVulkanH_SelectPresentMode(_physicalDevice, wd->Surface, &presentModes[0], IM_ARRAYSIZE(presentModes));
         //NP_ENGINE_LOG_INFO("Vulkan Info: Selected PresentMode = {0}", wd->PresentMode);
 
         // Create SwapChain, RenderPass, Framebuffer, etc.
@@ -569,9 +569,9 @@ namespace Engine
     // TODO: Figure out what most of this code does.
     void Window::RenderFrame(ImGui_ImplVulkanH_Window* wd, ImDrawData* drawData)
     {
-        VkSemaphore image_acquired_semaphore  = wd->FrameSemaphores[wd->SemaphoreIndex].ImageAcquiredSemaphore;
-        VkSemaphore render_complete_semaphore = wd->FrameSemaphores[wd->SemaphoreIndex].RenderCompleteSemaphore;
-        VkResult err = vkAcquireNextImageKHR(_device, wd->Swapchain, UINT64_MAX, image_acquired_semaphore, VK_NULL_HANDLE, &wd->FrameIndex);
+        VkSemaphore imageAcquiredSemaphore  = wd->FrameSemaphores[wd->SemaphoreIndex].ImageAcquiredSemaphore;
+        VkSemaphore renderCompleteSemaphore = wd->FrameSemaphores[wd->SemaphoreIndex].RenderCompleteSemaphore;
+        VkResult err = vkAcquireNextImageKHR(_device, wd->Swapchain, UINT64_MAX, imageAcquiredSemaphore, VK_NULL_HANDLE, &wd->FrameIndex);
         if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR)
         {
             _swapChainRebuild = true;
@@ -622,12 +622,12 @@ namespace Engine
             VkSubmitInfo info = {};
             info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
             info.waitSemaphoreCount = 1;
-            info.pWaitSemaphores = &image_acquired_semaphore;
+            info.pWaitSemaphores = &imageAcquiredSemaphore;
             info.pWaitDstStageMask = &waitStage;
             info.commandBufferCount = 1;
             info.pCommandBuffers = &fd->CommandBuffer;
             info.signalSemaphoreCount = 1;
-            info.pSignalSemaphores = &render_complete_semaphore;
+            info.pSignalSemaphores = &renderCompleteSemaphore;
 
             err = vkEndCommandBuffer(fd->CommandBuffer);
             CheckVkResult(err);
