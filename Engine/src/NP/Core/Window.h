@@ -83,6 +83,7 @@ namespace Engine
 
         static vkb::Instance CreateVkbInstance(const std::vector<const char*>& extensions);
         static vkb::PhysicalDevice SelectVkbPhysicalDevice(VkSurfaceKHR surface, vkb::Instance instance);
+        static vkb::Device CreateVkbLogicalDevice(const vkb::PhysicalDevice& physicalDevice);
 
         static VkPhysicalDevice SelectPhysicalDevice();
         static bool IsDeviceCompatible(const VkPhysicalDevice& device);

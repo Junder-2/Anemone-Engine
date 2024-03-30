@@ -249,13 +249,16 @@ namespace Engine
         const vkb::PhysicalDevice physicalDevice = SelectVkbPhysicalDevice(_surface, vkbInstance);
         _physicalDevice = physicalDevice.physical_device;
 
+        const vkb::Device logicalDevice = CreateVkbLogicalDevice(physicalDevice);
+        _device = logicalDevice.device;
+
         // Select Physical Device (GPU)
         //_physicalDevice = SelectPhysicalDevice();
 
         _queueFamily = FindQueueFamilies(_physicalDevice);
 
         // Create Logical Device (with 1 queue)
-        CreateLogicalDevice();
+        //CreateLogicalDevice();
 
         int w, h;
         SDL_GetWindowSize(window, &w, &h);
@@ -372,6 +375,32 @@ namespace Engine
             .value();
 
         return physicalDevice;
+    }
+
+    vkb::Device Window::CreateVkbLogicalDevice(const vkb::PhysicalDevice& physicalDevice)
+    {
+        std::vector<vkb::CustomQueueDescription> queueDescriptions;
+        std::vector<VkQueueFamilyProperties> queueFamilies = physicalDevice.get_queue_families();
+        QueueFamilyIndices indices;
+        for (uint32_t i = 0; i < static_cast<uint32_t>(queueFamilies.size ()); i++) {
+            if (!(queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)) continue;
+
+            queueDescriptions.push_back(vkb::CustomQueueDescription (i, std::vector<float> (queueFamilies[i].queueCount, 1.0f)));
+            indices.GraphicsFamily = i;
+            break;
+        }
+
+        // Create the final vulkan device.
+        vkb::DeviceBuilder deviceBuilder{ physicalDevice };
+
+        vkb::Device logicalDevice = deviceBuilder
+            .set_allocation_callbacks(_allocator)
+            .custom_queue_setup(queueDescriptions)
+
+            .build()
+            .value();
+
+        return logicalDevice;
     }
 
     VkPhysicalDevice Window::SelectPhysicalDevice()
