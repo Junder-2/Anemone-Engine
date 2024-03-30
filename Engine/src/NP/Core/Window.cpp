@@ -236,7 +236,9 @@ namespace Engine
     void Window::SetupVulkan(SDL_Window* window)
     {
         const std::vector<const char*> extensions = GetAvailableExtensions(window);
-        CreateVulkanInstance(extensions);
+        vkb::Instance vkbInstance = CreateVkbInstance(extensions);
+        _instance = vkbInstance.instance;
+        _debugMessenger = vkbInstance.debug_messenger;
 
         VkSurfaceKHR surface;
         if (SDL_Vulkan_CreateSurface(window, _instance, &surface) == 0)
@@ -307,7 +309,7 @@ namespace Engine
         return true;
     }
 
-    void Window::CreateVulkanInstance(const std::vector<const char*>& extensions)
+    vkb::Instance Window::CreateVkbInstance(const std::vector<const char*>& extensions)
     {
         VkDebugUtilsMessageSeverityFlagBitsEXT debugMessageSeverityFlags = (VkDebugUtilsMessageSeverityFlagBitsEXT)(
             VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
@@ -335,10 +337,7 @@ namespace Engine
             .set_allocation_callbacks(_allocator)
             .build();
 
-        vkb::Instance vkbInstance = vkbResult.value();
-
-        _instance = vkbInstance.instance;
-        _debugMessenger = vkbInstance.debug_messenger;
+        return vkbResult.value();
     }
 
     VkPhysicalDevice Window::SelectPhysicalDevice()

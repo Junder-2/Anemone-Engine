@@ -10,6 +10,13 @@
 //#include "SDL.h"
 //#include "vulkan/vulkan_core.h"
 
+namespace vkb
+{
+    struct Instance;
+    struct PhysicalDevice;
+    struct Device;
+    struct Swapchain;
+}
 
 namespace Engine
 {
@@ -73,7 +80,8 @@ namespace Engine
 
         static std::vector<const char*> GetAvailableExtensions(SDL_Window* window);
         static bool CheckValidationLayers();
-        static void CreateVulkanInstance(const std::vector<const char*>& extensions);
+
+        static vkb::Instance CreateVkbInstance(const std::vector<const char*>& extensions);
 
         static VkPhysicalDevice SelectPhysicalDevice();
         static bool IsDeviceCompatible(const VkPhysicalDevice& device);
