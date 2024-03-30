@@ -252,10 +252,17 @@ namespace Engine
         const vkb::Device logicalDevice = CreateVkbLogicalDevice(physicalDevice);
         _device = logicalDevice.device;
 
+        vkb::Result<VkQueue> queueResult = logicalDevice.get_queue(vkb::QueueType::graphics);
+        if (!queueResult.has_value())
+        {
+            NP_ENGINE_LOG_ERROR("Queue has no graphics support.\n");
+        }
+        _queue = queueResult.value();
+
         // Select Physical Device (GPU)
         //_physicalDevice = SelectPhysicalDevice();
 
-        _queueFamily = FindQueueFamilies(_physicalDevice);
+        //_queueFamily = FindQueueFamilies(_physicalDevice);
 
         // Create Logical Device (with 1 queue)
         //CreateLogicalDevice();
@@ -389,6 +396,7 @@ namespace Engine
             indices.GraphicsFamily = i;
             break;
         }
+        _queueFamily = indices;
 
         // Create the final vulkan device.
         vkb::DeviceBuilder deviceBuilder{ physicalDevice };
