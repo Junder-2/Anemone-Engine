@@ -99,8 +99,5 @@ namespace Engine
         inline static bool _swapChainRebuild = false;
 
         inline static ImGuiIO* _io;
-        inline static bool _showDemoWindow = true;
-        inline static bool _showAnotherWindow = false;
-        inline static ImVec4 _clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     };
 }
