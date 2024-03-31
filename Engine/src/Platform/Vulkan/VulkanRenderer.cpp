@@ -96,20 +96,11 @@ namespace Engine
         }
         _queue = queueResult.value();
 
-        // Select Physical Device (GPU)
-        //_physicalDevice = SelectPhysicalDevice();
-
-        //_queueFamily = FindQueueFamilies(_physicalDevice);
-
-        // Create Logical Device (with 1 queue)
-        //CreateLogicalDevice();
-
         int w, h;
         SDL_GetWindowSize(window, &w, &h);
         ImGui_ImplVulkanH_Window* wd = &_mainWindowData;
         SetupVulkanWindow(wd, _surface, w, h);
 
-        // Create Descriptor Pool
         CreateDescriptorPool();
     }
 

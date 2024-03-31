@@ -70,6 +70,8 @@ namespace Engine
             void* pUserData);
 
     private:
+        SDL_Window* _window;
+
         // Vulkan
         #ifdef NDEBUG
         static constexpr bool enableValidationLayers = false;
@@ -100,8 +102,5 @@ namespace Engine
         inline static bool _showDemoWindow = true;
         inline static bool _showAnotherWindow = false;
         inline static ImVec4 _clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
-    private:
-        SDL_Window* _window;
     };
 }
