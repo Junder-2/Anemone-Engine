@@ -10,29 +10,18 @@
 //#include "SDL.h"
 //#include "vulkan/vulkan_core.h"
 
-// Proxy functions
-inline VkResult CreateDebugUtilsMessengerEXT(
-    VkInstance instance,
-    const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
-    const VkAllocationCallbacks* pAllocator,
-    VkDebugUtilsMessengerEXT* pDebugMessenger)
+namespace vkb
 {
-    auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
-    if (func != nullptr)
-        return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
-
-    return VK_ERROR_EXTENSION_NOT_PRESENT;
-}
-
-inline void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator) {
-    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
-    if (func != nullptr) {
-        func(instance, debugMessenger, pAllocator);
-    }
+    struct Instance;
+    struct PhysicalDevice;
+    struct Device;
+    struct Swapchain;
 }
 
 namespace Engine
 {
+    class VulkanRenderer;
+
     struct NP_API WindowProperties
     {
         std::string Title;
@@ -83,75 +72,14 @@ namespace Engine
         void ProcessEvents(float deltaTime);
         void ProcessWindowEvent(const SDL_WindowEvent& windowEvent, float deltaTime);
 
-        // ImGui
-        static void CleanupImGui();
-
-        // Vulkan
-        static void CheckVkResult(VkResult err);
-
-        static void SetupVulkan(SDL_Window* window);
-
-        static ImVector<const char*> GetAvailableExtensions(SDL_Window* window);
-        static bool CheckValidationLayers();
-        static void CreateVulkanInstance(const ImVector<const char*>& extensions);
-
-        static VkPhysicalDevice SelectPhysicalDevice();
-        static bool IsDeviceCompatible(const VkPhysicalDevice& device);
-        static int GetDeviceScore(const VkPhysicalDevice& device);
-
-        static QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
-
-        static void CreateLogicalDevice();
-
-        static void CreateDescriptorPool();
-
-        static void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height);
-
-        inline static void RenderFrame(ImGui_ImplVulkanH_Window* wd, ImDrawData* draw_data);
-        inline static void RevealFrame(ImGui_ImplVulkanH_Window* wd);
-
-        static void CleanupVulkanWindow();
-        static void CleanupVulkan();
-
-        static void SetupDebugMessenger();
-        static void PopulateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
-        static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
-            VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-            VkDebugUtilsMessageTypeFlagsEXT messageType,
-            const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-            void* pUserData);
-
     private:
         SDL_Window* _windowContext;
 
         WindowProperties _windowData;
 
-        // Vulkan
-        #ifdef NDEBUG
-            static constexpr bool enableValidationLayers = false;
-        #else
-            static constexpr bool enableValidationLayers = true;
-        #endif
-        inline const static std::vector<const char*> validationLayers = {
-            "VK_LAYER_KHRONOS_validation"
-        };
+        std::unique_ptr<VulkanRenderer> _vulkanRenderer;
 
-        inline static VkAllocationCallbacks* _allocator = nullptr;
-        inline static VkInstance _instance = VK_NULL_HANDLE;
-        inline static VkDebugUtilsMessengerEXT _debugMessenger;
-        inline static VkPhysicalDevice _physicalDevice = VK_NULL_HANDLE;
-        inline static VkDevice _device = VK_NULL_HANDLE;
-        inline static QueueFamilyIndices _queueFamily = (QueueFamilyIndices)-1;
-        inline static VkQueue _queue = VK_NULL_HANDLE;
-        inline static VkPipelineCache _pipelineCache = VK_NULL_HANDLE;
-        inline static VkDescriptorPool _descriptorPool = VK_NULL_HANDLE;
-
-        // ImGui
-        inline static ImGui_ImplVulkanH_Window _mainWindowData;
-        inline static uint32_t _minImageCount = 2;
-        inline static bool _swapChainRebuild = false;
-
-        ImGuiIO* _io;
+        //ImGuiIO* _io; Moved to VulkanRenderer, so expose getter functions there.
         bool _showDemoWindow = true;
         bool _showAnotherWindow = false;
         ImVec4 _clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);

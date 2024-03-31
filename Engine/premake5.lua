@@ -29,6 +29,7 @@ project "Engine"
         "%{IncludeDir.GLM}",
         "%{IncludeDir.entt}",
         "%{IncludeDir.VulkanSDK}",
+        "%{IncludeDir.VkBootstrap}",
     }
 
     libdirs
@@ -41,7 +42,8 @@ project "Engine"
     {
         "SDL2",
         "ImGui",
-        "vulkan-1"
+        "vulkan-1",
+        "VkBootstrap",
     }
 
     filter "files:vendor/imgui/backends/**.cpp or files:vendor/imgui/backends/**.h"

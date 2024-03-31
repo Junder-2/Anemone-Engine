@@ -20,6 +20,7 @@ OutputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 group "Dependencies"
     include "Engine/vendor/imgui"
+    include "Engine/vendor/VkBootstrap"
 group ""
 
 group "Core"
