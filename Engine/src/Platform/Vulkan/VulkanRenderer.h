@@ -75,6 +75,8 @@ namespace Engine
     private:
         SDL_Window* _window;
 
+        bool _initialized = false;
+
         // Vulkan
         #ifdef NDEBUG
         static constexpr bool enableValidationLayers = false;

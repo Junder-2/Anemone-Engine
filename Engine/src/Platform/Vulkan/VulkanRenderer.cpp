@@ -19,12 +19,25 @@ namespace Engine
 
     void VulkanRenderer::Setup()
     {
+        if (_initialized)
+        {
+            NP_ENGINE_LOG_WARN("Unable to setup VulkanRenderer as it has already been initialized.");
+            return;
+        }
+
         SetupVulkan(_window);
         SetupImGui(_window);
+        _initialized = true;
     }
 
     void VulkanRenderer::NewFrame(const WindowProperties& props)
     {
+        if (!_initialized)
+        {
+            NP_ENGINE_LOG_WARN("Unable to begin VulkanRenderer frame as it was never fully initialized.");
+            return;
+        }
+
         if (_swapChainRebuild)
         {
             if (props.Width > 0 && props.Height > 0)
@@ -43,6 +56,12 @@ namespace Engine
 
     void VulkanRenderer::EndFrame()
     {
+        if (!_initialized)
+        {
+            NP_ENGINE_LOG_WARN("Unable to end VulkanRenderer frame as it was never fully initialized.");
+            return;
+        }
+
         ImGui::Render();
         ImDrawData* drawData = ImGui::GetDrawData();
         const bool isMinimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
@@ -59,11 +78,18 @@ namespace Engine
 
     void VulkanRenderer::Cleanup()
     {
+        if (!_initialized)
+        {
+            NP_ENGINE_LOG_WARN("Unable to clean up VulkanRenderer as it was never fully initialized.");
+            return;
+        }
+
         const VkResult err = vkDeviceWaitIdle(_device);
         CheckVkResult(err);
 
         CleanupImGui();
         CleanupVulkan();
+        _initialized = false;
     }
 
     float VulkanRenderer::GetFramerate()
