@@ -20,6 +20,8 @@ namespace vkb
 
 namespace Engine
 {
+    class VulkanRenderer;
+
     struct NP_API WindowProperties
     {
         std::string Title;
@@ -114,6 +116,8 @@ namespace Engine
         WindowProperties _windowData;
 
         // Vulkan
+        std::unique_ptr<VulkanRenderer> _vulkanRenderer;
+
         #ifdef NDEBUG
             static constexpr bool enableValidationLayers = false;
         #else

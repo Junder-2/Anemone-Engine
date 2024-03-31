@@ -10,6 +10,7 @@
 #include <VkBootstrap.h>
 
 #include "Application.h"
+#include "../../Platform/Vulkan/VulkanRenderer.h"
 
 namespace Engine
 {
@@ -42,6 +43,9 @@ namespace Engine
         }
 
         // Vulkan
+        _vulkanRenderer = std::make_unique<VulkanRenderer>(_windowContext);
+        _vulkanRenderer->Setup();
+        return;
         SetupVulkan(_windowContext);
 
         // Setup Dear ImGui context
@@ -79,22 +83,22 @@ namespace Engine
     void Window::OnUpdate(float deltaTime)
     {
         ProcessEvents(deltaTime);
-
         // Resize swap chain?
-        if (_swapChainRebuild)
-        {
-            if (_windowData.Width > 0 && _windowData.Height > 0)
-            {
-                ImGui_ImplVulkan_SetMinImageCount(_minImageCount);
-                ImGui_ImplVulkanH_CreateOrResizeWindow(_instance, _physicalDevice, _device, &_mainWindowData, _queueFamily.GraphicsFamily.value(), _allocator, _windowData.Width, _windowData.Height, _minImageCount);
-                _mainWindowData.FrameIndex = 0;
-                _swapChainRebuild = false;
-            }
-        }
+        //if (_swapChainRebuild)
+        //{
+        //    if (_windowData.Width > 0 && _windowData.Height > 0)
+        //    {
+        //        ImGui_ImplVulkan_SetMinImageCount(_minImageCount);
+        //        ImGui_ImplVulkanH_CreateOrResizeWindow(_instance, _physicalDevice, _device, &_mainWindowData, _queueFamily.GraphicsFamily.value(), _allocator, _windowData.Width, _windowData.Height, _minImageCount);
+        //        _mainWindowData.FrameIndex = 0;
+        //        _swapChainRebuild = false;
+        //    }
+        //}
 
-        ImGui_ImplVulkan_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame();
+        _vulkanRenderer->NewFrame(_windowData);
+        //ImGui_ImplVulkan_NewFrame();
+        //ImGui_ImplSDL2_NewFrame();
+        //ImGui::NewFrame();
 
         // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         if (_showDemoWindow)
@@ -118,7 +122,7 @@ namespace Engine
         ImGui::SameLine();
         ImGui::Text("counter = %d", counter);
 
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / _io->Framerate, _io->Framerate);
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / _vulkanRenderer->GetFramerate(), _vulkanRenderer->GetFramerate());
         //ImGui::Text("Engine %.3f ms/frame", deltaTime * 1000.f);
         ImGui::End();
 
@@ -133,18 +137,19 @@ namespace Engine
         }
 
         // Rendering
-        ImGui::Render();
-        ImDrawData* drawData = ImGui::GetDrawData();
-        const bool isMinimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
-        if (!isMinimized)
-        {
-            _mainWindowData.ClearValue.color.float32[0] = _clearColor.x * _clearColor.w;
-            _mainWindowData.ClearValue.color.float32[1] = _clearColor.y * _clearColor.w;
-            _mainWindowData.ClearValue.color.float32[2] = _clearColor.z * _clearColor.w;
-            _mainWindowData.ClearValue.color.float32[3] = _clearColor.w;
-            RenderFrame(&_mainWindowData, drawData);
-            RevealFrame(&_mainWindowData);
-        }
+        _vulkanRenderer->EndFrame();
+        //ImGui::Render();
+        //ImDrawData* drawData = ImGui::GetDrawData();
+        //const bool isMinimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
+        //if (!isMinimized)
+        //{
+        //    _mainWindowData.ClearValue.color.float32[0] = _clearColor.x * _clearColor.w;
+        //    _mainWindowData.ClearValue.color.float32[1] = _clearColor.y * _clearColor.w;
+        //    _mainWindowData.ClearValue.color.float32[2] = _clearColor.z * _clearColor.w;
+        //    _mainWindowData.ClearValue.color.float32[3] = _clearColor.w;
+        //    RenderFrame(&_mainWindowData, drawData);
+        //    RevealFrame(&_mainWindowData);
+        //}
     }
 
     void Window::ProcessEvents(float deltaTime)
@@ -199,11 +204,12 @@ namespace Engine
     void Window::Shutdown()
     {
         // Cleanup
-        const VkResult err = vkDeviceWaitIdle(_device);
-        CheckVkResult(err);
-        CleanupImGui();
+        _vulkanRenderer->Cleanup();
+        //const VkResult err = vkDeviceWaitIdle(_device);
+        //CheckVkResult(err);
+        //CleanupImGui();
 
-        CleanupVulkan();
+        //CleanupVulkan();
 
         SDL_DestroyWindow(_windowContext);
         SDL_Quit();
