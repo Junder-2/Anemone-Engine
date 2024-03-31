@@ -82,7 +82,6 @@ namespace Engine
         //ImGuiIO* _io; Moved to VulkanRenderer, so expose getter functions there.
         bool _showDemoWindow = true;
         bool _showAnotherWindow = false;
-        ImVec4 _clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
     };
 
 }
