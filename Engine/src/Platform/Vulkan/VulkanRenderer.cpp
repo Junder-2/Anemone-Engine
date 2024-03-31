@@ -48,10 +48,10 @@ namespace Engine
         const bool isMinimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
         if (!isMinimized)
         {
-            _mainWindowData.ClearValue.color.float32[0] = _clearColor.x * _clearColor.w;
-            _mainWindowData.ClearValue.color.float32[1] = _clearColor.y * _clearColor.w;
-            _mainWindowData.ClearValue.color.float32[2] = _clearColor.z * _clearColor.w;
-            _mainWindowData.ClearValue.color.float32[3] = _clearColor.w;
+            _mainWindowData.ClearValue.color.float32[0] = ClearColor.x * ClearColor.w;
+            _mainWindowData.ClearValue.color.float32[1] = ClearColor.y * ClearColor.w;
+            _mainWindowData.ClearValue.color.float32[2] = ClearColor.z * ClearColor.w;
+            _mainWindowData.ClearValue.color.float32[3] = ClearColor.w;
             RenderFrame(&_mainWindowData, drawData);
             RevealFrame(&_mainWindowData);
         }
@@ -96,20 +96,11 @@ namespace Engine
         }
         _queue = queueResult.value();
 
-        // Select Physical Device (GPU)
-        //_physicalDevice = SelectPhysicalDevice();
-
-        //_queueFamily = FindQueueFamilies(_physicalDevice);
-
-        // Create Logical Device (with 1 queue)
-        //CreateLogicalDevice();
-
         int w, h;
         SDL_GetWindowSize(window, &w, &h);
         ImGui_ImplVulkanH_Window* wd = &_mainWindowData;
         SetupVulkanWindow(wd, _surface, w, h);
 
-        // Create Descriptor Pool
         CreateDescriptorPool();
     }
 
