@@ -69,7 +69,7 @@ namespace Engine
             const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
             void* pUserData);
 
-    public:
+    private:
         // Vulkan
         #ifdef NDEBUG
         static constexpr bool enableValidationLayers = false;
