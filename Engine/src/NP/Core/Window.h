@@ -79,6 +79,10 @@ namespace Engine
 
         std::unique_ptr<VulkanRenderer> _vulkanRenderer;
 
+        bool LostFocus() const { return _imGuiLostFocus || _windowLostFocus; }
+        bool _imGuiLostFocus = false;
+        bool _windowLostFocus = false;
+
         //ImGuiIO* _io; Moved to VulkanRenderer, so expose getter functions there.
         bool _showDemoWindow = true;
         bool _showAnotherWindow = false;

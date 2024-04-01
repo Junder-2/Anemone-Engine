@@ -95,10 +95,16 @@ namespace Engine
         InputManager* inputManager = &Application::Get().GetInputManager();
         inputManager->OnUpdate();
 
+        const bool prevLostFocus = LostFocus();
+
         SDL_Event event;
         while(SDL_PollEvent(&event))
         {
             ImGui_ImplSDL2_ProcessEvent(&event);
+            const auto io = _vulkanRenderer->GetImGuiIO();
+
+            _imGuiLostFocus = (io->WantCaptureKeyboard);
+
             switch (event.type)
             {
                 case SDL_QUIT:
@@ -109,20 +115,22 @@ namespace Engine
                 continue;
                 case SDL_KEYDOWN:
                 case SDL_KEYUP:
-                    if(event.key.repeat != 0) continue;
+                    if(LostFocus() || event.key.repeat != 0) continue;
                     inputManager->ProcessKey(event.key.keysym.sym, event.type == SDL_KEYDOWN);
                 continue;
                 case SDL_MOUSEBUTTONDOWN:
-                    case SDL_MOUSEBUTTONUP:
+                case SDL_MOUSEBUTTONUP:
+                    if(LostFocus()) continue;
                     inputManager->ProcessMouseButton(MOUSE_BUTTON_TO_SDL_MOUSE_BUTTON(event.button.button), event.type == SDL_MOUSEBUTTONDOWN, event.button.clicks == 2);
                 continue;
                 case SDL_MOUSEMOTION:
+                    if(LostFocus()) continue;
                     inputManager->ProcessMouseMovement((float)event.motion.x/(float)_windowData.Width, (float)event.motion.y/(float)_windowData.Height, deltaTime);
                 continue;
             }
         }
 
-        inputManager->PopulateKeyStates(SDL_GetKeyboardState(nullptr));
+        if(!LostFocus()) inputManager->PopulateKeyStates(SDL_GetKeyboardState(nullptr));
     }
 
     void Window::ProcessWindowEvent(const SDL_WindowEvent& windowEvent, float deltaTime)
@@ -138,6 +146,13 @@ namespace Engine
 
                 if(WindowResizeDelegate) WindowResizeDelegate(_windowData.Width, _windowData.Height);
             break;
+            case SDL_WINDOWEVENT_FOCUS_LOST:
+                _windowLostFocus = true;
+            break;
+            case SDL_WINDOWEVENT_FOCUS_GAINED:
+                _windowLostFocus = false;
+            break;
+
         }
     }
 
