@@ -121,6 +121,8 @@ namespace Engine
                 continue;
             }
         }
+
+        inputManager->PopulateKeyStates(SDL_GetKeyboardState(nullptr));
     }
 
     void Window::ProcessWindowEvent(const SDL_WindowEvent& windowEvent, float deltaTime)
