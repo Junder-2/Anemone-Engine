@@ -38,6 +38,7 @@ namespace Engine
         void Cleanup();
 
         float GetFramerate();
+        static ImGuiIO* GetImGuiIO() { return _io; }
 
     private:
         // Vulkan
