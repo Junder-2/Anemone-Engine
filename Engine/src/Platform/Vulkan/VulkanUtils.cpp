@@ -1,6 +1,8 @@
 #include "nppch.h"
 #include "VulkanUtils.h"
 
+#include <fstream>
+
 namespace VulkanUtils
 {
     void TransitionImage(const VkCommandBuffer cmd, const VkImage image, const VkImageLayout currentLayout, const VkImageLayout newLayout)
@@ -69,5 +71,36 @@ namespace VulkanUtils
         blitInfo.pRegions = &blitRegion;
 
         vkCmdBlitImage2(cmd, &blitInfo);
+    }
+
+    bool LoadShaderModule(const char* filePath, const VkDevice device, const VkAllocationCallbacks* allocator, VkShaderModule* outShaderModule)
+    {
+        std::ifstream file(filePath, std::ios::ate | std::ios::binary);
+
+        if (!file.is_open()) return false;
+
+        // File size in bytes.
+        const size_t fileSize = file.tellg();
+
+        std::vector<uint32_t> buffer(fileSize / sizeof(uint32_t));
+
+        file.seekg(0);
+
+        file.read((char*)buffer.data(), fileSize);
+
+        file.close();
+
+        VkShaderModuleCreateInfo createInfo = { .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO, .pNext = nullptr };
+        createInfo.codeSize = buffer.size() * sizeof(uint32_t);
+        createInfo.pCode = buffer.data();
+
+        VkShaderModule shaderModule;
+        if (vkCreateShaderModule(device, &createInfo, allocator, &shaderModule) != VK_SUCCESS)
+        {
+            return false;
+        }
+
+        *outShaderModule = shaderModule;
+        return true;
     }
 }
