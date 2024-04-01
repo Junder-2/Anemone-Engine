@@ -57,6 +57,16 @@ namespace Engine
         }
     }
 
+    void InputManager::FlushInputs()
+    {
+        for (auto it = _keyboardInputActions.begin(); it != _keyboardInputActions.end(); ++it)
+        {
+            it->second->FlushAction();
+        }
+        _mouseInputAction.FlushAction();
+        _currentKeyStates = nullptr;
+    }
+
     void InputManager::PopulateKeyStates(const Uint8* newKeyStates)
     {
         _currentKeyStates = newKeyStates;
@@ -89,7 +99,7 @@ namespace Engine
             return _keyboardInputActions[keyCode]->GetInputValue().GetTriggerState();
         }
 
-        if (_currentKeyStates[SDL_GetScancodeFromKey(keyCode)])
+        if (_currentKeyStates != nullptr && _currentKeyStates[SDL_GetScancodeFromKey(keyCode)])
         {
             return TriggerHolding;
         }

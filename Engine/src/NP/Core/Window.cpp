@@ -130,6 +130,11 @@ namespace Engine
             }
         }
 
+        if(!prevLostFocus && LostFocus())
+        {
+            inputManager->FlushInputs();
+        }
+
         if(!LostFocus()) inputManager->PopulateKeyStates(SDL_GetKeyboardState(nullptr));
     }
 

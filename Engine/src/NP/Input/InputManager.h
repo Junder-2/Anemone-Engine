@@ -26,6 +26,7 @@ namespace Engine
         void BindMouseButtonAction(DelegateMember<TClass, void(MouseButtonValue)> delegateMember);
 
         void OnUpdate();
+        void FlushInputs();
         void PopulateKeyStates(const Uint8* newKeyStates);
         void ProcessKey(int keyCode, bool press);
         void ProcessMouseMovement(float xPos, float yPos, float deltaTime);
@@ -36,7 +37,6 @@ namespace Engine
         glm::vec2 GetMouseDelta() const { return _mouseInputAction.GetMoveValue().GetMouseDelta(); }
         glm::vec2 GetMousePos() const { return _mouseInputAction.GetMoveValue().GetMousePos(); }
         TriggerState GetMouseTriggerState(const int index) const { return _mouseInputAction.GetButtonValue().GetTriggerState(index); }
-
 
     private:
         const Uint8* _currentKeyStates{};

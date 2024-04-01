@@ -14,6 +14,15 @@ namespace Engine
         return false;
     }
 
+    void InputAction::FlushAction()
+    {
+        if (_inputValue.GetIntValue() == 0) return;
+
+        _inputValue = 0;
+
+        if (_inputDelegate) _inputDelegate(_inputValue);
+    }
+
     bool InputTrigger::PopulateInput(const float input)
     {
         InputAction::PopulateInput(input);

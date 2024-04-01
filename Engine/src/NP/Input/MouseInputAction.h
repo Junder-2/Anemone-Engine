@@ -83,6 +83,7 @@ namespace Engine
         bool PopulateMoveInput(float x, float y, float deltaTime);
         bool PopulateButtonInput(int buttonIndex, TriggerState newState, bool isDoubleClick = false);
         void ProcessAction();
+        void FlushAction();
 
         MouseMoveValue GetMoveValue() const { return _moveValue; }
         MouseButtonValue GetButtonValue() const { return _buttonValue; }
