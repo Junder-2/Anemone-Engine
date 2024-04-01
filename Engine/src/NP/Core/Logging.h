@@ -18,8 +18,22 @@ namespace Engine
         static void InitEngine();
         static void InitApp(const std::string& appName = "APP");
 
-        static std::shared_ptr<spdlog::logger>& GetEngineLogger() { return _engineLogger; }
-        static std::shared_ptr<spdlog::logger>& GetAppLogger() { return _appLogger; }
+        static std::shared_ptr<spdlog::logger>& GetEngineLogger()
+        {
+            if(_engineLogger == nullptr)
+            {
+                spdlog::log(spdlog::level::level_enum::err, "Engine logger not yet initialized");
+            }
+            return _engineLogger;
+        }
+        static std::shared_ptr<spdlog::logger>& GetAppLogger()
+        {
+            if(_appLogger == nullptr)
+            {
+                GetEngineLogger()->error("App logger not yet initialized");
+            }
+            return _appLogger;
+        }
     private:
         static std::shared_ptr<spdlog::logger> _engineLogger;
         static std::shared_ptr<spdlog::logger> _appLogger;
