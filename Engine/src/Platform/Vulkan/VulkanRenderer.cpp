@@ -134,6 +134,7 @@ namespace Engine
     {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
+
         _io = &ImGui::GetIO(); (void)_io;
         _io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
         _io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
@@ -143,8 +144,9 @@ namespace Engine
         //ImGui::StyleColorsLight();
 
         // Setup Platform/Renderer backends
-        ImGui_ImplVulkanH_Window* wd = &_mainWindowData;
         ImGui_ImplSDL2_InitForVulkan(window);
+        ImGui_ImplVulkanH_Window* wd = &_mainWindowData;
+
         ImGui_ImplVulkan_InitInfo initInfo = {};
         initInfo.Instance = _instance;
         initInfo.PhysicalDevice = _physicalDevice;
@@ -160,6 +162,7 @@ namespace Engine
         initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
         initInfo.Allocator = _allocator;
         initInfo.CheckVkResultFn = CheckVkResult;
+
         ImGui_ImplVulkan_Init(&initInfo);
     }
 
