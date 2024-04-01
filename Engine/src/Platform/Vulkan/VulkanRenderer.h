@@ -84,9 +84,6 @@ namespace Engine
         #else
         static constexpr bool enableValidationLayers = true;
         #endif
-        inline const static std::vector<const char*> validationLayers = {
-            "VK_LAYER_KHRONOS_validation"
-        };
 
         inline static VkAllocationCallbacks* _allocator = nullptr;
         inline static VkInstance _instance = VK_NULL_HANDLE;
