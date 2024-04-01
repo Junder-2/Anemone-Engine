@@ -28,7 +28,7 @@ namespace Engine
         void OnMouseKeyTest(MouseButtonValue inputValue);
         void OnMouseMoveTest(MouseMoveValue inputValue);
 
-        Window& GetWindowContext() const { return *_windowContext; }
+        Window& GetWindow() const { return *_windowContext; }
         InputManager& GetInputManager() const { return *_inputManager.get(); }
 
         static Application& Get() { return *_appInstance; }

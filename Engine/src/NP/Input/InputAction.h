@@ -43,6 +43,7 @@ namespace Engine
         void BindAction(DelegateMember<TClass, void(InputValue)> delegateMember);
         virtual bool PopulateInput(float input);
         virtual bool ProcessAction() = 0;
+        virtual void FlushAction();
 
         InputValue GetInputValue() const { return _inputValue; }
 

@@ -3,6 +3,7 @@
 
 #include "InputAction.h"
 #include "InputTypes.h"
+#include "../Core/Application.h"
 
 namespace Engine
 {
@@ -56,6 +57,21 @@ namespace Engine
         }
     }
 
+    void InputManager::FlushInputs()
+    {
+        for (auto it = _keyboardInputActions.begin(); it != _keyboardInputActions.end(); ++it)
+        {
+            it->second->FlushAction();
+        }
+        _mouseInputAction.FlushAction();
+        _currentKeyStates = nullptr;
+    }
+
+    void InputManager::PopulateKeyStates(const Uint8* newKeyStates)
+    {
+        _currentKeyStates = newKeyStates;
+    }
+
     void InputManager::ProcessKey(const int keyCode, const bool press)
     {
         if (!_keyboardInputActions.contains(keyCode)) return;
@@ -76,14 +92,19 @@ namespace Engine
         _dirtyMouse = _mouseInputAction.PopulateButtonInput(index, press ? TriggerStarted : TriggerStopped, isDoubleClick);
     }
 
-    TriggerState InputManager::GetKeyTriggerState(int keyCode)
+    TriggerState InputManager::GetKeyTriggerState(const int keyCode)
     {
         if (_keyboardInputActions.contains(keyCode))
         {
             return _keyboardInputActions[keyCode]->GetInputValue().GetTriggerState();
         }
 
-        NP_ENGINE_LOG_WARN("No registered of key {0}", keyCode);
+        if (_currentKeyStates != nullptr && _currentKeyStates[SDL_GetScancodeFromKey(keyCode)])
+        {
+            return TriggerHolding;
+        }
+
+        //NP_ENGINE_LOG_WARN("No registered of key {0}", keyCode);
 
         return TriggerNone;
     }

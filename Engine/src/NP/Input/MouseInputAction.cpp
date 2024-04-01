@@ -47,4 +47,17 @@ namespace Engine
             }
         }
     }
+
+    void MouseInputAction::FlushAction()
+    {
+        _moveValue.SetMouseDelta(0, 0);
+
+        for (int i = 0; i < MOUSE_BUTTON_MAX; ++i)
+        {
+            auto prevValue = _buttonValue.GetTriggerState(i);
+            if(prevValue == TriggerNone) continue;
+            _buttonValue.SetTriggerState(i, TriggerNone);
+            if(_buttonInputDelegate) _buttonInputDelegate(_buttonValue);
+        }
+    }
 }
