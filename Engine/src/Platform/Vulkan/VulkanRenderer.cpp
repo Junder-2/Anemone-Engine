@@ -126,13 +126,12 @@ namespace Engine
         SDL_GetWindowSize(window, &w, &h);
         ImGui_ImplVulkanH_Window* wd = &_mainWindowData;
         SetupVulkanWindow(wd, _surface, w, h);
-
-        CreateDescriptorPool();
     }
 
     void VulkanRenderer::SetupImGui(SDL_Window* window)
     {
         IMGUI_CHECKVERSION();
+        CreateImGuiDescriptorPool();
         ImGui::CreateContext();
 
         _io = &ImGui::GetIO(); (void)_io;
@@ -154,7 +153,7 @@ namespace Engine
         initInfo.QueueFamily = _queueFamily.GraphicsFamily.value();
         initInfo.Queue = _queue;
         initInfo.PipelineCache = _pipelineCache;
-        initInfo.DescriptorPool = _descriptorPool;
+        initInfo.DescriptorPool = _imGuiDescriptorPool;
         initInfo.RenderPass = wd->RenderPass;
         initInfo.Subpass = 0;
         initInfo.MinImageCount = _minImageCount;
@@ -310,21 +309,21 @@ namespace Engine
         ImGui_ImplVulkanH_CreateOrResizeWindow(_instance, _physicalDevice, _device, wd, _queueFamily.GraphicsFamily.value(), _allocator, width, height, _minImageCount);
     }
 
-    void VulkanRenderer::CreateDescriptorPool()
+    void VulkanRenderer::CreateImGuiDescriptorPool()
     {
         VkDescriptorPoolSize poolSizes[] =
         {
             { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1 },
         };
 
-        VkDescriptorPoolCreateInfo poolInfo = {};
+        VkDescriptorPoolCreateInfo poolInfo = { };
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
         poolInfo.maxSets = 1;
         poolInfo.poolSizeCount = (uint32_t)IM_ARRAYSIZE(poolSizes);
         poolInfo.pPoolSizes = poolSizes;
 
-        VkResult err = vkCreateDescriptorPool(_device, &poolInfo, _allocator, &_descriptorPool);
+        VkResult err = vkCreateDescriptorPool(_device, &poolInfo, _allocator, &_imGuiDescriptorPool);
         CheckVkResult(err);
     }
 
@@ -429,7 +428,7 @@ namespace Engine
         // Calls vkDestroyPipeline, vkDestroyRenderPass, vkDestroySwapchainKHR and vkDestroySurfaceKHR.
         ImGui_ImplVulkanH_DestroyWindow(_instance, _device, &_mainWindowData, _allocator);
 
-        vkDestroyDescriptorPool(_device, _descriptorPool, _allocator);
+        vkDestroyDescriptorPool(_device, _imGuiDescriptorPool, _allocator);
 
         vkDestroyDevice(_device, _allocator);
 

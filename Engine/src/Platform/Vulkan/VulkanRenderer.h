@@ -55,7 +55,7 @@ namespace Engine
 
         static void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height);
 
-        static void CreateDescriptorPool();
+        static void CreateImGuiDescriptorPool();
 
         inline static void RenderFrame(ImGui_ImplVulkanH_Window* wd, ImDrawData* drawData);
         inline static void RevealFrame(ImGui_ImplVulkanH_Window* wd);
@@ -97,12 +97,13 @@ namespace Engine
         inline static QueueFamilyIndices _queueFamily = (QueueFamilyIndices)-1;
         inline static VkQueue _queue = VK_NULL_HANDLE;
         inline static VkPipelineCache _pipelineCache = VK_NULL_HANDLE;
-        inline static VkDescriptorPool _descriptorPool = VK_NULL_HANDLE;
 
         // ImGui
         inline static ImGui_ImplVulkanH_Window _mainWindowData;
         inline static uint32_t _minImageCount = 2;
         inline static bool _swapChainRebuild = false;
+
+        inline static VkDescriptorPool _imGuiDescriptorPool = VK_NULL_HANDLE;
 
         inline static ImGuiIO* _io;
     };
