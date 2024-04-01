@@ -325,6 +325,8 @@ namespace Engine
 
         VkResult err = vkCreateDescriptorPool(_device, &poolInfo, _allocator, &_imGuiDescriptorPool);
         CheckVkResult(err);
+
+        _mainDeletionQueue.PushFunction([&]{ vkDestroyDescriptorPool(_device, _imGuiDescriptorPool, _allocator); });
     }
 
     // TODO: Figure out what most of this code does.
@@ -428,7 +430,7 @@ namespace Engine
         // Calls vkDestroyPipeline, vkDestroyRenderPass, vkDestroySwapchainKHR and vkDestroySurfaceKHR.
         ImGui_ImplVulkanH_DestroyWindow(_instance, _device, &_mainWindowData, _allocator);
 
-        vkDestroyDescriptorPool(_device, _imGuiDescriptorPool, _allocator);
+        _mainDeletionQueue.Flush();
 
         vkDestroyDevice(_device, _allocator);
 

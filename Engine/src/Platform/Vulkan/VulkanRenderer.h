@@ -5,6 +5,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "imgui.h"
+#include "VulkanDeletionQueue.h"
 
 namespace vkb
 {
@@ -84,6 +85,9 @@ namespace Engine
         #else
         static constexpr bool enableValidationLayers = true;
         #endif
+
+        // Deletion queue with the scope of the renderer.
+        inline static VulkanDeletionQueue _mainDeletionQueue;
 
         inline static VkAllocationCallbacks* _allocator = nullptr;
         inline static VkInstance _instance = VK_NULL_HANDLE;
