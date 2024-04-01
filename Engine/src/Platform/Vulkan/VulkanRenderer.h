@@ -1,10 +1,7 @@
 #pragma once
-#include <imgui_impl_vulkan.h>
-#include <SDL_events.h>
 #include <SDL_video.h>
-#include <vulkan/vulkan_core.h>
+#include <imgui_impl_vulkan.h>
 
-#include "imgui.h"
 #include "VulkanDeletionQueue.h"
 
 namespace vkb
