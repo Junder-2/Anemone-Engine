@@ -1,12 +1,12 @@
 #pragma once
-#include "glm/gtx/quaternion.hpp"
+#include "../../TransformMatrix.h"
 
 namespace Engine
 {
     struct CameraComponent
     {
     public:
-        glm::mat4 Transform {};
+        TransformMatrix Transform {};
         glm::vec4 ViewPos = {};
         glm::mat4 PerspectiveMatrix = {};
         glm::mat4 ViewMatrix = {};
@@ -14,32 +14,12 @@ namespace Engine
         CameraComponent() = default;
         CameraComponent(const CameraComponent&) = default;
 
-        CameraComponent(const glm::mat4& transform) : Transform(transform)
-        {
-        }
-
         void SetPerspective(float fov, float aspect, float zNear, float zFar);
 
         void UpdateAspectRatio(float aspect);
 
-        void SetPosition(glm::vec3 position);
-
-        glm::vec3 GetPosition()
-        {
-            return Transform[3];
-        }
-
-        void SetRotation(glm::vec3 rotation);
-
-        glm::vec3 GetEulerRotation() const
-        {
-            return eulerAngles(toQuat(Transform));
-        }
-
-        glm::quat GetRotation() const
-        {
-            return toQuat(Transform);
-        }
+        void SetPosition(glm::vec3 newPosition);
+        void SetRotation(glm::vec3 newRotation);
 
         float GetFOV() const
         {

@@ -1,11 +1,12 @@
 ﻿#pragma once
+#include "../../TransformMatrix.h"
 
 namespace Engine
 {
     struct TransformComponent
     {
     public:
-        glm::mat4 Transform;
+        TransformMatrix Transform;
 
         //copy constructor
         TransformComponent() = default;

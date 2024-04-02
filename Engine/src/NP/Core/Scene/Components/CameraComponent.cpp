@@ -3,21 +3,15 @@
 
 namespace Engine
 {
-    void CameraComponent::SetPosition(const glm::vec3 position)
+    void CameraComponent::SetPosition(const glm::vec3 newPosition)
     {
-        Transform[3] = xyz1(position);
+        Transform.SetPosition(newPosition);
         UpdateViewMatrix();
     }
 
-    void CameraComponent::SetRotation(const glm::vec3 rotation)
+    void CameraComponent::SetRotation(const glm::vec3 newRotation)
     {
-        Transform[0] = glm::vec4(1, 0, 0, 0);
-        Transform[1] = glm::vec4(0, 1, 0, 0);
-        Transform[2] = glm::vec4(0, 0, 1, 0);
-        Transform = rotate(Transform, glm::radians(rotation.x), glm::vec3(1.f, 0.f, 0.f));
-        Transform = rotate(Transform, glm::radians(rotation.y), glm::vec3(0.f, 1.f, 0.f));
-        Transform = rotate(Transform, glm::radians(rotation.z), glm::vec3(0.f, 0.f, 1.f));
-
+        Transform.SetRotation(newRotation);
         UpdateViewMatrix();
     }
 
@@ -63,7 +57,7 @@ namespace Engine
             ViewMatrix[1][1] *= -1.f;
         }
 
-        ViewPos = glm::vec4(GetPosition(), 0.0f) * glm::vec4(-1.0f, 1.0f, -1.0f, 1.0f);
+        ViewPos = glm::vec4(Transform.GetPosition(), 0.0f) * glm::vec4(-1.0f, 1.0f, -1.0f, 1.0f);
 
         if (ViewMatrix != currentMatrix) {
             _updated = true;
