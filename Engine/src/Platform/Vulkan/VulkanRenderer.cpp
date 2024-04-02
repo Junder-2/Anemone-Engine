@@ -9,6 +9,7 @@
 #include <VkBootstrap.h>
 
 #include "../../NP/Core/Window.h"
+#include "../../NP/Utilities/ImGuiUtilities.h"
 
 namespace Engine
 {
@@ -128,6 +129,7 @@ namespace Engine
         //_io->ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
         // Setup Dear ImGui style
+        //ImGuiUtilities::StyleNPDark();
         ImGui::StyleColorsDark();
         //ImGui::StyleColorsLight();
 
