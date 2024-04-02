@@ -13,6 +13,6 @@ Engine::Application* Engine::CreateApplication()
     ApplicationSpecification spec;
     spec.Name = "Sandbox";
     spec.LogName = "SANDBOX";
-    
+
     return new Sandbox(spec);
 }
