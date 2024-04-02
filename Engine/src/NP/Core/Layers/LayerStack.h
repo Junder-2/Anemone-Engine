@@ -1,17 +1,16 @@
 #pragma once
+#include "Layer.h"
 
 namespace Engine
 {
-    class Layer;
-
     class NP_API LayerStack
     {
     public:
         LayerStack() = default;
-        ~LayerStack() = default;
+        ~LayerStack();
 
-        void PushLayer(Layer* layer);
-        void PopLayer(Layer* layer);
+        void PushLayer(Layer* layer); // these should probs be static?
+        void PopLayer(Layer* layer); // static?
 
         // Iterator functions
         std::vector<Layer*>::iterator begin() { return _layers.begin(); }
@@ -25,7 +24,7 @@ namespace Engine
         std::vector<Layer*>::const_reverse_iterator rend() const { return _layers.rend(); }
 
     private:
-        std::vector<Layer*> _layers;
+        std::vector<Layer*> _layers; // todo: make into smartpointer
         unsigned int _layerInsertIndex = 0;
     };
 }

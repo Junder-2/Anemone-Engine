@@ -5,8 +5,9 @@
 
 #include <SDL_timer.h>
 
-#include "Layer.h"
+#include "Layers/Layer.h"
 #include "../Input/InputManager.h"
+#include "Layers/EditorLayer.h"
 
 namespace Engine
 {
@@ -21,6 +22,15 @@ namespace Engine
 
         _windowContext->WindowCloseDelegate += MakeDelegate(this, &Application::Shutdown);
         _windowContext->WindowResizeDelegate += MakeDelegate(this, &Application::OnResizeTest);
+
+        //todo: make into template method
+        EditorLayer* editorLayer = new EditorLayer("EditorLayer");
+        editorLayer->AddScene<Scene>("Game");
+        editorLayer->AddScene<Scene>("Main Menu");
+        editorLayer->AddScene<Scene>("Credits");
+        _layerStack.PushLayer(editorLayer);
+
+        editorLayer->SetActiveScene("roe");
 
         // input testing
         // GetInputManager().RegisterKeyboardTrigger(KeyCode0);
@@ -41,7 +51,7 @@ namespace Engine
 
             float deltaTime = timeStep / static_cast<float>(SDL_GetPerformanceFrequency());
 
-            for (Layer* layer : _layerStack)
+            for (Layer* layer : _layerStack) // raw pointers
             {
                 layer->OnUpdate(deltaTime);
             }
