@@ -23,6 +23,9 @@ namespace Engine
             delete val;
         }
 
+        for (const TwoBindingInput* val : _keyboardTwoBindings | std::views::values)
+        {
+            delete val;
         }
 
         _keyboardInputActions.clear();
@@ -35,6 +38,17 @@ namespace Engine
         InputTrigger* newInputAction = new InputTrigger(keyCode);
 
         _keyboardInputActions.insert_or_assign(keyCode, newInputAction);
+    }
+
+    void InputManager::RegisterKeyboardTwoKeyAxis(const int negativeKeyCode, const int positiveKeyCode)
+    {
+        const IntPair twoKeys(negativeKeyCode, positiveKeyCode);
+
+        if(_keyboardTwoBindings.contains(twoKeys)) return;
+
+        TwoBindingInput* twoKeyInputBinding = new TwoBindingInput(negativeKeyCode, positiveKeyCode);
+
+        _keyboardTwoBindings.insert_or_assign(twoKeys, twoKeyInputBinding);
     }
 
     void InputManager::OnUpdate()

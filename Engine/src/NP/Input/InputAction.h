@@ -82,4 +82,30 @@ namespace Engine
     {
         _inputDelegate += delegateMember;
     }
+
+    class TwoBindingInput
+    {
+    public:
+        TwoBindingInput() = default;
+        TwoBindingInput(const int negativeBindingId, const int positiveBindingId) //todo: might want to turn the combined binding Id into has so we can decode it later
+        : _inputValue(negativeBindingId+positiveBindingId), _negativeBindingId(negativeBindingId), _positiveBindingId(positiveBindingId) {}
+        ~TwoBindingInput() = default;
+
+        template <class TClass>
+        void BindAction(DelegateMember<TClass, void(InputValue)> delegateMember);
+        void OnBoundInput(InputValue inputValue);
+
+    private:
+        MulticastDelegate<void(InputValue)> _inputDelegate;
+        InputValue _inputValue;
+
+        int _negativeBindingId = 0;
+        int _positiveBindingId = 0;
+    };
+
+    template <class TClass>
+    void TwoBindingInput::BindAction(DelegateMember<TClass, void(InputValue)> delegateMember)
+    {
+        _inputDelegate += delegateMember;
+    }
 }
