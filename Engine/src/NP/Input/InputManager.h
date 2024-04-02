@@ -40,7 +40,7 @@ namespace Engine
 
     private:
         const Uint8* _currentKeyStates{};
-        std::map<int, InputAction*> _keyboardInputActions {};
+        std::unordered_map<int, InputAction*> _keyboardInputActions {};
         std::queue<int> _dirtyKeys {};
         MouseInputAction _mouseInputAction {};
         bool _dirtyMouse = false;
@@ -55,7 +55,7 @@ namespace Engine
             return;
         }
 
-        InputTrigger* newInputAction = new InputTrigger();
+        InputTrigger* newInputAction = new InputTrigger(keyCode);
 
         newInputAction->BindAction(delegateMember);
 
