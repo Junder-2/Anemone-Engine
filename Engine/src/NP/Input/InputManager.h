@@ -49,7 +49,14 @@ namespace Engine
     template <class TClass>
     void InputManager::BindKeyboardTrigger(const int keyCode, DelegateMember<TClass, void(InputValue)> delegateMember)
     {
-        if(_keyboardInputActions.contains(keyCode))
+        if(!_keyboardInputActions.contains(keyCode))
+        {
+            RegisterKeyboardTrigger(keyCode);
+        }
+
+        _keyboardInputActions[keyCode]->BindAction(delegateMember);
+    }
+
         {
             _keyboardInputActions[keyCode]->BindAction(delegateMember);
             return;

@@ -18,9 +18,11 @@ namespace Engine
 
     InputManager::~InputManager()
     {
-        for (auto it = _keyboardInputActions.begin(); it != _keyboardInputActions.end(); ++it)
+        for (const InputAction* val : _keyboardInputActions | std::views::values)
         {
-            delete it->second;
+            delete val;
+        }
+
         }
 
         _keyboardInputActions.clear();
