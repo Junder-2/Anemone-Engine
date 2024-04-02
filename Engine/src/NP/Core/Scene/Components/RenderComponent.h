@@ -1,7 +1,9 @@
 ﻿#pragma once
 
-namespace Engine {
-    struct RenderComponent {
+namespace Engine
+{
+    struct RenderComponent
+    {
         // this is a example
         glm::mat4 Renderer;
 

@@ -1,7 +1,9 @@
 ﻿#pragma once
 
-namespace Engine {
-    struct TransformComponent {
+namespace Engine
+{
+    struct TransformComponent
+    {
     public:
         glm::mat4 Transform;
 
