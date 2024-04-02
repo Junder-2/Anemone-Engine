@@ -95,7 +95,7 @@ namespace Engine
     {
         if (!_keyboardInputActions.contains(keyCode)) return;
 
-        if(_keyboardInputActions[keyCode]->PopulateInput((float)(press ? TriggerStarted : TriggerStopped)))
+        if (_keyboardInputActions[keyCode]->PopulateInput((float)(press ? TriggerStarted : TriggerStopped)))
         {
             _dirtyKeys.push(keyCode);
         }
@@ -109,6 +109,24 @@ namespace Engine
     void InputManager::ProcessMouseButton(const int index, const bool press, const bool isDoubleClick /*= false */)
     {
         _dirtyMouse = _mouseInputAction.PopulateButtonInput(index, press ? TriggerStarted : TriggerStopped, isDoubleClick);
+    }
+
+    std::array<InputValue, 4> InputManager::GetCurrentTriggeredKeys()
+    {
+        std::array<InputValue, 4> newArray;
+
+        int index = 0;
+
+        for (const InputAction* val : _keyboardInputActions | std::views::values)
+        {
+            if (val->GetInputValue().GetIntValue() == 0) continue;
+
+            newArray[index] = val->GetInputValue();
+            index++;
+            if(index >= 4) break;
+        }
+
+        return newArray;
     }
 
     TriggerState InputManager::GetKeyTriggerState(const int keyCode)

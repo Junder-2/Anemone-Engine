@@ -36,10 +36,13 @@ namespace Engine
         void ProcessMouseButton(int index, bool press, bool isDoubleClick = false);
 
         TriggerState GetKeyTriggerState(int keyCode);
+        // todo: just using for debug now. probably dirty to use array
+        std::array<InputValue, 4> GetCurrentTriggeredKeys();
 
         glm::vec2 GetMouseDelta() const { return _mouseInputAction.GetMoveValue().GetMouseDelta(); }
         glm::vec2 GetMousePos() const { return _mouseInputAction.GetMoveValue().GetMousePos(); }
         TriggerState GetMouseTriggerState(const int index) const { return _mouseInputAction.GetButtonValue().GetTriggerState(index); }
+        MouseButtonValue GetMouseButtonValues() const { return _mouseInputAction.GetButtonValue(); }
 
     private:
         const Uint8* _currentKeyStates{};
