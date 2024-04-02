@@ -33,6 +33,10 @@ namespace Engine
         //editorLayer->SetActiveScene("roe");
 
         // input testing
+        // for (int i = KeyCodeA; i < KeyCodeZ+1; ++i)
+        // {
+        //     GetInputManager().RegisterKeyboardTrigger(i);
+        // }
         // GetInputManager().RegisterKeyboardTrigger(KeyCode0);
         // GetInputManager().BindKeyboardTrigger(KeyCode1, MakeDelegate(this, &Application::OnKeyTest));
         // GetInputManager().BindKeyboardTrigger(KeyCode2, MakeDelegate(this, &Application::OnKeyTest));
@@ -64,13 +68,6 @@ namespace Engine
             //todo frame yap
 
             _windowContext->OnUpdate(deltaTime);
-
-            // auto pressed = GetInputManager().GetKeyTriggerState(KeyCode0);
-            //
-            // if(pressed != TriggerNone)
-            // {
-            //     NP_ENGINE_LOG_INFO("O key state {0}", (int)pressed);
-            // }
         }
     }
 

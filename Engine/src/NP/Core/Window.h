@@ -69,6 +69,8 @@ namespace Engine
         void ProcessEvents(float deltaTime);
         void ProcessWindowEvent(const SDL_WindowEvent& windowEvent, float deltaTime);
 
+        static void ShowInputDebugOverlay(bool* pOpen);
+
     private:
         SDL_Window* _windowContext;
 
