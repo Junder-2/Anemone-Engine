@@ -34,7 +34,13 @@ namespace Engine
 
         // input testing
         // GetInputManager().RegisterKeyboardTrigger(KeyCode0);
-        // GetInputManager().BindKeyboardTrigger(KeyCodeO, MakeDelegate(this, &Application::OnKeyTest));
+        // GetInputManager().BindKeyboardTrigger(KeyCode1, MakeDelegate(this, &Application::OnKeyTest));
+        // GetInputManager().BindKeyboardTrigger(KeyCode2, MakeDelegate(this, &Application::OnKeyTest));
+        // GetInputManager().BindKeyboardTrigger(KeyCode3, MakeDelegate(this, &Application::OnKeyTest));
+
+        // GetInputManager().BindKeyboardAxis(KeyCodeA, KeyCodeD, MakeDelegate(this, &Application::OnAxisTest));
+        // GetInputManager().BindKeyboardAxis(KeyCodeS, KeyCodeW, MakeDelegate(this, &Application::OnAxisTest));
+
         // GetInputManager().BindMouseButtonAction(MakeDelegate(this, &Application::OnMouseKeyTest));
         // GetInputManager().BindMouseMoveAction(MakeDelegate(this, &Application::OnMouseMoveTest));
     }
@@ -81,6 +87,11 @@ namespace Engine
     void Application::OnKeyTest(InputValue inputValue)
     {
         NP_ENGINE_LOG_INFO("pressed {0}: {1}", inputValue.GetBindingId(), inputValue.GetIntValue());
+    }
+
+    void Application::OnAxisTest(InputValue inputValue)
+    {
+        NP_ENGINE_LOG_INFO("pressed {0}: {1}", inputValue.GetBindingId(), inputValue.GetAxis());
     }
 
     void Application::OnMouseKeyTest(MouseButtonValue inputValue)
