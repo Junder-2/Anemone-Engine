@@ -147,7 +147,7 @@ namespace Engine
         {
             case SDL_WINDOWEVENT_RESIZED:
             case SDL_WINDOWEVENT_SIZE_CHANGED:
-                if(_windowData.Width != windowEvent.data1 || _windowData.Height != windowEvent.data2) break;
+                if(_windowData.Width == windowEvent.data1 && _windowData.Height == windowEvent.data2) break;
 
                 _windowData.Width = windowEvent.data1;
                 _windowData.Height = windowEvent.data2;
