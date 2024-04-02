@@ -1,10 +1,7 @@
 #pragma once
-#include <imgui_impl_vulkan.h>
 #include <SDL_events.h>
 #include <SDL_video.h>
-#include <vulkan/vulkan_core.h>
 
-#include "imgui.h"
 #include "../Delegate/Delegate.h"
 
 //#include "SDL.h"
@@ -71,6 +68,8 @@ namespace Engine
 
         void ProcessEvents(float deltaTime);
         void ProcessWindowEvent(const SDL_WindowEvent& windowEvent, float deltaTime);
+
+        static void ShowInputDebugOverlay(bool* pOpen);
 
     private:
         SDL_Window* _windowContext;

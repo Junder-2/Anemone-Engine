@@ -2,7 +2,7 @@
 
 namespace Engine
 {
-    class NP_API Layer
+    class NP_API Layer // should probaly be abstract
     {
     public:
         Layer(const std::string& name = "Layer");
@@ -12,7 +12,9 @@ namespace Engine
         virtual void OnDetach() { }
         virtual void OnUpdate(float deltaTime) { }
 
+
     protected:
         std::string _debugName;
+
     };
 }

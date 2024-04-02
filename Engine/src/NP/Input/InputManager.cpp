@@ -1,6 +1,8 @@
 #include "nppch.h"
 #include "InputManager.h"
 
+#include <ranges>
+
 #include "InputAction.h"
 #include "InputTypes.h"
 #include "../Core/Application.h"
@@ -16,9 +18,14 @@ namespace Engine
 
     InputManager::~InputManager()
     {
-        for (auto it = _keyboardInputActions.begin(); it != _keyboardInputActions.end(); ++it)
+        for (const InputAction* val : _keyboardInputActions | std::views::values)
         {
-            delete it->second;
+            delete val;
+        }
+
+        for (const TwoBindingInput* val : _keyboardTwoBindings | std::views::values)
+        {
+            delete val;
         }
 
         _keyboardInputActions.clear();
@@ -28,9 +35,20 @@ namespace Engine
     {
         if (_keyboardInputActions.contains(keyCode)) return;
 
-        InputTrigger* newInputAction = new InputTrigger();
+        InputTrigger* newInputAction = new InputTrigger(keyCode);
 
         _keyboardInputActions.insert_or_assign(keyCode, newInputAction);
+    }
+
+    void InputManager::RegisterKeyboardTwoKeyAxis(const int negativeKeyCode, const int positiveKeyCode)
+    {
+        const IntPair twoKeys(negativeKeyCode, positiveKeyCode);
+
+        if(_keyboardTwoBindings.contains(twoKeys)) return;
+
+        TwoBindingInput* twoKeyInputBinding = new TwoBindingInput(negativeKeyCode, positiveKeyCode);
+
+        _keyboardTwoBindings.insert_or_assign(twoKeys, twoKeyInputBinding);
     }
 
     void InputManager::OnUpdate()
@@ -59,10 +77,11 @@ namespace Engine
 
     void InputManager::FlushInputs()
     {
-        for (auto it = _keyboardInputActions.begin(); it != _keyboardInputActions.end(); ++it)
+        for (const auto val : _keyboardInputActions | std::views::values)
         {
-            it->second->FlushAction();
+            val->FlushAction();
         }
+
         _mouseInputAction.FlushAction();
         _currentKeyStates = nullptr;
     }
@@ -76,7 +95,7 @@ namespace Engine
     {
         if (!_keyboardInputActions.contains(keyCode)) return;
 
-        if(_keyboardInputActions[keyCode]->PopulateInput((float)(press ? TriggerStarted : TriggerStopped)))
+        if (_keyboardInputActions[keyCode]->PopulateInput((float)(press ? TriggerStarted : TriggerStopped)))
         {
             _dirtyKeys.push(keyCode);
         }
@@ -90,6 +109,24 @@ namespace Engine
     void InputManager::ProcessMouseButton(const int index, const bool press, const bool isDoubleClick /*= false */)
     {
         _dirtyMouse = _mouseInputAction.PopulateButtonInput(index, press ? TriggerStarted : TriggerStopped, isDoubleClick);
+    }
+
+    std::array<InputValue, 4> InputManager::GetCurrentTriggeredKeys()
+    {
+        std::array<InputValue, 4> newArray;
+
+        int index = 0;
+
+        for (const InputAction* val : _keyboardInputActions | std::views::values)
+        {
+            if (val->GetInputValue().GetIntValue() == 0) continue;
+
+            newArray[index] = val->GetInputValue();
+            index++;
+            if(index >= 4) break;
+        }
+
+        return newArray;
     }
 
     TriggerState InputManager::GetKeyTriggerState(const int keyCode)

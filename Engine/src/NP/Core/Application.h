@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Core.h"
-#include "LayerStack.h"
+#include "Layers/LayerStack.h"
 #include "Window.h"
 #include "../Input/InputManager.h"
 
@@ -25,6 +25,7 @@ namespace Engine
         //Test functions
         void OnResizeTest(int width, int height);
         void OnKeyTest(InputValue inputValue);
+        void OnAxisTest(InputValue inputValue);
         void OnMouseKeyTest(MouseButtonValue inputValue);
         void OnMouseMoveTest(MouseMoveValue inputValue);
 

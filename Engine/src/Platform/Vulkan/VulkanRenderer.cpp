@@ -72,6 +72,17 @@ namespace Engine
             _mainWindowData.ClearValue.color.float32[2] = ClearColor.z * ClearColor.w;
             _mainWindowData.ClearValue.color.float32[3] = ClearColor.w;
             RenderFrame(&_mainWindowData, drawData);
+        }
+
+        // Update and Render additional Platform Windows
+        if (_io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+        }
+
+        if (!isMinimized)
+        {
             RevealFrame(&_mainWindowData);
         }
     }
@@ -137,10 +148,22 @@ namespace Engine
         _io = &ImGui::GetIO(); (void)_io;
         _io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
         _io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
+        _io->ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
+        _io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
+        //_io->ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
+        //_io->ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
         //ImGui::StyleColorsLight();
+
+        // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+        ImGuiStyle& style = ImGui::GetStyle();
+        if (_io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            style.WindowRounding = 0.0f;
+            style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+        }
 
         // Setup Platform/Renderer backends
         ImGui_ImplSDL2_InitForVulkan(window);

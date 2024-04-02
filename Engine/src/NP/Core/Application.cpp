@@ -5,8 +5,9 @@
 
 #include <SDL_timer.h>
 
-#include "Layer.h"
+#include "Layers/Layer.h"
 #include "../Input/InputManager.h"
+#include "Layers/EditorLayer.h"
 
 namespace Engine
 {
@@ -22,9 +23,28 @@ namespace Engine
         _windowContext->WindowCloseDelegate += MakeDelegate(this, &Application::Shutdown);
         _windowContext->WindowResizeDelegate += MakeDelegate(this, &Application::OnResizeTest);
 
+        //todo: make into template method
+        EditorLayer* editorLayer = new EditorLayer("EditorLayer");
+        editorLayer->AddScene<Scene>("Game");
+        //editorLayer->AddScene<Scene>("Main Menu");
+        //editorLayer->AddScene<Scene>("Credits");
+        _layerStack.PushLayer(editorLayer);
+
+        //editorLayer->SetActiveScene("roe");
+
         // input testing
+        // for (int i = KeyCodeA; i < KeyCodeZ+1; ++i)
+        // {
+        //     GetInputManager().RegisterKeyboardTrigger(i);
+        // }
         // GetInputManager().RegisterKeyboardTrigger(KeyCode0);
-        // GetInputManager().BindKeyboardTrigger(KeyCodeO, MakeDelegate(this, &Application::OnKeyTest));
+        // GetInputManager().BindKeyboardTrigger(KeyCode1, MakeDelegate(this, &Application::OnKeyTest));
+        // GetInputManager().BindKeyboardTrigger(KeyCode2, MakeDelegate(this, &Application::OnKeyTest));
+        // GetInputManager().BindKeyboardTrigger(KeyCode3, MakeDelegate(this, &Application::OnKeyTest));
+
+        // GetInputManager().BindKeyboardAxis(KeyCodeA, KeyCodeD, MakeDelegate(this, &Application::OnAxisTest));
+        // GetInputManager().BindKeyboardAxis(KeyCodeS, KeyCodeW, MakeDelegate(this, &Application::OnAxisTest));
+
         // GetInputManager().BindMouseButtonAction(MakeDelegate(this, &Application::OnMouseKeyTest));
         // GetInputManager().BindMouseMoveAction(MakeDelegate(this, &Application::OnMouseMoveTest));
     }
@@ -41,20 +61,13 @@ namespace Engine
 
             float deltaTime = timeStep / static_cast<float>(SDL_GetPerformanceFrequency());
 
-            for (Layer* layer : _layerStack)
+            for (Layer* layer : _layerStack) // raw pointers
             {
                 layer->OnUpdate(deltaTime);
             }
             //todo frame yap
 
             _windowContext->OnUpdate(deltaTime);
-
-            // auto pressed = GetInputManager().GetKeyTriggerState(KeyCode0);
-            //
-            // if(pressed != TriggerNone)
-            // {
-            //     NP_ENGINE_LOG_INFO("O key state {0}", (int)pressed);
-            // }
         }
     }
 
@@ -70,7 +83,12 @@ namespace Engine
 
     void Application::OnKeyTest(InputValue inputValue)
     {
-        NP_ENGINE_LOG_INFO("pressed O {0}", inputValue.GetIntValue());
+        NP_ENGINE_LOG_INFO("pressed {0}: {1}", inputValue.GetBindingId(), inputValue.GetIntValue());
+    }
+
+    void Application::OnAxisTest(InputValue inputValue)
+    {
+        NP_ENGINE_LOG_INFO("pressed {0}: {1}", inputValue.GetBindingId(), inputValue.GetAxis());
     }
 
     void Application::OnMouseKeyTest(MouseButtonValue inputValue)

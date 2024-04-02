@@ -11,6 +11,7 @@ namespace Engine
     void Logging::InitEngine()
     {
         #ifndef NP_DIST
+        if(_engineLogger != nullptr) return;
         spdlog::set_pattern("%^[%n %T] %v%$");
 
         _engineLogger = spdlog::stdout_color_mt("ENGINE");
@@ -21,6 +22,7 @@ namespace Engine
     void Logging::InitApp(const std::string& appName)
     {
         #ifndef NP_DIST
+        if(GetEngineLogger() == nullptr || _appLogger != nullptr) return;
         _appLogger = spdlog::stdout_color_mt(appName);
         _appLogger->set_level(spdlog::level::trace);
         #endif

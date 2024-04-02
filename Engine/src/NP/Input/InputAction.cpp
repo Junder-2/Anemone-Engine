@@ -56,4 +56,25 @@ namespace Engine
 
         return false;
     }
+
+    void TwoBindingInput::OnBoundInput(InputValue inputValue)
+    {
+        const int bindingId = inputValue.GetBindingId();
+
+        if(bindingId == _negativeBindingId)
+        {
+            _inputValue = inputValue.GetTriggerState() == TriggerStarted ? -1 : 0;
+        }
+        else if(bindingId == _positiveBindingId)
+        {
+            _inputValue = inputValue.GetTriggerState() == TriggerStarted ? 1 : 0;
+        }
+        else
+        {
+            NP_ENGINE_LOG_WARN("TwoKeyInputBinding is incorrectly set up");
+            return;;
+        }
+
+        if(_inputDelegate) _inputDelegate(_inputValue);
+    }
 }
