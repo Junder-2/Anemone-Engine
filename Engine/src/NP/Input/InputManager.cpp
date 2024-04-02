@@ -1,6 +1,8 @@
 #include "nppch.h"
 #include "InputManager.h"
 
+#include <ranges>
+
 #include "InputAction.h"
 #include "InputTypes.h"
 #include "../Core/Application.h"
@@ -28,7 +30,7 @@ namespace Engine
     {
         if (_keyboardInputActions.contains(keyCode)) return;
 
-        InputTrigger* newInputAction = new InputTrigger();
+        InputTrigger* newInputAction = new InputTrigger(keyCode);
 
         _keyboardInputActions.insert_or_assign(keyCode, newInputAction);
     }
@@ -59,10 +61,11 @@ namespace Engine
 
     void InputManager::FlushInputs()
     {
-        for (auto it = _keyboardInputActions.begin(); it != _keyboardInputActions.end(); ++it)
+        for (const auto val : _keyboardInputActions | std::views::values)
         {
-            it->second->FlushAction();
+            val->FlushAction();
         }
+
         _mouseInputAction.FlushAction();
         _currentKeyStates = nullptr;
     }
