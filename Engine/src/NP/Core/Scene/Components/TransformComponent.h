@@ -12,11 +12,11 @@ namespace Engine
         TransformComponent() = default;
         TransformComponent(const TransformComponent&) = default;
 
-        TransformComponent(const glm::mat4& transform) : Transform(transform) {
+        TransformComponent(const TransformMatrix& transform) : Transform(transform) {
         }
 
         // lets you access the Transform, this is a glm::mat4 with extra fuss
-         operator const glm::mat4&() const { return Transform; }
-         operator glm::mat4&() { return Transform; }
+         operator const TransformMatrix&() const { return Transform; }
+         operator TransformMatrix&() { return Transform; }
     };
 }

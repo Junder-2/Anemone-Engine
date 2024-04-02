@@ -4,10 +4,9 @@
 #include "Components/RenderComponent.h"
 #include "Components/TransformComponent.h"
 
-
 namespace Engine
 {
-    static void UpdatePosition(glm::mat4& transform)
+    static void UpdatePosition(TransformMatrix& transform)
     {
         // I need to figure how the math library works better, don't know the methods yet
         //transform = scale(transform, glm::vec<3, float>(2, 1, 1));
