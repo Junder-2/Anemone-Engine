@@ -26,11 +26,11 @@ namespace Engine
         //todo: make into template method
         EditorLayer* editorLayer = new EditorLayer("EditorLayer");
         editorLayer->AddScene<Scene>("Game");
-        editorLayer->AddScene<Scene>("Main Menu");
-        editorLayer->AddScene<Scene>("Credits");
+        //editorLayer->AddScene<Scene>("Main Menu");
+        //editorLayer->AddScene<Scene>("Credits");
         _layerStack.PushLayer(editorLayer);
 
-        editorLayer->SetActiveScene("roe");
+        //editorLayer->SetActiveScene("roe");
 
         // input testing
         // GetInputManager().RegisterKeyboardTrigger(KeyCode0);

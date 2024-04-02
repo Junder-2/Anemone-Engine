@@ -5,6 +5,7 @@ namespace Engine
     struct TransformMatrix
     {
     public:
+
         TransformMatrix(const glm::mat4& transform = glm::mat4(1.f)) : _transformMatrix(transform) {}
         TransformMatrix(const TransformMatrix&) = default;
 
