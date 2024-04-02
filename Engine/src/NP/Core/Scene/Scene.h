@@ -6,6 +6,7 @@ namespace Engine
 {
     class Scene
     {
+    public:
         Scene();
         Scene(const Scene&) = default;
 
