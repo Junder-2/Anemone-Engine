@@ -27,9 +27,9 @@ namespace Engine
 
         Entity ent(this);
 
-        auto component = ent.AddComponent<TransformComponent>();
+        auto component = ent.AddComponent<RenderComponent>();
         //auto Gety = ent.TryGetComponent<RenderComponent>(comp);
-        if (RenderComponent comp; ent.TryGetComponent<RenderComponent>(comp))
+        if (RenderComponent comp; ent.TryGetComponent(comp))
         {
             NP_ENGINE_LOG_TRACE("WE have component: {}", comp.ToString());
         }
