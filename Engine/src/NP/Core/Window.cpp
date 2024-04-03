@@ -143,10 +143,16 @@ namespace Engine
 
     void Window::ProcessWindowEvent(const SDL_WindowEvent& windowEvent, float deltaTime)
     {
+        const bool isMainWindow = windowEvent.windowID == SDL_GetWindowID(_windowContext);
         switch (windowEvent.event)
         {
+            case SDL_WINDOWEVENT_CLOSE:
+                if(!isMainWindow) return;
+                if(WindowCloseDelegate) WindowCloseDelegate();
+            break;
             case SDL_WINDOWEVENT_RESIZED:
             case SDL_WINDOWEVENT_SIZE_CHANGED:
+                if(!isMainWindow) return;
                 if(_windowData.Width == windowEvent.data1 && _windowData.Height == windowEvent.data2) break;
 
                 _windowData.Width = windowEvent.data1;
@@ -154,13 +160,15 @@ namespace Engine
 
                 if(WindowResizeDelegate) WindowResizeDelegate(_windowData.Width, _windowData.Height);
             break;
+            case SDL_WINDOWEVENT_ENTER:
+                _windowLostFocus = !isMainWindow;
+            break;
             case SDL_WINDOWEVENT_FOCUS_LOST:
                 _windowLostFocus = true;
             break;
             case SDL_WINDOWEVENT_FOCUS_GAINED:
                 _windowLostFocus = false;
             break;
-
         }
     }
 
