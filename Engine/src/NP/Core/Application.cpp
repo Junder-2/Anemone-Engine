@@ -51,6 +51,27 @@ namespace Engine
 
     Application::~Application() = default;
 
+    void Application::Run()
+    {
+        while (_isRunning)
+        {
+            const Uint64 timeStamp = SDL_GetPerformanceCounter();
+            const Uint64 timeStep = timeStamp - _lastTimeStamp;
+            _lastTimeStamp = timeStamp;
+
+            float deltaTime = timeStep / static_cast<float>(SDL_GetPerformanceFrequency());
+
+            for (Layer* layer : _layerStack) // raw pointers
+            {
+                layer->OnUpdate(deltaTime);
+            }
+            //todo frame yap
+
+            //Split this so inputs get processed before everything else
+            _windowContext->OnUpdate(deltaTime);
+        }
+    }
+
     void Application::OnEvent(Event& event)
     {
         EventHandler::PushEvent(&event);
@@ -92,27 +113,6 @@ namespace Engine
         }
 
         EventHandler::ClearEvent();
-    }
-
-    void Application::Run()
-    {
-        while (_isRunning)
-        {
-            const Uint64 timeStamp = SDL_GetPerformanceCounter();
-            const Uint64 timeStep = timeStamp - _lastTimeStamp;
-            _lastTimeStamp = timeStamp;
-
-            float deltaTime = timeStep / static_cast<float>(SDL_GetPerformanceFrequency());
-
-            for (Layer* layer : _layerStack) // raw pointers
-            {
-                layer->OnUpdate(deltaTime);
-            }
-            //todo frame yap
-
-            //Split this so inputs get processed before everything else
-            _windowContext->OnUpdate(deltaTime);
-        }
     }
 
     void Application::Shutdown()
