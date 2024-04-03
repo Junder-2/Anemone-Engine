@@ -9,10 +9,10 @@ namespace Engine
         Layer(const std::string& name = "Layer") : _debugName(name) { }
         virtual ~Layer() = default;
 
-        virtual void OnAttach() = 0;
-        virtual void OnDetach() = 0;
-        virtual void OnUpdate(float deltaTime) = 0;
-        virtual void OnEvent(Event& event) = 0;
+        virtual void OnAttach() {}
+        virtual void OnDetach() {}
+        virtual void OnUpdate(float deltaTime) {}
+        virtual void OnEvent(Event& event) {}
 
     protected:
         std::string _debugName;
