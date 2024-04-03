@@ -81,6 +81,16 @@ namespace VulkanInitializers
         return info;
     }
 
+    VkPipelineShaderStageCreateInfo PipelineShaderStageCreateInfo(const VkShaderStageFlagBits stage, const VkShaderModule shaderModule, const char* entry)
+    {
+        VkPipelineShaderStageCreateInfo info = { .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, .pNext = nullptr };
+        info.stage = stage;
+        info.module = shaderModule; // Module containing the code for this shader stage.
+        info.pName = entry; // Name of shader entry function.
+
+        return info;
+    }
+
     VkImageCreateInfo ImageCreateInfo(const VkFormat format, const VkImageUsageFlags usageFlags, const VkExtent3D extent)
     {
         VkImageCreateInfo info = { };
