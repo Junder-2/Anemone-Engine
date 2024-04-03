@@ -1,20 +1,21 @@
 ﻿#pragma once
+#include "Component.h"
 #include "../../TransformMatrix.h"
 
 namespace Engine
 {
-    struct TransformComponent : std::enable_shared_from_this<TransformComponent>
+    struct TransformComponent : std::enable_shared_from_this<TransformComponent>, Component
     {
     public:
         TransformMatrix Transform;
-        const char* Name;
 
         std::shared_ptr<TransformComponent> Parent;
         std::vector<std::shared_ptr<TransformComponent>> Children;
 
         ~TransformComponent() = default;
-        //copy constructor
-        TransformComponent() = default;
+
+
+        TransformComponent() : Component(typeid(*this).name()) {}
 
         void SetParent(const TransformComponent& parent)
         {
@@ -29,7 +30,10 @@ namespace Engine
 
         TransformComponent(const TransformComponent&) = default;
 
-        TransformComponent(const TransformMatrix& transform, const char* name = "Undefined", const std::shared_ptr<TransformComponent>& parent = nullptr) : Transform(transform), Name(name), Parent(parent) { };
+        TransformComponent(const TransformMatrix& transform, const std::shared_ptr<TransformComponent>& parent = nullptr) : Component(typeid(*this).name()), Transform(transform), Parent(parent)
+        {
+            NP_ENGINE_LOG_TRACE("We are not getting in here");
+        };
 
 
         // lets you access the Transform, this is a glm::mat4 with extra fuss
