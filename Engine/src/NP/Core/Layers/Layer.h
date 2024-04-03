@@ -5,7 +5,7 @@ namespace Engine
     class NP_API Layer // should probaly be abstract
     {
     public:
-        Layer(const std::string& name = "Layer");
+        Layer(const std::string& name = "Layer") : _debugName(name) { }
         virtual ~Layer() = default;
 
         virtual void OnAttach() { }
