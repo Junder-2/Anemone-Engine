@@ -8,18 +8,16 @@ namespace Engine
     class EditorLayer : public Layer
     {
     public:
-        EditorLayer(const std::string& name = "Layer") : Layer(name)
-        {
-        };
+        EditorLayer(const std::string& name = "Layer") : Layer(name) {};
 
-        ~EditorLayer();
-
+        ~EditorLayer() override;
 
         void OnAttach() override;
 
         void OnDetach() override
         {
         }
+        void OnEvent(Event& event) override;
 
         void OnUpdate(float deltaTime) override;
 
