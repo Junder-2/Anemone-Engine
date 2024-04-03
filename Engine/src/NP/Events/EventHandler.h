@@ -18,7 +18,12 @@ namespace Engine
 
         static void ConsumeEvent()
         {
-            if(_currentEvent != nullptr) _currentEvent->Consume();
+            if(_currentEvent == nullptr)
+            {
+                NP_ENGINE_LOG_WARN("Cannot consume event outside of event handling");
+                return;
+            }
+            _currentEvent->Consume();
         }
 
     private:
