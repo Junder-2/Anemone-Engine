@@ -63,11 +63,11 @@ namespace Engine
 
         if(bindingId == _negativeBindingId)
         {
-            _inputValue = inputValue.GetTriggerState() == TriggerStarted ? -1 : 0;
+            _inputValue = inputValue.GetTriggerState() == TriggerStarted ? -1.0f : .0f;
         }
         else if(bindingId == _positiveBindingId)
         {
-            _inputValue = inputValue.GetTriggerState() == TriggerStarted ? 1 : 0;
+            _inputValue = inputValue.GetTriggerState() == TriggerStarted ? 1.0f : .0f; 
         }
         else
         {
