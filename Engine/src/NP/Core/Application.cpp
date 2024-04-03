@@ -72,19 +72,22 @@ namespace Engine
         }
     }
 
-    void Application::OnEvent(Event& event)
+    void Application::OnEvent(Event& e)
     {
-        EventHandler::PushEvent(&event);
+        EventHandler::PushEvent(&e);
 
-        if(event.HasCategory(WindowEvent))
+        if(e.HasCategory(WindowEvent))
         {
-            switch (event.GetEventType())
+            switch (e.GetEventType())
             {
                 case EventType::WindowClose:
                     Shutdown();
                 break;
                 case EventType::WindowResize:
-                    OnWindowResize(dynamic_cast<WindowResizeEvent&>(event));
+                    OnWindowResize(dynamic_cast<WindowResizeEvent&>(e));
+                break;
+                case EventType::WindowMoved:
+                    OnWindowMove(dynamic_cast<WindowMovedEvent&>(e));
                 break;
             }
         }
@@ -108,8 +111,8 @@ namespace Engine
 
         for (Layer* layer : _layerStack) // raw pointers
         {
-            if(event.IsConsumed()) break;
-            layer->OnEvent(event);
+            if(e.IsConsumed()) break;
+            layer->OnEvent(e);
         }
 
         EventHandler::ClearEvent();
@@ -122,7 +125,12 @@ namespace Engine
 
     void Application::OnWindowResize(WindowResizeEvent& e)
     {
-        NP_ENGINE_LOG_INFO("new size {0}, {1}", e.GetWidth(), e.GetHeight());
+        NP_ENGINE_LOG_INFO("new size ({0}, {1})", e.GetWidth(), e.GetHeight());
+    }
+
+    void Application::OnWindowMove(WindowMovedEvent& e)
+    {
+        NP_ENGINE_LOG_INFO("new pos ({0}, {1}) : ({2}, {3})", e.GetX(), e.GetY(), e.GetXDelta(), e.GetYDelta());
     }
 
     void Application::OnKeyTest(KeyTriggerEvent& keyTriggerEvent)

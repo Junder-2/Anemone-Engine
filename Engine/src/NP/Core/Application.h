@@ -25,8 +25,9 @@ namespace Engine
         void Run();
         void Shutdown();
 
-        void OnEvent(Event& event);
+        void OnEvent(Event& e);
         void OnWindowResize(WindowResizeEvent& e);
+        void OnWindowMove(WindowMovedEvent& e);
 
         //Test functions
         void OnResizeTest(int width, int height);

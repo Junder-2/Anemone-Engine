@@ -26,10 +26,13 @@ namespace Engine
         uint32_t Width;
         uint32_t Height;
 
+        uint32_t XPos;
+        uint32_t YPos;
+
         bool VSync;
 
         WindowProperties(const std::string& title = "NP Engine", uint32_t width = 900, uint32_t height = 500, bool vSync = true) :
-            Title(title), Width(width), Height(height), VSync(vSync)
+            Title(title), Width(width), Height(height), XPos(0), YPos(0), VSync(vSync)
         {
         }
     };

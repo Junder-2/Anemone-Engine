@@ -35,6 +35,13 @@ namespace Engine
 
         SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_VULKAN | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
         _windowContext = SDL_CreateWindow(props.Title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowData.Width, _windowData.Height, windowFlags);
+
+        int xPos, yPos;
+        SDL_GetWindowPosition(_windowContext, &xPos, &yPos);
+
+        _windowData.XPos = xPos;
+        _windowData.YPos = yPos;
+
         if (_windowContext == nullptr)
         {
             NP_ENGINE_LOG_ERROR("Could not create SDL window.");
@@ -168,13 +175,31 @@ namespace Engine
             case SDL_WINDOWEVENT_SIZE_CHANGED:
             {
                 if(!isMainWindow) return;
-                if(_windowData.Width == windowEvent.data1 && _windowData.Height == windowEvent.data2) break;
+                const uint32_t newX = (uint32_t)windowEvent.data1;
+                const uint32_t newY = (uint32_t)windowEvent.data2;
+                if(_windowData.Width == newX && _windowData.Height == newY) break;
 
-                _windowData.Width = windowEvent.data1;
-                _windowData.Height = windowEvent.data2;
+                _windowData.Width = newX;
+                _windowData.Height = newY;
 
                 WindowResizeEvent resizeEvent(_windowData.Width, _windowData.Height);
                 if(EventDelegate) EventDelegate(resizeEvent);
+            }
+            break;
+            case SDL_WINDOWEVENT_MOVED:
+            {
+                if(!isMainWindow) return;
+                uint32_t newX = (uint32_t)windowEvent.data1;
+                uint32_t newY = (uint32_t)windowEvent.data2;
+                if(_windowData.XPos == newX && _windowData.YPos == newY) break;
+
+                const float xDelta = ((int)_windowData.XPos- (int)newX) * deltaTime;
+                const float yDelta = ((int)_windowData.YPos - (int)newY) * deltaTime;
+                _windowData.XPos = newX;
+                _windowData.YPos = newY;
+
+                WindowMovedEvent movedEvent(_windowData.XPos, _windowData.YPos, xDelta, yDelta);
+                if(EventDelegate) EventDelegate(movedEvent);
             }
             break;
             case SDL_WINDOWEVENT_ENTER:
