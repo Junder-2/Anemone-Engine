@@ -4,6 +4,7 @@
 
 #include "InputAction.h"
 #include "MouseInputAction.h" // todo: include this in the input action?
+#include "../Events/Event.h"
 #include "../Delegate/Delegate.h" // todo: add to include directories in premake so we don't have to format it like this
 
 namespace Engine
@@ -15,6 +16,8 @@ namespace Engine
 
         InputManager();
         ~InputManager();
+
+        SinglecastDelegate<void(Event&)> EventDelegate;
 
         void RegisterKeyboardTrigger(int keyCode);
         void RegisterKeyboardTwoKeyAxis(int negativeKeyCode, int positiveKeyCode);

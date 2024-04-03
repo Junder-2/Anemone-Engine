@@ -1,4 +1,5 @@
 #pragma once
+#include "../../Events/Event.h"
 
 namespace Engine
 {
@@ -8,10 +9,10 @@ namespace Engine
         Layer(const std::string& name = "Layer");
         virtual ~Layer() = default;
 
-        virtual void OnAttach() { }
-        virtual void OnDetach() { }
-        virtual void OnUpdate(float deltaTime) { }
-
+        virtual void OnAttach() = 0;
+        virtual void OnDetach() = 0;
+        virtual void OnUpdate(float deltaTime) = 0;
+        virtual void OnEvent(Event& event) = 0;
 
     protected:
         std::string _debugName;

@@ -3,6 +3,7 @@
 #include <SDL_video.h>
 
 #include "../Delegate/Delegate.h"
+#include "../Events/Event.h"
 
 //#include "SDL.h"
 //#include "vulkan/vulkan_core.h"
@@ -59,8 +60,7 @@ namespace Engine
         uint32_t GetHeight() const { return _windowData.Height; }
         SDL_Window* GetWindowContext() const { return _windowContext; }
 
-        MulticastDelegate<void()> WindowCloseDelegate;
-        MulticastDelegate<void(int width, int height)> WindowResizeDelegate;
+        SinglecastDelegate<void(Event&)> EventDelegate;
 
     private:
         void Init(const WindowProperties& props);

@@ -8,6 +8,7 @@
 
 #include "Application.h"
 #include "../../Platform/Vulkan/VulkanRenderer.h"
+#include "../Events/WindowEvent.h"
 
 namespace Engine
 {
@@ -111,7 +112,10 @@ namespace Engine
             switch (event.type)
             {
                 case SDL_QUIT:
-                    if(WindowCloseDelegate) WindowCloseDelegate();
+                {
+                    WindowCloseEvent closeEvent;
+                    if(EventDelegate) EventDelegate(closeEvent);
+                }
                 break;
                 case SDL_WINDOWEVENT:
                     ProcessWindowEvent(event.window, deltaTime);
@@ -135,7 +139,14 @@ namespace Engine
 
         if(!prevLostFocus && LostFocus())
         {
+            WindowFocusChangeEvent focusChangeEvent(false);
+            if(EventDelegate) EventDelegate(focusChangeEvent);
             inputManager->FlushInputs();
+        }
+        else if(prevLostFocus && !LostFocus())
+        {
+            WindowFocusChangeEvent focusChangeEvent(true);
+            if(EventDelegate) EventDelegate(focusChangeEvent);
         }
 
         if(!LostFocus()) inputManager->PopulateKeyStates(SDL_GetKeyboardState(nullptr));
@@ -147,18 +158,24 @@ namespace Engine
         switch (windowEvent.event)
         {
             case SDL_WINDOWEVENT_CLOSE:
+            {
                 if(!isMainWindow) return;
-                if(WindowCloseDelegate) WindowCloseDelegate();
+                WindowCloseEvent closeEvent;
+                if(EventDelegate) EventDelegate(closeEvent);
+            }
             break;
             case SDL_WINDOWEVENT_RESIZED:
             case SDL_WINDOWEVENT_SIZE_CHANGED:
+            {
                 if(!isMainWindow) return;
                 if(_windowData.Width == windowEvent.data1 && _windowData.Height == windowEvent.data2) break;
 
                 _windowData.Width = windowEvent.data1;
                 _windowData.Height = windowEvent.data2;
 
-                if(WindowResizeDelegate) WindowResizeDelegate(_windowData.Width, _windowData.Height);
+                WindowResizeEvent resizeEvent(_windowData.Width, _windowData.Height);
+                if(EventDelegate) EventDelegate(resizeEvent);
+            }
             break;
             case SDL_WINDOWEVENT_ENTER:
                 _windowLostFocus = !isMainWindow;
@@ -196,7 +213,7 @@ namespace Engine
         {
             const glm::vec2 mousePos = inputManager->GetMousePos();
             ImGui::Text("Mouse Pos: (%.3f,%.3f)", mousePos.x, mousePos.y);
-            const MouseButtonValue mouseButtonValues = inputManager->GetMouseButtonValues();
+            const MouseButtonValues mouseButtonValues = inputManager->GetMouseButtonValues();
             ImGui::Text("Mouse Buttons: (");
             bool start = true;
             for (int i = 0; i < MOUSE_BUTTON_MAX; i++)

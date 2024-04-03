@@ -7,6 +7,8 @@
 
 #include "Layers/Layer.h"
 #include "../Input/InputManager.h"
+#include "../Events/Event.h"
+#include "../Events/EventHandler.h"
 #include "Layers/EditorLayer.h"
 
 namespace Engine
@@ -18,10 +20,11 @@ namespace Engine
         _appInstance = this;
 
         _windowContext = Window::Create(WindowProperties(_appSpec.Name));
-        _inputManager = InputManager::Create();
+        _windowContext->EventDelegate = MakeDelegate(this, &Application::OnEvent);
 
-        _windowContext->WindowCloseDelegate += MakeDelegate(this, &Application::Shutdown);
-        _windowContext->WindowResizeDelegate += MakeDelegate(this, &Application::OnResizeTest);
+        _inputManager = InputManager::Create();
+        _inputManager->EventDelegate = MakeDelegate(this, &Application::OnEvent);
+
 
         //todo: make into template method
         EditorLayer* editorLayer = new EditorLayer("EditorLayer");
@@ -44,12 +47,52 @@ namespace Engine
 
         // GetInputManager().BindKeyboardAxis(KeyCodeA, KeyCodeD, MakeDelegate(this, &Application::OnAxisTest));
         // GetInputManager().BindKeyboardAxis(KeyCodeS, KeyCodeW, MakeDelegate(this, &Application::OnAxisTest));
-
-        // GetInputManager().BindMouseButtonAction(MakeDelegate(this, &Application::OnMouseKeyTest));
-        // GetInputManager().BindMouseMoveAction(MakeDelegate(this, &Application::OnMouseMoveTest));
     }
 
     Application::~Application() = default;
+
+    void Application::OnEvent(Event& event)
+    {
+        EventHandler::PushEvent(&event);
+
+        if(event.HasCategory(WindowEvent))
+        {
+            switch (event.GetEventType())
+            {
+                case EventType::WindowClose:
+                    Shutdown();
+                break;
+                case EventType::WindowResize:
+                    OnWindowResize(dynamic_cast<WindowResizeEvent&>(event));
+                break;
+            }
+        }
+
+        //Input debugging
+        // if(event.HasCategory(InputEvent))
+        // {
+        //     switch (event.GetEventType())
+        //     {
+        //         case EventType::KeyboardInput:
+        //             OnKeyTest(dynamic_cast<KeyTriggerEvent&>(event));
+        //         break;
+        //         case EventType::MouseButton:
+        //             OnMouseKeyTest(dynamic_cast<MouseButtonEvent&>(event));
+        //         break;
+        //         case EventType::MouseMovement:
+        //             OnMouseMoveTest(dynamic_cast<MouseMovementEvent&>(event));
+        //         break;
+        //     }
+        // }
+
+        for (Layer* layer : _layerStack) // raw pointers
+        {
+            if(event.IsConsumed()) break;
+            layer->OnEvent(event);
+        }
+
+        EventHandler::ClearEvent();
+    }
 
     void Application::Run()
     {
@@ -67,6 +110,7 @@ namespace Engine
             }
             //todo frame yap
 
+            //Split this so inputs get processed before everything else
             _windowContext->OnUpdate(deltaTime);
         }
     }
@@ -76,13 +120,14 @@ namespace Engine
         _isRunning = false;
     }
 
-    void Application::OnResizeTest(int width, int height)
+    void Application::OnWindowResize(WindowResizeEvent& e)
     {
-        NP_ENGINE_LOG_INFO("new size {0}, {1}", width, height);
+        NP_ENGINE_LOG_INFO("new size {0}, {1}", e.GetWidth(), e.GetHeight());
     }
 
-    void Application::OnKeyTest(InputValue inputValue)
+    void Application::OnKeyTest(KeyTriggerEvent& keyTriggerEvent)
     {
+        const InputValue inputValue = keyTriggerEvent;
         NP_ENGINE_LOG_INFO("pressed {0}: {1}", inputValue.GetBindingId(), inputValue.GetIntValue());
     }
 
@@ -91,15 +136,17 @@ namespace Engine
         NP_ENGINE_LOG_INFO("pressed {0}: {1}", inputValue.GetBindingId(), inputValue.GetAxis());
     }
 
-    void Application::OnMouseKeyTest(MouseButtonValue inputValue)
+    void Application::OnMouseKeyTest(MouseButtonEvent& mouseButtonEvent)
     {
+        const MouseButtonValues inputValue = mouseButtonEvent;
         NP_ENGINE_LOG_INFO("pressed mouse key {0}, with state {1}, is doubleclick {2}", inputValue.GetCurrentButtonIndex(), (int)inputValue.GetTriggerState(), inputValue.GetIsDoubleClick());
         NP_ENGINE_LOG_INFO("Raw mouse button state {0}", std::bitset<16>(inputValue.GetRawButtonStates()).to_string());
     }
 
-    void Application::OnMouseMoveTest(MouseMoveValue inputValue)
+    void Application::OnMouseMoveTest(MouseMovementEvent& mouseMovementEvent)
     {
+        const MouseMoveValue inputValue = mouseMovementEvent;
         // spdlog formatting not working use explicit glm::to_string
-        NP_ENGINE_LOG_TRACE("moved mouse pos:({0}), delta:({1})", glm::to_string(inputValue.GetMousePos()), glm::to_string(inputValue.GetMouseDelta()));
+        NP_ENGINE_LOG_INFO("moved mouse pos:({0}), delta:({1})", glm::to_string(inputValue.GetMousePos()), glm::to_string(inputValue.GetMouseDelta()));
     }
 }

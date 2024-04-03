@@ -6,6 +6,8 @@
 #include "InputAction.h"
 #include "InputTypes.h"
 #include "../Core/Application.h"
+#include "../Events/KeyboardEvent.h"
+#include "../Events/MouseEvent.h"
 
 namespace Engine
 {
@@ -71,6 +73,8 @@ namespace Engine
                 int keyCode = dirtyKeysCopy.front();
                 if(_keyboardInputActions[keyCode]->ProcessAction(&needProcessing))
                 {
+                    KeyTriggerEvent keyTriggerEvent(_keyboardInputActions[keyCode]->GetInputValue());
+                    if(EventDelegate) EventDelegate(keyTriggerEvent);
                 }
                 if(needProcessing)
                 {
@@ -87,6 +91,8 @@ namespace Engine
         {
             if(val->FlushAction())
             {
+                KeyTriggerEvent keyTriggerEvent(val->GetInputValue());
+                if(EventDelegate) EventDelegate(keyTriggerEvent);
             }
         }
 
@@ -107,6 +113,8 @@ namespace Engine
 
         if(_keyboardInputActions[keyCode]->PopulateInput((float)(press ? TriggerStarted : TriggerStopped), &needProcessing))
         {
+            KeyTriggerEvent keyTriggerEvent(_keyboardInputActions[keyCode]->GetInputValue());
+            if(EventDelegate) EventDelegate(keyTriggerEvent);
         }
 
         if(needProcessing)
@@ -117,9 +125,10 @@ namespace Engine
 
     void InputManager::ProcessMouseMovement(const float xPos, const float yPos, const float deltaTime)
     {
-        _dirtyMouse = _mouseInputAction.PopulateMoveInput(xPos, yPos, deltaTime);
         if(_mouseInputAction.PopulateMoveInput(&_dirtyMouse, xPos, yPos, deltaTime))
         {
+            MouseMovementEvent mouseMovementEvent(_mouseInputAction.GetMoveValue());
+            if(EventDelegate) EventDelegate(mouseMovementEvent);
         }
     }
 
@@ -127,6 +136,8 @@ namespace Engine
     {
         if(_mouseInputAction.PopulateButtonInput(&_dirtyMouse, index, press ? TriggerStarted : TriggerStopped, isDoubleClick))
         {
+            MouseButtonEvent mouseButtonEvent(_mouseInputAction.GetButtonValue());
+            if(EventDelegate) EventDelegate(mouseButtonEvent);
         }
     }
 
