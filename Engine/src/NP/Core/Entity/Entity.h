@@ -47,6 +47,11 @@ namespace Engine
         std::shared_ptr<Scene> SceneHandle;
     };
 
+    /**
+    * Adds a component to a an entity.
+    * @param Args Forwards arguments to the T type constructor.
+    * @return Returns a ref to the added component.
+    */
     template <typename T, typename... Args>
     std::enable_if_t<std::is_base_of_v<Component, T>, T&> Entity::AddComponent(Args&&... args)
     {
@@ -59,6 +64,9 @@ namespace Engine
         return SceneHandle->Registry.emplace<T>(EntityHandle, std::forward<Args>(args)...);
     }
 
+    /**
+    * Removes T type component from the entity if is has a component of that type.
+    */
     template <typename T>
     std::enable_if_t<std::is_base_of_v<Component, T>> Entity::RemoveComponent()
     {
@@ -70,6 +78,10 @@ namespace Engine
         NP_ENGINE_LOG_WARN("Attempted to remove component of type {} that doesn't exist", typeid(T).name());
     }
 
+    /**
+    * Checks whether entity has T type component.
+    * @return Return true if T type component is found.
+    */
     template <typename T>
     std::enable_if_t<std::is_base_of_v<Component, T>, bool> Entity::HasComponent()
     {
@@ -77,6 +89,11 @@ namespace Engine
         return Component == nullptr ? false : true;
     }
 
+    /**
+    * Attemps to fetch component of type T
+    * @param T& Ref out component.
+    * @return Returns true if component is found.
+    */
     template <typename T>
     std::enable_if_t<std::is_base_of_v<Component, T>, bool> Entity::TryGetComponent(T& outComponent)
     {

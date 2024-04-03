@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "Component.h"
-
+//todo: finish, this is just a demo
 namespace Engine
 {
     struct RenderComponent : Component
