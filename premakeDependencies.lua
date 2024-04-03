@@ -9,6 +9,7 @@ External["GLM"] = "%{wks.location}/Engine/vendor/GLM"
 External["spdlog"] = "%{wks.location}/Engine/vendor/spdlog"
 External["VkBootstrap"] = "%{wks.location}/Engine/vendor/VkBootstrap"
 External["entt"] = "%{wks.location}/Engine/vendor/entt"
+External["VMA"] = "%{wks.location}/Engine/vendor/VMA"
 
 -- Include Directories
 IncludeDir = {}
@@ -19,6 +20,7 @@ IncludeDir["spdlog"] = "%{External.spdlog}/include"
 IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
 IncludeDir["VkBootstrap"] = "%{External.VkBootstrap}/src"
 IncludeDir["entt"] = "%{External.entt}/include"
+IncludeDir["VMA"] = "%{External.VMA}/include"
 
 -- Library Directories
 LibraryDir = {}

@@ -18,6 +18,7 @@ project "Engine"
         "vendor/GLM/glm/**.inl",
         "vendor/imgui/backends/imgui_impl_sdl2.cpp",
         "vendor/imgui/backends/imgui_impl_vulkan.cpp",
+        "vendor/VMA/include/vk_mem_alloc.h",
     }
 
     includedirs
@@ -30,6 +31,7 @@ project "Engine"
         "%{IncludeDir.entt}",
         "%{IncludeDir.VulkanSDK}",
         "%{IncludeDir.VkBootstrap}",
+        "%{IncludeDir.VMA}",
     }
 
     libdirs
