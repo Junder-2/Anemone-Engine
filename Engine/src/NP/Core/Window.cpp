@@ -203,7 +203,7 @@ namespace Engine
             {
                 const int buttonState = mouseButtonValues.GetTriggerState(i);
                 if (buttonState == 0) continue;
-                ImGui::SameLine(0, start ? 0 : -1);
+                ImGui::SameLine(0, start ? .0f : -1.0f);
                 ImGui::Text("%d:%d", i, buttonState);
                 start = false;
             }
@@ -216,7 +216,7 @@ namespace Engine
             for (auto keyValue : keyValues)
             {
                 if(keyValue.GetIntValue() == 0) continue;
-                ImGui::SameLine(0, start ? 0 : -1);
+                ImGui::SameLine(0, start ? .0f : -1.0f);
                 ImGui::Text("%d:%d", keyValue.GetBindingId(), keyValue.GetIntValue());
                 start = false;
             }

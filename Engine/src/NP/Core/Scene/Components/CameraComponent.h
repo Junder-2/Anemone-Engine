@@ -1,9 +1,10 @@
 #pragma once
+#include "Component.h"
 #include "../../TransformMatrix.h"
 
 namespace Engine
 {
-    struct CameraComponent
+    struct CameraComponent : Component
     {
     public:
         TransformMatrix Transform {};
@@ -11,8 +12,10 @@ namespace Engine
         glm::mat4 PerspectiveMatrix = {};
         glm::mat4 ViewMatrix = {};
 
-        CameraComponent() = default;
+
+        CameraComponent() : Component(typeid(*this).name()) {} // does this compile?  // NOLINT(modernize-use-equals-default)
         CameraComponent(const CameraComponent&) = default;
+
 
         void SetPerspective(float fov, float aspect, float zNear, float zFar);
 

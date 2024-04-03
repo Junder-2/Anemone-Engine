@@ -4,7 +4,7 @@
 
 namespace Engine
 {
-    class Scene
+    class Scene : std::enable_shared_from_this<Scene>
     {
     public:
         Scene();
@@ -24,9 +24,9 @@ namespace Engine
         operator const std::vector<entt::entity>() const { return _entities; }
         operator std::vector<entt::entity>() { return _entities; }
 
+        entt::registry Registry;
     private:
-        std::vector<entt::entity> _entities;
+        std::vector<entt::entity> _entities; // todo: this might not be used.
 
-        entt::registry _registry;
     };
 }
