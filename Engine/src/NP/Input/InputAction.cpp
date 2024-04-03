@@ -3,7 +3,7 @@
 
 namespace Engine
 {
-    bool InputAction::PopulateInput(const float input)
+    bool InputAction::PopulateInput(const float input, bool* needProcessing)
     {
         if (_inputValue.GetIntValue() == (int)input) return false;
 
@@ -11,26 +11,30 @@ namespace Engine
 
         if (_inputDelegate) _inputDelegate(_inputValue);
 
-        return false;
+        return true;
     }
 
-    void InputAction::FlushAction()
+    bool InputAction::FlushAction()
     {
-        if (_inputValue.GetIntValue() == 0) return;
+        if (_inputValue.GetIntValue() == 0) return false;
 
         _inputValue = 0;
 
         if (_inputDelegate) _inputDelegate(_inputValue);
-    }
-
-    bool InputTrigger::PopulateInput(const float input)
-    {
-        InputAction::PopulateInput(input);
 
         return true;
     }
 
-    bool InputTrigger::ProcessAction()
+    bool InputTrigger::PopulateInput(const float input, bool* needProcessing)
+    {
+        const bool changed = InputAction::PopulateInput(input, needProcessing);
+
+        *needProcessing = true;
+
+        return changed;
+    }
+
+    bool InputTrigger::ProcessAction(bool* needProcessing)
     {
         switch (_inputValue.GetTriggerState())
         {
@@ -41,10 +45,11 @@ namespace Engine
                 _inputValue = TriggerNone;
         }
 
-        return false;
+        *needProcessing = false;
+        return true;
     }
 
-    bool InputAxis::PopulateInput(const float input)
+    bool InputAxis::PopulateInput(const float input, bool* needProcessing)
     {
         float axisInput = (input / 32767);
 
@@ -54,7 +59,7 @@ namespace Engine
 
         if (_inputDelegate) _inputDelegate(_inputValue);
 
-        return false;
+        return true;
     }
 
     void TwoBindingInput::OnBoundInput(InputValue inputValue)

@@ -53,6 +53,8 @@ namespace Engine
 
     void InputManager::OnUpdate()
     {
+        bool needProcessing = false;
+
         if(_dirtyMouse)
         {
             _mouseInputAction.ProcessAction();
@@ -65,8 +67,12 @@ namespace Engine
 
             while(!dirtyKeysCopy.empty())
             {
+                needProcessing = false;
                 int keyCode = dirtyKeysCopy.front();
-                if(_keyboardInputActions[keyCode]->ProcessAction())
+                if(_keyboardInputActions[keyCode]->ProcessAction(&needProcessing))
+                {
+                }
+                if(needProcessing)
                 {
                     _dirtyKeys.push(keyCode);
                 }
@@ -79,7 +85,9 @@ namespace Engine
     {
         for (const auto val : _keyboardInputActions | std::views::values)
         {
-            val->FlushAction();
+            if(val->FlushAction())
+            {
+            }
         }
 
         _mouseInputAction.FlushAction();
@@ -95,7 +103,13 @@ namespace Engine
     {
         if (!_keyboardInputActions.contains(keyCode)) return;
 
-        if (_keyboardInputActions[keyCode]->PopulateInput((float)(press ? TriggerStarted : TriggerStopped)))
+        bool needProcessing = false;
+
+        if(_keyboardInputActions[keyCode]->PopulateInput((float)(press ? TriggerStarted : TriggerStopped), &needProcessing))
+        {
+        }
+
+        if(needProcessing)
         {
             _dirtyKeys.push(keyCode);
         }
@@ -104,11 +118,16 @@ namespace Engine
     void InputManager::ProcessMouseMovement(const float xPos, const float yPos, const float deltaTime)
     {
         _dirtyMouse = _mouseInputAction.PopulateMoveInput(xPos, yPos, deltaTime);
+        if(_mouseInputAction.PopulateMoveInput(&_dirtyMouse, xPos, yPos, deltaTime))
+        {
+        }
     }
 
     void InputManager::ProcessMouseButton(const int index, const bool press, const bool isDoubleClick /*= false */)
     {
-        _dirtyMouse = _mouseInputAction.PopulateButtonInput(index, press ? TriggerStarted : TriggerStopped, isDoubleClick);
+        if(_mouseInputAction.PopulateButtonInput(&_dirtyMouse, index, press ? TriggerStarted : TriggerStopped, isDoubleClick))
+        {
+        }
     }
 
     std::array<InputValue, 4> InputManager::GetCurrentTriggeredKeys()

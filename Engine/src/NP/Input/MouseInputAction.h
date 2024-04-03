@@ -80,8 +80,8 @@ namespace Engine
         void BindMoveAction(DelegateMember<TClass, void(MouseMoveValue)> delegateMember);
         template <class TClass>
         void BindButtonAction(DelegateMember<TClass, void(MouseButtonValues)> delegateMember);
-        bool PopulateMoveInput(float x, float y, float deltaTime);
-        bool PopulateButtonInput(int buttonIndex, TriggerState newState, bool isDoubleClick = false);
+        bool PopulateMoveInput(bool* needProcessing, float x, float y, float deltaTime);
+        bool PopulateButtonInput(bool* needProcessing, int buttonIndex, TriggerState newState, bool isDoubleClick = false);
         void ProcessAction();
         void FlushAction();
 
