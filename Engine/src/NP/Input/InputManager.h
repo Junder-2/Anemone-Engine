@@ -26,7 +26,7 @@ namespace Engine
         template <class TClass>
         void BindMouseMoveAction(DelegateMember<TClass, void(MouseMoveValue)> delegateMember);
         template <class TClass>
-        void BindMouseButtonAction(DelegateMember<TClass, void(MouseButtonValue)> delegateMember);
+        void BindMouseButtonAction(DelegateMember<TClass, void(MouseButtonValues)> delegateMember);
 
         void OnUpdate();
         void FlushInputs();
@@ -42,7 +42,7 @@ namespace Engine
         glm::vec2 GetMouseDelta() const { return _mouseInputAction.GetMoveValue().GetMouseDelta(); }
         glm::vec2 GetMousePos() const { return _mouseInputAction.GetMoveValue().GetMousePos(); }
         TriggerState GetMouseTriggerState(const int index) const { return _mouseInputAction.GetButtonValue().GetTriggerState(index); }
-        MouseButtonValue GetMouseButtonValues() const { return _mouseInputAction.GetButtonValue(); }
+        MouseButtonValues GetMouseButtonValues() const { return _mouseInputAction.GetButtonValue(); }
 
     private:
         const Uint8* _currentKeyStates{};
@@ -98,7 +98,7 @@ namespace Engine
     }
 
     template <class TClass>
-    void InputManager::BindMouseButtonAction(DelegateMember<TClass, void(MouseButtonValue)> delegateMember)
+    void InputManager::BindMouseButtonAction(DelegateMember<TClass, void(MouseButtonValues)> delegateMember)
     {
         _mouseInputAction.BindButtonAction(delegateMember);
     }

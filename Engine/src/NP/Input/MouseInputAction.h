@@ -28,7 +28,7 @@ namespace Engine
         glm::vec2 _mousePosition = {};
     };
 
-    struct MouseButtonValue
+    struct MouseButtonValues
     {
         int GetCurrentButtonIndex() const
         {
@@ -79,20 +79,20 @@ namespace Engine
         template <class TClass>
         void BindMoveAction(DelegateMember<TClass, void(MouseMoveValue)> delegateMember);
         template <class TClass>
-        void BindButtonAction(DelegateMember<TClass, void(MouseButtonValue)> delegateMember);
+        void BindButtonAction(DelegateMember<TClass, void(MouseButtonValues)> delegateMember);
         bool PopulateMoveInput(float x, float y, float deltaTime);
         bool PopulateButtonInput(int buttonIndex, TriggerState newState, bool isDoubleClick = false);
         void ProcessAction();
         void FlushAction();
 
         MouseMoveValue GetMoveValue() const { return _moveValue; }
-        MouseButtonValue GetButtonValue() const { return _buttonValue; }
+        MouseButtonValues GetButtonValue() const { return _buttonValue; }
 
     protected:
         MouseMoveValue _moveValue {};
-        MouseButtonValue _buttonValue {};
+        MouseButtonValues _buttonValue {};
         MulticastDelegate<void(MouseMoveValue)> _moveInputDelegate;
-        MulticastDelegate<void(MouseButtonValue)> _buttonInputDelegate;
+        MulticastDelegate<void(MouseButtonValues)> _buttonInputDelegate;
     };
 
     template <class TClass>
@@ -102,7 +102,7 @@ namespace Engine
     }
 
     template <class TClass>
-    void MouseInputAction::BindButtonAction(DelegateMember<TClass, void(MouseButtonValue)> delegateMember)
+    void MouseInputAction::BindButtonAction(DelegateMember<TClass, void(MouseButtonValues)> delegateMember)
     {
         _buttonInputDelegate += delegateMember;
     }
