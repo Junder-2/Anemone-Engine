@@ -67,7 +67,7 @@ namespace Engine
         }
         else if(bindingId == _positiveBindingId)
         {
-            _inputValue = inputValue.GetTriggerState() == TriggerStarted ? 1.0f : .0f; 
+            _inputValue = inputValue.GetTriggerState() == TriggerStarted ? 1.0f : .0f;
         }
         else
         {
