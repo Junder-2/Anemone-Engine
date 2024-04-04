@@ -39,7 +39,7 @@ namespace Engine
         void OnMouseScrollTest(MouseScrollEvent& mouseScrollEvent);
         void OnMouseMoveTest(MouseMovementEvent& mouseMovementEvent);
 
-        Window& GetWindow() const { return *_windowContext; }
+        Window& GetWindow() const { return *_window; }
         InputManager& GetInputManager() const { return *_inputManager.get(); }
 
         static Application& Get() { return *_appInstance; }
@@ -48,7 +48,7 @@ namespace Engine
 
     private:
         ApplicationSpecification _appSpec;
-        std::unique_ptr<Window> _windowContext;
+        std::unique_ptr<Window> _window;
         std::unique_ptr<InputManager> _inputManager;
         bool _isRunning = true;
 

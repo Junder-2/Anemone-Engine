@@ -17,7 +17,7 @@ namespace Engine
         void OnDetach() override
         {
         }
-        void OnEvent(Event& event) override;
+        void OnEvent(Event& e) override;
 
         void OnUpdate(float deltaTime) override;
 
