@@ -28,7 +28,7 @@ namespace Engine
         glm::vec2 _mousePosition = {};
     };
 
-    struct MouseButtonValue
+    struct MouseButtonValues
     {
         int GetCurrentButtonIndex() const
         {
@@ -79,31 +79,20 @@ namespace Engine
         template <class TClass>
         void BindMoveAction(DelegateMember<TClass, void(MouseMoveValue)> delegateMember);
         template <class TClass>
-        void BindButtonAction(DelegateMember<TClass, void(MouseButtonValue)> delegateMember);
-        bool PopulateMoveInput(float x, float y, float deltaTime);
-        bool PopulateButtonInput(int buttonIndex, TriggerState newState, bool isDoubleClick = false);
+        void BindButtonAction(DelegateMember<TClass, void(MouseButtonValues)> delegateMember);
+        bool PopulateMoveInput(bool* needProcessing, float x, float y, float deltaTime);
+        bool PopulateButtonInput(bool* needProcessing, int buttonIndex, TriggerState newState, bool isDoubleClick = false);
+        bool PopulateScrollInput(bool* needProcessing, float x, float y);
         void ProcessAction();
         void FlushAction();
 
         MouseMoveValue GetMoveValue() const { return _moveValue; }
-        MouseButtonValue GetButtonValue() const { return _buttonValue; }
+        MouseButtonValues GetButtonValue() const { return _buttonValue; }
+        glm::vec2 GetScrollValue() const { return _scrollWheelValue; }
 
     protected:
         MouseMoveValue _moveValue {};
-        MouseButtonValue _buttonValue {};
-        MulticastDelegate<void(MouseMoveValue)> _moveInputDelegate;
-        MulticastDelegate<void(MouseButtonValue)> _buttonInputDelegate;
+        MouseButtonValues _buttonValue {};
+        glm::vec2 _scrollWheelValue {};
     };
-
-    template <class TClass>
-    void MouseInputAction::BindMoveAction(DelegateMember<TClass, void(MouseMoveValue)> delegateMember)
-    {
-        _moveInputDelegate += delegateMember;
-    }
-
-    template <class TClass>
-    void MouseInputAction::BindButtonAction(DelegateMember<TClass, void(MouseButtonValue)> delegateMember)
-    {
-        _buttonInputDelegate += delegateMember;
-    }
 }

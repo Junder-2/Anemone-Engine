@@ -49,15 +49,14 @@ namespace Engine
 
         template <class TClass>
         void BindAction(DelegateMember<TClass, void(InputValue)> delegateMember);
-        virtual bool PopulateInput(float input);
-        virtual bool ProcessAction() = 0;
-        virtual void FlushAction();
+        virtual bool PopulateInput(float input, bool* needProcessing);
+        virtual bool ProcessAction(bool* needProcessing) = 0;
+        virtual bool FlushAction();
 
         InputValue GetInputValue() const { return _inputValue; }
 
     protected:
         InputValue _inputValue;
-        MulticastDelegate<void(InputValue)> _inputDelegate;
     };
 
     class InputTrigger final : public InputAction
@@ -65,8 +64,8 @@ namespace Engine
     public:
         InputTrigger(const int bindingId = 0) : InputAction(bindingId) {}
 
-        bool PopulateInput(float input) override;
-        bool ProcessAction() override;
+        bool PopulateInput(float input, bool* needProcessing) override;
+        bool ProcessAction(bool* needProcessing) override;
     };
 
     class InputAxis : public InputAction
@@ -74,14 +73,8 @@ namespace Engine
     public:
         InputAxis(const int bindingId = 0) : InputAction(bindingId) {}
 
-        bool PopulateInput(float input) override;
+        bool PopulateInput(float input, bool* needProcessing) override;
     };
-
-    template <class TClass>
-    void InputAction::BindAction(DelegateMember<TClass, void(InputValue)> delegateMember)
-    {
-        _inputDelegate += delegateMember;
-    }
 
     class TwoBindingInput
     {

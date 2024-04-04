@@ -12,6 +12,11 @@ void Engine::EditorLayer::OnAttach()
 {
 }
 
+void Engine::EditorLayer::OnEvent(Event& event)
+{
+    
+}
+
 void Engine::EditorLayer::OnUpdate(float deltaTime)
 {
     // // is the

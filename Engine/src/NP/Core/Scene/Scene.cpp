@@ -1,6 +1,7 @@
 ﻿#include "nppch.h"
 #include "Scene.h"
 
+#include "../Entity/Entity.h"
 #include "Components/RenderComponent.h"
 #include "Components/TransformComponent.h"
 
@@ -21,17 +22,45 @@ namespace Engine
     Engine::Scene::Scene()
     {
         //create an entity
-        entt::entity entity = _registry.create();
-       // entt::entity entit2 = _registry.create();
+        //entt::entity entity = Registry.create();
+        // entt::entity entit2 = _registry.create();
 
+        Entity ent(this);
+
+        auto component = ent.AddComponent<RenderComponent>();
+        //auto Gety = ent.TryGetComponent<RenderComponent>(comp);
+        if (RenderComponent comp; ent.TryGetComponent(comp))
+        {
+            NP_ENGINE_LOG_TRACE("WE have component: {}", comp.ToString());
+        }
+        else
+        {
+            NP_ENGINE_LOG_TRACE("We do not have component");
+        }
+        // auto component = ent.GetComponent<TransformComponent>();
+        // if (ent.HasComponent<TransformComponent>())
+        // {
+        //
+        // }
+
+        // if (componentR nullptr)
+        // {
+        //     NP_ENGINE_LOG_TRACE("We have component");
+        // }
+        // else
+        // {
+        //     NP_ENGINE_LOG_TRACE("We don't have component");
+        // }
         // auto component2 = _registry.emplace<TransformComponent>(entit2);
         // add a component to an entity
         //auto component = _registry.emplace<TransformComponent>(entity, TransformMatrix(), component2);
         // component.SetParent(component2);
         //
         // // adds a component and calls the constructor
-        auto componentChanged = _registry.emplace<TransformComponent>(entity, TransformMatrix());
-        NP_ENGINE_LOG_TRACE(componentChanged.Name);
+        //auto componentChanged = Registry.emplace<TransformComponent>(entity, TransformMatrix());
+        //componentChanged.ToString();
+        //NP_ENGINE_LOG_TRACE(componentChanged.ToString());
+
         //
         // // calls a method on the component
         // UpdatePosition(component);

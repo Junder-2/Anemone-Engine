@@ -3,6 +3,7 @@
 #include <SDL_video.h>
 
 #include "../Delegate/Delegate.h"
+#include "../Events/Event.h"
 
 //#include "SDL.h"
 //#include "vulkan/vulkan_core.h"
@@ -17,10 +18,13 @@ namespace Engine
         uint32_t Width;
         uint32_t Height;
 
+        uint32_t XPos;
+        uint32_t YPos;
+
         bool VSync;
 
         WindowProperties(const std::string& title = "NP Engine", uint32_t width = 900, uint32_t height = 500, bool vSync = true) :
-            Title(title), Width(width), Height(height), VSync(vSync)
+            Title(title), Width(width), Height(height), XPos(0), YPos(0), VSync(vSync)
         {
         }
     };
@@ -41,8 +45,7 @@ namespace Engine
         uint32_t GetHeight() const { return _windowData.Height; }
         SDL_Window* GetWindowContext() const { return _windowContext; }
 
-        MulticastDelegate<void()> WindowCloseDelegate;
-        MulticastDelegate<void(int width, int height)> WindowResizeDelegate;
+        SinglecastDelegate<void(Event&)> EventDelegate;
 
     private:
         void Init(const WindowProperties& props);
@@ -50,6 +53,8 @@ namespace Engine
 
         void ProcessEvents(float deltaTime);
         void ProcessWindowEvent(const SDL_WindowEvent& windowEvent, float deltaTime);
+
+        void DispatchEvent(Event& e);
 
         static void ShowInputDebugOverlay(bool* pOpen);
 

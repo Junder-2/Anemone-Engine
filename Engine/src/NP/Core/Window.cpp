@@ -8,6 +8,7 @@
 
 #include "Application.h"
 #include "../../Platform/Vulkan/VulkanRenderer.h"
+#include "../Events/WindowEvent.h"
 
 namespace Engine
 {
@@ -34,6 +35,13 @@ namespace Engine
 
         SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_VULKAN | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
         _windowContext = SDL_CreateWindow(props.Title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowData.Width, _windowData.Height, windowFlags);
+
+        int xPos, yPos;
+        SDL_GetWindowPosition(_windowContext, &xPos, &yPos);
+
+        _windowData.XPos = xPos;
+        _windowData.YPos = yPos;
+
         if (_windowContext == nullptr)
         {
             NP_ENGINE_LOG_ERROR("Could not create SDL window.");
@@ -111,31 +119,62 @@ namespace Engine
             switch (event.type)
             {
                 case SDL_QUIT:
-                    if(WindowCloseDelegate) WindowCloseDelegate();
+                {
+                    WindowCloseEvent closeEvent;
+                    DispatchEvent(closeEvent);
+                }
                 break;
                 case SDL_WINDOWEVENT:
                     ProcessWindowEvent(event.window, deltaTime);
                 continue;
                 case SDL_KEYDOWN:
                 case SDL_KEYUP:
+                {
                     if(LostFocus() || event.key.repeat != 0) continue;
                     inputManager->ProcessKey(event.key.keysym.sym, event.type == SDL_KEYDOWN);
+                }
                 continue;
                 case SDL_MOUSEBUTTONDOWN:
                 case SDL_MOUSEBUTTONUP:
+                {
                     if(LostFocus()) continue;
-                    inputManager->ProcessMouseButton(MOUSE_BUTTON_TO_SDL_MOUSE_BUTTON(event.button.button), event.type == SDL_MOUSEBUTTONDOWN, event.button.clicks == 2);
+                    const int keyIndex = MOUSE_BUTTON_TO_SDL_MOUSE_BUTTON(event.button.button);
+
+                    inputManager->ProcessMouseButton(keyIndex, event.type == SDL_MOUSEBUTTONDOWN, event.button.clicks == 2);
+                }
+                continue;
+                case SDL_MOUSEWHEEL:
+                {
+                    if(LostFocus()) continue;
+                    const float x = event.wheel.preciseX;
+                    const float y = event.wheel.preciseY;
+
+                    inputManager->ProcessMouseScroll(x, y);
+                }
                 continue;
                 case SDL_MOUSEMOTION:
+                {
                     if(LostFocus()) continue;
-                    inputManager->ProcessMouseMovement((float)event.motion.x/(float)_windowData.Width, (float)event.motion.y/(float)_windowData.Height, deltaTime);
+
+                    const float x = std::clamp((float)event.motion.x/(float)_windowData.Width, 0.f, 1.f);
+                    const float y = std::clamp((float)event.motion.y/(float)_windowData.Height, 0.f, 1.f);
+
+                    inputManager->ProcessMouseMovement(x, y, deltaTime);
+                }
                 continue;
             }
         }
 
         if(!prevLostFocus && LostFocus())
         {
+            WindowFocusChangeEvent focusChangeEvent(false);
+            DispatchEvent(focusChangeEvent);
             inputManager->FlushInputs();
+        }
+        else if(prevLostFocus && !LostFocus())
+        {
+            WindowFocusChangeEvent focusChangeEvent(true);
+            DispatchEvent(focusChangeEvent);
         }
 
         if(!LostFocus()) inputManager->PopulateKeyStates(SDL_GetKeyboardState(nullptr));
@@ -147,18 +186,55 @@ namespace Engine
         switch (windowEvent.event)
         {
             case SDL_WINDOWEVENT_CLOSE:
+            {
                 if(!isMainWindow) return;
-                if(WindowCloseDelegate) WindowCloseDelegate();
+                WindowCloseEvent closeEvent;
+                DispatchEvent(closeEvent);
+            }
             break;
             case SDL_WINDOWEVENT_RESIZED:
             case SDL_WINDOWEVENT_SIZE_CHANGED:
+            {
                 if(!isMainWindow) return;
-                if(_windowData.Width == windowEvent.data1 && _windowData.Height == windowEvent.data2) break;
+                const uint32_t newX = (uint32_t)windowEvent.data1;
+                const uint32_t newY = (uint32_t)windowEvent.data2;
+                if(_windowData.Width == newX && _windowData.Height == newY) break;
 
-                _windowData.Width = windowEvent.data1;
-                _windowData.Height = windowEvent.data2;
+                _windowData.Width = newX;
+                _windowData.Height = newY;
 
-                if(WindowResizeDelegate) WindowResizeDelegate(_windowData.Width, _windowData.Height);
+                WindowResizeEvent resizeEvent(_windowData.Width, _windowData.Height);
+                DispatchEvent(resizeEvent);
+            }
+            break;
+            case SDL_WINDOWEVENT_MINIMIZED:
+            case SDL_WINDOWEVENT_RESTORED:
+            case SDL_WINDOWEVENT_MAXIMIZED:
+            {
+                if(!isMainWindow) return;
+
+                const WindowState windowState = windowEvent.event == SDL_WINDOWEVENT_MAXIMIZED ? WindowMaximized
+                : windowEvent.event == SDL_WINDOWEVENT_RESTORED ? WindowRestored : WindowMinimized;
+
+                WindowStateChangeEvent stateChangeEvent(windowState);
+                DispatchEvent(stateChangeEvent);
+            }
+            break;
+            case SDL_WINDOWEVENT_MOVED:
+            {
+                if(!isMainWindow) return;
+                uint32_t newX = (uint32_t)windowEvent.data1;
+                uint32_t newY = (uint32_t)windowEvent.data2;
+                if(_windowData.XPos == newX && _windowData.YPos == newY) break;
+
+                const float xDelta = ((int)_windowData.XPos- (int)newX) * deltaTime;
+                const float yDelta = ((int)_windowData.YPos - (int)newY) * deltaTime;
+                _windowData.XPos = newX;
+                _windowData.YPos = newY;
+
+                WindowMovedEvent movedEvent(_windowData.XPos, _windowData.YPos, xDelta, yDelta);
+                DispatchEvent(movedEvent);
+            }
             break;
             case SDL_WINDOWEVENT_ENTER:
                 _windowLostFocus = !isMainWindow;
@@ -170,6 +246,11 @@ namespace Engine
                 _windowLostFocus = false;
             break;
         }
+    }
+
+    void Window::DispatchEvent(Event& e)
+    {
+        if(EventDelegate) EventDelegate(e);
     }
 
     void Window::ShowInputDebugOverlay(bool* pOpen)
@@ -196,14 +277,14 @@ namespace Engine
         {
             const glm::vec2 mousePos = inputManager->GetMousePos();
             ImGui::Text("Mouse Pos: (%.3f,%.3f)", mousePos.x, mousePos.y);
-            const MouseButtonValue mouseButtonValues = inputManager->GetMouseButtonValues();
+            const MouseButtonValues mouseButtonValues = inputManager->GetMouseButtonValues();
             ImGui::Text("Mouse Buttons: (");
             bool start = true;
             for (int i = 0; i < MOUSE_BUTTON_MAX; i++)
             {
                 const int buttonState = mouseButtonValues.GetTriggerState(i);
                 if (buttonState == 0) continue;
-                ImGui::SameLine(0, start ? 0 : -1);
+                ImGui::SameLine(0, start ? .0f : -1.0f);
                 ImGui::Text("%d:%d", i, buttonState);
                 start = false;
             }
@@ -216,7 +297,7 @@ namespace Engine
             for (auto keyValue : keyValues)
             {
                 if(keyValue.GetIntValue() == 0) continue;
-                ImGui::SameLine(0, start ? 0 : -1);
+                ImGui::SameLine(0, start ? .0f : -1.0f);
                 ImGui::Text("%d:%d", keyValue.GetBindingId(), keyValue.GetIntValue());
                 start = false;
             }

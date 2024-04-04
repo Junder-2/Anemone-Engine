@@ -3,6 +3,9 @@
 #include "Core.h"
 #include "Layers/LayerStack.h"
 #include "Window.h"
+#include "../Events/KeyboardEvent.h"
+#include "../Events/MouseEvent.h"
+#include "../Events/WindowEvent.h"
 #include "../Input/InputManager.h"
 
 namespace Engine
@@ -22,12 +25,19 @@ namespace Engine
         void Run();
         void Shutdown();
 
+        void OnEvent(Event& e);
+        void OnWindowResize(WindowResizeEvent& e);
+        void OnWindowMove(WindowMovedEvent& e);
+        void OnWindowStateChange(WindowStateChangeEvent& e);
+        void OnWindowFocusChange(WindowFocusChangeEvent& e);
+
         //Test functions
         void OnResizeTest(int width, int height);
-        void OnKeyTest(InputValue inputValue);
+        void OnKeyTest(KeyTriggerEvent& keyTriggerEvent);
         void OnAxisTest(InputValue inputValue);
-        void OnMouseKeyTest(MouseButtonValue inputValue);
-        void OnMouseMoveTest(MouseMoveValue inputValue);
+        void OnMouseKeyTest(MouseButtonEvent& mouseButtonEvent);
+        void OnMouseScrollTest(MouseScrollEvent& mouseScrollEvent);
+        void OnMouseMoveTest(MouseMovementEvent& mouseMovementEvent);
 
         Window& GetWindow() const { return *_windowContext; }
         InputManager& GetInputManager() const { return *_inputManager.get(); }
