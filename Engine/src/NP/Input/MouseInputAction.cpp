@@ -5,11 +5,7 @@ namespace Engine
 {
     MouseInputAction::MouseInputAction() = default;
 
-    MouseInputAction::~MouseInputAction()
-    {
-        _buttonInputDelegate.Clear();
-        _moveInputDelegate.Clear();
-    }
+    MouseInputAction::~MouseInputAction() = default;
 
     bool MouseInputAction::PopulateMoveInput(bool* needProcessing, const float x, const float y, const float deltaTime)
     {
@@ -17,8 +13,6 @@ namespace Engine
         _moveValue.SetMousePos(x, y);
         _moveValue.SetMouseDelta((x - prevMousePos.x)*deltaTime, (y - prevMousePos.y)*deltaTime);
 
-        if(_moveInputDelegate) _moveInputDelegate(_moveValue);
-        
         *needProcessing = true;
         return true;
     }
@@ -27,7 +21,6 @@ namespace Engine
     {
         _buttonValue.SetTriggerState(buttonIndex, newState, isDoubleClick);
 
-        if(_buttonInputDelegate) _buttonInputDelegate(_buttonValue);
 
         *needProcessing = true;
         return true;
@@ -59,7 +52,6 @@ namespace Engine
             auto prevValue = _buttonValue.GetTriggerState(i);
             if(prevValue == TriggerNone) continue;
             _buttonValue.SetTriggerState(i, TriggerNone);
-            if(_buttonInputDelegate) _buttonInputDelegate(_buttonValue);
         }
     }
 }

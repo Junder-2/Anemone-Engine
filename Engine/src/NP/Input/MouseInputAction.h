@@ -91,19 +91,5 @@ namespace Engine
     protected:
         MouseMoveValue _moveValue {};
         MouseButtonValues _buttonValue {};
-        MulticastDelegate<void(MouseMoveValue)> _moveInputDelegate;
-        MulticastDelegate<void(MouseButtonValues)> _buttonInputDelegate;
     };
-
-    template <class TClass>
-    void MouseInputAction::BindMoveAction(DelegateMember<TClass, void(MouseMoveValue)> delegateMember)
-    {
-        _moveInputDelegate += delegateMember;
-    }
-
-    template <class TClass>
-    void MouseInputAction::BindButtonAction(DelegateMember<TClass, void(MouseButtonValues)> delegateMember)
-    {
-        _buttonInputDelegate += delegateMember;
-    }
 }
