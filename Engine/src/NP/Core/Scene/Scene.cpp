@@ -97,6 +97,10 @@ namespace Engine
     }
 
 
+    void Scene::OnEvent(Event& e)
+    {
+    }
+
     void Scene::OnUpdate(float timeStep)
     {
     }
