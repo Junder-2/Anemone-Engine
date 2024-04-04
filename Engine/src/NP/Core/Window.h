@@ -7,14 +7,6 @@
 //#include "SDL.h"
 //#include "vulkan/vulkan_core.h"
 
-namespace vkb
-{
-    struct Instance;
-    struct PhysicalDevice;
-    struct Device;
-    struct Swapchain;
-}
-
 namespace Engine
 {
     class VulkanRenderer;
