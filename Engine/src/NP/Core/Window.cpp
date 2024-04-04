@@ -129,17 +129,29 @@ namespace Engine
                 continue;
                 case SDL_KEYDOWN:
                 case SDL_KEYUP:
+                {
                     if(LostFocus() || event.key.repeat != 0) continue;
                     inputManager->ProcessKey(event.key.keysym.sym, event.type == SDL_KEYDOWN);
+                }
                 continue;
                 case SDL_MOUSEBUTTONDOWN:
                 case SDL_MOUSEBUTTONUP:
+                {
                     if(LostFocus()) continue;
-                    inputManager->ProcessMouseButton(MOUSE_BUTTON_TO_SDL_MOUSE_BUTTON(event.button.button), event.type == SDL_MOUSEBUTTONDOWN, event.button.clicks == 2);
+                    const int keyIndex = MOUSE_BUTTON_TO_SDL_MOUSE_BUTTON(event.button.button);
+
+                    inputManager->ProcessMouseButton(keyIndex, event.type == SDL_MOUSEBUTTONDOWN, event.button.clicks == 2);
+                }
                 continue;
                 case SDL_MOUSEMOTION:
+                {
                     if(LostFocus()) continue;
-                    inputManager->ProcessMouseMovement((float)event.motion.x/(float)_windowData.Width, (float)event.motion.y/(float)_windowData.Height, deltaTime);
+
+                    const float x = std::clamp((float)event.motion.x/(float)_windowData.Width, 0.f, 1.f);
+                    const float y = std::clamp((float)event.motion.y/(float)_windowData.Height, 0.f, 1.f);
+
+                    inputManager->ProcessMouseMovement(x, y, deltaTime);
+                }
                 continue;
             }
         }
