@@ -57,7 +57,6 @@ namespace Engine
 
     protected:
         InputValue _inputValue;
-        MulticastDelegate<void(InputValue)> _inputDelegate;
     };
 
     class InputTrigger final : public InputAction
@@ -76,12 +75,6 @@ namespace Engine
 
         bool PopulateInput(float input, bool* needProcessing) override;
     };
-
-    template <class TClass>
-    void InputAction::BindAction(DelegateMember<TClass, void(InputValue)> delegateMember)
-    {
-        _inputDelegate += delegateMember;
-    }
 
     class TwoBindingInput
     {

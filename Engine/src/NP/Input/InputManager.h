@@ -1,5 +1,6 @@
 #pragma once
 
+#include <entt.hpp>
 #include <queue> // todo: we can probably precomile this
 
 #include "InputAction.h"
@@ -22,15 +23,6 @@ namespace Engine
         void RegisterKeyboardTrigger(int keyCode);
         void RegisterKeyboardTwoKeyAxis(int negativeKeyCode, int positiveKeyCode);
 
-        template <class TClass>
-        void BindKeyboardTrigger(int keyCode, DelegateMember<TClass, void(InputValue)> delegateMember);
-        template <class TClass>
-        void BindKeyboardAxis(int negativeKeyCode, int positiveKeyCode, DelegateMember<TClass, void(InputValue)> delegateMember);
-        template <class TClass>
-        void BindMouseMoveAction(DelegateMember<TClass, void(MouseMoveValue)> delegateMember);
-        template <class TClass>
-        void BindMouseButtonAction(DelegateMember<TClass, void(MouseButtonValues)> delegateMember);
-
         void OnUpdate();
         void FlushInputs();
         void PopulateKeyStates(const Uint8* newKeyStates);
@@ -48,61 +40,40 @@ namespace Engine
         MouseButtonValues GetMouseButtonValues() const { return _mouseInputAction.GetButtonValue(); }
 
     private:
+        void DispatchEvent(Event& e);
+
         const Uint8* _currentKeyStates{};
-        std::unordered_map<int, InputAction*> _keyboardInputActions {};
+        entt::dense_map<int, InputAction*> _keyboardInputActions {};
         std::unordered_map<IntPair, TwoBindingInput*> _keyboardTwoBindings {};
         std::queue<int> _dirtyKeys {};
         MouseInputAction _mouseInputAction {};
         bool _dirtyMouse = false;
     };
 
-    template <class TClass>
-    void InputManager::BindKeyboardTrigger(const int keyCode, DelegateMember<TClass, void(InputValue)> delegateMember)
-    {
-        if(!_keyboardInputActions.contains(keyCode))
-        {
-            RegisterKeyboardTrigger(keyCode);
-        }
-
-        _keyboardInputActions[keyCode]->BindAction(delegateMember);
-    }
-
-    template <class TClass>
-    void InputManager::BindKeyboardAxis(const int negativeKeyCode, const int positiveKeyCode, DelegateMember<TClass, void(InputValue)> delegateMember)
-    {
-        const IntPair twoKeys(negativeKeyCode, positiveKeyCode);
-
-        if(!_keyboardTwoBindings.contains(twoKeys))
-        {
-            RegisterKeyboardTwoKeyAxis(negativeKeyCode, positiveKeyCode);
-        }
-
-        TwoBindingInput* twoKeyInputBinding = _keyboardTwoBindings[twoKeys];
-
-        if(!_keyboardInputActions.contains(negativeKeyCode))
-        {
-            RegisterKeyboardTrigger(negativeKeyCode);
-        }
-        if(!_keyboardInputActions.contains(positiveKeyCode))
-        {
-            RegisterKeyboardTrigger(positiveKeyCode);
-        }
-
-        _keyboardInputActions[negativeKeyCode]->BindAction(MakeDelegate(twoKeyInputBinding, &TwoBindingInput::OnBoundInput));
-        _keyboardInputActions[positiveKeyCode]->BindAction(MakeDelegate(twoKeyInputBinding, &TwoBindingInput::OnBoundInput));
-
-        twoKeyInputBinding->BindAction(delegateMember);
-    }
-
-    template <class TClass>
-    void InputManager::BindMouseMoveAction(DelegateMember<TClass, void(MouseMoveValue)> delegateMember)
-    {
-        _mouseInputAction.BindMoveAction(delegateMember);
-    }
-
-    template <class TClass>
-    void InputManager::BindMouseButtonAction(DelegateMember<TClass, void(MouseButtonValues)> delegateMember)
-    {
-        _mouseInputAction.BindButtonAction(delegateMember);
-    }
+    // template <class TClass>
+    // void InputManager::BindKeyboardAxis(const int negativeKeyCode, const int positiveKeyCode, DelegateMember<TClass, void(InputValue)> delegateMember)
+    // {
+    //     const IntPair twoKeys(negativeKeyCode, positiveKeyCode);
+    //
+    //     if(!_keyboardTwoBindings.contains(twoKeys))
+    //     {
+    //         RegisterKeyboardTwoKeyAxis(negativeKeyCode, positiveKeyCode);
+    //     }
+    //
+    //     TwoBindingInput* twoKeyInputBinding = _keyboardTwoBindings[twoKeys];
+    //
+    //     if(!_keyboardInputActions.contains(negativeKeyCode))
+    //     {
+    //         RegisterKeyboardTrigger(negativeKeyCode);
+    //     }
+    //     if(!_keyboardInputActions.contains(positiveKeyCode))
+    //     {
+    //         RegisterKeyboardTrigger(positiveKeyCode);
+    //     }
+    //
+    //     _keyboardInputActions[negativeKeyCode]->BindAction(MakeDelegate(twoKeyInputBinding, &TwoBindingInput::OnBoundInput));
+    //     _keyboardInputActions[positiveKeyCode]->BindAction(MakeDelegate(twoKeyInputBinding, &TwoBindingInput::OnBoundInput));
+    //
+    //     twoKeyInputBinding->BindAction(delegateMember);
+    // }
 }

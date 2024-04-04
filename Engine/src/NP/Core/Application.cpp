@@ -41,12 +41,6 @@ namespace Engine
         //     GetInputManager().RegisterKeyboardTrigger(i);
         // }
         // GetInputManager().RegisterKeyboardTrigger(KeyCode0);
-        // GetInputManager().BindKeyboardTrigger(KeyCode1, MakeDelegate(this, &Application::OnKeyTest));
-        // GetInputManager().BindKeyboardTrigger(KeyCode2, MakeDelegate(this, &Application::OnKeyTest));
-        // GetInputManager().BindKeyboardTrigger(KeyCode3, MakeDelegate(this, &Application::OnKeyTest));
-
-        // GetInputManager().BindKeyboardAxis(KeyCodeA, KeyCodeD, MakeDelegate(this, &Application::OnAxisTest));
-        // GetInputManager().BindKeyboardAxis(KeyCodeS, KeyCodeW, MakeDelegate(this, &Application::OnAxisTest));
     }
 
     Application::~Application() = default;

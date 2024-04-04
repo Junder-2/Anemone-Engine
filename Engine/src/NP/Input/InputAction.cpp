@@ -9,8 +9,6 @@ namespace Engine
 
         _inputValue = input;
 
-        if (_inputDelegate) _inputDelegate(_inputValue);
-
         return true;
     }
 
@@ -19,8 +17,6 @@ namespace Engine
         if (_inputValue.GetIntValue() == 0) return false;
 
         _inputValue = 0;
-
-        if (_inputDelegate) _inputDelegate(_inputValue);
 
         return true;
     }
@@ -56,8 +52,6 @@ namespace Engine
         if (_inputValue.GetAxis() == axisInput) return false;
 
         _inputValue = axisInput;
-
-        if (_inputDelegate) _inputDelegate(_inputValue);
 
         return true;
     }

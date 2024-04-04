@@ -33,6 +33,11 @@ namespace Engine
         _keyboardInputActions.clear();
     }
 
+    void InputManager::DispatchEvent(Event& e)
+    {
+        if(EventDelegate) EventDelegate(e);
+    }
+
     void InputManager::RegisterKeyboardTrigger(const int keyCode)
     {
         if (_keyboardInputActions.contains(keyCode)) return;
@@ -44,6 +49,7 @@ namespace Engine
 
     void InputManager::RegisterKeyboardTwoKeyAxis(const int negativeKeyCode, const int positiveKeyCode)
     {
+        return; //todo: not functional after refactor
         const IntPair twoKeys(negativeKeyCode, positiveKeyCode);
 
         if(_keyboardTwoBindings.contains(twoKeys)) return;
@@ -74,7 +80,7 @@ namespace Engine
                 if(_keyboardInputActions[keyCode]->ProcessAction(&needProcessing))
                 {
                     KeyTriggerEvent keyTriggerEvent(_keyboardInputActions[keyCode]->GetInputValue());
-                    if(EventDelegate) EventDelegate(keyTriggerEvent);
+                    DispatchEvent(keyTriggerEvent);
                 }
                 if(needProcessing)
                 {
@@ -85,6 +91,11 @@ namespace Engine
         }
     }
 
+    void InputManager::PopulateKeyStates(const Uint8* newKeyStates)
+    {
+        _currentKeyStates = newKeyStates;
+    }
+
     void InputManager::FlushInputs()
     {
         for (const auto val : _keyboardInputActions | std::views::values)
@@ -92,17 +103,12 @@ namespace Engine
             if(val->FlushAction())
             {
                 KeyTriggerEvent keyTriggerEvent(val->GetInputValue());
-                if(EventDelegate) EventDelegate(keyTriggerEvent);
+                DispatchEvent(keyTriggerEvent);
             }
         }
 
         _mouseInputAction.FlushAction();
         _currentKeyStates = nullptr;
-    }
-
-    void InputManager::PopulateKeyStates(const Uint8* newKeyStates)
-    {
-        _currentKeyStates = newKeyStates;
     }
 
     void InputManager::ProcessKey(const int keyCode, const bool press)
@@ -114,7 +120,7 @@ namespace Engine
         if(_keyboardInputActions[keyCode]->PopulateInput((float)(press ? TriggerStarted : TriggerStopped), &needProcessing))
         {
             KeyTriggerEvent keyTriggerEvent(_keyboardInputActions[keyCode]->GetInputValue());
-            if(EventDelegate) EventDelegate(keyTriggerEvent);
+            DispatchEvent(keyTriggerEvent);
         }
 
         if(needProcessing)
@@ -128,7 +134,7 @@ namespace Engine
         if(_mouseInputAction.PopulateMoveInput(&_dirtyMouse, xPos, yPos, deltaTime))
         {
             MouseMovementEvent mouseMovementEvent(_mouseInputAction.GetMoveValue());
-            if(EventDelegate) EventDelegate(mouseMovementEvent);
+            DispatchEvent(mouseMovementEvent);
         }
     }
 
@@ -137,7 +143,7 @@ namespace Engine
         if(_mouseInputAction.PopulateButtonInput(&_dirtyMouse, index, press ? TriggerStarted : TriggerStopped, isDoubleClick))
         {
             MouseButtonEvent mouseButtonEvent(_mouseInputAction.GetButtonValue());
-            if(EventDelegate) EventDelegate(mouseButtonEvent);
+            DispatchEvent(mouseButtonEvent);
         }
     }
 
