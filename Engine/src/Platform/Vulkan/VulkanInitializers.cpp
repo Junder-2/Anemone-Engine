@@ -114,6 +114,23 @@ namespace VulkanInitializers
         return depthAttachment;
     }
 
+    VkRenderingInfo RenderingInfo(const VkExtent2D renderExtent, const VkRenderingAttachmentInfo* colorAttachment, const VkRenderingAttachmentInfo* depthAttachment)
+    {
+        VkRenderingInfo renderInfo = { };
+        renderInfo.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
+        renderInfo.pNext = nullptr;
+
+        constexpr VkOffset2D offset = VkOffset2D { 0, 0 };
+        renderInfo.renderArea = VkRect2D { offset, renderExtent };
+        renderInfo.layerCount = 1;
+        renderInfo.colorAttachmentCount = 1;
+        renderInfo.pColorAttachments = colorAttachment;
+        renderInfo.pDepthAttachment = depthAttachment;
+        renderInfo.pStencilAttachment = nullptr;
+
+        return renderInfo;
+    }
+
     VkPipelineShaderStageCreateInfo PipelineShaderStageCreateInfo(const VkShaderStageFlagBits stage, const VkShaderModule shaderModule, const char* entry)
     {
         VkPipelineShaderStageCreateInfo info = { .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, .pNext = nullptr };
