@@ -3,6 +3,7 @@
 #include <imgui_impl_vulkan.h>
 
 #include "VulkanDeletionQueue.h"
+#include "VulkanPipelineBuilder.h"
 
 namespace vkb
 {
@@ -50,6 +51,7 @@ namespace Engine
         static vkb::Instance CreateVkbInstance(const std::vector<const char*>& extensions);
         static vkb::PhysicalDevice SelectVkbPhysicalDevice(VkSurfaceKHR surface, vkb::Instance instance);
         static vkb::Device CreateVkbLogicalDevice(const vkb::PhysicalDevice& physicalDevice);
+        static PipelineWrapper CreatePipeline(const vkb::Device& logicalDevice);
 
         static void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height);
 
@@ -97,6 +99,7 @@ namespace Engine
         inline static QueueFamilyIndices _queueFamily = (QueueFamilyIndices)-1;
         inline static VkQueue _queue = VK_NULL_HANDLE;
         inline static VkPipelineCache _pipelineCache = VK_NULL_HANDLE;
+        inline static VkPipeline _meshPipeline = VK_NULL_HANDLE;
 
         // ImGui
         inline static ImGui_ImplVulkanH_Window _mainWindowData;

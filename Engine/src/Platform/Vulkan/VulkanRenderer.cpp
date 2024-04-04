@@ -135,6 +135,9 @@ namespace Engine
         }
         _queue = queueResult.value();
 
+        //const PipelineWrapper pipeline = CreatePipeline(logicalDevice);
+        //_trianglePipeline = pipeline.Pipeline;
+
         int w, h;
         SDL_GetWindowSize(window, &w, &h);
         ImGui_ImplVulkanH_Window* wd = &_mainWindowData;
@@ -302,6 +305,34 @@ namespace Engine
             .value();
 
         return logicalDevice;
+    }
+
+    PipelineWrapper VulkanRenderer::CreatePipeline(const vkb::Device& logicalDevice)
+    {
+        VkPipelineLayout pipelineLayout = VK_NULL_HANDLE; // Dummy for now
+        VkShaderModule triangleVertShader; // Dummy for now
+        VkShaderModule triangleFragShader; // Dummy for now
+        AllocatedImage drawImage = { }; // Dummy for now
+
+        VulkanPipelineBuilder builder{ logicalDevice, pipelineLayout };
+        vkb::Result<PipelineWrapper> pipeline = builder
+            .SetShaders(triangleVertShader, triangleFragShader)
+            .SetBlendMode(None)
+            .SetDepthTestOperator(VK_COMPARE_OP_ALWAYS)
+
+            .SetColorFormat(drawImage.ImageFormat)
+            .SetDepthFormat(VK_FORMAT_UNDEFINED)
+
+            .SetAllocationCallbacks(_allocator)
+            .Build();
+
+        _mainDeletionQueue.PushFunction([&]
+        {
+            vkDestroyPipelineLayout(_device, pipelineLayout, _allocator);
+            vkDestroyPipeline(_device, _meshPipeline, _allocator);
+        });
+
+        return pipeline.value();
     }
 
     void VulkanRenderer::SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height)
