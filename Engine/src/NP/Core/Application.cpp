@@ -19,8 +19,8 @@ namespace Engine
     {
         _appInstance = this;
 
-        _windowContext = Window::Create(WindowProperties(_appSpec.Name));
-        _windowContext->EventDelegate = MakeDelegate(this, &Application::OnEvent);
+        _window = Window::Create(WindowProperties(_appSpec.Name));
+        _window->EventDelegate = MakeDelegate(this, &Application::OnEvent);
 
         _inputManager = InputManager::Create();
         _inputManager->EventDelegate = MakeDelegate(this, &Application::OnEvent);
@@ -62,7 +62,7 @@ namespace Engine
             //todo frame yap
 
             //Split this so inputs get processed before everything else
-            _windowContext->OnUpdate(deltaTime);
+            _window->OnUpdate(deltaTime);
         }
     }
 
@@ -111,6 +111,8 @@ namespace Engine
         //         break;
         //     }
         // }
+
+        //todo: should send to renderer
 
         for (Layer* layer : _layerStack) // raw pointers
         {
