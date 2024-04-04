@@ -55,6 +55,8 @@ namespace Engine
 
         static void CreateImGuiDescriptorPool();
 
+        inline static void DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView);
+
         inline static void RenderFrame(ImGui_ImplVulkanH_Window* wd, ImDrawData* drawData);
         inline static void RevealFrame(ImGui_ImplVulkanH_Window* wd);
 

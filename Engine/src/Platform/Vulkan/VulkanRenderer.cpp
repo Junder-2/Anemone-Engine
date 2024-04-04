@@ -8,6 +8,7 @@
 #include <imgui_impl_vulkan.h>
 #include <VkBootstrap.h>
 
+#include "VulkanInitializers.h"
 #include "../../NP/Core/Window.h"
 #include "../../NP/Utilities/ImGuiUtilities.h"
 
@@ -352,6 +353,20 @@ namespace Engine
         CheckVkResult(err);
 
         _mainDeletionQueue.PushFunction([&]{ vkDestroyDescriptorPool(_device, _imGuiDescriptorPool, _allocator); });
+    }
+
+    // TODO: Fully integrate ImGui into rendering loop.
+    void VulkanRenderer::DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView)
+    {
+        VkExtent2D windowExtent { 0, 0 }; // Placeholder.
+        VkRenderingAttachmentInfo colorAttachment = VulkanInitializers::AttachmentInfo(targetImageView, nullptr, VK_IMAGE_LAYOUT_GENERAL);
+        VkRenderingInfo renderInfo = VulkanInitializers::RenderingInfo(windowExtent, &colorAttachment, nullptr);
+
+        vkCmdBeginRendering(cmd, &renderInfo);
+
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmd);
+
+        vkCmdEndRendering(cmd);
     }
 
     // TODO: Figure out what most of this code does.
