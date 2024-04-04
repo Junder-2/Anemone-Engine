@@ -42,6 +42,7 @@ namespace Engine
     private:
         void DispatchEvent(Event& e);
 
+    private:
         const Uint8* _currentKeyStates{};
         entt::dense_map<int, InputAction*> _keyboardInputActions {};
         std::unordered_map<IntPair, TwoBindingInput*> _keyboardTwoBindings {};

@@ -121,7 +121,7 @@ namespace Engine
                 case SDL_QUIT:
                 {
                     WindowCloseEvent closeEvent;
-                    if(EventDelegate) EventDelegate(closeEvent);
+                    DispatchEvent(closeEvent);
                 }
                 break;
                 case SDL_WINDOWEVENT:
@@ -147,13 +147,13 @@ namespace Engine
         if(!prevLostFocus && LostFocus())
         {
             WindowFocusChangeEvent focusChangeEvent(false);
-            if(EventDelegate) EventDelegate(focusChangeEvent);
+            DispatchEvent(focusChangeEvent);
             inputManager->FlushInputs();
         }
         else if(prevLostFocus && !LostFocus())
         {
             WindowFocusChangeEvent focusChangeEvent(true);
-            if(EventDelegate) EventDelegate(focusChangeEvent);
+            DispatchEvent(focusChangeEvent);
         }
 
         if(!LostFocus()) inputManager->PopulateKeyStates(SDL_GetKeyboardState(nullptr));
@@ -168,7 +168,7 @@ namespace Engine
             {
                 if(!isMainWindow) return;
                 WindowCloseEvent closeEvent;
-                if(EventDelegate) EventDelegate(closeEvent);
+                DispatchEvent(closeEvent);
             }
             break;
             case SDL_WINDOWEVENT_RESIZED:
@@ -183,7 +183,7 @@ namespace Engine
                 _windowData.Height = newY;
 
                 WindowResizeEvent resizeEvent(_windowData.Width, _windowData.Height);
-                if(EventDelegate) EventDelegate(resizeEvent);
+                DispatchEvent(resizeEvent);
             }
             break;
             case SDL_WINDOWEVENT_MOVED:
@@ -199,7 +199,7 @@ namespace Engine
                 _windowData.YPos = newY;
 
                 WindowMovedEvent movedEvent(_windowData.XPos, _windowData.YPos, xDelta, yDelta);
-                if(EventDelegate) EventDelegate(movedEvent);
+                DispatchEvent(movedEvent);
             }
             break;
             case SDL_WINDOWEVENT_ENTER:
@@ -212,6 +212,11 @@ namespace Engine
                 _windowLostFocus = false;
             break;
         }
+    }
+
+    void Window::DispatchEvent(Event& e)
+    {
+        if(EventDelegate) EventDelegate(e);
     }
 
     void Window::ShowInputDebugOverlay(bool* pOpen)
