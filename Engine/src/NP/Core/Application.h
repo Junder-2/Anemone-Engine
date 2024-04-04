@@ -34,6 +34,7 @@ namespace Engine
         void OnKeyTest(KeyTriggerEvent& keyTriggerEvent);
         void OnAxisTest(InputValue inputValue);
         void OnMouseKeyTest(MouseButtonEvent& mouseButtonEvent);
+        void OnMouseScrollTest(MouseScrollEvent& mouseScrollEvent);
         void OnMouseMoveTest(MouseMovementEvent& mouseMovementEvent);
 
         Window& GetWindow() const { return *_windowContext; }

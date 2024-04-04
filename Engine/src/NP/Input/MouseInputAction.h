@@ -82,14 +82,17 @@ namespace Engine
         void BindButtonAction(DelegateMember<TClass, void(MouseButtonValues)> delegateMember);
         bool PopulateMoveInput(bool* needProcessing, float x, float y, float deltaTime);
         bool PopulateButtonInput(bool* needProcessing, int buttonIndex, TriggerState newState, bool isDoubleClick = false);
+        bool PopulateScrollInput(bool* needProcessing, float x, float y);
         void ProcessAction();
         void FlushAction();
 
         MouseMoveValue GetMoveValue() const { return _moveValue; }
         MouseButtonValues GetButtonValue() const { return _buttonValue; }
+        glm::vec2 GetScrollValue() const { return _scrollWheelValue; }
 
     protected:
         MouseMoveValue _moveValue {};
         MouseButtonValues _buttonValue {};
+        glm::vec2 _scrollWheelValue {};
     };
 }

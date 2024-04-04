@@ -147,6 +147,15 @@ namespace Engine
         }
     }
 
+    void InputManager::ProcessMouseScroll(const float xDelta, const float yDelta)
+    {
+        if(_mouseInputAction.PopulateScrollInput(&_dirtyMouse, xDelta, yDelta))
+        {
+            MouseScrollEvent mouseWheelEvent(_mouseInputAction.GetScrollValue());
+            DispatchEvent(mouseWheelEvent);
+        }
+    }
+
     std::array<InputValue, 4> InputManager::GetCurrentTriggeredKeys()
     {
         std::array<InputValue, 4> newArray;

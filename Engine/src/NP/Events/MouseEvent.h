@@ -33,4 +33,21 @@ namespace Engine
     private:
         MouseButtonValues _buttonValues;
     };
+
+    class MouseScrollEvent final : public Event
+    {
+    public:
+        MouseScrollEvent(const float xDelta, const float yDelta) : _xDelta(xDelta), _yDelta(yDelta) {}
+        MouseScrollEvent(const glm::vec2 delta) : _xDelta(delta.x), _yDelta(delta.y) {}
+
+        EventType GetEventType() const override { return EventType::MouseScrolled; }
+        int GetEventCategories() const override { return (InputEvent | MouseEvent); }
+
+        float GetXDelta() const { return _xDelta; }
+        float GetYDelta() const { return _yDelta; }
+
+    private:
+        float _xDelta;
+        float _yDelta;
+    };
 }

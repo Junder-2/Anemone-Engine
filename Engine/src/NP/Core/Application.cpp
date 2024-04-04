@@ -87,18 +87,21 @@ namespace Engine
         }
 
         //Input debugging
-        // if(event.HasCategory(InputEvent))
+        // if(e.HasCategory(InputEvent))
         // {
-        //     switch (event.GetEventType())
+        //     switch (e.GetEventType())
         //     {
         //         case EventType::KeyboardInput:
-        //             OnKeyTest(dynamic_cast<KeyTriggerEvent&>(event));
+        //             OnKeyTest(dynamic_cast<KeyTriggerEvent&>(e));
         //         break;
         //         case EventType::MouseButton:
-        //             OnMouseKeyTest(dynamic_cast<MouseButtonEvent&>(event));
+        //             OnMouseKeyTest(dynamic_cast<MouseButtonEvent&>(e));
+        //         break;
+        //         case EventType::MouseScrolled:
+        //             OnMouseScrollTest(dynamic_cast<MouseScrollEvent&>(e));
         //         break;
         //         case EventType::MouseMovement:
-        //             OnMouseMoveTest(dynamic_cast<MouseMovementEvent&>(event));
+        //             OnMouseMoveTest(dynamic_cast<MouseMovementEvent&>(e));
         //         break;
         //     }
         // }
@@ -142,7 +145,12 @@ namespace Engine
     {
         const MouseButtonValues inputValue = mouseButtonEvent;
         NP_ENGINE_LOG_INFO("pressed mouse key {0}, with state {1}, is doubleclick {2}", inputValue.GetCurrentButtonIndex(), (int)inputValue.GetTriggerState(), inputValue.GetIsDoubleClick());
-        NP_ENGINE_LOG_INFO("Raw mouse button state {0}", std::bitset<16>(inputValue.GetRawButtonStates()).to_string());
+        NP_ENGINE_LOG_INFO("raw mouse button state {0}", std::bitset<16>(inputValue.GetRawButtonStates()).to_string());
+    }
+
+    void Application::OnMouseScrollTest(MouseScrollEvent& mouseScrollEvent)
+    {
+        NP_ENGINE_LOG_INFO("scrolled mouse ({0}, {1})", mouseScrollEvent.GetXDelta(), mouseScrollEvent.GetYDelta());
     }
 
     void Application::OnMouseMoveTest(MouseMovementEvent& mouseMovementEvent)

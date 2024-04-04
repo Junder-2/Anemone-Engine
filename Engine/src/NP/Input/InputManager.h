@@ -29,6 +29,7 @@ namespace Engine
         void ProcessKey(int keyCode, bool press);
         void ProcessMouseMovement(float xPos, float yPos, float deltaTime);
         void ProcessMouseButton(int index, bool press, bool isDoubleClick = false);
+        void ProcessMouseScroll(float xDelta, float yDelta);
 
         TriggerState GetKeyTriggerState(int keyCode);
         // todo: just using for debug now. probably dirty to use array

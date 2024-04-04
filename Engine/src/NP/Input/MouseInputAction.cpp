@@ -21,6 +21,14 @@ namespace Engine
     {
         _buttonValue.SetTriggerState(buttonIndex, newState, isDoubleClick);
 
+        *needProcessing = true;
+        return true;
+    }
+
+    bool MouseInputAction::PopulateScrollInput(bool* needProcessing, const float x, const float y)
+    {
+        _scrollWheelValue.x = x;
+        _scrollWheelValue.y = y;
 
         *needProcessing = true;
         return true;
@@ -29,6 +37,8 @@ namespace Engine
     void MouseInputAction::ProcessAction()
     {
         _moveValue.SetMouseDelta(0, 0);
+        _scrollWheelValue.x = 0;
+        _scrollWheelValue.y = 0;
 
         for (int i = 0; i < MOUSE_BUTTON_MAX; ++i)
         {

@@ -143,6 +143,15 @@ namespace Engine
                     inputManager->ProcessMouseButton(keyIndex, event.type == SDL_MOUSEBUTTONDOWN, event.button.clicks == 2);
                 }
                 continue;
+                case SDL_MOUSEWHEEL:
+                {
+                    if(LostFocus()) continue;
+                    const float x = event.wheel.preciseX;
+                    const float y = event.wheel.preciseY;
+
+                    inputManager->ProcessMouseScroll(x, y);
+                }
+                continue;
                 case SDL_MOUSEMOTION:
                 {
                     if(LostFocus()) continue;

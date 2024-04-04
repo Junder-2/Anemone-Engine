@@ -45,7 +45,7 @@ namespace Engine
     class WindowMovedEvent final : public Event
     {
     public:
-        WindowMovedEvent(const uint32_t x, const uint32_t y, const float xDelta, const float yDelta) : _xPos(x), _yPos(y), _deltaX(xDelta), _deltaY(yDelta) {}
+        WindowMovedEvent(const uint32_t x, const uint32_t y, const float xDelta, const float yDelta) : _xPos(x), _yPos(y), _xDelta(xDelta), _yDelta(yDelta) {}
 
         EventType GetEventType() const override { return EventType::WindowMoved; }
         int GetEventCategories() const override { return (WindowEvent); }
@@ -53,14 +53,14 @@ namespace Engine
         uint32_t GetX() const { return _xPos; }
         uint32_t GetY() const { return _yPos; }
 
-        float GetXDelta() const { return _deltaX; }
-        float GetYDelta() const { return _deltaY; }
+        float GetXDelta() const { return _xDelta; }
+        float GetYDelta() const { return _yDelta; }
 
     private:
         uint32_t _xPos;
         uint32_t _yPos;
 
-        float _deltaX;
-        float _deltaY;
+        float _xDelta;
+        float _yDelta;
     };
 }
