@@ -81,6 +81,39 @@ namespace VulkanInitializers
         return info;
     }
 
+    VkRenderingAttachmentInfo AttachmentInfo(const VkImageView view, const VkClearValue* clear, const VkImageLayout layout)
+    {
+        VkRenderingAttachmentInfo colorAttachment = { };
+        colorAttachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
+        colorAttachment.pNext = nullptr;
+
+        colorAttachment.imageView = view;
+        colorAttachment.imageLayout = layout;
+        colorAttachment.loadOp = clear ? VK_ATTACHMENT_LOAD_OP_CLEAR : VK_ATTACHMENT_LOAD_OP_LOAD;
+        colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        if (clear)
+        {
+            colorAttachment.clearValue = *clear;
+        }
+
+        return colorAttachment;
+    }
+
+    VkRenderingAttachmentInfo DepthAttachmentInfo(const VkImageView view, const VkImageLayout layout)
+    {
+        VkRenderingAttachmentInfo depthAttachment = { };
+        depthAttachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
+        depthAttachment.pNext = nullptr;
+
+        depthAttachment.imageView = view;
+        depthAttachment.imageLayout = layout;
+        depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        depthAttachment.clearValue.depthStencil.depth = 0.0f;
+
+        return depthAttachment;
+    }
+
     VkPipelineShaderStageCreateInfo PipelineShaderStageCreateInfo(const VkShaderStageFlagBits stage, const VkShaderModule shaderModule, const char* entry)
     {
         VkPipelineShaderStageCreateInfo info = { .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, .pNext = nullptr };
