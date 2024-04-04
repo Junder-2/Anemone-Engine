@@ -25,16 +25,6 @@ namespace Engine
         }
     };
 
-    struct QueueFamilyIndices
-    {
-        std::optional<uint32_t> GraphicsFamily;
-
-        bool HasFamily() const
-        {
-            return GraphicsFamily.has_value();
-        }
-    };
-
     class NP_API Window
     {
     public:
