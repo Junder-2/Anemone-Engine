@@ -8,7 +8,7 @@ namespace Engine
     class EditorLayer : public Layer
     {
     public:
-        EditorLayer(const std::string& name = "Layer") : Layer(name) {};
+        EditorLayer(const std::string& name = "EditorLayer") : Layer(name) {};
 
         ~EditorLayer() override;
 
