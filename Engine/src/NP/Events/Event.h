@@ -6,7 +6,7 @@ namespace Engine
     enum class EventType
     {
         None = 0,
-        WindowClose, WindowResize, WindowFocusChange, WindowMoved,
+        WindowClose, WindowResize, WindowStateChange, WindowFocusChange, WindowMoved,
         KeyboardInput,
         MouseButton, MouseMovement, MouseScrolled
     };
@@ -19,6 +19,13 @@ namespace Engine
         KeyboardEvent = BIT(1),
         MouseEvent = BIT(2),
     } EventCategory;
+
+    typedef enum : uint8_t
+    {
+        WindowMinimized = 0,
+        WindowRestored = 1,
+        WindowMaximized = 2,
+    } WindowState;
 
     class Event
     {

@@ -207,6 +207,19 @@ namespace Engine
                 DispatchEvent(resizeEvent);
             }
             break;
+            case SDL_WINDOWEVENT_MINIMIZED:
+            case SDL_WINDOWEVENT_RESTORED:
+            case SDL_WINDOWEVENT_MAXIMIZED:
+            {
+                if(!isMainWindow) return;
+
+                const WindowState windowState = windowEvent.event == SDL_WINDOWEVENT_MAXIMIZED ? WindowMaximized
+                : windowEvent.event == SDL_WINDOWEVENT_RESTORED ? WindowRestored : WindowMinimized;
+
+                WindowStateChangeEvent stateChangeEvent(windowState);
+                DispatchEvent(stateChangeEvent);
+            }
+            break;
             case SDL_WINDOWEVENT_MOVED:
             {
                 if(!isMainWindow) return;

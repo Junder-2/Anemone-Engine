@@ -28,6 +28,8 @@ namespace Engine
         void OnEvent(Event& e);
         void OnWindowResize(WindowResizeEvent& e);
         void OnWindowMove(WindowMovedEvent& e);
+        void OnWindowStateChange(WindowStateChangeEvent& e);
+        void OnWindowFocusChange(WindowFocusChangeEvent& e);
 
         //Test functions
         void OnResizeTest(int width, int height);

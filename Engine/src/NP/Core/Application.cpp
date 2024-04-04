@@ -83,6 +83,12 @@ namespace Engine
                 case EventType::WindowMoved:
                     OnWindowMove(dynamic_cast<WindowMovedEvent&>(e));
                 break;
+                case EventType::WindowFocusChange:
+                    OnWindowFocusChange(dynamic_cast<WindowFocusChangeEvent&>(e));
+                break;
+                case EventType::WindowStateChange:
+                    OnWindowStateChange(dynamic_cast<WindowStateChangeEvent&>(e));
+                break;
             }
         }
 
@@ -128,6 +134,16 @@ namespace Engine
     void Application::OnWindowMove(WindowMovedEvent& e)
     {
         NP_ENGINE_LOG_INFO("new pos ({0}, {1}) : ({2}, {3})", e.GetX(), e.GetY(), e.GetXDelta(), e.GetYDelta());
+    }
+
+    void Application::OnWindowStateChange(WindowStateChangeEvent& e)
+    {
+        NP_ENGINE_LOG_INFO("window state change {0}", (int)e.GetState());
+    }
+
+    void Application::OnWindowFocusChange(WindowFocusChangeEvent& e)
+    {
+        NP_ENGINE_LOG_INFO("window focus change {0}", e.IsFocused());
     }
 
     void Application::OnKeyTest(KeyTriggerEvent& keyTriggerEvent)

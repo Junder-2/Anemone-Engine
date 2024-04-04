@@ -12,10 +12,24 @@ namespace Engine
         int GetEventCategories() const override { return (WindowEvent); }
     };
 
+    class WindowStateChangeEvent final : public Event
+    {
+    public:
+        WindowStateChangeEvent(const WindowState state) : _stateValue(state) {};
+
+        EventType GetEventType() const override { return EventType::WindowStateChange; }
+        int GetEventCategories() const override { return (WindowEvent); }
+
+        WindowState GetState() const { return _stateValue; }
+
+    private:
+        WindowState _stateValue;
+    };
+
     class WindowFocusChangeEvent final : public Event
     {
     public:
-        WindowFocusChangeEvent(bool isFocused) : _isFocused(isFocused) {}
+        WindowFocusChangeEvent(const bool isFocused) : _isFocused(isFocused) {}
 
         EventType GetEventType() const override { return EventType::WindowFocusChange; }
         int GetEventCategories() const override { return (WindowEvent); }
