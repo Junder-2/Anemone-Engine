@@ -6,7 +6,7 @@
 
 namespace Engine
 {
-    void ImGuiUtilities::StyleNPDark(ImGuiStyle* dst)
+    void ImGuiUtilities::StyleAnemoneDark(ImGuiStyle* dst)
     {
         // ImGuiIO io = ImGui::GetIO();
         // io.Fonts->AddFontFromFileTTF("../Engine/vendor/imgui/misc/fonts/Cousine-Regular.ttf", 14);
@@ -29,68 +29,68 @@ namespace Engine
         constexpr auto imWhite = ImVec4(1, 1, 1, 1);
         constexpr auto imClear = ImVec4(0, 0, 0, 0);
 
-        constexpr ImVec4 npWhite = ImVec4(0.86f, 0.87f, 0.98f, 1.00f);
-        constexpr ImVec4 npBlack = ImVec4(0.10f, 0.11f, 0.18f, 1.00f);
-        constexpr ImVec4 npBlackBg = ImVec4(0.10f, 0.11f, 0.18f, .98f);
-        constexpr ImVec4 npDark = ImVec4(0.20f, 0.22f, 0.36f, 1.00f);
-        const ImVec4 npDarkHover = ImLerp(npDark, imBlack, .1f);
-        const ImVec4 npDarkActive = ImLerp(npDark, imBlack, .2f);
-        constexpr ImVec4 npColor = ImVec4(0.25f, 0.30f, 0.55f, 1.00f);
-        const ImVec4 npColorHover = ImLerp(npColor, imBlack, .1f);
-        const ImVec4 npColorActive = ImLerp(npColor, imBlack, .2f);
-        constexpr ImVec4 npHint = ImVec4(0.57f, 0.62f, 0.87f, 1.00f);
-        const ImVec4 npHintHover = ImLerp(npHint, imBlack, .1f);
-        const ImVec4 npHintActive = ImLerp(npHint, imBlack, .2f);
-        const ImVec4 npBorder = ImLerp(imClear, npBlack, .5f);
-        const ImVec4 npBorderHover = ImLerp(npBorder, imBlack, .1f);
-        const ImVec4 npBorderActive = ImLerp(npBorder, imBlack, .2f);
+        constexpr ImVec4 aneWhite = ImVec4(0.86f, 0.87f, 0.98f, 1.00f);
+        constexpr ImVec4 aneBlack = ImVec4(0.10f, 0.11f, 0.18f, 1.00f);
+        constexpr ImVec4 aneBlackBg = ImVec4(0.10f, 0.11f, 0.18f, .98f);
+        constexpr ImVec4 aneDark = ImVec4(0.20f, 0.22f, 0.36f, 1.00f);
+        const ImVec4 aneDarkHover = ImLerp(aneDark, imBlack, .1f);
+        const ImVec4 aneDarkActive = ImLerp(aneDark, imBlack, .2f);
+        constexpr ImVec4 aneColor = ImVec4(0.25f, 0.30f, 0.55f, 1.00f);
+        const ImVec4 aneColorHover = ImLerp(aneColor, imBlack, .1f);
+        const ImVec4 aneColorActive = ImLerp(aneColor, imBlack, .2f);
+        constexpr ImVec4 aneHint = ImVec4(0.57f, 0.62f, 0.87f, 1.00f);
+        const ImVec4 aneHintHover = ImLerp(aneHint, imBlack, .1f);
+        const ImVec4 aneHintActive = ImLerp(aneHint, imBlack, .2f);
+        const ImVec4 aneBorder = ImLerp(imClear, aneBlack, .5f);
+        const ImVec4 aneBorderHover = ImLerp(aneBorder, imBlack, .1f);
+        const ImVec4 aneBorderActive = ImLerp(aneBorder, imBlack, .2f);
 
-        colors[ImGuiCol_Text]                   = npWhite;
-        colors[ImGuiCol_TextDisabled]           = ImLerp(imBlack, npWhite, .95f);
+        colors[ImGuiCol_Text]                   = aneWhite;
+        colors[ImGuiCol_TextDisabled]           = ImLerp(imBlack, aneWhite, .95f);
 
-        colors[ImGuiCol_WindowBg]               = npBlackBg;
-        colors[ImGuiCol_ChildBg]                = npBlackBg;
-        colors[ImGuiCol_PopupBg]                = npBlackBg;
+        colors[ImGuiCol_WindowBg]               = aneBlackBg;
+        colors[ImGuiCol_ChildBg]                = aneBlackBg;
+        colors[ImGuiCol_PopupBg]                = aneBlackBg;
 
-        colors[ImGuiCol_Border]                 = ImLerp(npColor, imClear, .5f);
+        colors[ImGuiCol_Border]                 = ImLerp(aneColor, imClear, .5f);
         colors[ImGuiCol_BorderShadow]           = imClear;
-        colors[ImGuiCol_FrameBg]                = npBorder;
-        colors[ImGuiCol_FrameBgHovered]         = npBorderHover;
-        colors[ImGuiCol_FrameBgActive]          = npBorderActive;
-        colors[ImGuiCol_TitleBg]                = npDark;
-        colors[ImGuiCol_TitleBgActive]          = npDarkHover;
-        colors[ImGuiCol_TitleBgCollapsed]       = npDarkActive;
-        colors[ImGuiCol_MenuBarBg]              = npDark;
+        colors[ImGuiCol_FrameBg]                = aneBorder;
+        colors[ImGuiCol_FrameBgHovered]         = aneBorderHover;
+        colors[ImGuiCol_FrameBgActive]          = aneBorderActive;
+        colors[ImGuiCol_TitleBg]                = aneDark;
+        colors[ImGuiCol_TitleBgActive]          = aneDarkHover;
+        colors[ImGuiCol_TitleBgCollapsed]       = aneDarkActive;
+        colors[ImGuiCol_MenuBarBg]              = aneDark;
 
-        colors[ImGuiCol_ScrollbarBg]            = npBorder;
-        colors[ImGuiCol_ScrollbarGrab]          = npColor;
-        colors[ImGuiCol_ScrollbarGrabHovered]   = npColorHover;
-        colors[ImGuiCol_ScrollbarGrabActive]    = npColorActive;
+        colors[ImGuiCol_ScrollbarBg]            = aneBorder;
+        colors[ImGuiCol_ScrollbarGrab]          = aneColor;
+        colors[ImGuiCol_ScrollbarGrabHovered]   = aneColorHover;
+        colors[ImGuiCol_ScrollbarGrabActive]    = aneColorActive;
 
-        colors[ImGuiCol_CheckMark]              = npHint;
-        colors[ImGuiCol_SliderGrab]             = npHint;
-        colors[ImGuiCol_SliderGrabActive]       = npHintActive;
+        colors[ImGuiCol_CheckMark]              = aneHint;
+        colors[ImGuiCol_SliderGrab]             = aneHint;
+        colors[ImGuiCol_SliderGrabActive]       = aneHintActive;
 
-        colors[ImGuiCol_Button]                 = npColor;
-        colors[ImGuiCol_ButtonHovered]          = npColorHover;
-        colors[ImGuiCol_ButtonActive]           = npColorActive;
+        colors[ImGuiCol_Button]                 = aneColor;
+        colors[ImGuiCol_ButtonHovered]          = aneColorHover;
+        colors[ImGuiCol_ButtonActive]           = aneColorActive;
 
-        colors[ImGuiCol_Header]                 = npDark;
-        colors[ImGuiCol_HeaderHovered]          = npDarkHover;
-        colors[ImGuiCol_HeaderActive]           = npDarkActive;
+        colors[ImGuiCol_Header]                 = aneDark;
+        colors[ImGuiCol_HeaderHovered]          = aneDarkHover;
+        colors[ImGuiCol_HeaderActive]           = aneDarkActive;
 
-        colors[ImGuiCol_Separator]              = npBorder;
-        colors[ImGuiCol_SeparatorHovered]       = npBorderHover;
-        colors[ImGuiCol_SeparatorActive]        = npBorderActive;
+        colors[ImGuiCol_Separator]              = aneBorder;
+        colors[ImGuiCol_SeparatorHovered]       = aneBorderHover;
+        colors[ImGuiCol_SeparatorActive]        = aneBorderActive;
 
-        colors[ImGuiCol_ResizeGrip]             = npColor;
-        colors[ImGuiCol_ResizeGripHovered]      = npColorHover;
-        colors[ImGuiCol_ResizeGripActive]       = npColorActive;
-        colors[ImGuiCol_Tab]                    = npDark;
-        colors[ImGuiCol_TabHovered]             = npDarkHover;
-        colors[ImGuiCol_TabActive]              = npDarkActive;
-        colors[ImGuiCol_TabUnfocused]           = ImLerp(imBlack, npDarkHover, 0.9f);
-        colors[ImGuiCol_TabUnfocusedActive]     = ImLerp(imBlack, npDarkHover, 0.8f);
+        colors[ImGuiCol_ResizeGrip]             = aneColor;
+        colors[ImGuiCol_ResizeGripHovered]      = aneColorHover;
+        colors[ImGuiCol_ResizeGripActive]       = aneColorActive;
+        colors[ImGuiCol_Tab]                    = aneDark;
+        colors[ImGuiCol_TabHovered]             = aneDarkHover;
+        colors[ImGuiCol_TabActive]              = aneDarkActive;
+        colors[ImGuiCol_TabUnfocused]           = ImLerp(imBlack, aneDarkHover, 0.9f);
+        colors[ImGuiCol_TabUnfocusedActive]     = ImLerp(imBlack, aneDarkHover, 0.8f);
 
         colors[ImGuiCol_PlotLines]              = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
         colors[ImGuiCol_PlotLinesHovered]       = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);

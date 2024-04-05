@@ -74,6 +74,4 @@ namespace Engine
         bool _showDemoWindow = true;
         bool _showAnotherWindow = false;
     };
-
 }
-

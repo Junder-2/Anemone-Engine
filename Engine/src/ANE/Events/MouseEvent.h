@@ -1,6 +1,6 @@
 #pragma once
 #include "Event.h"
-#include "../Input/MouseInputAction.h"
+#include "ANE/Input/MouseInputAction.h"
 
 namespace Engine
 {

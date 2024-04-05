@@ -5,10 +5,8 @@
 
 #include <SDL_timer.h>
 
+#include "ANE/Events/EventHandler.h"
 #include "Layers/Layer.h"
-#include "../Input/InputManager.h"
-#include "../Events/Event.h"
-#include "../Events/EventHandler.h"
 #include "Entity/Entity.h"
 #include "Layers/EditorLayer.h"
 #include "ANE/Renderer/Renderer.h"

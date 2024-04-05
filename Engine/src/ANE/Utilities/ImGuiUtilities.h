@@ -7,6 +7,6 @@ namespace Engine
     class ImGuiUtilities
     {
     public:
-        static void StyleNPDark(ImGuiStyle* dst = nullptr);
+        static void StyleAnemoneDark(ImGuiStyle* dst = nullptr);
     };
 }
