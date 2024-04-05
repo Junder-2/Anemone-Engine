@@ -7,8 +7,8 @@ project "Engine"
     targetdir ("%{wks.location}/bin/" .. OutputDir .. "/%{prj.name}")
     objdir ("%{wks.location}/bin-intermediate/" .. OutputDir .. "/%{prj.name}")
 
-    pchheader "nppch.h"
-    pchsource "src/nppch.cpp"
+    pchheader "anepch.h"
+    pchsource "src/anepch.cpp"
 
     files
     {
@@ -55,7 +55,7 @@ project "Engine"
 
         defines
         {
-            "NP_BUILD_DLL"
+            "ANE_BUILD_DLL"
         }
 
         postbuildcommands
@@ -65,15 +65,15 @@ project "Engine"
         }
 
     filter "configurations:Debug"
-        defines "NP_DEBUG"
+        defines "ANE_DEBUG"
         symbols "on"
 
     filter "configurations:Release"
-        defines "NP_RELEASE"
+        defines "ANE_RELEASE"
         optimize "on"
         symbols "on"
 
     filter "configurations:Dist"
-        defines "NP_DIST"
+        defines "ANE_DIST"
         optimize "on"
         symbols "off"

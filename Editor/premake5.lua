@@ -36,14 +36,14 @@ project "Editor"
         systemversion "latest"
 
     filter "configurations:Debug"
-        defines "NP_DEBUG"
+        defines "ANE_DEBUG"
         symbols "on"
 
     filter "configurations:Release"
-        defines "NP_RELEASE"
+        defines "ANE_RELEASE"
         optimize "on"
         symbols "on"
 
     filter "configurations:Dist"
-        defines "NP_DIST"
+        defines "ANE_DIST"
         optimize "on"

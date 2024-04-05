@@ -1,4 +1,4 @@
-#include "nppch.h"
+#include "anepch.h"
 #include "VulkanRenderer.h"
 
 #include <SDL.h>
@@ -8,8 +8,8 @@
 #include <imgui_impl_vulkan.h>
 #include <VkBootstrap.h>
 
-#include "../../NP/Core/Window.h"
-#include "../../NP/Utilities/ImGuiUtilities.h"
+#include "ANE/Core/Window.h"
+#include "ANE/Utilities/ImGuiUtilities.h"
 
 namespace Engine
 {
@@ -92,7 +92,7 @@ namespace Engine
 
         if (SDL_Vulkan_CreateSurface(window, _instance, &_surface) == 0)
         {
-            NP_ENGINE_LOG_ERROR("Could not create Vulkan surface.\n");
+            ANE_ENGINE_LOG_ERROR("Could not create Vulkan surface.\n");
         }
 
         const vkb::PhysicalDevice physicalDevice = SelectVkbPhysicalDevice(_surface, vkbInstance);
@@ -104,7 +104,7 @@ namespace Engine
         vkb::Result<VkQueue> queueResult = logicalDevice.get_queue(vkb::QueueType::graphics);
         if (!queueResult.has_value())
         {
-            NP_ENGINE_LOG_ERROR("Queue has no graphics support.\n");
+            ANE_ENGINE_LOG_ERROR("Queue has no graphics support.\n");
         }
         _queue = queueResult.value();
 
@@ -166,7 +166,7 @@ namespace Engine
     {
         if (err == VK_SUCCESS)
             return;
-        NP_ENGINE_LOG_ERROR("Vulkan Error: VkResult = {0}", (int)err);
+        ANE_ENGINE_LOG_ERROR("Vulkan Error: VkResult = {0}", (int)err);
         if (err < 0)
             abort();
     }
@@ -284,7 +284,7 @@ namespace Engine
         vkGetPhysicalDeviceSurfaceSupportKHR(_physicalDevice, _queueFamily.GraphicsFamily.value(), wd->Surface, &res);
         if (res != VK_TRUE)
         {
-            NP_ENGINE_LOG_ERROR("Error no WSI support on physical device 0\n");
+            ANE_ENGINE_LOG_ERROR("Error no WSI support on physical device 0\n");
         }
 
         // Select Surface Format
@@ -299,7 +299,7 @@ namespace Engine
             VkPresentModeKHR presentModes[] = { VK_PRESENT_MODE_FIFO_KHR };
         #endif
         wd->PresentMode = ImGui_ImplVulkanH_SelectPresentMode(_physicalDevice, wd->Surface, &presentModes[0], IM_ARRAYSIZE(presentModes));
-        //NP_ENGINE_LOG_INFO("Vulkan Info: Selected PresentMode = {0}", wd->PresentMode);
+        //ANE_ENGINE_LOG_INFO("Vulkan Info: Selected PresentMode = {0}", wd->PresentMode);
 
         // Create SwapChain, RenderPass, Framebuffer, etc.
         IM_ASSERT(_minImageCount >= 2);
@@ -448,19 +448,19 @@ namespace Engine
     {
         if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
         {
-            NP_ENGINE_LOG_ERROR("Validation layer: {0}", pCallbackData->pMessage);
+            ANE_ENGINE_LOG_ERROR("Validation layer: {0}", pCallbackData->pMessage);
         }
         else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
         {
-            NP_ENGINE_LOG_WARN("Validation layer: {0}", pCallbackData->pMessage);
+            ANE_ENGINE_LOG_WARN("Validation layer: {0}", pCallbackData->pMessage);
         }
         //else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
         //{
-        //    NP_ENGINE_LOG_INFO("Validation layer: {0}", pCallbackData->pMessage);
+        //    ANE_ENGINE_LOG_INFO("Validation layer: {0}", pCallbackData->pMessage);
         //}
         //else if (messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT)
         //{
-        //    NP_ENGINE_LOG_INFO("Validation layer: {0}", pCallbackData->pMessage);
+        //    ANE_ENGINE_LOG_INFO("Validation layer: {0}", pCallbackData->pMessage);
         //}
 
         return VK_FALSE;
