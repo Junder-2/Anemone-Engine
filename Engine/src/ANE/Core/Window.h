@@ -5,9 +5,6 @@
 #include "ANE/Delegate/Delegate.h"
 #include "ANE/Events/Event.h"
 
-//#include "SDL.h"
-//#include "vulkan/vulkan_core.h"
-
 namespace vkb
 {
     struct Instance;
@@ -91,6 +88,4 @@ namespace Engine
         bool _showDemoWindow = true;
         bool _showAnotherWindow = false;
     };
-
 }
-

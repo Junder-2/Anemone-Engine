@@ -52,3 +52,7 @@ namespace Engine
         bool _consumed = false;
     };
 }
+
+#include "WindowEvent.h"
+#include "KeyboardEvent.h"
+#include "MouseEvent.h"

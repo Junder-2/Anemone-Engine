@@ -1,6 +1,6 @@
 #pragma once
 #include "Event.h"
-#include "../Input/InputAction.h"
+#include "ANE/Input/InputAction.h"
 
 namespace Engine
 {

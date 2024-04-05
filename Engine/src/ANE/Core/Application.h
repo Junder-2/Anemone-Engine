@@ -3,10 +3,9 @@
 #include "Core.h"
 #include "Layers/LayerStack.h"
 #include "Window.h"
-#include "../Events/KeyboardEvent.h"
-#include "../Events/MouseEvent.h"
-#include "../Events/WindowEvent.h"
-#include "../Input/InputManager.h"
+#include "ANE/Events/Event.h"
+
+#include "ANE/Input/InputManager.h"
 
 namespace Engine
 {
