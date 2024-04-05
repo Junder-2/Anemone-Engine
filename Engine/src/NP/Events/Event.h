@@ -1,5 +1,5 @@
 #pragma once
-#include "../Utilities/CommonUtilities.h"
+#include "NP/Utilities/CommonUtilities.h"
 
 namespace Engine
 {
@@ -19,11 +19,11 @@ namespace Engine
     */
     typedef enum
     {
-        None = 0,
+        NoneEvent = 0,
         WindowEvent = BIT(0),
-        InputEvent = BIT(0),
-        KeyboardEvent = BIT(1),
-        MouseEvent = BIT(2),
+        InputEvent = BIT(1),
+        KeyboardEvent = BIT(2),
+        MouseEvent = BIT(3),
     } EventCategory;
 
     typedef enum : uint8_t
