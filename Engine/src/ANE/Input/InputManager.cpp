@@ -16,7 +16,19 @@ namespace Engine
         return std::make_unique<InputManager>();
     }
 
-    InputManager::InputManager() = default;
+    InputManager::InputManager()
+    {
+        // input testing
+        for (int i = KeyCodeA; i < KeyCodeZ+1; ++i)
+        {
+            RegisterKeyboardTrigger(i);
+        }
+
+        for (int i = KeyCode0; i < KeyCode9+1; ++i)
+        {
+            RegisterKeyboardTrigger(i);
+        }
+    }
 
     InputManager::~InputManager()
     {
