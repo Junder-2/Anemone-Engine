@@ -1,12 +1,10 @@
 ﻿#pragma once
 #include <entt.hpp>
-#include <memory>
 
-#include "../Scene/Scene.h"
-#include "../Scene/Components/Component.h"
-#include "../Scene/Components/TagComponent.h"
-#include "../Scene/Components/TransformComponent.h"
-
+#include "ANE/Core/Scene/Scene.h"
+#include "ANE/Core/Scene/Components/Component.h"
+#include "ANE/Core/Scene/Components/TagComponent.h"
+#include "ANE/Core/Scene/Components/TransformComponent.h"
 
 namespace Engine
 {

@@ -1,6 +1,6 @@
 ﻿#include "anepch.h"
 #include "EditorLayer.h"
-#include "../Entity/Entity.h"
+#include "ANE/Core/Entity/Entity.h"
 #include "LayerStack.h"
 
 Engine::EditorLayer::EditorLayer(const std::string& name) : Layer(name)

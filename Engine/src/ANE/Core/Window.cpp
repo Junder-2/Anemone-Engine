@@ -7,8 +7,7 @@
 #include <VkBootstrap.h>
 
 #include "Application.h"
-#include "../../Platform/Vulkan/VulkanRenderer.h"
-#include "../Events/WindowEvent.h"
+#include "Platform/Vulkan/VulkanRenderer.h"
 
 namespace Engine
 {

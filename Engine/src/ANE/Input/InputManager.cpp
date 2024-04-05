@@ -2,12 +2,10 @@
 #include "InputManager.h"
 
 #include <ranges>
+#include <SDL_keyboard.h>
 
 #include "InputAction.h"
 #include "InputTypes.h"
-#include "../Core/Application.h"
-#include "../Events/KeyboardEvent.h"
-#include "../Events/MouseEvent.h"
 
 namespace Engine
 {

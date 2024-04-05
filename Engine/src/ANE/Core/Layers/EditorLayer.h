@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "Layer.h"
 #include "entt.hpp"
-#include "../Scene/Scene.h"
+#include "ANE/Core/Scene/Scene.h"
 
 namespace Engine
 {
