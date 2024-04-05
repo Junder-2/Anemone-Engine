@@ -74,6 +74,7 @@ namespace Engine
             }
             Renderer::EndUIDataBuffer();
 
+            Renderer::Render(_window->GetProperties());
             //Renderer::Present()
             //Split this so inputs get processed before everything else
         }

@@ -43,6 +43,7 @@ namespace Engine
         bool IsVSync() const { return  _windowData.VSync; }
         uint32_t GetWidth() const { return _windowData.Width; }
         uint32_t GetHeight() const { return _windowData.Height; }
+        WindowProperties GetProperties() { return _windowData; }
         SDL_Window* GetWindowContext() const { return _windowContext; }
 
         SinglecastDelegate<void(Event&)> EventDelegate;

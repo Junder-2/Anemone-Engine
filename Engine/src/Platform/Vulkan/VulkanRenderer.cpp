@@ -77,11 +77,11 @@ namespace Engine
         }
 
         // Update and Render additional Platform Windows
-        if (_io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-        {
-            ImGui::UpdatePlatformWindows();
-            ImGui::RenderPlatformWindowsDefault();
-        }
+        //if (_io->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        //{
+        //    ImGui::UpdatePlatformWindows();
+        //    ImGui::RenderPlatformWindowsDefault();
+        //}
 
         if (!isMinimized)
         {

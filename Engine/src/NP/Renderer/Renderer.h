@@ -11,7 +11,7 @@ namespace Engine
     public:
         static void Init(SDL_Window* window);
         static void Shutdown();
-        static void Render();
+        static void Render(const WindowProperties& props);
 
         //These methods are sandwiched around the UI Layer render loops
         //ALL Imgui:: name space commands between these two methods will
