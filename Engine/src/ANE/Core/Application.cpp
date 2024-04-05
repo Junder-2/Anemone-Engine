@@ -128,6 +128,7 @@ namespace Engine
     void Application::Shutdown()
     {
         _isRunning = false;
+        EventHandler::ConsumeEvent();
     }
 
     void Application::OnWindowResize(WindowResizeEvent& e)
