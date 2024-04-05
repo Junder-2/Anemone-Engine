@@ -4,10 +4,17 @@
 
 namespace Engine
 {
-    typedef enum
+    typedef enum : uint8_t
     {
-        Trigger,
-        Axis
+        InputSourceKeyboard,
+        InputSourceGamepad,
+    } InputSourceType;
+
+    typedef enum : uint8_t
+    {
+        InputTypeBoolean,
+        InputTypeTrigger,
+        InputTypeAxis
     } InputValueType;
 
     typedef enum

@@ -1,6 +1,5 @@
 #pragma once
 #include "InputTypes.h"
-#include "../Delegate/Delegate.h"
 #include "glm/vec2.hpp"
 
 namespace Engine
@@ -8,9 +7,6 @@ namespace Engine
     struct MouseMoveValue
     {
     public:
-        glm::vec2 GetMousePos() const { return _mousePosition; }
-        glm::vec2 GetMouseDelta() const { return _mouseDelta; }
-
         void SetMousePos(const float x, const float y)
         {
             _mousePosition.x = x;
@@ -22,6 +18,9 @@ namespace Engine
             _mouseDelta.x = x;
             _mouseDelta.y = y;
         }
+
+        glm::vec2 GetMousePos() const { return _mousePosition; }
+        glm::vec2 GetMouseDelta() const { return _mouseDelta; }
 
     private:
         glm::vec2 _mouseDelta = {};
@@ -59,7 +58,7 @@ namespace Engine
         {
             _isDoubleClick = isDoubleClick;
             _lastIndex = std::min(index, MOUSE_BUTTON_MAX-1);
-            //Clear and add new state to button
+            // Clear and add new state to button
             _buttonStates &= ~GetMouseButtonMaskFromMouseButton(index);
             _buttonStates |= GetMouseButtonStateFromMouseButton(newState, index);
         }
@@ -76,10 +75,6 @@ namespace Engine
         MouseInputAction();
         ~MouseInputAction();
 
-        template <class TClass>
-        void BindMoveAction(DelegateMember<TClass, void(MouseMoveValue)> delegateMember);
-        template <class TClass>
-        void BindButtonAction(DelegateMember<TClass, void(MouseButtonValues)> delegateMember);
         bool PopulateMoveInput(bool* needProcessing, float x, float y, float deltaTime);
         bool PopulateButtonInput(bool* needProcessing, int buttonIndex, TriggerState newState, bool isDoubleClick = false);
         bool PopulateScrollInput(bool* needProcessing, float x, float y);

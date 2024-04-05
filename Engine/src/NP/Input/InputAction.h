@@ -1,7 +1,6 @@
 #pragma once
 
 #include "InputTypes.h"
-#include "../Delegate/Delegate.h" // todo: add to include directory
 
 namespace Engine
 {
@@ -9,6 +8,17 @@ namespace Engine
     {
     public:
         InputValue(const int bindingId = 0) : _bindingId(bindingId) { }
+        InputValue(const InputValueType type, const InputSourceType sourceType, const int bindingId = 0) : _valueType(type), _sourceType(sourceType), _bindingId(bindingId) { }
+
+        InputValueType GetValueType() const
+        {
+            return _valueType;
+        }
+
+        InputValueType GetSourceType() const
+        {
+            return _valueType;
+        }
 
         int GetIntValue() const
         {
@@ -38,17 +48,17 @@ namespace Engine
 
     protected:
         float _value = 0;
-        int _bindingId = 0;
+        InputValueType _valueType = InputTypeBoolean;
+        InputSourceType _sourceType = InputSourceKeyboard;
+        int _bindingId;
     };
 
     class InputAction
     {
     public:
-        InputAction(const int bindingId = 0) : _inputValue(InputValue(bindingId)) {}
+        InputAction(const InputValueType type, const InputSourceType sourceType, const int bindingId = 0) : _inputValue(InputValue(type, sourceType, bindingId)) {}
         virtual ~InputAction() = default;
 
-        template <class TClass>
-        void BindAction(DelegateMember<TClass, void(InputValue)> delegateMember);
         virtual bool PopulateInput(float input, bool* needProcessing);
         virtual bool ProcessAction(bool* needProcessing) = 0;
         virtual bool FlushAction();
@@ -62,7 +72,7 @@ namespace Engine
     class InputTrigger final : public InputAction
     {
     public:
-        InputTrigger(const int bindingId = 0) : InputAction(bindingId) {}
+        InputTrigger(const InputSourceType sourceType, const int bindingId = 0) : InputAction(InputTypeTrigger, sourceType, bindingId) {}
 
         bool PopulateInput(float input, bool* needProcessing) override;
         bool ProcessAction(bool* needProcessing) override;
@@ -71,7 +81,7 @@ namespace Engine
     class InputAxis : public InputAction
     {
     public:
-        InputAxis(const int bindingId = 0) : InputAction(bindingId) {}
+        InputAxis(const InputSourceType sourceType, const int bindingId = 0) : InputAction(InputTypeAxis, sourceType, bindingId) {}
 
         bool PopulateInput(float input, bool* needProcessing) override;
     };
@@ -79,26 +89,18 @@ namespace Engine
     class TwoBindingInput
     {
     public:
-        TwoBindingInput() = default;
-        TwoBindingInput(const int negativeBindingId, const int positiveBindingId) //todo: might want to turn the combined binding Id into has so we can decode it later
-        : _inputValue(negativeBindingId+positiveBindingId), _negativeBindingId(negativeBindingId), _positiveBindingId(positiveBindingId) {}
+        TwoBindingInput(const InputSourceType sourceType, const int negativeBindingId, const int positiveBindingId) //todo: might want to turn the combined binding Id into has so we can decode it later
+        : _inputValue(InputTypeAxis, sourceType, negativeBindingId+positiveBindingId), _negativeBindingId(negativeBindingId), _positiveBindingId(positiveBindingId) {}
         ~TwoBindingInput() = default;
 
-        template <class TClass>
-        void BindAction(DelegateMember<TClass, void(InputValue)> delegateMember);
         void OnBoundInput(InputValue inputValue);
 
     private:
-        MulticastDelegate<void(InputValue)> _inputDelegate;
         InputValue _inputValue;
 
         int _negativeBindingId = 0;
         int _positiveBindingId = 0;
     };
-
-    template <class TClass>
-    void TwoBindingInput::BindAction(DelegateMember<TClass, void(InputValue)> delegateMember)
-    {
-        _inputDelegate += delegateMember;
-    }
 }
+
+#include "MouseInputAction.h"
