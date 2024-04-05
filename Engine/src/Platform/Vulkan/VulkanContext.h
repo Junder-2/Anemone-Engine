@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../NP/Renderer/RenderingContext.h"
+#include "ANE/Renderer/RenderingContext.h"
 
 typedef struct SDL_Window SDL_Window;
 
