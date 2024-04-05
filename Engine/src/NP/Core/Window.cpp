@@ -48,16 +48,17 @@ namespace Engine
         }
 
         // Vulkan
-        _vulkanRenderer = std::make_unique<VulkanRenderer>(_windowContext);
-        _vulkanRenderer->Setup();
+        //_vulkanRenderer = std::make_unique<VulkanRenderer>(_windowContext);
+        //_vulkanRenderer->Setup();
     }
 
     void Window::OnUpdate(float deltaTime)
     {
         ProcessEvents(deltaTime);
 
-        _vulkanRenderer->NewFrame(_windowData);
+        //_vulkanRenderer->NewFrame(_windowData);
 
+        return;
         static bool showSimpleOverlay = true;
         if (showSimpleOverlay) ShowInputDebugOverlay(&showSimpleOverlay);
 
@@ -76,14 +77,14 @@ namespace Engine
         ImGui::Checkbox("Another Window", &_showAnotherWindow);
 
         ImGui::SliderFloat("float", &f, 0.0f, 1.0f); // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::ColorEdit3("clear color", (float*)&_vulkanRenderer->ClearColor); // Edit 3 floats representing a color
+        //ImGui::ColorEdit3("clear color", (float*)&_vulkanRenderer->ClearColor); // Edit 3 floats representing a color
 
         if (ImGui::Button("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
             counter++;
         ImGui::SameLine();
         ImGui::Text("counter = %d", counter);
 
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / _vulkanRenderer->GetFramerate(), _vulkanRenderer->GetFramerate());
+        //ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / _vulkanRenderer->GetFramerate(), _vulkanRenderer->GetFramerate());
         //ImGui::Text("Engine %.3f ms/frame", deltaTime * 1000.f);
         ImGui::End();
 
@@ -98,7 +99,7 @@ namespace Engine
         }
 
         // Rendering
-        _vulkanRenderer->EndFrame();
+        //_vulkanRenderer->EndFrame();
     }
 
     void Window::ProcessEvents(float deltaTime)
@@ -112,9 +113,9 @@ namespace Engine
         while(SDL_PollEvent(&event))
         {
             ImGui_ImplSDL2_ProcessEvent(&event);
-            const auto io = _vulkanRenderer->GetImGuiIO();
+            //const auto io = _vulkanRenderer->GetImGuiIO();
 
-            _imGuiLostFocus = (io->WantCaptureKeyboard);
+            //_imGuiLostFocus = (io->WantCaptureKeyboard);
 
             switch (event.type)
             {
@@ -315,7 +316,7 @@ namespace Engine
 
     void Window::Shutdown()
     {
-        _vulkanRenderer->Cleanup();
+        //_vulkanRenderer->Cleanup();
 
         SDL_DestroyWindow(_windowContext);
         SDL_Quit();
