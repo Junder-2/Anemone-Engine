@@ -50,6 +50,10 @@ namespace Engine
                 _swapChainRebuild = false;
             }
         }
+
+        //ImGui_ImplVulkan_NewFrame();
+        //ImGui_ImplSDL2_NewFrame();
+        //ImGui::NewFrame();
     }
 
     void VulkanRenderer::EndFrame()
@@ -60,6 +64,7 @@ namespace Engine
             return;
         }
 
+        //ImGui::Render();
         ImDrawData* drawData = ImGui::GetDrawData();
         const bool isMinimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
         if (!isMinimized)
