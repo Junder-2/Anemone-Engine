@@ -10,6 +10,7 @@
 #include "../Events/Event.h"
 #include "../Events/EventHandler.h"
 #include "Layers/EditorLayer.h"
+#include "NP/Renderer/Renderer.h"
 
 namespace Engine
 {
@@ -25,6 +26,8 @@ namespace Engine
         _inputManager = InputManager::Create();
         _inputManager->EventDelegate = MakeDelegate(this, &Application::OnEvent);
 
+
+        Renderer::Init(_window->GetWindowContext());
 
         //todo: make into template method
         EditorLayer* editorLayer = new EditorLayer("EditorLayer");
@@ -55,13 +58,24 @@ namespace Engine
 
             float deltaTime = timeStep / static_cast<float>(SDL_GetPerformanceFrequency());
 
+
+            //Renderer
             for (Layer* layer : _layerStack) // raw pointers
             {
                 layer->OnUpdate(deltaTime);
             }
             //todo frame yap
 
+            Renderer::BeginUiDataBuffer();
+            for (Layer* layer : _layerStack) // raw pointers
+                {
+                layer->OnUIRender();
+                }
+            Renderer::EndUIDataBuffer();
+
+            //Renderer::Present()
             //Split this so inputs get processed before everything else
+
             _window->OnUpdate(deltaTime);
         }
     }
