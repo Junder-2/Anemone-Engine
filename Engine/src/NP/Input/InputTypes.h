@@ -1,6 +1,6 @@
 #pragma once
-#include "../Utilities/CommonUtilities.h"
 #include <SDL_keycode.h>
+#include "NP/Utilities/CommonUtilities.h"
 
 namespace Engine
 {
@@ -324,5 +324,4 @@ namespace Engine
         SDLK_ENDCALL = SDL_SCANCODE_TO_KEYCODE(SDL_SCANCODE_ENDCALL)
         */
     } KeyCodes;
-
 }
