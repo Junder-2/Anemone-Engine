@@ -7,6 +7,8 @@
 
 namespace Engine
 {
+    std::unique_ptr<VulkanRenderer> Renderer::_vulkanRenderer;
+
     void Renderer::Init(SDL_Window* window)
     {
         _vulkanRenderer = std::make_unique<VulkanRenderer>(window);
@@ -20,7 +22,8 @@ namespace Engine
 
     void Renderer::Render()
     {
-
+        //_vulkanRenderer->DrawMain(cmd);
+        //_vulkanRenderer->DrawImGui(cmd, imageView);
     }
 
     void Renderer::BeginUiDataBuffer()
