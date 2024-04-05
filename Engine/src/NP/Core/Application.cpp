@@ -68,9 +68,9 @@ namespace Engine
 
             Renderer::BeginUiDataBuffer();
             for (Layer* layer : _layerStack) // raw pointers
-                {
+            {
                 layer->OnUIRender();
-                }
+            }
             Renderer::EndUIDataBuffer();
 
             //Renderer::Present()
