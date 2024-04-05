@@ -1,6 +1,6 @@
 #pragma once
 
-#include <NP.h>
+#include <..\..\Engine\src\ANE.h>
 
 class Editor : public Engine::Application
 {

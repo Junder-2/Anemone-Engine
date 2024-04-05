@@ -3,8 +3,8 @@
 Engine::Application* Engine::CreateApplication()
 {
     ApplicationSpecification spec;
-    spec.Name = "NP Editor";
-    spec.LogName = "NP EDITOR";
+    spec.Name = "Anemone Editor";
+    spec.LogName = "ANE EDITOR";
 
     return new Editor(spec);
 }

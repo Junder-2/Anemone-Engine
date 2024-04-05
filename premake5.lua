@@ -1,6 +1,6 @@
 include "premakeDependencies.lua"
 
-workspace "NP-Engine"
+workspace "Anemone-Engine"
     architecture "x86_64"
     startproject "Editor"
 
