@@ -58,6 +58,7 @@ namespace Engine
 
             float deltaTime = timeStep / static_cast<float>(SDL_GetPerformanceFrequency());
 
+            _window->OnUpdate(deltaTime);
 
             //Renderer
             for (Layer* layer : _layerStack) // raw pointers
@@ -65,8 +66,6 @@ namespace Engine
                 layer->OnUpdate(deltaTime);
             }
             //todo frame yap
-
-            _window->OnUpdate(deltaTime);
 
             Renderer::BeginUiDataBuffer();
             for (Layer* layer : _layerStack) // raw pointers
