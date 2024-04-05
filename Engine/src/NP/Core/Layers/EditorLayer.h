@@ -8,7 +8,7 @@ namespace Engine
     class EditorLayer : public Layer
     {
     public:
-        EditorLayer(const std::string& name = "EditorLayer") : Layer(name) {};
+        EditorLayer(const std::string& name = "EditorLayer");
 
         ~EditorLayer() override;
 
@@ -17,17 +17,16 @@ namespace Engine
         void OnDetach() override
         {
         }
+
         void OnEvent(Event& e) override;
 
         void OnUpdate(float deltaTime) override;
 
         template <class TValue>
-        std::enable_if_t<std::is_base_of_v<Scene, TValue>>
-        AddScene(const char* key);
+        std::enable_if_t<std::is_base_of_v<Scene, TValue>> AddScene(const char* key);
 
         template <class TValue>
-        std::enable_if_t<std::is_base_of_v<Scene, TValue>>
-        AddScene(const char* key, const std::vector<entt::entity> entities);
+        std::enable_if_t<std::is_base_of_v<Scene, TValue>> AddScene(const char* key, const std::vector<entt::entity> entities);
 
         void SetActiveScene(const char* sceneName)
         {
@@ -35,6 +34,8 @@ namespace Engine
 
             _activeScene = _scenes.at(sceneName);
         }
+
+        std::shared_ptr<Scene> GetActiveScene() { return _activeScene; }
 
     protected:
         std::string _debugName;
@@ -56,5 +57,7 @@ namespace Engine
     {
         std::unique_ptr<TValue> tempScene = std::make_unique<TValue>();
         _scenes.emplace(std::make_pair(key, std::move(tempScene)));
+        if (_scenes.size() == 1)
+            SetActiveScene(key);
     }
 }

@@ -9,7 +9,9 @@
 #include "../Input/InputManager.h"
 #include "../Events/Event.h"
 #include "../Events/EventHandler.h"
+#include "Entity/Entity.h"
 #include "Layers/EditorLayer.h"
+#include "Scene/Components/RenderComponent.h"
 
 namespace Engine
 {
@@ -28,7 +30,16 @@ namespace Engine
 
         //todo: make into template method
         EditorLayer* editorLayer = new EditorLayer("EditorLayer");
-        editorLayer->AddScene<Scene>("Game");
+        editorLayer->AddScene<Scene>("Game"); //
+        //editorLayer->SetActiveScene("Game");
+        Entity ent = editorLayer->GetActiveScene()->Create("Square Entity");
+        ent.AddComponent<RenderComponent>();
+        if (RenderComponent comp; ent.TryGetComponent<RenderComponent>(comp))
+        {
+            TagComponent tag;
+            ent.TryGetComponent(tag);
+            NP_ENGINE_LOG_WARN("We have a renderComponent with tag: {0} on entity: {1}", comp.ToString(), tag.Tag);
+        }
         //editorLayer->AddScene<Scene>("Main Menu");
         //editorLayer->AddScene<Scene>("Credits");
         _layerStack.PushLayer(editorLayer);

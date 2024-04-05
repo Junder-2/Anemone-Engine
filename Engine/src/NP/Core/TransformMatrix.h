@@ -24,7 +24,7 @@ namespace Engine
             return xyz(_transformMatrix[3]);
         }
 
-        void SetRotation(const glm::vec3 newRotation)
+        void SetRotation(const glm::vec3 newRotation) // todo: fix, overwrite rotation
         {
             _transformMatrix[0] = glm::vec4(1, 0, 0, 0);
             _transformMatrix[1] = glm::vec4(0, 1, 0, 0);

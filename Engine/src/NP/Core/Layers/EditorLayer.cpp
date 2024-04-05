@@ -1,11 +1,16 @@
 ﻿#include "nppch.h"
 #include "EditorLayer.h"
+#include "../Entity/Entity.h"
 #include "LayerStack.h"
+
+Engine::EditorLayer::EditorLayer(const std::string& name) : Layer(name)
+{
+}
 
 Engine::EditorLayer::~EditorLayer()
 {
-    //LayerStack stacky;
-    //stacky::PushLayer(this);
+
+
 }
 
 void Engine::EditorLayer::OnAttach()
@@ -14,7 +19,7 @@ void Engine::EditorLayer::OnAttach()
 
 void Engine::EditorLayer::OnEvent(Event& e)
 {
-    
+
 }
 
 void Engine::EditorLayer::OnUpdate(float deltaTime)
