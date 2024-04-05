@@ -23,6 +23,7 @@ project "Engine"
 
     includedirs
     {
+        "src/",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.SDL2}",
         "%{IncludeDir.ImGui}",
