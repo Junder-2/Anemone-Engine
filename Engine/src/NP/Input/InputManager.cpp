@@ -42,7 +42,7 @@ namespace Engine
     {
         if (_keyboardInputActions.contains(keyCode)) return;
 
-        InputTrigger* newInputAction = new InputTrigger(keyCode);
+        InputTrigger* newInputAction = new InputTrigger(InputSourceKeyboard, keyCode);
 
         _keyboardInputActions.insert_or_assign(keyCode, newInputAction);
     }
@@ -54,7 +54,7 @@ namespace Engine
 
         if(_keyboardTwoBindings.contains(twoKeys)) return;
 
-        TwoBindingInput* twoKeyInputBinding = new TwoBindingInput(negativeKeyCode, positiveKeyCode);
+        TwoBindingInput* twoKeyInputBinding = new TwoBindingInput(InputSourceKeyboard, negativeKeyCode, positiveKeyCode);
 
         _keyboardTwoBindings.insert_or_assign(twoKeys, twoKeyInputBinding);
     }

@@ -9,8 +9,7 @@ namespace Engine
         glm::mat3 Renderer;
 
         //copy constructor
-        RenderComponent() : Component(typeid(*this).name()) {}
-        RenderComponent(const RenderComponent&) = default;
+        NP_COMPONENT_INIT(RenderComponent)
 
         RenderComponent(const glm::mat3& transform) : Component(typeid(*this).name()) , Renderer(transform) {
 

@@ -3,8 +3,9 @@
 #include <memory>
 
 #include "../Scene/Scene.h"
-
 #include "../Scene/Components/Component.h"
+#include "../Scene/Components/TagComponent.h"
+#include "../Scene/Components/TransformComponent.h"
 
 
 namespace Engine
@@ -12,39 +13,35 @@ namespace Engine
     class Entity
     {
     public:
-        Entity(Scene* scene)
+        Entity(Scene* scene, const char* name) // only access this during creation
         {
-            SceneHandle = (std::shared_ptr<Scene>(scene, [](Scene*)
-            {
-            }));
+            SceneHandle = scene;
+
             EntityHandle = SceneHandle->Registry.create();
+            this->AddComponent<TransformComponent>();
+            this->AddComponent<TagComponent>(name);
         };
 
         Entity(Entity&) = default;
 
         template <typename T, typename... Args>
-        std::enable_if_t<std::is_base_of_v<Component, T>, T&>
-        AddComponent(Args&&... args);
+        std::enable_if_t<std::is_base_of_v<Component, T>, T&> AddComponent(Args&&... args);
 
         template <typename T>
-        std::enable_if_t<std::is_base_of_v<Component, T>>
-        RemoveComponent();
+        std::enable_if_t<std::is_base_of_v<Component, T>> RemoveComponent();
 
         template <typename T>
-        std::enable_if_t<std::is_base_of_v<Component, T>, bool>
-        HasComponent();
+        std::enable_if_t<std::is_base_of_v<Component, T>, bool> HasComponent();
 
         template <typename T>
-        std::enable_if_t<std::is_base_of_v<Component, T>, bool>
-        TryGetComponent(T& outComponent);
+        std::enable_if_t<std::is_base_of_v<Component, T>, bool> TryGetComponent(T& outComponent);
 
     private:
         template <typename T>
-        std::enable_if_t<std::is_base_of_v<Component, T>, T&>
-        GetComponent();
+        std::enable_if_t<std::is_base_of_v<Component, T>, T&> GetComponent();
 
         entt::entity EntityHandle = {entt::null};
-        std::shared_ptr<Scene> SceneHandle;
+        Scene* SceneHandle;
     };
 
     /**
@@ -85,13 +82,13 @@ namespace Engine
     template <typename T>
     std::enable_if_t<std::is_base_of_v<Component, T>, bool> Entity::HasComponent()
     {
-        auto Component = SceneHandle->Registry.try_get<T>(EntityHandle);
-        return Component == nullptr ? false : true;
+        auto component = SceneHandle->Registry.try_get<T>(EntityHandle);
+        return component == nullptr ? false : true;
     }
 
     /**
     * Attemps to fetch component of type T
-    * @param T& Ref out component.
+    * @param outComponent Ref out component
     * @return Returns true if component is found.
     */
     template <typename T>
@@ -101,7 +98,7 @@ namespace Engine
         {
             outComponent = GetComponent<T>();
             return true;
-        };
+        }
 
         NP_ENGINE_LOG_WARN("Attempted to remove component of type {} that doesn't exist", typeid(T).name());
         return false;

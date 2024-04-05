@@ -71,9 +71,7 @@ namespace Engine
         else
         {
             NP_ENGINE_LOG_WARN("TwoKeyInputBinding is incorrectly set up");
-            return;;
+            return;
         }
-
-        if(_inputDelegate) _inputDelegate(_inputValue);
     }
 }

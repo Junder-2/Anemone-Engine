@@ -4,12 +4,28 @@
 
 namespace Engine
 {
-    typedef enum
+    /**
+    * Type of input source, used to determine the derived class
+    */
+    typedef enum : uint8_t
     {
-        Trigger,
-        Axis
+        InputSourceKeyboard,
+        InputSourceGamepad,
+    } InputSourceType;
+
+    /**
+    * Type of input value, used to determine the derived class
+    */
+    typedef enum : uint8_t
+    {
+        InputTypeBoolean,
+        InputTypeTrigger,
+        InputTypeAxis
     } InputValueType;
 
+    /**
+    * The trigger state/stage
+    */
     typedef enum
     {
         TriggerNone,
@@ -18,6 +34,9 @@ namespace Engine
         TriggerStopped,
     } TriggerState;
 
+    /**
+    * The mouse button index
+    */
     typedef enum
     {
         MouseButtonLeft = 0,
@@ -30,6 +49,9 @@ namespace Engine
     #define MOUSE_BUTTON_MAX (MouseButtonX2+1)
     #define MOUSE_BUTTON_TO_SDL_MOUSE_BUTTON(x) ((x)-1)
 
+    /**
+    * Mask to get a region of combined mouse button value
+    */
     typedef enum {
         MouseButtonMaskLeft = 0,
         MouseButtonMaskMiddle = TWO_BIT_MASK(MouseButtonMiddle),
@@ -38,22 +60,33 @@ namespace Engine
         MouseButtonMaskX2 = TWO_BIT_MASK(MouseButtonX2),
     } MouseButtonMask;
 
+    /**
+    * Converts mouse button index to corresponding mask
+    */
     inline MouseButtonMask GetMouseButtonMaskFromMouseButton(const int button)
     {
         return static_cast<MouseButtonMask>(TWO_BIT_MASK(button));
     }
 
+    /**
+    * Extracts the trigger value from a combined mouse button value
+    */
     inline TriggerState GetTriggerStateFromMouseButtonState(const uint16_t state, const int button)
     {
         return static_cast<TriggerState>((state & TWO_BIT_MASK(button)) >> 2*button);
     }
 
+    /**
+    * Converts a trigger value to the corresponding combined value
+    */
     inline uint16_t GetMouseButtonStateFromMouseButton(const TriggerState state, const int button)
     {
         return state << button*2;
     }
 
-    // Wrapper for SDL_KeyCode
+    /**
+    * Wrapper for SDL_KeyCode
+    */
     typedef enum
     {
         KeyCodeNone = 0,

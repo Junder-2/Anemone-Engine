@@ -1,16 +1,15 @@
 #pragma once
 #include "InputTypes.h"
-#include "../Delegate/Delegate.h"
 #include "glm/vec2.hpp"
 
 namespace Engine
 {
+    /**
+    * Stores the mouse position and deltas
+    */
     struct MouseMoveValue
     {
     public:
-        glm::vec2 GetMousePos() const { return _mousePosition; }
-        glm::vec2 GetMouseDelta() const { return _mouseDelta; }
-
         void SetMousePos(const float x, const float y)
         {
             _mousePosition.x = x;
@@ -23,28 +22,46 @@ namespace Engine
             _mouseDelta.y = y;
         }
 
+        glm::vec2 GetMousePos() const { return _mousePosition; }
+        glm::vec2 GetMouseDelta() const { return _mouseDelta; }
+
     private:
         glm::vec2 _mouseDelta = {};
         glm::vec2 _mousePosition = {};
     };
 
+    /**
+    * Stores the mouse buttons state
+    */
     struct MouseButtonValues
     {
+        /**
+        * Gets the button index of the latest press
+        */
         int GetCurrentButtonIndex() const
         {
             return _lastIndex;
         }
 
+        /**
+        * If latest press is double click
+        */
         bool GetIsDoubleClick() const
         {
             return _isDoubleClick;
         }
 
+        /**
+        * Gets the bitfield of the button values (each button is two bits)
+        */
         uint16_t GetRawButtonStates() const
         {
             return _buttonStates;
         }
 
+        /**
+        * Gets the trigger state of latest press
+        */
         TriggerState GetTriggerState() const
         {
             return GetTriggerStateFromMouseButtonState(_buttonStates, _lastIndex);
@@ -59,7 +76,7 @@ namespace Engine
         {
             _isDoubleClick = isDoubleClick;
             _lastIndex = std::min(index, MOUSE_BUTTON_MAX-1);
-            //Clear and add new state to button
+            // Clear and add new state to button
             _buttonStates &= ~GetMouseButtonMaskFromMouseButton(index);
             _buttonStates |= GetMouseButtonStateFromMouseButton(newState, index);
         }
@@ -67,23 +84,47 @@ namespace Engine
     private:
         int _lastIndex = 0;
         bool _isDoubleClick = false;
+        /**
+        * each button is two bits
+        */
         uint16_t _buttonStates = 0;
     };
 
+    /**
+    * Processes mouse inputs
+    */
     class MouseInputAction
     {
     public:
         MouseInputAction();
         ~MouseInputAction();
 
-        template <class TClass>
-        void BindMoveAction(DelegateMember<TClass, void(MouseMoveValue)> delegateMember);
-        template <class TClass>
-        void BindButtonAction(DelegateMember<TClass, void(MouseButtonValues)> delegateMember);
+        /**
+        * Populates new move input
+        * @param needProcessing if this action needs processing next frame
+        * @returns stored data changed
+        */
         bool PopulateMoveInput(bool* needProcessing, float x, float y, float deltaTime);
+        /**
+        * Populates new mouse button input
+        * @param needProcessing if this action needs processing next frame
+        * @param buttonIndex the mouse button to populate
+        * @returns stored data changed
+        */
         bool PopulateButtonInput(bool* needProcessing, int buttonIndex, TriggerState newState, bool isDoubleClick = false);
+        /**
+        * Populates new mouse scroll input
+        * @param needProcessing if this action needs processing next frame
+        * @returns stored data changed
+        */
         bool PopulateScrollInput(bool* needProcessing, float x, float y);
+        /**
+        * Processes actions by clearing deltas
+        */
         void ProcessAction();
+        /**
+        * Clears input data
+        */
         void FlushAction();
 
         MouseMoveValue GetMoveValue() const { return _moveValue; }

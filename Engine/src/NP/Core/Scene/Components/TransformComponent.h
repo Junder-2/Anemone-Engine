@@ -15,7 +15,9 @@ namespace Engine
         ~TransformComponent() = default;
 
 
-        TransformComponent() : Component(typeid(*this).name()) {}
+        NP_COMPONENT_INIT(TransformComponent)
+        // TransformComponent() : Component(typeid(*this).name()) {}
+        // TransformComponent(const TransformComponent&) = default;
 
         void SetParent(const TransformComponent& parent)
         {
@@ -28,7 +30,6 @@ namespace Engine
             Children.push_back(std::make_shared<TransformComponent>(child));
         }
 
-        TransformComponent(const TransformComponent&) = default;
 
         TransformComponent(const TransformMatrix& transform, const std::shared_ptr<TransformComponent>& parent = nullptr) : Component(typeid(*this).name()), Transform(transform), Parent(parent)
         {
