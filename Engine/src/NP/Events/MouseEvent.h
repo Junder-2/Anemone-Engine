@@ -4,6 +4,9 @@
 
 namespace Engine
 {
+    /**
+    * Mouse event, stores the new (x,y) and deltas
+    */
     class MouseMovementEvent final : public Event
     {
     public:
@@ -19,6 +22,9 @@ namespace Engine
         MouseMoveValue _moveValue;
     };
 
+    /**
+    * Mouse event, stores the new trigger value of all buttons
+    */
     class MouseButtonEvent final : public Event
     {
     public:
@@ -34,6 +40,9 @@ namespace Engine
         MouseButtonValues _buttonValues;
     };
 
+    /**
+    * Mouse event, stores the new scroll deltas
+    */
     class MouseScrollEvent final : public Event
     {
     public:

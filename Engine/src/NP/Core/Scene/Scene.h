@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "entt.hpp"
-
+#include "../../Events/Event.h"
 
 namespace Engine
 {
@@ -14,6 +14,7 @@ namespace Engine
 
         ~Scene() = default;
 
+        void OnEvent(Event& e);
         void OnUpdate(float timeStep);
 
         std::vector<entt::entity> GetEntities()
