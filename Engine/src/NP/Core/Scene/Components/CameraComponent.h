@@ -4,7 +4,7 @@
 
 namespace Engine
 {
-    struct CameraComponent : Component
+    struct CameraComponent : Component // this might need to be remade..
     {
     public:
         TransformMatrix Transform {};
@@ -13,8 +13,9 @@ namespace Engine
         glm::mat4 ViewMatrix = {};
 
 
-        CameraComponent() : Component(typeid(*this).name()) {} // does this compile?  // NOLINT(modernize-use-equals-default)
-        CameraComponent(const CameraComponent&) = default;
+        NP_COMPONENT_INIT(CameraComponent)
+        // CameraComponent() : Component(typeid(*this).name()) {} // does this compile?  // NOLINT(modernize-use-equals-default)
+        // CameraComponent(const CameraComponent&) = default;
 
 
         void SetPerspective(float fov, float aspect, float zNear, float zFar);

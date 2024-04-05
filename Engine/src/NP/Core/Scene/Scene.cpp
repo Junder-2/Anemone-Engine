@@ -7,16 +7,7 @@
 
 namespace Engine
 {
-    static void UpdatePosition(TransformMatrix& transform)
-    {
-        // I need to figure how the math library works better, don't know the methods yet
-        //transform = scale(transform, glm::vec<3, float>(2, 1, 1));
-    }
 
-    static void OnTransformConstructed(entt::registry& registry, entt::entity entity)
-    {
-        NP_ENGINE_LOG_INFO("entity");
-    }
 
 
     Engine::Scene::Scene()
@@ -25,18 +16,18 @@ namespace Engine
         //entt::entity entity = Registry.create();
         // entt::entity entit2 = _registry.create();
 
-        Entity ent(this);
+        //Entity ent(this);
 
-        auto component = ent.AddComponent<RenderComponent>();
-        //auto Gety = ent.TryGetComponent<RenderComponent>(comp);
-        if (RenderComponent comp; ent.TryGetComponent(comp))
-        {
-            NP_ENGINE_LOG_TRACE("WE have component: {}", comp.ToString());
-        }
-        else
-        {
-            NP_ENGINE_LOG_TRACE("We do not have component");
-        }
+        // auto component = ent.AddComponent<RenderComponent>();
+        // //auto Gety = ent.TryGetComponent<RenderComponent>(comp);
+        // if (RenderComponent comp; ent.TryGetComponent(comp))
+        // {
+        //     NP_ENGINE_LOG_TRACE("WE have component: {}", comp.ToString());
+        // }
+        // else
+        // {
+        //     NP_ENGINE_LOG_TRACE("We do not have component");
+        // }
         // auto component = ent.GetComponent<TransformComponent>();
         // if (ent.HasComponent<TransformComponent>())
         // {
@@ -103,5 +94,16 @@ namespace Engine
 
     void Scene::OnUpdate(float timeStep)
     {
+    }
+
+    /**
+     * \brief Creates a Entity in the scene, adds a Transform and Tag
+     * \param name Name of Entity, if no name is given it will be tagged with: "Untagged"
+     * \return reference of the newly created Entity.
+     */
+    [[nodiscard("Entity never used")]] Entity Scene::Create(const char* name)
+    {
+        Entity ent{this, name};
+        return ent;
     }
 }
