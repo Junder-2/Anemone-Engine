@@ -25,7 +25,6 @@ project "Sandbox"
         "%{IncludeDir.GLM}",
         "%{IncludeDir.entt}",
         "%{IncludeDir.VulkanSDK}",
-        "%{wks.location}/Engine/src",
     }
 
     links
