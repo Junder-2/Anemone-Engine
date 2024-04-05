@@ -3,19 +3,31 @@
 
 namespace Engine
 {
+    /**
+    * Global class to handle current event
+    */
     class EventHandler
     {
     public:
+        /**
+        * Sets the new current event
+        */
         static void PushEvent(Event* newEvent)
         {
             _currentEvent = newEvent;
         }
 
+        /**
+        * Clears current event
+        */
         static void ClearEvent()
         {
             _currentEvent = nullptr;
         }
 
+        /**
+        * Consumes current event
+        */
         static void ConsumeEvent()
         {
             if(_currentEvent == nullptr)

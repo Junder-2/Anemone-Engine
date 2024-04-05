@@ -3,6 +3,9 @@
 
 namespace Engine
 {
+    /**
+    * Window event
+    */
     class WindowCloseEvent final : public Event
     {
     public:
@@ -12,6 +15,9 @@ namespace Engine
         int GetEventCategories() const override { return (WindowEvent); }
     };
 
+    /**
+    * Window event, stores the new window state (minimized, restored, maximized)
+    */
     class WindowStateChangeEvent final : public Event
     {
     public:
@@ -26,6 +32,9 @@ namespace Engine
         WindowState _stateValue;
     };
 
+    /**
+    * Window event, stores the focus
+    */
     class WindowFocusChangeEvent final : public Event
     {
     public:
@@ -40,6 +49,9 @@ namespace Engine
         bool _isFocused;
     };
 
+    /**
+    * Window event, stores new width and height
+    */
     class WindowResizeEvent final : public Event
     {
     public:
@@ -56,6 +68,9 @@ namespace Engine
         uint32_t _height;
     };
 
+    /**
+    * Window event, stores the new (x,y) and deltas
+    */
     class WindowMovedEvent final : public Event
     {
     public:

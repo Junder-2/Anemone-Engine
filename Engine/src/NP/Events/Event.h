@@ -3,6 +3,9 @@
 
 namespace Engine
 {
+    /**
+    * The type of event, used to determine the derived class Event is
+    */
     enum class EventType
     {
         None = 0,
@@ -11,6 +14,9 @@ namespace Engine
         MouseButton, MouseMovement, MouseScrolled
     };
 
+    /**
+    * The category of event, used to filter events
+    */
     typedef enum
     {
         None = 0,
@@ -27,6 +33,9 @@ namespace Engine
         WindowMaximized = 2,
     } WindowState;
 
+    /**
+    * Base class for events, use type to determine the derived class
+    */
     class Event
     {
     public:
@@ -34,7 +43,7 @@ namespace Engine
         virtual EventType GetEventType() const = 0;
         virtual int GetEventCategories() const = 0;
 
-        bool HasCategory(EventCategory category) const { return GetEventCategories() & category; }
+        bool HasCategory(const EventCategory category) const { return GetEventCategories() & category; }
 
         void Consume() { _consumed = true; }
         bool IsConsumed() const { return _consumed; }
