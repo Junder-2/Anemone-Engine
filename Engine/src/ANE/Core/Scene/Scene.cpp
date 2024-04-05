@@ -1,7 +1,7 @@
 ﻿#include "anepch.h"
 #include "Scene.h"
 
-#include "../Entity/Entity.h"
+#include "ANE/Core/Entity/Entity.h"
 #include "Components/RenderComponent.h"
 #include "Components/TransformComponent.h"
 

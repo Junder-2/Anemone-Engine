@@ -2,12 +2,10 @@
 #include "InputManager.h"
 
 #include <ranges>
+#include <SDL_keyboard.h>
 
 #include "InputAction.h"
 #include "InputTypes.h"
-#include "../Core/Application.h"
-#include "../Events/KeyboardEvent.h"
-#include "../Events/MouseEvent.h"
 
 namespace Engine
 {
@@ -16,7 +14,19 @@ namespace Engine
         return std::make_unique<InputManager>();
     }
 
-    InputManager::InputManager() = default;
+    InputManager::InputManager()
+    {
+        // input testing
+        for (int i = KeyCodeA; i < KeyCodeZ+1; ++i)
+        {
+            RegisterKeyboardTrigger(i);
+        }
+
+        for (int i = KeyCode0; i < KeyCode9+1; ++i)
+        {
+            RegisterKeyboardTrigger(i);
+        }
+    }
 
     InputManager::~InputManager()
     {

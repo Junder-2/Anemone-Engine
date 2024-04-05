@@ -46,13 +46,6 @@ namespace Engine
         _layerStack.PushLayer(editorLayer);
 
         //editorLayer->SetActiveScene("roe");
-
-        // input testing
-        // for (int i = KeyCodeA; i < KeyCodeZ+1; ++i)
-        // {
-        //     GetInputManager().RegisterKeyboardTrigger(i);
-        // }
-        // GetInputManager().RegisterKeyboardTrigger(KeyCode0);
     }
 
     Application::~Application() = default;
