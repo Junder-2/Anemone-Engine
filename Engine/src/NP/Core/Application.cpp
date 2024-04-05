@@ -78,6 +78,9 @@ namespace Engine
             //Renderer::Present()
             //Split this so inputs get processed before everything else
         }
+
+        // TODO: Figure out where this function should go.
+        Renderer::Shutdown();
     }
 
     void Application::OnEvent(Event& e)
