@@ -10,8 +10,6 @@
 
 namespace Engine
 {
-    class VulkanRenderer;
-
     struct ANE_API WindowProperties
     {
         std::string Title;
@@ -64,7 +62,7 @@ namespace Engine
 
         WindowProperties _windowData;
 
-        std::unique_ptr<VulkanRenderer> _vulkanRenderer;
+        //std::unique_ptr<VulkanRenderer> _vulkanRenderer;
 
         bool LostFocus() const { return _imGuiLostFocus || _windowLostFocus; }
         bool _imGuiLostFocus = false;
