@@ -66,6 +66,8 @@ namespace Engine
             }
             //todo frame yap
 
+            _window->OnUpdate(deltaTime);
+
             Renderer::BeginUiDataBuffer();
             for (Layer* layer : _layerStack) // raw pointers
             {
@@ -75,8 +77,6 @@ namespace Engine
 
             //Renderer::Present()
             //Split this so inputs get processed before everything else
-
-            _window->OnUpdate(deltaTime);
         }
     }
 
