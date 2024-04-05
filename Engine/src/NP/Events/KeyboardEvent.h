@@ -4,6 +4,9 @@
 
 namespace Engine
 {
+    /**
+    * Keyboard event, stores the trigger state
+    */
     class KeyTriggerEvent final : public Event
     {
     public:
@@ -19,6 +22,9 @@ namespace Engine
         InputValue _inputValue;
     };
 
+    /**
+    * Keyboard event, stores the axis value
+    */
     class KeyAxisEvent final : public Event
     {
     public:
