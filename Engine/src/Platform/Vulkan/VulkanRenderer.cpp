@@ -129,7 +129,7 @@ namespace Engine
         //_io->ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
         // Setup Dear ImGui style
-        //ImGuiUtilities::StyleNPDark();
+        //ImGuiUtilities::StyleAnemoneDark();
         ImGui::StyleColorsDark();
         //ImGui::StyleColorsLight();
 
