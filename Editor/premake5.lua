@@ -25,7 +25,6 @@ project "Editor"
         "%{IncludeDir.GLM}",
         "%{IncludeDir.VulkanSDK}",
         "%{IncludeDir.entt}",
-        "%{wks.location}/Engine/src",
     }
 
     links
