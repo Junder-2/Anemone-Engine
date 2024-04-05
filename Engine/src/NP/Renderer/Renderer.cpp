@@ -36,5 +36,11 @@ namespace Engine
     void Renderer::EndUIDataBuffer()
     {
         ImGui::Render();
+
+        if (_vulkanRenderer->GetImGuiIO()->ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+        {
+            ImGui::UpdatePlatformWindows();
+            ImGui::RenderPlatformWindowsDefault();
+        }
     }
 }
