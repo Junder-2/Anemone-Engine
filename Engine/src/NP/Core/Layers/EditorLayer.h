@@ -8,6 +8,7 @@ namespace Engine
     class EditorLayer : public Layer
     {
     public:
+        void OnUIRender() override;
         EditorLayer(const std::string& name = "EditorLayer") : Layer(name) {};
 
         ~EditorLayer() override;

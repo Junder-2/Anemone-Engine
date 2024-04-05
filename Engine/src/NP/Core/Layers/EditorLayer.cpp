@@ -14,7 +14,16 @@ void Engine::EditorLayer::OnAttach()
 
 void Engine::EditorLayer::OnEvent(Event& e)
 {
-    
+
+}
+
+void Engine::EditorLayer::OnUIRender()
+{
+    ImGui::Begin("Hello");
+    ImGui::Button("Button");
+    ImGui::End();
+
+    ImGui::ShowDemoWindow();
 }
 
 void Engine::EditorLayer::OnUpdate(float deltaTime)

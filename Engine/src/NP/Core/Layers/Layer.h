@@ -1,5 +1,6 @@
 #pragma once
 #include "../../Events/Event.h"
+#include "imgui.h"
 
 namespace Engine
 {
@@ -13,6 +14,7 @@ namespace Engine
         virtual void OnDetach() {}
         virtual void OnUpdate(float deltaTime) {}
         virtual void OnEvent(Event& e) {}
+        virtual void OnUIRender() {}
 
     protected:
         std::string _debugName;
