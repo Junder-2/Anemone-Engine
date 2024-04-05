@@ -12,12 +12,12 @@ namespace Engine
     void Renderer::Init(SDL_Window* window)
     {
         _vulkanRenderer = std::make_unique<VulkanRenderer>(window);
-        //_vulkanRenderer->Setup();
+        _vulkanRenderer->Setup();
     }
 
     void Renderer::Shutdown()
     {
-       // _vulkanRenderer->Cleanup();
+       _vulkanRenderer->Cleanup();
     }
 
     void Renderer::Render()
