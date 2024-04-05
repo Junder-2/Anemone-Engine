@@ -17,6 +17,7 @@ project "Editor"
 
     includedirs
     {
+        "%{wks.location}/Engine/src",
         "%{IncludeDir.spdlog}",
         "%{IncludeDir.SDL2}",
         "%{IncludeDir.ImGui}",
