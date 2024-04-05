@@ -11,7 +11,7 @@
 #include "../Events/EventHandler.h"
 #include "Entity/Entity.h"
 #include "Layers/EditorLayer.h"
-#include "NP/Renderer/Renderer.h"
+#include "ANE/Renderer/Renderer.h"
 #include "Scene/Components/RenderComponent.h"
 
 namespace Engine
