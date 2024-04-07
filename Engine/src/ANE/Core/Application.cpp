@@ -26,21 +26,29 @@ namespace Engine
         _inputManager = InputManager::Create();
         _inputManager->EventDelegate = MakeDelegate(this, &Application::OnEvent);
 
-
         Renderer::Init(_window->GetWindowContext());
 
-        //todo: make into template method
+        //Create a layer
         EditorLayer* editorLayer = new EditorLayer("EditorLayer");
-        editorLayer->AddScene<Scene>("Game"); //
-        //editorLayer->SetActiveScene("Game");
+
+        //Add scene to layer
+        editorLayer->AddScene<Scene>("Game");
+
+        //Create a Entity
         Entity ent = editorLayer->GetActiveScene()->Create("Square Entity");
+
+        //Add component to entity
         ent.AddComponent<RenderComponent>();
+
+        //Get Component from entity
         if (RenderComponent comp; ent.TryGetComponent<RenderComponent>(comp))
         {
             TagComponent tag;
             ent.TryGetComponent(tag);
             ANE_ENGINE_LOG_WARN("We have a renderComponent with tag: {0} on entity: {1}", comp.ToString(), tag.Tag);
         }
+
+
         //editorLayer->AddScene<Scene>("Main Menu");
         //editorLayer->AddScene<Scene>("Credits");
         _layerStack.PushLayer(editorLayer);
@@ -145,6 +153,7 @@ namespace Engine
     void Application::Shutdown()
     {
         _isRunning = false;
+        EventHandler::ConsumeEvent();
     }
 
     void Application::OnWindowResize(WindowResizeEvent& e)

@@ -25,9 +25,11 @@ namespace Engine
 
         void SetRotation(const glm::vec3 newRotation) // todo: fix, overwrite rotation
         {
-            _transformMatrix[0] = glm::vec4(1, 0, 0, 0);
-            _transformMatrix[1] = glm::vec4(0, 1, 0, 0);
-            _transformMatrix[2] = glm::vec4(0, 0, 1, 0);
+            const glm::vec3 scale = GetScale();
+
+            _transformMatrix[0] = glm::vec4(1, 0, 0, 0) * scale.x;
+            _transformMatrix[1] = glm::vec4(0, 1, 0, 0) * scale.y;
+            _transformMatrix[2] = glm::vec4(0, 0, 1, 0) * scale.z;
             _transformMatrix = rotate(_transformMatrix, glm::radians(newRotation.x), glm::vec3(1.f, 0.f, 0.f));
             _transformMatrix = rotate(_transformMatrix, glm::radians(newRotation.y), glm::vec3(0.f, 1.f, 0.f));
             _transformMatrix = rotate(_transformMatrix, glm::radians(newRotation.z), glm::vec3(0.f, 0.f, 1.f));
@@ -35,11 +37,13 @@ namespace Engine
 
         void SetRotation(const glm::quat newRotation)
         {
+            const glm::vec3 scale = GetScale();
+
             glm::mat3 rotMatrix = mat3_cast(newRotation);
 
-            _transformMatrix[0] = xyz0(rotMatrix[0]);
-            _transformMatrix[1] = xyz0(rotMatrix[1]);
-            _transformMatrix[2] = xyz0(rotMatrix[2]);
+            _transformMatrix[0] = xyz0(rotMatrix[0]) * scale.x;
+            _transformMatrix[1] = xyz0(rotMatrix[1]) * scale.y;
+            _transformMatrix[2] = xyz0(rotMatrix[2]) * scale.z;
         }
 
         void AddRotation(const glm::vec3 delta)
