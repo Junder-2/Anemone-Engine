@@ -27,4 +27,15 @@ namespace Engine
         VmaBuffer VertexBuffer;
         VkDeviceAddress VertexBufferAddress;
     };
+
+    struct Vertex
+    {
+        // Optimal 16-byte alignment layout.
+        glm::vec3 Position;
+        float UvX;
+        glm::vec3 Normal;
+        float UvY;
+        glm::vec4 Color;
+    };
+
 }
