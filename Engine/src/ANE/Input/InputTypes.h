@@ -41,9 +41,9 @@ namespace Engine
     {
         MouseButtonLeft = 0,
         MouseButtonMiddle = 1,
-        MouseButtonRight = 3,
-        MouseButtonX1 = 4,
-        MouseButtonX2 = 5,
+        MouseButtonRight = 2,
+        MouseButtonX1 = 3,
+        MouseButtonX2 = 4,
     } MouseButton;
 
     #define MOUSE_BUTTON_MAX (MouseButtonX2+1)
