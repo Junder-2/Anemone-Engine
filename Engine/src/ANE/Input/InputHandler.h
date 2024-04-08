@@ -28,7 +28,6 @@ namespace Engine
         * Registers a keyboard key to be handled and processed
         * @param keyCode id from KeyCodes
         */
-        void RegisterKeyboardTwoKeyAxis(int negativeKeyCode, int positiveKeyCode);
         void RegisterKeyboardKey(int keyCode);
 
         void PopulateKeyStates(const Uint8* newKeyStates);
@@ -64,38 +63,11 @@ namespace Engine
 
         const Uint8* _currentKeyStates{};
         entt::dense_map<int, InputAction*> _keyboardInputActions {};
-        std::unordered_map<IntPair, TwoBindingInput*> _keyboardTwoBindings {};
         std::queue<int> _dirtyKeys {};
         MouseInputAction _mouseInputAction {};
         bool _dirtyMouse = false;
     };
 
-    // template <class TClass>
-    // void InputManager::BindKeyboardAxis(const int negativeKeyCode, const int positiveKeyCode, DelegateMember<TClass, void(InputValue)> delegateMember)
-    // {
-    //     const IntPair twoKeys(negativeKeyCode, positiveKeyCode);
-    //
-    //     if(!_keyboardTwoBindings.contains(twoKeys))
-    //     {
-    //         RegisterKeyboardTwoKeyAxis(negativeKeyCode, positiveKeyCode);
-    //     }
-    //
-    //     TwoBindingInput* twoKeyInputBinding = _keyboardTwoBindings[twoKeys];
-    //
-    //     if(!_keyboardInputActions.contains(negativeKeyCode))
-    //     {
-    //         RegisterKeyboardTrigger(negativeKeyCode);
-    //     }
-    //     if(!_keyboardInputActions.contains(positiveKeyCode))
-    //     {
-    //         RegisterKeyboardTrigger(positiveKeyCode);
-    //     }
-    //
-    //     _keyboardInputActions[negativeKeyCode]->BindAction(MakeDelegate(twoKeyInputBinding, &TwoBindingInput::OnBoundInput));
-    //     _keyboardInputActions[positiveKeyCode]->BindAction(MakeDelegate(twoKeyInputBinding, &TwoBindingInput::OnBoundInput));
-    //
-    //     twoKeyInputBinding->BindAction(delegateMember);
-    // }
     template <class TClass>
     void InputHandler::BindOnEvent(DelegateMember<TClass, void(Event&)> delegateMember)
     {
