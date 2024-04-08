@@ -10,8 +10,9 @@ namespace Engine
     public:
         void OnCreate() override
         {
-            InputSystem::Get().BindInput(InputDeviceKeyboard, KeyCodeW, MakeDelegate(this, &CameraController::OnKeyTest));
-            InputSystem::Get().BindMouseButton(MouseButtonLeft, MakeDelegate(this, &CameraController::OnKeyTest));
+            InputSystem& inputSystem = InputUtilities::GetInputSystem();
+            inputSystem.BindInput(InputDeviceKeyboard, KeyCodeW, MakeDelegate(this, &CameraController::OnKeyTest));
+            inputSystem.BindMouseButton(MouseButtonLeft, MakeDelegate(this, &CameraController::OnKeyTest));
         }
 
         void OnDestroy() override // has to be solved

@@ -1,18 +1,14 @@
 #pragma once
+#include "ANE/Subsystem/Subsystem.h"
 #include "InputAction.h"
 #include "InputHandler.h"
 
 namespace Engine
 {
     //Todo: use a abstract service locator
-    class InputSystem
+    class InputSystem : public Subsystem
     {
     public:
-        // TEMP
-        static void Create();
-        static InputSystem& Get() { return *_instance; }
-        //
-
         InputSystem();
         ~InputSystem() = default;
 
@@ -47,7 +43,6 @@ namespace Engine
         MouseButtonValues GetMouseButtonValues() const { return _inputHandler->GetMouseInputData().GetButtonValue(); }
 
     private:
-        static std::unique_ptr<InputSystem> _instance;
         InputHandler* _inputHandler;
 
         std::unordered_map<IntPair, MulticastDelegate<void(InputValue)>> _actionMappingDelegates;

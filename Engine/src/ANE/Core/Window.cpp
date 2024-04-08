@@ -8,6 +8,7 @@
 
 #include "Application.h"
 #include "ANE/Input/InputSystem.h"
+#include "ANE/Utilities/InputUtilities.h"
 #include "Platform/Vulkan/VulkanRenderer.h"
 
 namespace Engine
@@ -255,7 +256,7 @@ namespace Engine
 
     void Window::ShowInputDebugOverlay(bool* pOpen)
     {
-        InputSystem* inputManager = &InputSystem::Get();
+        const InputSystem* inputManager = &InputUtilities::GetInputSystem();
         static int location = 0;
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoDocking;
         if (location >= 0)

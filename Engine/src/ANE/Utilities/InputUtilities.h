@@ -1,10 +1,18 @@
 #pragma once
+#include "ANE/Core/Application.h"
+#include "ANE/Input/InputSystem.h"
 #include "ANE/Input/InputTypes.h"
+#include "ANE/Subsystem/SubsystemCollection.h"
 
 namespace Engine
 {
     namespace InputUtilities
     {
+        inline InputSystem& GetInputSystem()
+        {
+            return *Application::Get().GetSubsystemCollection().GetSubSystem<InputSystem>();
+        }
+
         inline std::string ToString(const InputDeviceType type)
         {
             switch (type)

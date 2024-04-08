@@ -6,13 +6,6 @@
 
 namespace Engine
 {
-    std::unique_ptr<InputSystem> InputSystem::_instance = nullptr;
-
-    void InputSystem::Create()
-    {
-        _instance = std::make_unique<InputSystem>();
-    }
-
     InputSystem::InputSystem()
     {
         _inputHandler = &Application::Get().GetInputHandler();
