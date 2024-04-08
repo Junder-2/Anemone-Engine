@@ -312,7 +312,7 @@ namespace Engine
         VkPipelineLayout pipelineLayout = VK_NULL_HANDLE; // Dummy for now
         VkShaderModule triangleVertShader; // Dummy for now
         VkShaderModule triangleFragShader; // Dummy for now
-        AllocatedImage drawImage = { }; // Dummy for now
+        VmaImage drawImage = { }; // Dummy for now
 
         VulkanPipelineBuilder builder{ logicalDevice, pipelineLayout };
         vkb::Result<PipelineWrapper> pipeline = builder

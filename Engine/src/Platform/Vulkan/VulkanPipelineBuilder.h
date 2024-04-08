@@ -24,15 +24,6 @@ namespace Engine
         operator VkPipeline() const;
     };
 
-    struct AllocatedImage
-    {
-        VkImage Image;
-        VkImageView ImageView;
-        VmaAllocation Allocation;
-        VkExtent3D ImageExtent;
-        VkFormat ImageFormat;
-    };
-
     class VulkanPipelineBuilder
     {
     public:

@@ -2,6 +2,7 @@
 #include <SDL_video.h>
 #include <imgui_impl_vulkan.h>
 
+#include "VmaTypes.h"
 #include "VulkanDeletionQueue.h"
 #include "VulkanPipelineBuilder.h"
 
