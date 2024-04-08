@@ -43,7 +43,7 @@ namespace Engine
 
         //Add component to entity
         ent.AddComponent<RenderComponent>();
-        ent.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+        // ent.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
         //Get Component from entity
         if (RenderComponent comp; ent.TryGetComponent<RenderComponent>(comp))
@@ -100,15 +100,15 @@ namespace Engine
                 case EventType::WindowResize:
                     OnWindowResize(dynamic_cast<WindowResizeEvent&>(e));
                 break;
-                case EventType::WindowMoved:
-                    OnWindowMove(dynamic_cast<WindowMovedEvent&>(e));
-                break;
-                case EventType::WindowFocusChange:
-                    OnWindowFocusChange(dynamic_cast<WindowFocusChangeEvent&>(e));
-                break;
-                case EventType::WindowStateChange:
-                    OnWindowStateChange(dynamic_cast<WindowStateChangeEvent&>(e));
-                break;
+                // case EventType::WindowMoved:
+                //     OnWindowMove(dynamic_cast<WindowMovedEvent&>(e));
+                // break;
+                // case EventType::WindowFocusChange:
+                //     OnWindowFocusChange(dynamic_cast<WindowFocusChangeEvent&>(e));
+                // break;
+                // case EventType::WindowStateChange:
+                //     OnWindowStateChange(dynamic_cast<WindowStateChangeEvent&>(e));
+                // break;
             }
         }
 
