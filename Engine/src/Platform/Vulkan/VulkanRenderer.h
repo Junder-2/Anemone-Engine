@@ -66,6 +66,10 @@ namespace Engine
         static void CleanupVulkan();
         static void CleanupImGui();
 
+        // VMA
+        // TODO: Isolate VMA code to separate file/class.
+        static void CreateVmaAllocator();
+
         // Debugging
         static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
             VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -101,6 +105,9 @@ namespace Engine
         inline static VkQueue _queue = VK_NULL_HANDLE;
         inline static VkPipelineCache _pipelineCache = VK_NULL_HANDLE;
         inline static VkPipeline _meshPipeline = VK_NULL_HANDLE;
+
+        // VMA
+        inline static VmaAllocator _vmaAllocator;
 
         // ImGui
         inline static ImGui_ImplVulkanH_Window _mainWindowData;

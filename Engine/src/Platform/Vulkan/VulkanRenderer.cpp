@@ -7,6 +7,8 @@
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_vulkan.h>
 #include <VkBootstrap.h>
+#define VMA_IMPLEMENTATION
+#include <vk_mem_alloc.h>
 
 #include "VulkanInitializers.h"
 #include "ANE/Core/Window.h"
@@ -135,6 +137,7 @@ namespace Engine
         }
         _queue = queueResult.value();
 
+        CreateVmaAllocator();
         //const PipelineWrapper pipeline = CreatePipeline(logicalDevice);
         //_trianglePipeline = pipeline.Pipeline;
 
@@ -503,6 +506,8 @@ namespace Engine
 
         _mainDeletionQueue.Flush();
 
+        vmaDestroyAllocator(_vmaAllocator);
+
         vkDestroyDevice(_device, _allocator);
 
         if (enableValidationLayers) vkb::destroy_debug_utils_messenger(_instance, _debugMessenger, _allocator);
@@ -514,6 +519,17 @@ namespace Engine
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplSDL2_Shutdown();
         ImGui::DestroyContext();
+    }
+
+    void VulkanRenderer::CreateVmaAllocator()
+    {
+        VmaAllocatorCreateInfo allocatorInfo = { };
+        allocatorInfo.physicalDevice = _physicalDevice;
+        allocatorInfo.device = _device;
+        allocatorInfo.instance = _instance;
+        allocatorInfo.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
+
+        CheckVkResult(vmaCreateAllocator(&allocatorInfo, &_vmaAllocator));
     }
 
     VkBool32 VulkanRenderer::DebugCallback(
