@@ -2,8 +2,6 @@
 
 #include <vulkan/vulkan.h>
 
-#include "VmaTypes.h"
-
 namespace VulkanInitializers
 {
     // Vulkan
@@ -29,7 +27,4 @@ namespace VulkanInitializers
     VkImageViewCreateInfo ImageviewCreateInfo(VkFormat format, VkImage image, VkImageAspectFlags aspectFlags);
 
     VkImageSubresourceRange ImageSubresourceRange(VkImageAspectFlags aspectMask);
-
-    // VMA
-
 }
