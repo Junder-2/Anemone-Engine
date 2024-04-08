@@ -532,6 +532,30 @@ namespace Engine
         CheckVkResult(vmaCreateAllocator(&allocatorInfo, &_vmaAllocator));
     }
 
+    void VulkanRenderer::ImmediateSubmit(std::function<void(VkCommandBuffer cmd)>&& function)
+    {
+        CheckVkResult(vkResetFences(_device, 1, &_immBuffer.Fence));
+        CheckVkResult(vkResetCommandBuffer(_immBuffer.CommandBuffer, 0));
+
+        const VkCommandBuffer cmd = _immBuffer.CommandBuffer;
+        // The command buffer is used exactly once, so we let Vulkan know that.
+        const VkCommandBufferBeginInfo cmdBeginInfo = VulkanInitializers::CommandBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+
+        CheckVkResult(vkBeginCommandBuffer(cmd, &cmdBeginInfo));
+
+        function(cmd);
+
+        CheckVkResult(vkEndCommandBuffer(cmd));
+
+        const VkCommandBufferSubmitInfo cmdInfo = VulkanInitializers::CommandBufferSubmitInfo(cmd);
+        const VkSubmitInfo2 submit = VulkanInitializers::SubmitInfo(&cmdInfo, nullptr, nullptr);
+
+        CheckVkResult(vkQueueSubmit2(_queue, 1, &submit, _immBuffer.Fence));
+
+        // Thread will be blocked until the graphic commands finish execution.
+        CheckVkResult(vkWaitForFences(_device, 1, &_immBuffer.Fence, true, 9999999999));
+    }
+
     VkBool32 VulkanRenderer::DebugCallback(
         VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
         VkDebugUtilsMessageTypeFlagsEXT messageType,

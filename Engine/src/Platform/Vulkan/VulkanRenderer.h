@@ -18,6 +18,13 @@ namespace Engine
 {
     struct WindowProperties;
 
+    struct VulkanImmediateBuffer
+    {
+        VkFence Fence;
+        VkCommandBuffer CommandBuffer;
+        VkCommandPool CommandPool;
+    };
+
     class VulkanRenderer
     {
         struct QueueFamilyIndices
@@ -70,6 +77,8 @@ namespace Engine
         // TODO: Isolate VMA code to separate file/class.
         static void CreateVmaAllocator();
 
+        static void ImmediateSubmit(std::function<void(VkCommandBuffer cmd)>&& function);
+
         // Debugging
         static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(
             VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -108,6 +117,8 @@ namespace Engine
 
         // VMA
         inline static VmaAllocator _vmaAllocator;
+
+        inline static VulkanImmediateBuffer _immBuffer;
 
         // ImGui
         inline static ImGui_ImplVulkanH_Window _mainWindowData;
