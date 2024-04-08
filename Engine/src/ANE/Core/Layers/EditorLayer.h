@@ -24,6 +24,8 @@ namespace Engine
 
         void OnUpdate(float deltaTime) override;
 
+        void OnEventTest(Event& e);
+
         template <class TValue>
         std::enable_if_t<std::is_base_of_v<Scene, TValue>> AddScene(const char* key);
 
