@@ -2,8 +2,11 @@
 
 #include <vulkan/vulkan.h>
 
+#include "VmaTypes.h"
+
 namespace VulkanInitializers
 {
+    // Vulkan
     VkCommandBufferBeginInfo CommandBufferBeginInfo(VkCommandBufferUsageFlags flags);
     VkCommandBufferSubmitInfo CommandBufferSubmitInfo(VkCommandBuffer cmd);
 
@@ -26,4 +29,7 @@ namespace VulkanInitializers
     VkImageViewCreateInfo ImageviewCreateInfo(VkFormat format, VkImage image, VkImageAspectFlags aspectFlags);
 
     VkImageSubresourceRange ImageSubresourceRange(VkImageAspectFlags aspectMask);
+
+    // VMA
+
 }

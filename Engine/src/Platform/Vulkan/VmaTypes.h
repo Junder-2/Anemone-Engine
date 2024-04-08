@@ -20,4 +20,11 @@ namespace Engine
         VmaAllocation Allocation;
         VmaAllocationInfo Info;
     };
+
+    struct VmaMeshBuffers
+    {
+        VmaBuffer IndexBuffer;
+        VmaBuffer VertexBuffer;
+        VkDeviceAddress VertexBufferAddress;
+    };
 }
