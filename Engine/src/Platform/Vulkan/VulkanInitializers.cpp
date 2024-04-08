@@ -5,9 +5,7 @@ namespace VulkanInitializers
 {
     VkCommandBufferBeginInfo CommandBufferBeginInfo(const VkCommandBufferUsageFlags flags)
     {
-        VkCommandBufferBeginInfo info = { };
-        info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-        info.pNext = nullptr;
+        VkCommandBufferBeginInfo info = { .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO, .pNext = nullptr };
 
         info.pInheritanceInfo = nullptr;
         info.flags = flags;
@@ -17,9 +15,7 @@ namespace VulkanInitializers
 
     VkCommandBufferSubmitInfo CommandBufferSubmitInfo(const VkCommandBuffer cmd)
     {
-        VkCommandBufferSubmitInfo info = { };
-        info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO;
-        info.pNext = nullptr;
+        VkCommandBufferSubmitInfo info = { .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_SUBMIT_INFO, .pNext = nullptr };
 
         info.commandBuffer = cmd;
         info.deviceMask = 0;
@@ -29,9 +25,7 @@ namespace VulkanInitializers
 
     VkFenceCreateInfo FenceCreateInfo(const VkFenceCreateFlags flags)
     {
-        VkFenceCreateInfo info = { };
-        info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-        info.pNext = nullptr;
+        VkFenceCreateInfo info = { info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO, info.pNext = nullptr };
 
         info.flags = flags;
 
@@ -40,9 +34,7 @@ namespace VulkanInitializers
 
     VkSemaphoreCreateInfo SemaphoreCreateInfo(const VkSemaphoreCreateFlags flags)
     {
-        VkSemaphoreCreateInfo info = { };
-        info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-        info.pNext = nullptr;
+        VkSemaphoreCreateInfo info = { .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO, .pNext = nullptr };
 
         info.flags = flags;
 
@@ -51,9 +43,7 @@ namespace VulkanInitializers
 
     VkSemaphoreSubmitInfo SemaphoreSubmitInfo(const VkPipelineStageFlags2 stageMask, const VkSemaphore semaphore)
     {
-        VkSemaphoreSubmitInfo submitInfo = { };
-        submitInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO;
-        submitInfo.pNext = nullptr;
+        VkSemaphoreSubmitInfo submitInfo = { .sType = VK_STRUCTURE_TYPE_SEMAPHORE_SUBMIT_INFO, .pNext = nullptr };
 
         submitInfo.semaphore = semaphore;
         submitInfo.stageMask = stageMask;
@@ -65,9 +55,7 @@ namespace VulkanInitializers
 
     VkSubmitInfo2 SubmitInfo(const VkCommandBufferSubmitInfo* cmd, const VkSemaphoreSubmitInfo* signalSemaphoreInfo, const VkSemaphoreSubmitInfo* waitSemaphoreInfo)
     {
-        VkSubmitInfo2 info = { };
-        info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO_2;
-        info.pNext = nullptr;
+        VkSubmitInfo2 info = { .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO_2, .pNext = nullptr };
 
         info.waitSemaphoreInfoCount = waitSemaphoreInfo == nullptr ? 0u : 1u;
         info.pWaitSemaphoreInfos = waitSemaphoreInfo;
@@ -83,9 +71,7 @@ namespace VulkanInitializers
 
     VkRenderingAttachmentInfo AttachmentInfo(const VkImageView view, const VkClearValue* clear, const VkImageLayout layout)
     {
-        VkRenderingAttachmentInfo colorAttachment = { };
-        colorAttachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
-        colorAttachment.pNext = nullptr;
+        VkRenderingAttachmentInfo colorAttachment = { .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO, .pNext = nullptr };
 
         colorAttachment.imageView = view;
         colorAttachment.imageLayout = layout;
@@ -101,9 +87,7 @@ namespace VulkanInitializers
 
     VkRenderingAttachmentInfo DepthAttachmentInfo(const VkImageView view, const VkImageLayout layout)
     {
-        VkRenderingAttachmentInfo depthAttachment = { };
-        depthAttachment.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
-        depthAttachment.pNext = nullptr;
+        VkRenderingAttachmentInfo depthAttachment = { .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO, .pNext = nullptr };
 
         depthAttachment.imageView = view;
         depthAttachment.imageLayout = layout;
@@ -116,9 +100,7 @@ namespace VulkanInitializers
 
     VkRenderingInfo RenderingInfo(const VkExtent2D renderExtent, const VkRenderingAttachmentInfo* colorAttachment, const VkRenderingAttachmentInfo* depthAttachment)
     {
-        VkRenderingInfo renderInfo = { };
-        renderInfo.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
-        renderInfo.pNext = nullptr;
+        VkRenderingInfo renderInfo = { .sType = VK_STRUCTURE_TYPE_RENDERING_INFO, .pNext = nullptr };
 
         constexpr VkOffset2D offset = VkOffset2D { 0, 0 };
         renderInfo.renderArea = VkRect2D { offset, renderExtent };
@@ -134,6 +116,7 @@ namespace VulkanInitializers
     VkPipelineShaderStageCreateInfo PipelineShaderStageCreateInfo(const VkShaderStageFlagBits stage, const VkShaderModule shaderModule, const char* entry)
     {
         VkPipelineShaderStageCreateInfo info = { .sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO, .pNext = nullptr };
+
         info.stage = stage;
         info.module = shaderModule; // Module containing the code for this shader stage.
         info.pName = entry; // Name of shader entry function.
@@ -144,6 +127,7 @@ namespace VulkanInitializers
     VkPipelineLayoutCreateInfo PipelineLayoutCreateInfo()
     {
         VkPipelineLayoutCreateInfo info = {.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO, .pNext = nullptr};
+
         info.flags = 0;
         info.setLayoutCount = 0;
         info.pSetLayouts = nullptr;
@@ -155,9 +139,7 @@ namespace VulkanInitializers
 
     VkImageCreateInfo ImageCreateInfo(const VkFormat format, const VkImageUsageFlags usageFlags, const VkExtent3D extent)
     {
-        VkImageCreateInfo info = { };
-        info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-        info.pNext = nullptr;
+        VkImageCreateInfo info = { .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO, .pNext = nullptr };
 
         info.imageType = VK_IMAGE_TYPE_2D;
 
@@ -180,9 +162,7 @@ namespace VulkanInitializers
     VkImageViewCreateInfo ImageviewCreateInfo(const VkFormat format, const VkImage image, const VkImageAspectFlags aspectFlags)
     {
         // Build a image-view for the depth image to use for rendering.
-        VkImageViewCreateInfo info = { };
-        info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-        info.pNext = nullptr;
+        VkImageViewCreateInfo info = { .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO, .pNext = nullptr };
 
         info.viewType = VK_IMAGE_VIEW_TYPE_2D;
         info.image = image;
@@ -200,6 +180,7 @@ namespace VulkanInitializers
     VkImageSubresourceRange ImageSubresourceRange(const VkImageAspectFlags aspectMask)
     {
         VkImageSubresourceRange subImage = { };
+
         subImage.aspectMask = aspectMask;
         subImage.baseMipLevel = 0;
         subImage.levelCount = VK_REMAINING_MIP_LEVELS;
