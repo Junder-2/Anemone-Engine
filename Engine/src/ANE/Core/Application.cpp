@@ -6,6 +6,7 @@
 #include <SDL_timer.h>
 
 #include "ANE/Events/EventHandler.h"
+#include "ANE/Input/InputSystem.h"
 #include "Layers/Layer.h"
 #include "Entity/Entity.h"
 #include "Layers/EditorLayer.h"
@@ -25,6 +26,7 @@ namespace Engine
         _inputHandler = InputHandler::Create();
         _inputHandler->BindOnEvent(MakeDelegate(this, &Application::OnEvent));
 
+        InputSystem::Create();
 
         //Create a layer
         EditorLayer* editorLayer = new EditorLayer("EditorLayer");
