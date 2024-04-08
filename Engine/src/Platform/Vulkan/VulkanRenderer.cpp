@@ -532,6 +532,28 @@ namespace Engine
         CheckVkResult(vmaCreateAllocator(&allocatorInfo, &_vmaAllocator));
     }
 
+    VmaBuffer VulkanRenderer::CreateBuffer(const size_t allocSize, const VkBufferUsageFlags usage, const VmaMemoryUsage memoryUsage)
+    {
+        VkBufferCreateInfo bufferInfo = { .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO, .pNext = nullptr};
+
+        bufferInfo.size = allocSize;
+        bufferInfo.usage = usage;
+
+        VmaAllocationCreateInfo vmaAllocInfo = { };
+        vmaAllocInfo.usage = memoryUsage;
+        vmaAllocInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT;
+
+        VmaBuffer newBuffer;
+        CheckVkResult(vmaCreateBuffer(_vmaAllocator, &bufferInfo, &vmaAllocInfo, &newBuffer.Buffer, &newBuffer.Allocation, &newBuffer.Info));
+
+        return newBuffer;
+    }
+
+    void VulkanRenderer::DestroyBuffer(const VmaBuffer& buffer)
+    {
+        vmaDestroyBuffer(_vmaAllocator, buffer.Buffer, buffer.Allocation);
+    }
+
     void VulkanRenderer::ImmediateSubmit(std::function<void(VkCommandBuffer cmd)>&& function)
     {
         CheckVkResult(vkResetFences(_device, 1, &_immBuffer.Fence));

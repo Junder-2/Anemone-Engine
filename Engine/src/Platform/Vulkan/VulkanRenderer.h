@@ -77,6 +77,9 @@ namespace Engine
         // TODO: Isolate VMA code to separate file/class.
         static void CreateVmaAllocator();
 
+        static VmaBuffer CreateBuffer(size_t allocSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage);
+        static void DestroyBuffer(const VmaBuffer& buffer);
+
         static void ImmediateSubmit(std::function<void(VkCommandBuffer cmd)>&& function);
 
         // Debugging
