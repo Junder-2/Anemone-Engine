@@ -141,6 +141,18 @@ namespace VulkanInitializers
         return info;
     }
 
+    VkPipelineLayoutCreateInfo PipelineLayoutCreateInfo()
+    {
+        VkPipelineLayoutCreateInfo info = {.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO, .pNext = nullptr};
+        info.flags = 0;
+        info.setLayoutCount = 0;
+        info.pSetLayouts = nullptr;
+        info.pushConstantRangeCount = 0;
+        info.pPushConstantRanges = nullptr;
+
+        return info;
+    }
+
     VkImageCreateInfo ImageCreateInfo(const VkFormat format, const VkImageUsageFlags usageFlags, const VkExtent3D extent)
     {
         VkImageCreateInfo info = { };
