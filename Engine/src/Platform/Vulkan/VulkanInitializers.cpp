@@ -159,7 +159,7 @@ namespace VulkanInitializers
         return info;
     }
 
-    VkImageViewCreateInfo ImageviewCreateInfo(const VkFormat format, const VkImage image, const VkImageAspectFlags aspectFlags)
+    VkImageViewCreateInfo ImageViewCreateInfo(const VkFormat format, const VkImage image, const VkImageAspectFlags aspectFlags)
     {
         // Build a image-view for the depth image to use for rendering.
         VkImageViewCreateInfo info = { .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO, .pNext = nullptr };
