@@ -13,6 +13,17 @@ namespace VulkanInitializers
         return info;
     }
 
+    VkCommandBufferAllocateInfo CommandBufferAllocateInfo(VkCommandPool pool, uint32_t count)
+    {
+        VkCommandBufferAllocateInfo info = { .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO, .pNext = nullptr };
+
+        info.commandPool = pool;
+        info.commandBufferCount = count;
+        info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+
+        return info;
+    }
+
     VkCommandBufferBeginInfo CommandBufferBeginInfo(const VkCommandBufferUsageFlags flags)
     {
         VkCommandBufferBeginInfo info = { .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO, .pNext = nullptr };

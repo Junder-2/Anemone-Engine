@@ -6,6 +6,7 @@ namespace VulkanInitializers
 {
     // Vulkan
     VkCommandPoolCreateInfo CommandPoolCreateInfo(uint32_t queueFamilyIndex, VkCommandPoolCreateFlags flags = 0);
+    VkCommandBufferAllocateInfo CommandBufferAllocateInfo(VkCommandPool pool, uint32_t count = 1);
 
     VkCommandBufferBeginInfo CommandBufferBeginInfo(VkCommandBufferUsageFlags flags);
     VkCommandBufferSubmitInfo CommandBufferSubmitInfo(VkCommandBuffer cmd);
