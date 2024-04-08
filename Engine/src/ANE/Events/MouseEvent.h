@@ -15,8 +15,7 @@ namespace Engine
         EventType GetEventType() const override { return EventType::MouseMovement; }
         int GetEventCategories() const override { return (EventCategoryInput | EventCategoryMouse); }
 
-        operator const MouseMoveValue&() const { return _moveValue; }
-        operator MouseMoveValue&() { return _moveValue; }
+        MouseMoveValue GetInputValue() const { return _moveValue; }
 
     private:
         MouseMoveValue _moveValue;
@@ -33,8 +32,7 @@ namespace Engine
         EventType GetEventType() const override { return EventType::MouseButton; }
         int GetEventCategories() const override { return (EventCategoryInput | EventCategoryMouse); }
 
-        operator const MouseButtonValues&() const { return _buttonValues; }
-        operator MouseButtonValues&() { return _buttonValues; }
+        MouseButtonValues GetInputValue() const { return _buttonValues; }
 
     private:
         MouseButtonValues _buttonValues;

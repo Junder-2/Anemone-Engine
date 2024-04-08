@@ -181,7 +181,7 @@ namespace Engine
 
     void Application::OnMouseKeyTest(MouseButtonEvent& mouseButtonEvent)
     {
-        const MouseButtonValues inputValue = mouseButtonEvent;
+        const MouseButtonValues inputValue = mouseButtonEvent.GetInputValue();
         ANE_ENGINE_LOG_INFO("pressed mouse key {0}, with state {1}, is doubleclick {2}", inputValue.GetCurrentButtonIndex(), (int)inputValue.GetTriggerState(), inputValue.GetIsDoubleClick());
         ANE_ENGINE_LOG_INFO("raw mouse button state {0}", std::bitset<16>(inputValue.GetRawButtonStates()).to_string());
     }
@@ -193,7 +193,7 @@ namespace Engine
 
     void Application::OnMouseMoveTest(MouseMovementEvent& mouseMovementEvent)
     {
-        const MouseMoveValue inputValue = mouseMovementEvent;
+        const MouseMoveValue inputValue = mouseMovementEvent.GetInputValue();
         // spdlog formatting not working use explicit glm::to_string
         ANE_ENGINE_LOG_INFO("moved mouse pos:({0}), delta:({1})", glm::to_string(inputValue.GetMousePos()), glm::to_string(inputValue.GetMouseDelta()));
     }
