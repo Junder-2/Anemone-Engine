@@ -33,7 +33,6 @@ namespace Engine
         //Test functions
         void OnResizeTest(int width, int height);
         void OnKeyTest(KeyboardKeyEvent& keyTriggerEvent);
-        void OnAxisTest(InputValue inputValue);
         void OnMouseKeyTest(MouseButtonEvent& mouseButtonEvent);
         void OnMouseScrollTest(MouseScrollEvent& mouseScrollEvent);
         void OnMouseMoveTest(MouseMovementEvent& mouseMovementEvent);

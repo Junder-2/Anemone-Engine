@@ -174,11 +174,6 @@ namespace Engine
         ANE_ENGINE_LOG_INFO("pressed {0}: {1}", inputValue.GetBindingId(), inputValue.GetIntValue());
     }
 
-    void Application::OnAxisTest(InputValue inputValue)
-    {
-        ANE_ENGINE_LOG_INFO("pressed {0}: {1}", inputValue.GetBindingId(), inputValue.GetAxis());
-    }
-
     void Application::OnMouseKeyTest(MouseButtonEvent& mouseButtonEvent)
     {
         const MouseButtonValues inputValue = mouseButtonEvent.GetInputValue();
