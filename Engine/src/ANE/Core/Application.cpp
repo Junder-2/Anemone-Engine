@@ -7,6 +7,7 @@
 
 #include "ANE/Events/EventHandler.h"
 #include "ANE/Input/InputSystem.h"
+#include "ANE/Subsystem/SubsystemCollection.h"
 #include "ANE/Utilities/InputUtilities.h"
 #include "Layers/Layer.h"
 #include "Entity/Entity.h"
@@ -23,14 +24,7 @@ namespace Engine
     Application::Application(const ApplicationSpecification& specification) : _appSpec(specification)
     {
         _appInstance = this;
-
-        _window = Window::Create(WindowProperties(_appSpec.Name));
-        _window->EventDelegate = MakeDelegate(this, &Application::OnEvent);
-
-        _inputHandler = InputHandler::Create();
-        _inputHandler->BindOnEvent(MakeDelegate(this, &Application::OnEvent));
-
-        InputSystem::Create();
+        Init();
 
         //Create a layer
         EditorLayer* editorLayer = new EditorLayer("EditorLayer");
@@ -64,6 +58,17 @@ namespace Engine
     }
 
     Application::~Application() = default;
+
+    void Application::Init()
+    {
+        _window = Window::Create(WindowProperties(_appSpec.Name));
+        _window->EventDelegate = MakeDelegate(this, &Application::OnEvent);
+
+        _inputHandler = InputHandler::Create();
+        _inputHandler->BindOnEvent(MakeDelegate(this, &Application::OnEvent));
+
+        _subsystemCollection = SubsystemCollection::Create();
+    }
 
     void Application::Run()
     {
