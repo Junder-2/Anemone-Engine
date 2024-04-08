@@ -1,5 +1,5 @@
 #include "anepch.h"
-#include "InputManager.h"
+#include "InputHandler.h"
 
 #include <ranges>
 #include <SDL_keyboard.h>
@@ -9,33 +9,28 @@
 
 namespace Engine
 {
-    std::unique_ptr<InputManager> InputManager::Create()
+    std::unique_ptr<InputHandler> InputHandler::Create()
     {
-        return std::make_unique<InputManager>();
+        return std::make_unique<InputHandler>();
     }
 
-    InputManager::InputManager()
+    InputHandler::InputHandler()
     {
         // input testing
         for (int i = KeyCodeA; i < KeyCodeZ+1; ++i)
         {
-            RegisterKeyboardTrigger(i);
+            RegisterKeyboardKey(i);
         }
 
         for (int i = KeyCode0; i < KeyCode9+1; ++i)
         {
-            RegisterKeyboardTrigger(i);
+            RegisterKeyboardKey(i);
         }
     }
 
-    InputManager::~InputManager()
+    InputHandler::~InputHandler()
     {
         for (const InputAction* val : _keyboardInputActions | std::views::values)
-        {
-            delete val;
-        }
-
-        for (const TwoBindingInput* val : _keyboardTwoBindings | std::views::values)
         {
             delete val;
         }
@@ -43,33 +38,21 @@ namespace Engine
         _keyboardInputActions.clear();
     }
 
-    void InputManager::DispatchEvent(Event& e)
+    void InputHandler::DispatchEvent(Event& e)
     {
-        if(EventDelegate) EventDelegate(e);
+        if(_eventDelegate) _eventDelegate(e);
     }
 
-    void InputManager::RegisterKeyboardTrigger(const int keyCode)
+    void InputHandler::RegisterKeyboardKey(const int keyCode)
     {
         if (_keyboardInputActions.contains(keyCode)) return;
 
-        InputTrigger* newInputAction = new InputTrigger(InputSourceKeyboard, keyCode);
+        InputTrigger* newInputAction = new InputTrigger(InputDeviceKeyboard, keyCode);
 
         _keyboardInputActions.insert_or_assign(keyCode, newInputAction);
     }
 
-    void InputManager::RegisterKeyboardTwoKeyAxis(const int negativeKeyCode, const int positiveKeyCode)
-    {
-        return; //todo: not functional after refactor
-        const IntPair twoKeys(negativeKeyCode, positiveKeyCode);
-
-        if(_keyboardTwoBindings.contains(twoKeys)) return;
-
-        TwoBindingInput* twoKeyInputBinding = new TwoBindingInput(InputSourceKeyboard, negativeKeyCode, positiveKeyCode);
-
-        _keyboardTwoBindings.insert_or_assign(twoKeys, twoKeyInputBinding);
-    }
-
-    void InputManager::OnUpdate()
+    void InputHandler::OnUpdate()
     {
         bool needProcessing = false;
 
@@ -89,7 +72,7 @@ namespace Engine
                 int keyCode = dirtyKeysCopy.front();
                 if(_keyboardInputActions[keyCode]->ProcessAction(&needProcessing))
                 {
-                    KeyTriggerEvent keyTriggerEvent(_keyboardInputActions[keyCode]->GetInputValue());
+                    KeyboardKeyEvent keyTriggerEvent(_keyboardInputActions[keyCode]->GetInputValue());
                     DispatchEvent(keyTriggerEvent);
                 }
                 if(needProcessing)
@@ -101,18 +84,18 @@ namespace Engine
         }
     }
 
-    void InputManager::PopulateKeyStates(const Uint8* newKeyStates)
+    void InputHandler::PopulateKeyStates(const Uint8* newKeyStates)
     {
         _currentKeyStates = newKeyStates;
     }
 
-    void InputManager::FlushInputs()
+    void InputHandler::FlushInputs()
     {
         for (const auto val : _keyboardInputActions | std::views::values)
         {
             if(val->FlushAction())
             {
-                KeyTriggerEvent keyTriggerEvent(val->GetInputValue());
+                KeyboardKeyEvent keyTriggerEvent(val->GetInputValue());
                 DispatchEvent(keyTriggerEvent);
             }
         }
@@ -121,7 +104,7 @@ namespace Engine
         _currentKeyStates = nullptr;
     }
 
-    void InputManager::ProcessKey(const int keyCode, const bool press)
+    void InputHandler::ProcessKey(const int keyCode, const bool press)
     {
         if (!_keyboardInputActions.contains(keyCode)) return;
 
@@ -129,7 +112,7 @@ namespace Engine
 
         if(_keyboardInputActions[keyCode]->PopulateInput((float)(press ? TriggerStarted : TriggerStopped), &needProcessing))
         {
-            KeyTriggerEvent keyTriggerEvent(_keyboardInputActions[keyCode]->GetInputValue());
+            KeyboardKeyEvent keyTriggerEvent(_keyboardInputActions[keyCode]->GetInputValue());
             DispatchEvent(keyTriggerEvent);
         }
 
@@ -139,7 +122,7 @@ namespace Engine
         }
     }
 
-    void InputManager::ProcessMouseMovement(const float xPos, const float yPos, const float deltaTime)
+    void InputHandler::ProcessMouseMovement(const float xPos, const float yPos, const float deltaTime)
     {
         if(_mouseInputAction.PopulateMoveInput(&_dirtyMouse, xPos, yPos, deltaTime))
         {
@@ -148,7 +131,7 @@ namespace Engine
         }
     }
 
-    void InputManager::ProcessMouseButton(const int index, const bool press, const bool isDoubleClick /*= false */)
+    void InputHandler::ProcessMouseButton(const int index, const bool press, const bool isDoubleClick /*= false */)
     {
         if(_mouseInputAction.PopulateButtonInput(&_dirtyMouse, index, press ? TriggerStarted : TriggerStopped, isDoubleClick))
         {
@@ -157,7 +140,7 @@ namespace Engine
         }
     }
 
-    void InputManager::ProcessMouseScroll(const float xDelta, const float yDelta)
+    void InputHandler::ProcessMouseScroll(const float xDelta, const float yDelta)
     {
         if(_mouseInputAction.PopulateScrollInput(&_dirtyMouse, xDelta, yDelta))
         {
@@ -166,7 +149,7 @@ namespace Engine
         }
     }
 
-    std::array<InputValue, 4> InputManager::GetCurrentTriggeredKeys()
+    std::array<InputValue, 4> InputHandler::GetCurrentTriggeredKeys()
     {
         std::array<InputValue, 4> newArray;
 
@@ -184,7 +167,7 @@ namespace Engine
         return newArray;
     }
 
-    TriggerState InputManager::GetKeyTriggerState(const int keyCode)
+    TriggerState InputHandler::GetKeyTriggerState(const int keyCode)
     {
         if (_keyboardInputActions.contains(keyCode))
         {

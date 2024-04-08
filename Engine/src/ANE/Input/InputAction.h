@@ -11,7 +11,7 @@ namespace Engine
     {
     public:
         InputValue(const int bindingId = 0) : _bindingId(bindingId) { }
-        InputValue(const InputValueType type, const InputSourceType sourceType, const int bindingId = 0) : _valueType(type), _sourceType(sourceType), _bindingId(bindingId) { }
+        InputValue(const InputValueType type, const InputDeviceType sourceType, const int bindingId = 0) : _valueType(type), _deviceType(sourceType), _bindingId(bindingId) { }
 
         /**
         * Returns the value type
@@ -24,9 +24,9 @@ namespace Engine
         /**
         * Returns the input source
         */
-        InputValueType GetSourceType() const
+        InputDeviceType GetDeviceType() const
         {
-            return _valueType;
+            return _deviceType;
         }
 
         /**
@@ -70,7 +70,7 @@ namespace Engine
     protected:
         float _value = 0;
         InputValueType _valueType = InputTypeBoolean;
-        InputSourceType _sourceType = InputSourceKeyboard;
+        InputDeviceType _deviceType = InputDeviceKeyboard;
         int _bindingId;
     };
 
@@ -80,7 +80,7 @@ namespace Engine
     class InputAction
     {
     public:
-        InputAction(const InputValueType type, const InputSourceType sourceType, const int bindingId = 0) : _inputValue(InputValue(type, sourceType, bindingId)) {}
+        InputAction(const InputValueType type, const InputDeviceType sourceType, const int bindingId = 0) : _inputValue(InputValue(type, sourceType, bindingId)) {}
         virtual ~InputAction() = default;
 
         /**
@@ -113,7 +113,7 @@ namespace Engine
     class InputTrigger final : public InputAction
     {
     public:
-        InputTrigger(const InputSourceType sourceType, const int bindingId = 0) : InputAction(InputTypeTrigger, sourceType, bindingId) {}
+        InputTrigger(const InputDeviceType sourceType, const int bindingId = 0) : InputAction(InputTypeTrigger, sourceType, bindingId) {}
 
         /**
         * Populates new input
@@ -135,7 +135,7 @@ namespace Engine
     class InputAxis : public InputAction
     {
     public:
-        InputAxis(const InputSourceType sourceType, const int bindingId = 0) : InputAction(InputTypeAxis, sourceType, bindingId) {}
+        InputAxis(const InputDeviceType sourceType, const int bindingId = 0) : InputAction(InputTypeAxis, sourceType, bindingId) {}
 
         /**
         * Populates new input
@@ -149,7 +149,7 @@ namespace Engine
     class TwoBindingInput
     {
     public:
-        TwoBindingInput(const InputSourceType sourceType, const int negativeBindingId, const int positiveBindingId) //todo: might want to turn the combined binding Id into has so we can decode it later
+        TwoBindingInput(const InputDeviceType sourceType, const int negativeBindingId, const int positiveBindingId) //todo: might want to turn the combined binding Id into has so we can decode it later
         : _inputValue(InputTypeAxis, sourceType, negativeBindingId+positiveBindingId), _negativeBindingId(negativeBindingId), _positiveBindingId(positiveBindingId) {}
         ~TwoBindingInput() = default;
 

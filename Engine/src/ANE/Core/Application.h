@@ -5,7 +5,7 @@
 #include "Window.h"
 #include "ANE/Events/Event.h"
 
-#include "ANE/Input/InputManager.h"
+#include "ANE/Input/InputHandler.h"
 
 namespace Engine
 {
@@ -32,14 +32,14 @@ namespace Engine
 
         //Test functions
         void OnResizeTest(int width, int height);
-        void OnKeyTest(KeyTriggerEvent& keyTriggerEvent);
+        void OnKeyTest(KeyboardKeyEvent& keyTriggerEvent);
         void OnAxisTest(InputValue inputValue);
         void OnMouseKeyTest(MouseButtonEvent& mouseButtonEvent);
         void OnMouseScrollTest(MouseScrollEvent& mouseScrollEvent);
         void OnMouseMoveTest(MouseMovementEvent& mouseMovementEvent);
 
         Window& GetWindow() const { return *_window; }
-        InputManager& GetInputManager() const { return *_inputManager.get(); }
+        InputHandler& GetInputHandler() const { return *_inputHandler; }
 
         static Application& Get() { return *_appInstance; }
 
@@ -48,7 +48,7 @@ namespace Engine
     private:
         ApplicationSpecification _appSpec;
         std::unique_ptr<Window> _window;
-        std::unique_ptr<InputManager> _inputManager;
+        std::unique_ptr<InputHandler> _inputHandler;
         bool _isRunning = true;
 
         static Application* _appInstance;

@@ -9,9 +9,9 @@ namespace Engine
     */
     typedef enum : uint8_t
     {
-        InputSourceKeyboard,
-        InputSourceGamepad,
-    } InputSourceType;
+        InputDeviceKeyboard,
+        InputDeviceGamepad,
+    } InputDeviceType;
 
     /**
     * Type of input value, used to determine the derived class

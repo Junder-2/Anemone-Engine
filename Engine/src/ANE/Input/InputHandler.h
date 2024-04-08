@@ -12,28 +12,24 @@ namespace Engine
     /**
     * Class that stores and processes inputs
     */
-    class InputManager
+    class InputHandler
     {
     public:
-        static std::unique_ptr<InputManager> Create();
+        static std::unique_ptr<InputHandler> Create();
 
-        InputManager();
-        ~InputManager();
+        InputHandler();
+        ~InputHandler();
 
+        template <class TClass>
+        void BindOnEvent(DelegateMember<TClass, void(Event&)> delegateMember);
         void OnUpdate();
-        SinglecastDelegate<void(Event&)> EventDelegate;
 
         /**
         * Registers a keyboard key to be handled and processed
         * @param keyCode id from KeyCodes
         */
-        void RegisterKeyboardTrigger(int keyCode);
-        /**
-        * Registers a keyboard input to be handled and processed
-        * @param negativeKeyCode id from KeyCodes
-        * @param positiveKeyCode id from KeyCodes
-        */
         void RegisterKeyboardTwoKeyAxis(int negativeKeyCode, int positiveKeyCode);
+        void RegisterKeyboardKey(int keyCode);
 
         void PopulateKeyStates(const Uint8* newKeyStates);
         void ProcessKey(int keyCode, bool press);
@@ -55,15 +51,17 @@ namespace Engine
         // todo: just using for debug now. probably dirty to use array
         std::array<InputValue, 4> GetCurrentTriggeredKeys();
 
-        glm::vec2 GetMouseDelta() const { return _mouseInputAction.GetMoveValue().GetMouseDelta(); }
-        glm::vec2 GetMousePos() const { return _mouseInputAction.GetMoveValue().GetMousePos(); }
-        TriggerState GetMouseTriggerState(const int index) const { return _mouseInputAction.GetButtonValue().GetTriggerState(index); }
-        MouseButtonValues GetMouseButtonValues() const { return _mouseInputAction.GetButtonValue(); }
+        /**
+        * Returns current mouse input data
+        */
+        MouseInputAction GetMouseInputData() const { return _mouseInputAction; }
 
     private:
         void DispatchEvent(Event& e);
 
     private:
+        SinglecastDelegate<void(Event&)> _eventDelegate;
+
         const Uint8* _currentKeyStates{};
         entt::dense_map<int, InputAction*> _keyboardInputActions {};
         std::unordered_map<IntPair, TwoBindingInput*> _keyboardTwoBindings {};
@@ -98,4 +96,9 @@ namespace Engine
     //
     //     twoKeyInputBinding->BindAction(delegateMember);
     // }
+    template <class TClass>
+    void InputHandler::BindOnEvent(DelegateMember<TClass, void(Event&)> delegateMember)
+    {
+        _eventDelegate = delegateMember;
+    }
 }

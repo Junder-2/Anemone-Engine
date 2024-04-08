@@ -12,7 +12,7 @@ namespace Engine
         WindowCloseEvent() = default;
 
         EventType GetEventType() const override { return EventType::WindowClose; }
-        int GetEventCategories() const override { return (WindowEvent); }
+        int GetEventCategories() const override { return (EventCategoryWindow); }
     };
 
     /**
@@ -24,7 +24,7 @@ namespace Engine
         WindowStateChangeEvent(const WindowState state) : _stateValue(state) {};
 
         EventType GetEventType() const override { return EventType::WindowStateChange; }
-        int GetEventCategories() const override { return (WindowEvent); }
+        int GetEventCategories() const override { return (EventCategoryWindow); }
 
         WindowState GetState() const { return _stateValue; }
 
@@ -41,7 +41,7 @@ namespace Engine
         WindowFocusChangeEvent(const bool isFocused) : _isFocused(isFocused) {}
 
         EventType GetEventType() const override { return EventType::WindowFocusChange; }
-        int GetEventCategories() const override { return (WindowEvent); }
+        int GetEventCategories() const override { return (EventCategoryWindow); }
 
         bool IsFocused() const { return _isFocused; }
 
@@ -58,7 +58,7 @@ namespace Engine
         WindowResizeEvent(const uint32_t width, const uint32_t height) : _width(width), _height(height) {}
 
         EventType GetEventType() const override { return EventType::WindowResize; }
-        int GetEventCategories() const override { return (WindowEvent); }
+        int GetEventCategories() const override { return (EventCategoryWindow); }
 
         uint32_t GetWidth() const { return _width; }
         uint32_t GetHeight() const { return _height; }
@@ -77,7 +77,7 @@ namespace Engine
         WindowMovedEvent(const uint32_t x, const uint32_t y, const float xDelta, const float yDelta) : _xPos(x), _yPos(y), _xDelta(xDelta), _yDelta(yDelta) {}
 
         EventType GetEventType() const override { return EventType::WindowMoved; }
-        int GetEventCategories() const override { return (WindowEvent); }
+        int GetEventCategories() const override { return (EventCategoryWindow); }
 
         uint32_t GetX() const { return _xPos; }
         uint32_t GetY() const { return _yPos; }

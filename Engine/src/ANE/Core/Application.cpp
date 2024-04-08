@@ -22,8 +22,8 @@ namespace Engine
         _window = Window::Create(WindowProperties(_appSpec.Name));
         _window->EventDelegate = MakeDelegate(this, &Application::OnEvent);
 
-        _inputManager = InputManager::Create();
-        _inputManager->EventDelegate = MakeDelegate(this, &Application::OnEvent);
+        _inputHandler = InputHandler::Create();
+        _inputHandler->BindOnEvent(MakeDelegate(this, &Application::OnEvent));
 
 
         //Create a layer
@@ -83,7 +83,7 @@ namespace Engine
     {
         EventHandler::PushEvent(&e);
 
-        if(e.HasCategory(WindowEvent))
+        if(e.HasCategory(EventCategoryWindow))
         {
             switch (e.GetEventType())
             {
@@ -106,7 +106,7 @@ namespace Engine
         }
 
         //Input debugging
-        // if(e.HasCategory(InputEvent))
+        // if(e.HasCategory(EventCategoryInput))
         // {
         //     switch (e.GetEventType())
         //     {
@@ -162,9 +162,9 @@ namespace Engine
         ANE_ENGINE_LOG_INFO("window focus change {0}", e.IsFocused());
     }
 
-    void Application::OnKeyTest(KeyTriggerEvent& keyTriggerEvent)
+    void Application::OnKeyTest(KeyboardKeyEvent& keyTriggerEvent)
     {
-        const InputValue inputValue = keyTriggerEvent;
+        const InputValue inputValue = keyTriggerEvent.GetInputValue();
         ANE_ENGINE_LOG_INFO("pressed {0}: {1}", inputValue.GetBindingId(), inputValue.GetIntValue());
     }
 
