@@ -33,3 +33,9 @@ void Engine::EditorLayer::OnUpdate(float deltaTime)
     //     _activeScene->OnUpdate(deltaTime);
 
 }
+
+void Engine::EditorLayer::OnEventTest(Event& e)
+{
+    ANE_LOG_INFO("Hello {0}?: {1}", _debugName, e.GetEventCategories());
+}
+

@@ -46,12 +46,14 @@ namespace Engine
             ANE_ENGINE_LOG_WARN("We have a renderComponent with tag: {0} on entity: {1}", comp.ToString(), tag.Tag);
         }
 
-
         //editorLayer->AddScene<Scene>("Main Menu");
         //editorLayer->AddScene<Scene>("Credits");
         _layerStack.PushLayer(editorLayer);
 
         //editorLayer->SetActiveScene("roe");
+
+        //Event binding test
+        //EventHandler::BindAppEvent(MakeDelegate(editorLayer, &EditorLayer::OnEventTest));
     }
 
     Application::~Application() = default;
