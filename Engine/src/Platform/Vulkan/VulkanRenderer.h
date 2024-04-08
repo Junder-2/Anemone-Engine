@@ -80,6 +80,10 @@ namespace Engine
         static VmaBuffer CreateBuffer(size_t allocSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage);
         static void DestroyBuffer(const VmaBuffer& buffer);
 
+        static VmaImage CreateImage(VkExtent3D size, VkFormat format, VkImageUsageFlags usage, bool mipmaps = false);
+        static VmaImage CreateImage(const void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, bool mipmaps = false);
+        static void DestroyImage(const VmaImage& image);
+
         static void ImmediateSubmit(std::function<void(VkCommandBuffer cmd)>&& function);
 
         // Debugging

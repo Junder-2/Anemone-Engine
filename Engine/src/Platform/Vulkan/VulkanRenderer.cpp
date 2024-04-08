@@ -11,6 +11,7 @@
 #include <vk_mem_alloc.h>
 
 #include "VulkanInitializers.h"
+#include "VulkanUtils.h"
 #include "ANE/Core/Window.h"
 #include "ANE/Utilities/ImGuiUtilities.h"
 
@@ -552,6 +553,82 @@ namespace Engine
     void VulkanRenderer::DestroyBuffer(const VmaBuffer& buffer)
     {
         vmaDestroyBuffer(_vmaAllocator, buffer.Buffer, buffer.Allocation);
+    }
+
+    VmaImage VulkanRenderer::CreateImage(const VkExtent3D size, const VkFormat format, const VkImageUsageFlags usage, const bool mipmaps)
+    {
+        VmaImage newImage;
+        newImage.ImageFormat = format;
+        newImage.ImageExtent = size;
+
+        VkImageCreateInfo imgInfo = VulkanInitializers::ImageCreateInfo(format, usage, size);
+        if (mipmaps)
+        {
+            imgInfo.mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(size.width, size.height)))) + 1;
+        }
+
+        // Always allocate images on dedicated GPU memory.
+        VmaAllocationCreateInfo allocInfo = { };
+        allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+        allocInfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+        CheckVkResult(vmaCreateImage(_vmaAllocator, &imgInfo, &allocInfo, &newImage.Image, &newImage.Allocation, nullptr));
+
+        // Depth formats need to use the correct aspect flag.
+        VkImageAspectFlags aspectFlag = VK_IMAGE_ASPECT_COLOR_BIT;
+        if (format == VK_FORMAT_D32_SFLOAT)
+        {
+            aspectFlag = VK_IMAGE_ASPECT_DEPTH_BIT;
+        }
+
+        // Build a image-view for the image.
+        VkImageViewCreateInfo viewInfo = VulkanInitializers::ImageViewCreateInfo(format, newImage.Image, aspectFlag);
+        viewInfo.subresourceRange.levelCount = imgInfo.mipLevels;
+
+        CheckVkResult(vkCreateImageView(_device, &viewInfo, nullptr, &newImage.ImageView));
+
+        return newImage;
+    }
+
+    VmaImage VulkanRenderer::CreateImage(const void* data, const VkExtent3D size, const VkFormat format, const VkImageUsageFlags usage, const bool mipmaps)
+    {
+        const size_t dataSize = (size_t)(size.depth * size.width * size.height * 4);
+        const VmaBuffer uploadBuffer = CreateBuffer(dataSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+
+        memcpy(uploadBuffer.Info.pMappedData, data, dataSize);
+
+        const VmaImage newImage = CreateImage(size, format, usage | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, mipmaps);
+
+        ImmediateSubmit([&](const VkCommandBuffer cmd)
+        {
+            VulkanUtils::TransitionImage(cmd, newImage.Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+            VkBufferImageCopy copyRegion = { };
+            copyRegion.bufferOffset = 0;
+            copyRegion.bufferRowLength = 0;
+            copyRegion.bufferImageHeight = 0;
+
+            copyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            copyRegion.imageSubresource.mipLevel = 0;
+            copyRegion.imageSubresource.baseArrayLayer = 0;
+            copyRegion.imageSubresource.layerCount = 1;
+            copyRegion.imageExtent = size;
+
+            // Copy the buffer into the image.
+            vkCmdCopyBufferToImage(cmd, uploadBuffer.Buffer, newImage.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+
+            VulkanUtils::TransitionImage(cmd, newImage.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        });
+
+        DestroyBuffer(uploadBuffer);
+
+        return newImage;
+    }
+
+    void VulkanRenderer::DestroyImage(const VmaImage& image)
+    {
+        vkDestroyImageView(_device, image.ImageView, _allocator);
+        vmaDestroyImage(_vmaAllocator, image.Image, image.Allocation);
     }
 
     void VulkanRenderer::ImmediateSubmit(std::function<void(VkCommandBuffer cmd)>&& function)
