@@ -19,11 +19,11 @@ namespace Engine
     */
     typedef enum
     {
-        NoneEvent = 0,
-        WindowEvent = BIT(0),
-        InputEvent = BIT(1),
-        KeyboardEvent = BIT(2),
-        MouseEvent = BIT(3),
+        EventCategoryNone = 0,
+        EventCategoryWindow = BIT(0),
+        EventCategoryInput = BIT(1),
+        EventCategoryKeyboard = BIT(2),
+        EventCategoryMouse = BIT(3),
     } EventCategory;
 
     typedef enum : uint8_t

@@ -34,8 +34,9 @@ namespace Engine
         return true;
     }
 
-    void MouseInputAction::ProcessAction()
+    bool MouseInputAction::ProcessAction()
     {
+        bool changed = false;
         _moveValue.SetMouseDelta(0, 0);
         _scrollWheelValue.x = 0;
         _scrollWheelValue.y = 0;
@@ -46,11 +47,16 @@ namespace Engine
             {
             case TriggerStarted:
                 _buttonValue.SetTriggerState(i, TriggerHolding);
-                break;
+                changed = true;
+            break;
             case TriggerStopped:
                 _buttonValue.SetTriggerState(i, TriggerNone);
+                changed = true;
+            break;
             }
         }
+
+        return changed;
     }
 
     void MouseInputAction::FlushAction()
