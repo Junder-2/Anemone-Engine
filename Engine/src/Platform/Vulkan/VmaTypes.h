@@ -7,10 +7,17 @@ namespace Engine
 {
     struct VmaImage
     {
-        VkImage image;
-        VkImageView imageView;
-        VmaAllocation allocation;
-        VkExtent3D imageExtent;
-        VkFormat imageFormat;
+        VkImage Image;
+        VkImageView ImageView;
+        VkExtent3D ImageExtent;
+        VkFormat ImageFormat;
+        VmaAllocation Allocation;
+    };
+
+    struct VmaBuffer
+    {
+        VkBuffer Buffer;
+        VmaAllocation Allocation;
+        VmaAllocationInfo Info;
     };
 }
