@@ -1,5 +1,6 @@
 #pragma once
 #include "Event.h"
+#include "ANE/Delegate/Delegate.h"
 
 namespace Engine
 {
@@ -38,7 +39,45 @@ namespace Engine
             _currentEvent->Consume();
         }
 
+        //TODO: TEMPORARY, bindings and execution should probably be moved to something thats not a static class
+        template <class TClass>
+        static void BindEditorEvent(DelegateMember<TClass, void(Event&)> delegateMember)
+        {
+            _editorEventDelegate += delegateMember;
+        }
+
+        template <class TClass>
+        static void BindAppEvent(DelegateMember<TClass, void(Event&)> delegateMember)
+        {
+            _appEventDelegate += delegateMember;
+        }
+
+        static void DispatchEditorEvents()
+        {
+            if(_currentEvent == nullptr)
+            {
+                ANE_ENGINE_LOG_WARN("Cannot execute event outside of event handling");
+                return;
+            }
+
+            if(_editorEventDelegate) _editorEventDelegate(*_currentEvent);
+        }
+
+        static void DispatchAppEvents()
+        {
+            if(_currentEvent == nullptr)
+            {
+                ANE_ENGINE_LOG_WARN("Cannot execute event outside of event handling");
+                return;
+            }
+
+            if(_appEventDelegate) _appEventDelegate(*_currentEvent);
+        }
+
     private:
         inline static Event* _currentEvent {};
+
+        inline static MulticastDelegate<void(Event&)> _editorEventDelegate;
+        inline static MulticastDelegate<void(Event&)> _appEventDelegate;
     };
 }
