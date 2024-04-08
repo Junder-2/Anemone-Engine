@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL_video.h>
 #include <imgui_impl_vulkan.h>
+#include <span>
 
 #include "VmaTypes.h"
 #include "VulkanDeletionQueue.h"
@@ -85,6 +86,8 @@ namespace Engine
         static void DestroyImage(const VmaImage& image);
 
         static void ImmediateSubmit(std::function<void(VkCommandBuffer cmd)>&& function);
+
+        static VmaMeshBuffers UploadMesh(std::span<uint32_t> indices, std::span<Vertex> vertices);
 
         // Debugging
         static VKAPI_ATTR VkBool32 VKAPI_CALL DebugCallback(

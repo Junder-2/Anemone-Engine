@@ -655,6 +655,58 @@ namespace Engine
         CheckVkResult(vkWaitForFences(_device, 1, &_immBuffer.Fence, true, 9999999999));
     }
 
+    VmaMeshBuffers VulkanRenderer::UploadMesh(const std::span<uint32_t> indices, const std::span<Vertex> vertices)
+    {
+        const size_t vertexBufferSize = vertices.size() * sizeof(Vertex);
+        const size_t indexBufferSize = indices.size() * sizeof(uint32_t);
+
+        VmaMeshBuffers newSurface;
+
+        constexpr VkBufferUsageFlags vertexBufferFlags =
+            VK_BUFFER_USAGE_STORAGE_BUFFER_BIT |
+            VK_BUFFER_USAGE_TRANSFER_DST_BIT |
+            VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
+        newSurface.VertexBuffer = CreateBuffer(vertexBufferSize, vertexBufferFlags, VMA_MEMORY_USAGE_GPU_ONLY);
+
+        // Find the address of the vertex buffer.
+        const VkBufferDeviceAddressInfo deviceAddressInfo{ .sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO, .buffer = newSurface.VertexBuffer.Buffer };
+        newSurface.VertexBufferAddress = vkGetBufferDeviceAddress(_device, &deviceAddressInfo);
+
+        constexpr VkBufferUsageFlags indexBufferFlags =
+            VK_BUFFER_USAGE_INDEX_BUFFER_BIT |
+            VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+        newSurface.IndexBuffer = CreateBuffer(indexBufferSize, indexBufferFlags, VMA_MEMORY_USAGE_GPU_ONLY);
+
+        const VmaBuffer staging = CreateBuffer(vertexBufferSize + indexBufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY);
+
+        // Copy buffers over to VMA allocation address.
+        void* data = staging.Allocation->GetMappedData();
+        memcpy(data, vertices.data(), vertexBufferSize);
+        memcpy((char*)data + vertexBufferSize, indices.data(), indexBufferSize);
+
+        // Copy buffers to the GPU.
+        ImmediateSubmit([&](const VkCommandBuffer cmd)
+        {
+            VkBufferCopy vertexCopy;
+            vertexCopy.srcOffset = 0;
+            vertexCopy.dstOffset = 0;
+            vertexCopy.size = vertexBufferSize;
+
+            vkCmdCopyBuffer(cmd, staging.Buffer, newSurface.VertexBuffer.Buffer, 1, &vertexCopy);
+
+            VkBufferCopy indexCopy;
+            indexCopy.srcOffset = vertexBufferSize;
+            indexCopy.dstOffset = 0;
+            indexCopy.size = indexBufferSize;
+
+            vkCmdCopyBuffer(cmd, staging.Buffer, newSurface.IndexBuffer.Buffer, 1, &indexCopy);
+        });
+
+        DestroyBuffer(staging);
+
+        return newSurface;
+    }
+
     VkBool32 VulkanRenderer::DebugCallback(
         VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
         VkDebugUtilsMessageTypeFlagsEXT messageType,
