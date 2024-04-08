@@ -7,6 +7,7 @@
 
 #include "ANE/Events/EventHandler.h"
 #include "ANE/Input/InputSystem.h"
+#include "ANE/Utilities/InputUtilities.h"
 #include "Layers/Layer.h"
 #include "Entity/Entity.h"
 #include "Entity/ExampleScripts/CameraController.h"
@@ -171,13 +172,14 @@ namespace Engine
     void Application::OnKeyTest(KeyboardKeyEvent& keyTriggerEvent)
     {
         const InputValue inputValue = keyTriggerEvent.GetInputValue();
-        ANE_ENGINE_LOG_INFO("pressed {0}: {1}", inputValue.GetBindingId(), inputValue.GetIntValue());
+        ANE_ENGINE_LOG_INFO("pressed {0}: {1}", inputValue.GetBindingId(), InputUtilities::ToString(inputValue.GetTriggerState()));
     }
 
     void Application::OnMouseKeyTest(MouseButtonEvent& mouseButtonEvent)
     {
         const MouseButtonValues inputValue = mouseButtonEvent.GetInputValue();
-        ANE_ENGINE_LOG_INFO("pressed mouse key {0}, with state {1}, is doubleclick {2}", inputValue.GetCurrentButtonIndex(), (int)inputValue.GetTriggerState(), inputValue.GetIsDoubleClick());
+        ANE_ENGINE_LOG_INFO("pressed mouse key {0}, with {1}, is doubleclick {2}", InputUtilities::ToString((MouseButton)inputValue.GetCurrentButtonIndex()),
+            InputUtilities::ToString(inputValue.GetTriggerState()), inputValue.GetIsDoubleClick());
         ANE_ENGINE_LOG_INFO("raw mouse button state {0}", std::bitset<16>(inputValue.GetRawButtonStates()).to_string());
     }
 

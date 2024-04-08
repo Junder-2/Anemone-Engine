@@ -1,14 +1,13 @@
 ﻿#pragma once
 #include "../ScriptableEntity.h"
-#include "ANE/Core/Scene/Components/RenderComponent.h"
 #include "ANE/Input/InputSystem.h"
+#include "ANE/Utilities/InputUtilities.h"
 
 namespace Engine
 {
     class CameraController : public ScriptableEntity
     {
     public:
-
         void OnCreate() override
         {
             InputSystem::Get().BindInput(InputDeviceKeyboard, KeyCodeW, MakeDelegate(this, &CameraController::OnKeyTest));
@@ -27,7 +26,7 @@ namespace Engine
 
         void OnKeyTest(InputValue inputValue)
         {
-            ANE_LOG_INFO("Testing K {}", inputValue.GetIntValue());
+            ANE_LOG_INFO("Testing Button device({0}) id({1}): {2}", InputUtilities::ToString(inputValue.GetDeviceType()), inputValue.GetBindingId(), InputUtilities::ToString(inputValue.GetTriggerState()));
         }
     };
 }
