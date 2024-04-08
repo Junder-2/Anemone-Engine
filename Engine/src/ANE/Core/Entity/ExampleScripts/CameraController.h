@@ -11,7 +11,8 @@ namespace Engine
 
         void OnCreate() override
         {
-            InputSystem::Get().BindInput(InputDeviceKeyboard, KeyCodeK, MakeDelegate(this, &CameraController::OnKeyTest));
+            InputSystem::Get().BindInput(InputDeviceKeyboard, KeyCodeW, MakeDelegate(this, &CameraController::OnKeyTest));
+            InputSystem::Get().BindMouseButton(MouseButtonLeft, MakeDelegate(this, &CameraController::OnKeyTest));
         }
 
         void OnDestroy() override // has to be solved
@@ -28,6 +29,5 @@ namespace Engine
         {
             ANE_LOG_INFO("Testing K {}", inputValue.GetIntValue());
         }
-
     };
 }

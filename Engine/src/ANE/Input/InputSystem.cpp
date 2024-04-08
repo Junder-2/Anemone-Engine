@@ -30,9 +30,46 @@ namespace Engine
 
             const IntPair bindingPair(keyValue.GetDeviceType(), keyValue.GetBindingId());
 
-            if(_actionMappings.contains(bindingPair))
+            if(_actionMappingDelegates.contains(bindingPair))
             {
-                _actionMappings[bindingPair](keyValue);
+                _actionMappingDelegates[bindingPair](keyValue);
+            }
+        }
+
+        if(e.HasCategory(EventCategoryMouse))
+        {
+            switch (e.GetEventType())
+            {
+                case EventType::MouseMovement:
+                {
+                    const MouseMoveValue mouseMoveValue = dynamic_cast<MouseMovementEvent&>(e).GetInputValue();
+
+                    if(_mouseMoveDelegate) _mouseMoveDelegate(mouseMoveValue);
+                }
+                break;
+                case EventType::MouseScrolled:
+                {
+                    const MouseScrollEvent mouseScrollEvent = dynamic_cast<MouseScrollEvent&>(e);
+
+                    if(_mouseScrollDelegate) _mouseScrollDelegate(mouseScrollEvent.GetXDelta(), mouseScrollEvent.GetYDelta());
+                }
+                break;
+                case EventType::MouseButton:
+                {
+                    const MouseButtonValues mouseButtonValues = dynamic_cast<MouseButtonEvent&>(e).GetInputValue();
+
+                    const int buttonId = mouseButtonValues.GetCurrentButtonIndex();
+
+                    const IntPair bindingPair(InputDeviceMouse, buttonId);
+
+                    if(_actionMappingDelegates.contains(bindingPair))
+                    {
+                        const InputValue buttonValue(mouseButtonValues.GetTriggerState(), InputTypeTrigger, InputDeviceMouse, buttonId);
+
+                        _actionMappingDelegates[bindingPair](buttonValue);
+                    }
+                }
+                break;
             }
         }
     }

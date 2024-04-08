@@ -11,6 +11,7 @@ namespace Engine
     {
         InputDeviceKeyboard,
         InputDeviceGamepad,
+        InputDeviceMouse,
     } InputDeviceType;
 
     /**

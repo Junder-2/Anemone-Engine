@@ -12,6 +12,7 @@ namespace Engine
     public:
         InputValue(const int bindingId = 0) : _bindingId(bindingId) { }
         InputValue(const InputValueType type, const InputDeviceType sourceType, const int bindingId = 0) : _valueType(type), _deviceType(sourceType), _bindingId(bindingId) { }
+        InputValue(const float value, const InputValueType type, const InputDeviceType sourceType, const int bindingId = 0) : _value(value), _valueType(type), _deviceType(sourceType), _bindingId(bindingId) { }
 
         /**
         * Returns the value type
