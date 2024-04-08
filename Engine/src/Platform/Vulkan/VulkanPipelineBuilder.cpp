@@ -1,7 +1,5 @@
 #include "anepch.h"
 #include "VulkanPipelineBuilder.h"
-#define VMA_IMPLEMENTATION
-#include "vk_mem_alloc.h"
 
 #include "VulkanInitializers.h"
 
