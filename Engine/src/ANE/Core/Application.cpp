@@ -9,7 +9,10 @@
 #include "ANE/Input/InputSystem.h"
 #include "Layers/Layer.h"
 #include "Entity/Entity.h"
+#include "Entity/ExampleScripts/CameraController.h"
 #include "Layers/EditorLayer.h"
+#include "Scene/Components/CameraComponent.h"
+#include "Scene/Components/NativeScriptComponent.h"
 #include "Scene/Components/RenderComponent.h"
 
 namespace Engine
@@ -39,6 +42,7 @@ namespace Engine
 
         //Add component to entity
         ent.AddComponent<RenderComponent>();
+        ent.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
         //Get Component from entity
         if (RenderComponent comp; ent.TryGetComponent<RenderComponent>(comp))

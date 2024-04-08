@@ -46,13 +46,7 @@ namespace Engine
         {
             case InputDeviceKeyboard:
                 _inputHandler->RegisterKeyboardKey(bindingId);
-                break;
-        }
-
-        if(!_actionMappings.contains(bindingPair))
-        {
-            MulticastDelegate<void(InputValue)> newDelegate;
-            _actionMappings.insert_or_assign(bindingPair, newDelegate);
+            break;
         }
 
         _actionMappings[bindingPair] += delegateMember;
