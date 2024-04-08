@@ -2,14 +2,11 @@
 #include "Scene.h"
 
 #include "ANE/Core/Entity/Entity.h"
-#include "Components/RenderComponent.h"
-#include "Components/TransformComponent.h"
+#include "Components/NativeScriptComponent.h"
+
 
 namespace Engine
 {
-
-
-
     Engine::Scene::Scene()
     {
         //create an entity
@@ -94,6 +91,19 @@ namespace Engine
 
     void Scene::OnUpdate(float timeStep)
     {
+
+        {
+            _registry.view<NativeScriptComponent>().each([&](auto entity, auto& scriptComponent)
+            {
+                if (!scriptComponent.Instance)
+                {
+                    scriptComponent.Instantiate();
+                    scriptComponent.Instance->_entity = { entity, this };
+                    scriptComponent.OnCreateFunction();
+                }
+                scriptComponent.OnUpdateFunction(timeStep);
+            });
+        }
     }
 
     /**
@@ -103,7 +113,7 @@ namespace Engine
      */
     [[nodiscard("Entity never used")]] Entity Scene::Create(const char* name)
     {
-        Entity ent{this, name};
+        Entity ent{this, name}; // here
         return ent;
     }
 }

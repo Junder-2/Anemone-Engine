@@ -37,12 +37,7 @@ void Engine::EditorLayer::OnUIRender()
 
 void Engine::EditorLayer::OnUpdate(float deltaTime)
 {
-    // // is the
-    //
-    // //if playmode
-    // if (_activeScene)
-    //     _activeScene->OnUpdate(deltaTime);
-
+    if (_activeScene) _activeScene->OnUpdate(deltaTime);
 }
 
 void Engine::EditorLayer::OnEventTest(Event& e)

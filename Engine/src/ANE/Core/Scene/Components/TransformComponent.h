@@ -12,7 +12,7 @@ namespace Engine
         std::shared_ptr<TransformComponent> Parent;
         std::vector<std::shared_ptr<TransformComponent>> Children;
 
-        ~TransformComponent() = default;
+       // ~TransformComponent() = default;
 
 
         ANE_COMPONENT_INIT(TransformComponent)
