@@ -58,7 +58,11 @@ namespace Engine
 
         if(_dirtyMouse)
         {
-            _mouseInputAction.ProcessAction();
+            if(_mouseInputAction.ProcessAction())
+            {
+                MouseButtonEvent mouseButtonEvent(_mouseInputAction.GetButtonValue());
+                DispatchEvent(mouseButtonEvent);
+            }
         }
 
         if(!_dirtyKeys.empty())

@@ -53,7 +53,7 @@ namespace Engine
     * Mask to get a region of combined mouse button value
     */
     typedef enum {
-        MouseButtonMaskLeft = 0,
+        MouseButtonMaskLeft = TWO_BIT_MASK(MouseButtonLeft),
         MouseButtonMaskMiddle = TWO_BIT_MASK(MouseButtonMiddle),
         MouseButtonMaskRight = TWO_BIT_MASK(MouseButtonRight),
         MouseButtonMaskX1 = TWO_BIT_MASK(MouseButtonX1),
