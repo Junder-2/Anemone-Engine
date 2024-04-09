@@ -43,14 +43,14 @@ namespace Engine
             return;
         }
 
-        if (_swapChainRebuild)
+        if (_rebuildSwapchain)
         {
             if (props.Width > 0 && props.Height > 0)
             {
                 ImGui_ImplVulkan_SetMinImageCount(_minImageCount);
                 ImGui_ImplVulkanH_CreateOrResizeWindow(_instance, _physicalDevice, _device, &_mainWindowData, _queueFamily.GraphicsFamily.value(), _allocator, props.Width, props.Height, _minImageCount);
                 _mainWindowData.FrameIndex = 0;
-                _swapChainRebuild = false;
+                _rebuildSwapchain = false;
             }
         }
 
@@ -474,7 +474,7 @@ namespace Engine
         VkResult err = vkAcquireNextImageKHR(_device, wd->Swapchain, UINT64_MAX, imageAcquiredSemaphore, VK_NULL_HANDLE, &wd->FrameIndex);
         if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR)
         {
-            _swapChainRebuild = true;
+            _rebuildSwapchain = true;
             return;
         }
         CheckVkResult(err);
@@ -539,7 +539,7 @@ namespace Engine
     // TODO: Figure out what most of this code does.
     void VulkanRenderer::RevealFrame(ImGui_ImplVulkanH_Window* wd)
     {
-        if (_swapChainRebuild) return;
+        if (_rebuildSwapchain) return;
 
         VkSemaphore renderCompleteSemaphore = wd->FrameSemaphores[wd->SemaphoreIndex].RenderCompleteSemaphore;
 
@@ -554,7 +554,7 @@ namespace Engine
         VkResult err = vkQueuePresentKHR(_queue, &info);
         if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR)
         {
-            _swapChainRebuild = true;
+            _rebuildSwapchain = true;
             return;
         }
         CheckVkResult(err);

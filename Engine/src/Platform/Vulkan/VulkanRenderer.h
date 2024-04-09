@@ -122,6 +122,7 @@ namespace Engine
         inline static VkExtent2D _windowExtent;
 
         bool _initialized = false;
+        inline static bool _rebuildSwapchain;
 
         // Vulkan
         #ifdef NDEBUG
@@ -154,7 +155,6 @@ namespace Engine
         // ImGui
         inline static ImGui_ImplVulkanH_Window _mainWindowData;
         inline static uint32_t _minImageCount = 2;
-        inline static bool _swapChainRebuild = false;
 
         inline static VkDescriptorPool _imGuiDescriptorPool = VK_NULL_HANDLE;
 
