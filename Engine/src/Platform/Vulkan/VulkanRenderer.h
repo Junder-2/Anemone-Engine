@@ -144,6 +144,7 @@ namespace Engine
         inline static VkQueue _queue = VK_NULL_HANDLE;
         inline static VkPipelineCache _pipelineCache = VK_NULL_HANDLE;
         inline static VkPipeline _meshPipeline = VK_NULL_HANDLE;
+        inline static VkPipelineLayout _pipelineLayout;
 
         // VMA
         inline static VmaAllocator _vmaAllocator;

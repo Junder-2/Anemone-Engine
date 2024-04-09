@@ -378,12 +378,11 @@ namespace Engine
 
     PipelineWrapper VulkanRenderer::CreatePipeline(const vkb::Device& logicalDevice)
     {
-        VkPipelineLayout pipelineLayout = VK_NULL_HANDLE; // Dummy for now
         VkShaderModule triangleVertShader; // Dummy for now
         VkShaderModule triangleFragShader; // Dummy for now
         VmaImage drawImage = { }; // Dummy for now
 
-        VulkanPipelineBuilder builder{ logicalDevice, pipelineLayout };
+        VulkanPipelineBuilder builder{ logicalDevice, _pipelineLayout };
         vkb::Result<PipelineWrapper> pipeline = builder
             .SetShaders(triangleVertShader, triangleFragShader)
             .SetBlendMode(None)
@@ -397,7 +396,7 @@ namespace Engine
 
         _mainDeletionQueue.PushFunction([&]
         {
-            vkDestroyPipelineLayout(_device, pipelineLayout, _allocator);
+            vkDestroyPipelineLayout(_device, _pipelineLayout, _allocator);
             vkDestroyPipeline(_device, _meshPipeline, _allocator);
         });
 
