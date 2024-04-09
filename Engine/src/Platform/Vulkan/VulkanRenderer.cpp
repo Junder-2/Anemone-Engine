@@ -150,6 +150,10 @@ namespace Engine
         SetupCommandBuffers();
 
         SetupSyncStructures();
+
+        CreatePipeline(logicalDevice);
+        //const PipelineWrapper pipeline = CreatePipeline(logicalDevice);
+        //_trianglePipeline = pipeline.Pipeline;
     }
 
     void VulkanRenderer::SetupImGui(SDL_Window* window)
