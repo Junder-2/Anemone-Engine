@@ -42,7 +42,7 @@ namespace Engine
 
         void Setup();
         void NewFrame(const WindowProperties& props);
-        void EndFrame();
+        void EndFrame(const WindowProperties& props);
         void Cleanup();
 
         float GetFramerate();

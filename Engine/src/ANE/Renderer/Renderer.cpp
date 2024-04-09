@@ -23,7 +23,7 @@ namespace Engine
     void Renderer::Render(const WindowProperties& props)
     {
         _vulkanRenderer->NewFrame(props);
-        _vulkanRenderer->EndFrame();
+        _vulkanRenderer->EndFrame(props);
         //_vulkanRenderer->DrawMain(cmd);
         //_vulkanRenderer->DrawImGui(cmd, imageView);
     }

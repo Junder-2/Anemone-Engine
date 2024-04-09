@@ -59,7 +59,7 @@ namespace Engine
         //ImGui::NewFrame();
     }
 
-    void VulkanRenderer::EndFrame()
+    void VulkanRenderer::EndFrame(const WindowProperties& props)
     {
         if (!_initialized)
         {
