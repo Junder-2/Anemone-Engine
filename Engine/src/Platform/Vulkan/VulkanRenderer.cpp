@@ -43,6 +43,8 @@ namespace Engine
             return;
         }
 
+        return;
+
         if (_rebuildSwapchain)
         {
             if (props.Width > 0 && props.Height > 0)
@@ -76,7 +78,8 @@ namespace Engine
             _mainWindowData.ClearValue.color.float32[1] = ClearColor.y * ClearColor.w;
             _mainWindowData.ClearValue.color.float32[2] = ClearColor.z * ClearColor.w;
             _mainWindowData.ClearValue.color.float32[3] = ClearColor.w;
-            RenderFrame(&_mainWindowData, drawData);
+            Draw(props);
+            //RenderFrame(&_mainWindowData, drawData);
         }
 
         // Update and Render additional Platform Windows
@@ -86,10 +89,10 @@ namespace Engine
         //    ImGui::RenderPlatformWindowsDefault();
         //}
 
-        if (!isMinimized)
-        {
-            RevealFrame(&_mainWindowData);
-        }
+        //if (!isMinimized)
+        //{
+        //    RevealFrame(&_mainWindowData);
+        //}
     }
 
     void VulkanRenderer::Cleanup()
@@ -140,10 +143,6 @@ namespace Engine
 
         CreateVmaAllocator();
 
-        int w, h;
-        SDL_GetWindowSize(window, &w, &h);
-        ImGui_ImplVulkanH_Window* wd = &_mainWindowData;
-        SetupVulkanWindow(wd, _surface, w, h);
         SetupSwapchain();
 
         SetupCommandBuffers();
