@@ -81,6 +81,7 @@ namespace Engine
 
         static vkb::Swapchain CreateSwapchain(uint32_t width, uint32_t height);
         static void DestroySwapchain();
+        static void ResizeSwapchain();
 
         static void SetupCommandBuffers();
         static void SetupSyncStructures();

@@ -343,6 +343,26 @@ namespace Engine
         }
     }
 
+    void VulkanRenderer::ResizeSwapchain()
+    {
+        vkDeviceWaitIdle(_device);
+
+        DestroySwapchain();
+
+        int w, h;
+        SDL_GetWindowSize(_window, &w, &h);
+        _windowExtent.width = w;
+        _windowExtent.height = h;
+
+        vkb::Swapchain swapchain = CreateSwapchain(w, h);
+        _swapchainExtent = swapchain.extent;
+        _swapchain = swapchain.swapchain;
+        _swapchainImages = swapchain.get_images().value();
+        _swapchainImageViews = swapchain.get_image_views().value();
+
+        _rebuildSwapchain = false;
+    }
+
     void VulkanRenderer::SetupCommandBuffers()
     {
         const uint32_t familyIndex = _queueFamily.GraphicsFamily.value();
