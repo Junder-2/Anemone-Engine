@@ -59,7 +59,7 @@ namespace Engine
         VulkanRenderer(SDL_Window* window);
 
         void Setup();
-        void EndFrame(const WindowProperties& props);
+        void Render(const WindowProperties& props);
         void Cleanup();
 
         float GetFramerate();

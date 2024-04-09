@@ -35,7 +35,7 @@ namespace Engine
         _initialized = true;
     }
 
-    void VulkanRenderer::EndFrame(const WindowProperties& props)
+    void VulkanRenderer::Render(const WindowProperties& props)
     {
         if (!_initialized)
         {
