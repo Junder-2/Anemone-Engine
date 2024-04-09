@@ -26,10 +26,7 @@ namespace Engine
     {
         _appInstance = this;
 
-        _window = Window::Create(WindowProperties(_appSpec.Name));
-        _window->EventDelegate = MakeDelegate(this, &Application::OnEvent);
 
-        Renderer::Init(_window->GetWindowContext());
         Init();
 
         //Create a layer
@@ -67,9 +64,10 @@ namespace Engine
 
     void Application::Init()
     {
+
         _window = Window::Create(WindowProperties(_appSpec.Name));
         _window->EventDelegate = MakeDelegate(this, &Application::OnEvent);
-
+        Renderer::Init(_window->GetWindowContext());
         _inputHandler = InputHandler::Create();
         _inputHandler->BindOnEvent(MakeDelegate(this, &Application::OnEvent));
 
@@ -91,6 +89,7 @@ namespace Engine
             //Renderer
             for (Layer* layer : _layerStack) // raw pointers
             {
+
                 layer->OnUpdate(deltaTime);
             }
             //todo frame yap
