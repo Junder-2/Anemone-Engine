@@ -410,6 +410,7 @@ namespace Engine
 
             .SetAllocationCallbacks(_allocator)
             .Build();
+        _meshPipeline = pipeline->Pipeline;
 
         // Cleanup.
         vkDestroyShaderModule(_device, meshFragShader, _allocator);
