@@ -160,7 +160,7 @@ namespace Engine
         _io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
         _io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
         _io->ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
-        _io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
+        //_io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows. Doesn't seem to like custom swapchains.
         //_io->ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
         //_io->ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
