@@ -697,7 +697,14 @@ namespace Engine
 
         vkCmdSetScissor(cmd, 0, 1, &scissor);
 
-        vkCmdDraw(cmd, 3, 1, 0, 0);
+        PushConstantBuffer pushConstants;
+        pushConstants.WorldMatrix = glm::mat4{ 1.f };
+        pushConstants.VertexBuffer = _rectangleMesh.VertexBufferAddress;
+
+        vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstantBuffer), &pushConstants);
+        vkCmdBindIndexBuffer(cmd, _rectangleMesh.IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
+
+        vkCmdDrawIndexed(cmd, 6, 1, 0, 0, 0);
 
         vkCmdEndRendering(cmd);
     }
