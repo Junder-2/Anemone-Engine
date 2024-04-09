@@ -9,9 +9,10 @@ namespace Engine
     */
     typedef enum : uint8_t
     {
-        InputSourceKeyboard,
-        InputSourceGamepad,
-    } InputSourceType;
+        InputDeviceKeyboard,
+        InputDeviceGamepad,
+        InputDeviceMouse,
+    } InputDeviceType;
 
     /**
     * Type of input value, used to determine the derived class
@@ -41,9 +42,9 @@ namespace Engine
     {
         MouseButtonLeft = 0,
         MouseButtonMiddle = 1,
-        MouseButtonRight = 3,
-        MouseButtonX1 = 4,
-        MouseButtonX2 = 5,
+        MouseButtonRight = 2,
+        MouseButtonX1 = 3,
+        MouseButtonX2 = 4,
     } MouseButton;
 
     #define MOUSE_BUTTON_MAX (MouseButtonX2+1)
@@ -53,7 +54,7 @@ namespace Engine
     * Mask to get a region of combined mouse button value
     */
     typedef enum {
-        MouseButtonMaskLeft = 0,
+        MouseButtonMaskLeft = TWO_BIT_MASK(MouseButtonLeft),
         MouseButtonMaskMiddle = TWO_BIT_MASK(MouseButtonMiddle),
         MouseButtonMaskRight = TWO_BIT_MASK(MouseButtonRight),
         MouseButtonMaskX1 = TWO_BIT_MASK(MouseButtonX1),

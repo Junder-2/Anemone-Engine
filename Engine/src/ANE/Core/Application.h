@@ -5,10 +5,12 @@
 #include "Window.h"
 #include "ANE/Events/Event.h"
 
-#include "ANE/Input/InputManager.h"
+#include "ANE/Input/InputHandler.h"
 
 namespace Engine
 {
+    class SubsystemCollection;
+
     struct ANE_API ApplicationSpecification
     {
         std::string Name = "Anemone Application";
@@ -21,6 +23,7 @@ namespace Engine
         Application(const ApplicationSpecification& specification);
         virtual ~Application();
 
+        void Init();
         void Run();
         void Shutdown();
 
@@ -31,15 +34,14 @@ namespace Engine
         void OnWindowFocusChange(WindowFocusChangeEvent& e);
 
         //Test functions
-        void OnResizeTest(int width, int height);
-        void OnKeyTest(KeyTriggerEvent& keyTriggerEvent);
-        void OnAxisTest(InputValue inputValue);
+        void OnKeyTest(KeyboardKeyEvent& keyTriggerEvent);
         void OnMouseKeyTest(MouseButtonEvent& mouseButtonEvent);
         void OnMouseScrollTest(MouseScrollEvent& mouseScrollEvent);
         void OnMouseMoveTest(MouseMovementEvent& mouseMovementEvent);
 
         Window& GetWindow() const { return *_window; }
-        InputManager& GetInputManager() const { return *_inputManager.get(); }
+        InputHandler& GetInputHandler() const { return *_inputHandler; }
+        SubsystemCollection& GetSubsystemCollection() const { return *_subsystemCollection; }
 
         static Application& Get() { return *_appInstance; }
 
@@ -48,7 +50,8 @@ namespace Engine
     private:
         ApplicationSpecification _appSpec;
         std::unique_ptr<Window> _window;
-        std::unique_ptr<InputManager> _inputManager;
+        std::unique_ptr<InputHandler> _inputHandler;
+        std::unique_ptr<SubsystemCollection> _subsystemCollection;
         bool _isRunning = true;
 
         static Application* _appInstance;
