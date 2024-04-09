@@ -41,6 +41,8 @@ namespace Engine
 
         std::shared_ptr<Scene> GetActiveScene() { return _activeScene; }
 
+        void CreateTestScene();
+
     protected:
         std::string _debugName;
 

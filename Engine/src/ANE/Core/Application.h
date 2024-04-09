@@ -27,6 +27,8 @@ namespace Engine
         void Run();
         void Shutdown();
 
+        void PushLayer(Layer* layer);
+
         void OnEvent(Event& e);
         void OnWindowResize(WindowResizeEvent& e);
         void OnWindowMove(WindowMovedEvent& e);

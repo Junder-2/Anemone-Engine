@@ -14,6 +14,7 @@ void Engine::LayerStack::PushLayer(Layer* layer)
 {
     _layers.emplace(_layers.begin() + _layerInsertIndex, layer);
     _layerInsertIndex++;
+
 }
 
 void Engine::LayerStack::PopLayer(Layer* layer)
