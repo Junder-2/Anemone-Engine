@@ -148,6 +148,8 @@ namespace Engine
         SetupVulkanWindow(wd, _surface, w, h);
 
         SetupCommandBuffers();
+
+        SetupSyncStructures();
     }
 
     void VulkanRenderer::SetupImGui(SDL_Window* window)
