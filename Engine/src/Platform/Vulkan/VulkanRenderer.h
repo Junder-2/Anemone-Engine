@@ -103,7 +103,7 @@ namespace Engine
         inline static ImVec4 ClearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     private:
-        SDL_Window* _window;
+        inline static SDL_Window* _window;
 
         bool _initialized = false;
 

@@ -17,9 +17,9 @@
 
 namespace Engine
 {
-    VulkanRenderer::VulkanRenderer(SDL_Window* window) : _window(window)
+    VulkanRenderer::VulkanRenderer(SDL_Window* window)
     {
-
+        _window = window;
     }
 
     void VulkanRenderer::Setup()
