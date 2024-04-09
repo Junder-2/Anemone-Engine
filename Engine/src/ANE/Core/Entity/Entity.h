@@ -54,9 +54,9 @@ namespace Engine
             return !(*this == other);
         }
 
-    private:
         template <typename T>
         std::enable_if_t<std::is_base_of_v<Component, T>, T&> GetComponent();
+    private:
 
         entt::entity EntityHandle = {entt::null};
         Scene* SceneHandle = nullptr;
