@@ -5,7 +5,6 @@
 
 namespace Engine
 {
-    //Todo: use a abstract service locator
     class InputSystem : public Subsystem
     {
     public:

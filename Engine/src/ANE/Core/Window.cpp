@@ -7,7 +7,7 @@
 #include <VkBootstrap.h>
 
 #include "Application.h"
-#include "ANE/Input/InputSystem.h"
+#include "ANE/Input/Input.h"
 #include "ANE/Utilities/InputUtilities.h"
 #include "Platform/Vulkan/VulkanRenderer.h"
 
@@ -257,7 +257,7 @@ namespace Engine
 
     void Window::ShowInputDebugOverlay(bool* pOpen)
     {
-        const InputSystem* inputManager = &InputUtilities::GetInputSystem();
+        const InputSystem* inputManager = &GetInputSystem();
         static int location = 0;
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoDocking;
         if (location >= 0)

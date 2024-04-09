@@ -6,8 +6,8 @@
 #include <SDL_timer.h>
 
 #include "ANE/Events/EventHandler.h"
-#include "ANE/Input/InputSystem.h"
 #include "ANE/Subsystem/SubsystemCollection.h"
+#include "ANE/Input/Input.h"
 #include "ANE/Utilities/InputUtilities.h"
 #include "Layers/Layer.h"
 #include "Entity/Entity.h"
