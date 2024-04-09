@@ -126,6 +126,38 @@ namespace Engine
         CreatePipeline(logicalDevice);
         //const PipelineWrapper pipeline = CreatePipeline(logicalDevice);
         //_trianglePipeline = pipeline.Pipeline;
+
+        // TODO: Import geometry data.
+        {
+            std::array<Vertex, 4> rectVertices;
+
+            rectVertices[0].Position = { .5,-.5, 0 };
+            rectVertices[1].Position = { .5, .5, 0 };
+            rectVertices[2].Position = {-.5,-.5, 0 };
+            rectVertices[3].Position = {-.5, .5, 0 };
+
+            rectVertices[0].Color = {.9,.9, 1, 1 };
+            rectVertices[1].Color = { 1, 0,.5, 1 };
+            rectVertices[2].Color = { 0, 1,.5, 1 };
+            rectVertices[3].Color = { 0, 0, 0, 1 };
+
+            std::array<uint32_t, 6> rectIndices;
+
+            rectIndices[0] = 0;
+            rectIndices[1] = 1;
+            rectIndices[2] = 2;
+
+            rectIndices[3] = 2;
+            rectIndices[4] = 1;
+            rectIndices[5] = 3;
+
+            _rectangleMesh = UploadMesh(rectIndices, rectVertices);
+            _mainDeletionQueue.PushFunction([]
+            {
+                DestroyBuffer(_rectangleMesh.IndexBuffer);
+                DestroyBuffer(_rectangleMesh.VertexBuffer);
+            });
+        }
     }
 
     void VulkanRenderer::SetupImGui(SDL_Window* window)

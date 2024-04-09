@@ -171,6 +171,8 @@ namespace Engine
         inline static VulkanFrame _frameData[3];
         inline static VulkanImmediateBuffer _immBuffer;
 
+        inline static VmaMeshBuffers _rectangleMesh;
+
         // ImGui
         inline static ImGui_ImplVulkanH_Window _mainWindowData;
         inline static uint32_t _minImageCount = 3;
