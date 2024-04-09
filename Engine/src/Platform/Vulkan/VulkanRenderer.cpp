@@ -505,23 +505,23 @@ namespace Engine
     PipelineWrapper VulkanRenderer::CreatePipeline(const vkb::Device& logicalDevice)
     {
         VkShaderModule meshVertShader;
-        if (!VulkanUtils::LoadShaderModule("../shaders/vertex_color.vert.spv", _device, _allocator, &meshVertShader))
+        if (!VulkanUtils::LoadShaderModule("../shaders/triangle_mesh.vert.spv", _device, _allocator, &meshVertShader))
         {
             ANE_ENGINE_LOG_ERROR("Error when building the triangle vertex shader module");
         }
         else
         {
-            ANE_ENGINE_LOG_INFO("Loaded shader module: vertex_color.vert.spv");
+            ANE_ENGINE_LOG_INFO("Loaded shader module: triangle_mesh.vert.spv");
         }
 
         VkShaderModule meshFragShader;
-        if (!VulkanUtils::LoadShaderModule("../shaders/vertex_color.frag.spv", _device, _allocator, &meshFragShader))
+        if (!VulkanUtils::LoadShaderModule("../shaders/triangle_mesh.frag.spv", _device, _allocator, &meshFragShader))
         {
             ANE_ENGINE_LOG_ERROR("Error when building the triangle fragment shader module.");
         }
         else
         {
-            ANE_ENGINE_LOG_INFO("Loaded shader module: vertex_color.frag.spv");
+            ANE_ENGINE_LOG_INFO("Loaded shader module: triangle_mesh.frag.spv");
         }
 
         VkPushConstantRange bufferRange;
