@@ -630,6 +630,41 @@ namespace Engine
         _frameIndex++;
     }
 
+    void VulkanRenderer::DrawGeometry(VkCommandBuffer cmd)
+    {
+        _drawExtent.height = std::min(_swapchainExtent.height, _colorImage.ImageExtent.height);
+        _drawExtent.width = std::min(_swapchainExtent.width, _colorImage.ImageExtent.width);
+
+        VkRenderingAttachmentInfo colorAttachment = VulkanInitializers::AttachmentInfo(_colorImage.ImageView, &_mainWindowData.ClearValue, VK_IMAGE_LAYOUT_GENERAL);
+        VkRenderingAttachmentInfo depthAttachment = VulkanInitializers::DepthAttachmentInfo(_depthImage.ImageView, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
+        VkRenderingInfo renderInfo = VulkanInitializers::RenderingInfo(_drawExtent, &colorAttachment, &depthAttachment);
+        vkCmdBeginRendering(cmd, &renderInfo);
+
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _meshPipeline);
+
+        VkViewport viewport;
+        viewport.x = 0;
+        viewport.y = 0;
+        viewport.width = (float)_drawExtent.width;
+        viewport.height = (float)_drawExtent.height;
+        viewport.minDepth = 0.f;
+        viewport.maxDepth = 1.f;
+
+        vkCmdSetViewport(cmd, 0, 1, &viewport);
+
+        VkRect2D scissor;
+        scissor.offset.x = 0;
+        scissor.offset.y = 0;
+        scissor.extent.width = _drawExtent.width;
+        scissor.extent.height = _drawExtent.height;
+
+        vkCmdSetScissor(cmd, 0, 1, &scissor);
+
+        vkCmdDraw(cmd, 3, 1, 0, 0);
+
+        vkCmdEndRendering(cmd);
+    }
+
     // TODO: Fully integrate ImGui into rendering loop.
     void VulkanRenderer::DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView)
     {

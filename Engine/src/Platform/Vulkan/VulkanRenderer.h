@@ -91,6 +91,7 @@ namespace Engine
         static void CreateImGuiDescriptorPool();
 
         inline static void Draw(const WindowProperties& props);
+        inline static void DrawGeometry(VkCommandBuffer cmd);
         inline static void DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView);
 
         static void CleanupVulkan();
@@ -159,7 +160,7 @@ namespace Engine
         inline static VkSwapchainKHR _swapchain;
         inline static VkFormat _swapchainImageFormat;
         inline static VkExtent2D _swapchainExtent;
-        //inline static VkExtent2D _drawExtent;
+        inline static VkExtent2D _drawExtent;
         inline static std::vector<VkImage> _swapchainImages;
         inline static std::vector<VkImageView> _swapchainImageViews;
 
