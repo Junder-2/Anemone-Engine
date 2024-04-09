@@ -43,14 +43,16 @@ namespace Engine
             return;
         }
 
-        if (_swapChainRebuild)
+        return;
+
+        if (_rebuildSwapchain)
         {
             if (props.Width > 0 && props.Height > 0)
             {
                 ImGui_ImplVulkan_SetMinImageCount(_minImageCount);
                 ImGui_ImplVulkanH_CreateOrResizeWindow(_instance, _physicalDevice, _device, &_mainWindowData, _queueFamily.GraphicsFamily.value(), _allocator, props.Width, props.Height, _minImageCount);
                 _mainWindowData.FrameIndex = 0;
-                _swapChainRebuild = false;
+                _rebuildSwapchain = false;
             }
         }
 
@@ -59,7 +61,7 @@ namespace Engine
         //ImGui::NewFrame();
     }
 
-    void VulkanRenderer::EndFrame()
+    void VulkanRenderer::EndFrame(const WindowProperties& props)
     {
         if (!_initialized)
         {
@@ -76,7 +78,8 @@ namespace Engine
             _mainWindowData.ClearValue.color.float32[1] = ClearColor.y * ClearColor.w;
             _mainWindowData.ClearValue.color.float32[2] = ClearColor.z * ClearColor.w;
             _mainWindowData.ClearValue.color.float32[3] = ClearColor.w;
-            RenderFrame(&_mainWindowData, drawData);
+            Draw(props);
+            //RenderFrame(&_mainWindowData, drawData);
         }
 
         // Update and Render additional Platform Windows
@@ -86,10 +89,10 @@ namespace Engine
         //    ImGui::RenderPlatformWindowsDefault();
         //}
 
-        if (!isMinimized)
-        {
-            RevealFrame(&_mainWindowData);
-        }
+        //if (!isMinimized)
+        //{
+        //    RevealFrame(&_mainWindowData);
+        //}
     }
 
     void VulkanRenderer::Cleanup()
@@ -139,15 +142,16 @@ namespace Engine
         _queue = queueResult.value();
 
         CreateVmaAllocator();
-        //const PipelineWrapper pipeline = CreatePipeline(logicalDevice);
-        //_trianglePipeline = pipeline.Pipeline;
 
-        int w, h;
-        SDL_GetWindowSize(window, &w, &h);
-        ImGui_ImplVulkanH_Window* wd = &_mainWindowData;
-        SetupVulkanWindow(wd, _surface, w, h);
+        SetupSwapchain();
 
         SetupCommandBuffers();
+
+        SetupSyncStructures();
+
+        CreatePipeline(logicalDevice);
+        //const PipelineWrapper pipeline = CreatePipeline(logicalDevice);
+        //_trianglePipeline = pipeline.Pipeline;
     }
 
     void VulkanRenderer::SetupImGui(SDL_Window* window)
@@ -160,7 +164,7 @@ namespace Engine
         _io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
         _io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
         _io->ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
-        _io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
+        //_io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows. Doesn't seem to like custom swapchains.
         //_io->ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
         //_io->ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
@@ -192,8 +196,16 @@ namespace Engine
         initInfo.RenderPass = wd->RenderPass;
         initInfo.Subpass = 0;
         initInfo.MinImageCount = _minImageCount;
-        initInfo.ImageCount = wd->ImageCount;
+        initInfo.ImageCount = _minImageCount;
         initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+
+        initInfo.UseDynamicRendering = true;
+        VkPipelineRenderingCreateInfoKHR renderingInfo{ .sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR, .pNext = nullptr };
+        renderingInfo.colorAttachmentCount = 1;
+        const VkFormat colorFormat = { _swapchainImageFormat };
+        renderingInfo.pColorAttachmentFormats = &colorFormat;
+        initInfo.PipelineRenderingCreateInfo = renderingInfo;
+
         initInfo.Allocator = _allocator;
         initInfo.CheckVkResultFn = CheckVkResult;
 
@@ -313,10 +325,135 @@ namespace Engine
         return logicalDevice;
     }
 
+    void VulkanRenderer::SetupSwapchain()
+    {
+        int w, h;
+        SDL_GetWindowSize(_window, &w, &h);
+        _windowExtent.width = w;
+        _windowExtent.height = h;
+
+        vkb::Swapchain swapchain = CreateSwapchain(w, h);
+        _swapchainExtent = swapchain.extent;
+        _swapchain = swapchain.swapchain;
+        _swapchainImages = swapchain.get_images().value();
+        _swapchainImageViews = swapchain.get_image_views().value();
+
+        const VkExtent3D imageExtent = { (uint32_t)w, (uint32_t)h, 1 };
+
+        // Setup color buffer.
+        _colorImage.ImageFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
+        _colorImage.ImageExtent = imageExtent;
+
+        VkImageUsageFlags drawImageUsages{};
+        drawImageUsages |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+        drawImageUsages |= VK_IMAGE_USAGE_STORAGE_BIT;
+        drawImageUsages |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+        const VkImageCreateInfo cImgInfo = VulkanInitializers::ImageCreateInfo(_colorImage.ImageFormat, drawImageUsages, imageExtent);
+
+        VmaAllocationCreateInfo cImgAllocInfo = { };
+        cImgAllocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+        cImgAllocInfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+        CheckVkResult(vmaCreateImage(_vmaAllocator, &cImgInfo, &cImgAllocInfo, &_colorImage.Image, &_colorImage.Allocation, nullptr));
+
+        const VkImageViewCreateInfo cViewInfo = VulkanInitializers::ImageViewCreateInfo(_colorImage.ImageFormat, _colorImage.Image, VK_IMAGE_ASPECT_COLOR_BIT);
+
+        CheckVkResult(vkCreateImageView(_device, &cViewInfo, _allocator, &_colorImage.ImageView));
+
+        // Setup depth buffer.
+        _depthImage.ImageFormat = VK_FORMAT_D32_SFLOAT;
+        _depthImage.ImageExtent = imageExtent;
+
+        VkImageUsageFlags depthImageUsages{};
+        depthImageUsages |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+
+        const VkImageCreateInfo dImgInfo = VulkanInitializers::ImageCreateInfo(_depthImage.ImageFormat, depthImageUsages, imageExtent);
+
+        CheckVkResult(vmaCreateImage(_vmaAllocator, &dImgInfo, &cImgAllocInfo, &_depthImage.Image, &_depthImage.Allocation, nullptr));
+
+        const VkImageViewCreateInfo dViewInfo = VulkanInitializers::ImageViewCreateInfo(_depthImage.ImageFormat, _depthImage.Image, VK_IMAGE_ASPECT_DEPTH_BIT);
+
+        CheckVkResult(vkCreateImageView(_device, &dViewInfo, _allocator, &_depthImage.ImageView));
+
+        // Cleanup.
+        _mainDeletionQueue.PushFunction([=]
+        {
+            vkDestroyImageView(_device, _colorImage.ImageView, _allocator);
+            vmaDestroyImage(_vmaAllocator, _colorImage.Image, _colorImage.Allocation);
+
+            vkDestroyImageView(_device, _depthImage.ImageView, _allocator);
+            vmaDestroyImage(_vmaAllocator, _depthImage.Image, _depthImage.Allocation);
+        });
+    }
+
+    vkb::Swapchain VulkanRenderer::CreateSwapchain(const uint32_t width, const uint32_t height)
+    {
+        vkb::SwapchainBuilder builder{_physicalDevice, _device, _surface};
+
+        _swapchainImageFormat = VK_FORMAT_B8G8R8A8_UNORM;
+
+        const vkb::Swapchain swapchain = builder
+             .set_desired_format(VkSurfaceFormatKHR{ .format = _swapchainImageFormat, .colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR })
+             .set_desired_present_mode(VK_PRESENT_MODE_FIFO_KHR)
+
+             .set_desired_extent(width, height)
+             .add_image_usage_flags(VK_IMAGE_USAGE_TRANSFER_DST_BIT)
+
+             .build()
+             .value();
+
+        return swapchain;
+    }
+
+    void VulkanRenderer::DestroySwapchain()
+    {
+        vkDestroySwapchainKHR(_device, _swapchain, _allocator);
+        for (const VkImageView& swapchainImageView : _swapchainImageViews)
+        {
+            vkDestroyImageView(_device, swapchainImageView, _allocator);
+        }
+    }
+
+    void VulkanRenderer::ResizeSwapchain()
+    {
+        vkDeviceWaitIdle(_device);
+
+        DestroySwapchain();
+
+        int w, h;
+        SDL_GetWindowSize(_window, &w, &h);
+        _windowExtent.width = w;
+        _windowExtent.height = h;
+
+        vkb::Swapchain swapchain = CreateSwapchain(w, h);
+        _swapchainExtent = swapchain.extent;
+        _swapchain = swapchain.swapchain;
+        _swapchainImages = swapchain.get_images().value();
+        _swapchainImageViews = swapchain.get_image_views().value();
+
+        _rebuildSwapchain = false;
+    }
+
     void VulkanRenderer::SetupCommandBuffers()
     {
         const uint32_t familyIndex = _queueFamily.GraphicsFamily.value();
         const VkCommandPoolCreateInfo commandPoolInfo = VulkanInitializers::CommandPoolCreateInfo(familyIndex, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
+
+        // Frame buffers.
+        for (VulkanFrame& frame : _frameData)
+        {
+            CheckVkResult(vkCreateCommandPool(_device, &commandPoolInfo, _allocator, &frame.CommandPool));
+
+            VkCommandBufferAllocateInfo cmdAllocInfo = VulkanInitializers::CommandBufferAllocateInfo(frame.CommandPool, 1);
+
+            CheckVkResult(vkAllocateCommandBuffers(_device, &cmdAllocInfo, &frame.CommandBuffer));
+
+            _mainDeletionQueue.PushFunction([=]
+            {
+                vkDestroyCommandPool(_device, frame.CommandPool, _allocator);
+            });
+        }
 
         // Immediate buffer.
         CheckVkResult(vkCreateCommandPool(_device, &commandPoolInfo, _allocator, &_immBuffer.CommandPool));
@@ -331,28 +468,87 @@ namespace Engine
         });
     }
 
+    void VulkanRenderer::SetupSyncStructures()
+    {
+        const VkFenceCreateInfo fenceCreateInfo = VulkanInitializers::FenceCreateInfo(VK_FENCE_CREATE_SIGNALED_BIT);
+        CheckVkResult(vkCreateFence(_device, &fenceCreateInfo, _allocator, &_immBuffer.Fence));
+
+        _mainDeletionQueue.PushFunction([=]
+        {
+            vkDestroyFence(_device, _immBuffer.Fence, _allocator);
+        });
+
+        for (VulkanFrame& frame : _frameData)
+        {
+            CheckVkResult(vkCreateFence(_device, &fenceCreateInfo, _allocator, &frame.Fence));
+
+            VkSemaphoreCreateInfo semaphoreCreateInfo = VulkanInitializers::SemaphoreCreateInfo();
+
+            CheckVkResult(vkCreateSemaphore(_device, &semaphoreCreateInfo, _allocator, &frame.SwapchainSemaphore));
+            CheckVkResult(vkCreateSemaphore(_device, &semaphoreCreateInfo, _allocator, &frame.RenderSemaphore));
+
+            _mainDeletionQueue.PushFunction([=]
+            {
+                vkDestroyFence(_device, frame.Fence, _allocator);
+                vkDestroySemaphore(_device, frame.SwapchainSemaphore, _allocator);
+                vkDestroySemaphore(_device, frame.RenderSemaphore, _allocator);
+            });
+        }
+    }
+
     PipelineWrapper VulkanRenderer::CreatePipeline(const vkb::Device& logicalDevice)
     {
-        VkPipelineLayout pipelineLayout = VK_NULL_HANDLE; // Dummy for now
-        VkShaderModule triangleVertShader; // Dummy for now
-        VkShaderModule triangleFragShader; // Dummy for now
-        VmaImage drawImage = { }; // Dummy for now
+        VkShaderModule meshVertShader;
+        if (!VulkanUtils::LoadShaderModule("../shaders/triangle_mesh.vert.spv", _device, _allocator, &meshVertShader))
+        {
+            ANE_ENGINE_LOG_ERROR("Error when building the triangle vertex shader module");
+        }
+        else
+        {
+            ANE_ENGINE_LOG_INFO("Loaded shader module: vertex_color.vert.spv");
+        }
 
-        VulkanPipelineBuilder builder{ logicalDevice, pipelineLayout };
+        VkShaderModule meshFragShader;
+        if (!VulkanUtils::LoadShaderModule("../shaders/triangle_mesh.frag.spv", _device, _allocator, &meshFragShader))
+        {
+            ANE_ENGINE_LOG_ERROR("Error when building the triangle fragment shader module.");
+        }
+        else
+        {
+            ANE_ENGINE_LOG_INFO("Loaded shader module: vertex_color.frag.spv");
+        }
+
+        VkPushConstantRange bufferRange;
+        bufferRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        bufferRange.offset = 0;
+        bufferRange.size = sizeof(PushConstantBuffer);
+
+        VkPipelineLayoutCreateInfo pipelineLayoutInfo = VulkanInitializers::PipelineLayoutCreateInfo();
+        pipelineLayoutInfo.pPushConstantRanges = &bufferRange;
+        pipelineLayoutInfo.pushConstantRangeCount = 1;
+
+        CheckVkResult(vkCreatePipelineLayout(_device, &pipelineLayoutInfo, _allocator, &_pipelineLayout));
+
+        VulkanPipelineBuilder builder{ logicalDevice, _pipelineLayout };
         vkb::Result<PipelineWrapper> pipeline = builder
-            .SetShaders(triangleVertShader, triangleFragShader)
+            .SetShaders(meshVertShader, meshFragShader)
             .SetBlendMode(None)
             .SetDepthTestOperator(VK_COMPARE_OP_ALWAYS)
 
-            .SetColorFormat(drawImage.ImageFormat)
+            .SetColorFormat(_colorImage.ImageFormat)
             .SetDepthFormat(VK_FORMAT_UNDEFINED)
 
             .SetAllocationCallbacks(_allocator)
             .Build();
+        _meshPipeline = pipeline->Pipeline;
+
+        // Cleanup.
+        vkDestroyShaderModule(_device, meshFragShader, _allocator);
+        vkDestroyShaderModule(_device, meshVertShader, _allocator);
 
         _mainDeletionQueue.PushFunction([&]
         {
-            vkDestroyPipelineLayout(_device, pipelineLayout, _allocator);
+            vkDestroyPipelineLayout(_device, _pipelineLayout, _allocator);
             vkDestroyPipeline(_device, _meshPipeline, _allocator);
         });
 
@@ -410,12 +606,92 @@ namespace Engine
         _mainDeletionQueue.PushFunction([&]{ vkDestroyDescriptorPool(_device, _imGuiDescriptorPool, _allocator); });
     }
 
+    void VulkanRenderer::Draw(const WindowProperties& props)
+    {
+        if (_rebuildSwapchain)
+        {
+            if (props.Width > 0 && props.Height > 0)
+            {
+                ResizeSwapchain();
+            }
+        }
+
+        ImDrawData* drawData = ImGui::GetDrawData();
+        const bool isMinimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
+        if (isMinimized)
+        {
+            return;
+        }
+
+        const VulkanFrame frame = GetFrame();
+        CheckVkResult(vkWaitForFences(_device, 1, &frame.Fence, true, 1000000000));
+
+        uint32_t swapchainImageIndex;
+        VkResult result = vkAcquireNextImageKHR(_device, _swapchain, 1000000000, frame.SwapchainSemaphore, nullptr, &swapchainImageIndex);
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+        {
+            _rebuildSwapchain = true;
+            return;
+        }
+
+        CheckVkResult(vkResetFences(_device, 1, &frame.Fence));
+
+        const VkCommandBuffer cmd = frame.CommandBuffer;
+
+        CheckVkResult(vkResetCommandBuffer(cmd, 0));
+        const VkCommandBufferBeginInfo cmdBeginInfo = VulkanInitializers::CommandBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+        CheckVkResult(vkBeginCommandBuffer(cmd, &cmdBeginInfo));
+
+        VulkanUtils::TransitionImage(cmd, _colorImage.Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+        VulkanUtils::TransitionImage(cmd, _depthImage.Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
+
+        // TODO: Draw geometry here.
+
+        VulkanUtils::TransitionImage(cmd, _colorImage.Image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+        const VkImage& swapchainImage = _swapchainImages[swapchainImageIndex];
+        VulkanUtils::TransitionImage(cmd, swapchainImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+        VulkanUtils::TransitionImage(cmd, swapchainImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+
+        DrawImGui(cmd, _swapchainImageViews[swapchainImageIndex]);
+
+        VulkanUtils::TransitionImage(cmd, swapchainImage, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+
+        CheckVkResult(vkEndCommandBuffer(cmd));
+
+        const VkCommandBufferSubmitInfo cmdInfo = VulkanInitializers::CommandBufferSubmitInfo(cmd);
+        const VkSemaphoreSubmitInfo waitInfo = VulkanInitializers::SemaphoreSubmitInfo(VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR, frame.SwapchainSemaphore);
+        const VkSemaphoreSubmitInfo signalInfo = VulkanInitializers::SemaphoreSubmitInfo(VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT, frame.RenderSemaphore);
+
+        const VkSubmitInfo2 submitInfo = VulkanInitializers::SubmitInfo(&cmdInfo, &signalInfo, &waitInfo);
+
+        CheckVkResult(vkQueueSubmit2(_queue, 1, &submitInfo, frame.Fence));
+
+        VkPresentInfoKHR presentInfo = VulkanInitializers::PresentInfo();
+
+        presentInfo.waitSemaphoreCount = 1;
+        presentInfo.pWaitSemaphores = &frame.RenderSemaphore;
+
+        presentInfo.swapchainCount = 1;
+        presentInfo.pSwapchains = &_swapchain;
+
+        presentInfo.pImageIndices = &swapchainImageIndex;
+
+        result = vkQueuePresentKHR(_queue, &presentInfo);
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            _rebuildSwapchain = true;
+            return;
+        }
+
+        _frameIndex++;
+    }
+
     // TODO: Fully integrate ImGui into rendering loop.
     void VulkanRenderer::DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView)
     {
-        VkExtent2D windowExtent { 0, 0 }; // Placeholder.
-        VkRenderingAttachmentInfo colorAttachment = VulkanInitializers::AttachmentInfo(targetImageView, nullptr, VK_IMAGE_LAYOUT_GENERAL);
-        VkRenderingInfo renderInfo = VulkanInitializers::RenderingInfo(windowExtent, &colorAttachment, nullptr);
+        VkRenderingAttachmentInfo colorAttachment = VulkanInitializers::AttachmentInfo(targetImageView, &_mainWindowData.ClearValue, VK_IMAGE_LAYOUT_GENERAL);
+        VkRenderingInfo renderInfo = VulkanInitializers::RenderingInfo(_windowExtent, &colorAttachment, nullptr);
 
         vkCmdBeginRendering(cmd, &renderInfo);
 
@@ -432,7 +708,7 @@ namespace Engine
         VkResult err = vkAcquireNextImageKHR(_device, wd->Swapchain, UINT64_MAX, imageAcquiredSemaphore, VK_NULL_HANDLE, &wd->FrameIndex);
         if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR)
         {
-            _swapChainRebuild = true;
+            _rebuildSwapchain = true;
             return;
         }
         CheckVkResult(err);
@@ -497,7 +773,7 @@ namespace Engine
     // TODO: Figure out what most of this code does.
     void VulkanRenderer::RevealFrame(ImGui_ImplVulkanH_Window* wd)
     {
-        if (_swapChainRebuild) return;
+        if (_rebuildSwapchain) return;
 
         VkSemaphore renderCompleteSemaphore = wd->FrameSemaphores[wd->SemaphoreIndex].RenderCompleteSemaphore;
 
@@ -512,7 +788,7 @@ namespace Engine
         VkResult err = vkQueuePresentKHR(_queue, &info);
         if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR)
         {
-            _swapChainRebuild = true;
+            _rebuildSwapchain = true;
             return;
         }
         CheckVkResult(err);
@@ -527,6 +803,10 @@ namespace Engine
 
         _mainDeletionQueue.Flush();
 
+        DestroySwapchain();
+
+        vkDestroySurfaceKHR(_instance, _surface, _allocator);
+
         vmaDestroyAllocator(_vmaAllocator);
 
         vkDestroyDevice(_device, _allocator);
@@ -540,6 +820,11 @@ namespace Engine
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplSDL2_Shutdown();
         ImGui::DestroyContext();
+    }
+
+    VulkanFrame VulkanRenderer::GetFrame()
+    {
+        return _frameData[_frameIndex % 3];
     }
 
     void VulkanRenderer::CreateVmaAllocator()
@@ -605,7 +890,7 @@ namespace Engine
         VkImageViewCreateInfo viewInfo = VulkanInitializers::ImageViewCreateInfo(format, newImage.Image, aspectFlag);
         viewInfo.subresourceRange.levelCount = imgInfo.mipLevels;
 
-        CheckVkResult(vkCreateImageView(_device, &viewInfo, nullptr, &newImage.ImageView));
+        CheckVkResult(vkCreateImageView(_device, &viewInfo, _allocator, &newImage.ImageView));
 
         return newImage;
     }

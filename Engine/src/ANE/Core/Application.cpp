@@ -26,7 +26,6 @@ namespace Engine
     {
         _appInstance = this;
 
-
         Init();
 
 
@@ -44,6 +43,8 @@ namespace Engine
         _inputHandler->BindOnEvent(MakeDelegate(this, &Application::OnEvent));
 
         _subsystemCollection = SubsystemCollection::Create();
+
+        Renderer::Init(_window->GetWindowContext());
     }
 
     void Application::Run()

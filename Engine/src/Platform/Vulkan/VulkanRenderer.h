@@ -19,11 +19,29 @@ namespace Engine
 {
     struct WindowProperties;
 
+    struct VulkanFrame
+    {
+        VkCommandPool CommandPool;
+        VkCommandBuffer CommandBuffer;
+
+        VkSemaphore SwapchainSemaphore, RenderSemaphore;
+        VkFence Fence;
+
+        VkImageView BackbufferView;
+        VkFramebuffer Framebuffer;
+    };
+
     struct VulkanImmediateBuffer
     {
         VkFence Fence;
         VkCommandBuffer CommandBuffer;
         VkCommandPool CommandPool;
+    };
+
+    struct PushConstantBuffer
+    {
+        glm::mat4 WorldMatrix;
+        VkDeviceAddress VertexBuffer;
     };
 
     class VulkanRenderer
@@ -42,7 +60,7 @@ namespace Engine
 
         void Setup();
         void NewFrame(const WindowProperties& props);
-        void EndFrame();
+        void EndFrame(const WindowProperties& props);
         void Cleanup();
 
         float GetFramerate();
@@ -61,7 +79,13 @@ namespace Engine
         static vkb::PhysicalDevice SelectVkbPhysicalDevice(VkSurfaceKHR surface, vkb::Instance instance);
         static vkb::Device CreateVkbLogicalDevice(const vkb::PhysicalDevice& physicalDevice);
 
+        static void SetupSwapchain();
+        static vkb::Swapchain CreateSwapchain(uint32_t width, uint32_t height);
+        static void DestroySwapchain();
+        static void ResizeSwapchain();
+
         static void SetupCommandBuffers();
+        static void SetupSyncStructures();
 
         static PipelineWrapper CreatePipeline(const vkb::Device& logicalDevice);
 
@@ -69,6 +93,7 @@ namespace Engine
 
         static void CreateImGuiDescriptorPool();
 
+        inline static void Draw(const WindowProperties& props);
         inline static void DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView);
 
         inline static void RenderFrame(ImGui_ImplVulkanH_Window* wd, ImDrawData* drawData);
@@ -76,6 +101,8 @@ namespace Engine
 
         static void CleanupVulkan();
         static void CleanupImGui();
+
+        static VulkanFrame GetFrame();
 
         // VMA
         // TODO: Isolate VMA code to separate file/class.
@@ -104,8 +131,10 @@ namespace Engine
 
     private:
         inline static SDL_Window* _window;
+        inline static VkExtent2D _windowExtent;
 
         bool _initialized = false;
+        inline static bool _rebuildSwapchain;
 
         // Vulkan
         #ifdef NDEBUG
@@ -127,16 +156,29 @@ namespace Engine
         inline static VkQueue _queue = VK_NULL_HANDLE;
         inline static VkPipelineCache _pipelineCache = VK_NULL_HANDLE;
         inline static VkPipeline _meshPipeline = VK_NULL_HANDLE;
+        inline static VkPipelineLayout _pipelineLayout;
+
+        inline static VmaImage _colorImage;
+        inline static VmaImage _depthImage;
+
+        // Swapchain
+        inline static VkSwapchainKHR _swapchain;
+        inline static VkFormat _swapchainImageFormat;
+        inline static VkExtent2D _swapchainExtent;
+        //inline static VkExtent2D _drawExtent;
+        inline static std::vector<VkImage> _swapchainImages;
+        inline static std::vector<VkImageView> _swapchainImageViews;
 
         // VMA
         inline static VmaAllocator _vmaAllocator;
 
+        inline static int _frameIndex = 0;
+        inline static VulkanFrame _frameData[3];
         inline static VulkanImmediateBuffer _immBuffer;
 
         // ImGui
         inline static ImGui_ImplVulkanH_Window _mainWindowData;
-        inline static uint32_t _minImageCount = 2;
-        inline static bool _swapChainRebuild = false;
+        inline static uint32_t _minImageCount = 3;
 
         inline static VkDescriptorPool _imGuiDescriptorPool = VK_NULL_HANDLE;
 
