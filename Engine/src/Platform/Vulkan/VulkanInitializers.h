@@ -17,6 +17,7 @@ namespace VulkanInitializers
     VkSemaphoreSubmitInfo SemaphoreSubmitInfo(VkPipelineStageFlags2 stageMask, VkSemaphore semaphore);
 
     VkSubmitInfo2 SubmitInfo(const VkCommandBufferSubmitInfo* cmd, const VkSemaphoreSubmitInfo* signalSemaphoreInfo, const VkSemaphoreSubmitInfo* waitSemaphoreInfo);
+    VkPresentInfoKHR PresentInfo();
 
     VkRenderingAttachmentInfo AttachmentInfo(VkImageView view, const VkClearValue* clear, VkImageLayout layout);
     VkRenderingAttachmentInfo DepthAttachmentInfo(VkImageView view, VkImageLayout layout);

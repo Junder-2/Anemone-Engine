@@ -90,6 +90,19 @@ namespace VulkanInitializers
         return info;
     }
 
+    VkPresentInfoKHR PresentInfo()
+    {
+        VkPresentInfoKHR info = { .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR, .pNext = nullptr };
+
+        info.waitSemaphoreCount = 0;
+        info.pWaitSemaphores = nullptr;
+        info.swapchainCount = 0;
+        info.pSwapchains = nullptr;
+        info.pImageIndices = nullptr;
+
+        return info;
+    }
+
     VkRenderingAttachmentInfo AttachmentInfo(const VkImageView view, const VkClearValue* clear, const VkImageLayout layout)
     {
         VkRenderingAttachmentInfo colorAttachment = { .sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO, .pNext = nullptr };
