@@ -590,16 +590,19 @@ namespace Engine
 
         // TODO: Draw geometry here.
 
+        // Prepare and copy color buffer into the active swapchain buffer.
         VulkanUtils::TransitionImage(cmd, _colorImage.Image, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
         const VkImage& swapchainImage = _swapchainImages[swapchainImageIndex];
         VulkanUtils::TransitionImage(cmd, swapchainImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
         VulkanUtils::CopyImageToImage(cmd, _colorImage.Image, swapchainImage,_drawExtent ,_swapchainExtent);
 
+        // Prepare and draw ImGui into active swapchain buffer.
         VulkanUtils::TransitionImage(cmd, swapchainImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
         DrawImGui(cmd, _swapchainImageViews[swapchainImageIndex]);
 
+        // Prepare and present active swapchain buffer.
         VulkanUtils::TransitionImage(cmd, swapchainImage, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
         CheckVkResult(vkEndCommandBuffer(cmd));
