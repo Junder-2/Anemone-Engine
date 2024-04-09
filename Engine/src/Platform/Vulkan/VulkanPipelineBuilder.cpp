@@ -67,6 +67,7 @@ namespace Engine
         VkPipelineRenderingCreateInfo renderingInfo = { VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO };
         renderingInfo.colorAttachmentCount = 1;
         renderingInfo.pColorAttachmentFormats = &_info.ColorAttachmentFormat;
+        renderingInfo.depthAttachmentFormat = _info.DepthAttachmentFormat;
 
         VkGraphicsPipelineCreateInfo pipelineInfo = { VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO };
         pipelineInfo.pNext = &renderingInfo;
