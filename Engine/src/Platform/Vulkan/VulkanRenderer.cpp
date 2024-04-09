@@ -199,6 +199,14 @@ namespace Engine
         initInfo.MinImageCount = _minImageCount;
         initInfo.ImageCount = _minImageCount;
         initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+
+        initInfo.UseDynamicRendering = true;
+        VkPipelineRenderingCreateInfoKHR renderingInfo{ .sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO_KHR, .pNext = nullptr };
+        renderingInfo.colorAttachmentCount = 1;
+        const VkFormat colorFormat = { _swapchainImageFormat };
+        renderingInfo.pColorAttachmentFormats = &colorFormat;
+        initInfo.PipelineRenderingCreateInfo = renderingInfo;
+
         initInfo.Allocator = _allocator;
         initInfo.CheckVkResultFn = CheckVkResult;
 
