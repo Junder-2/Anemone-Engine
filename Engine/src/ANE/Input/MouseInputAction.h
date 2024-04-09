@@ -120,8 +120,9 @@ namespace Engine
         bool PopulateScrollInput(bool* needProcessing, float x, float y);
         /**
         * Processes actions by clearing deltas
+        * * @returns stored data changed
         */
-        void ProcessAction();
+        bool ProcessAction();
         /**
         * Clears input data
         */

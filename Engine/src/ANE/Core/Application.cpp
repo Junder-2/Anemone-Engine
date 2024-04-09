@@ -6,10 +6,16 @@
 #include <SDL_timer.h>
 
 #include "ANE/Events/EventHandler.h"
+#include "ANE/Input/InputSystem.h"
+#include "ANE/Subsystem/SubsystemCollection.h"
+#include "ANE/Utilities/InputUtilities.h"
 #include "Layers/Layer.h"
 #include "Entity/Entity.h"
+#include "Entity/ExampleScripts/CameraController.h"
 #include "Layers/EditorLayer.h"
 #include "ANE/Renderer/Renderer.h"
+#include "Scene/Components/CameraComponent.h"
+#include "Scene/Components/NativeScriptComponent.h"
 #include "Scene/Components/RenderComponent.h"
 
 namespace Engine
@@ -23,10 +29,8 @@ namespace Engine
         _window = Window::Create(WindowProperties(_appSpec.Name));
         _window->EventDelegate = MakeDelegate(this, &Application::OnEvent);
 
-        _inputManager = InputManager::Create();
-        _inputManager->EventDelegate = MakeDelegate(this, &Application::OnEvent);
-
         Renderer::Init(_window->GetWindowContext());
+        Init();
 
         //Create a layer
         EditorLayer* editorLayer = new EditorLayer("EditorLayer");
@@ -39,6 +43,7 @@ namespace Engine
 
         //Add component to entity
         ent.AddComponent<RenderComponent>();
+        // ent.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
         //Get Component from entity
         if (RenderComponent comp; ent.TryGetComponent<RenderComponent>(comp))
@@ -59,6 +64,17 @@ namespace Engine
     }
 
     Application::~Application() = default;
+
+    void Application::Init()
+    {
+        _window = Window::Create(WindowProperties(_appSpec.Name));
+        _window->EventDelegate = MakeDelegate(this, &Application::OnEvent);
+
+        _inputHandler = InputHandler::Create();
+        _inputHandler->BindOnEvent(MakeDelegate(this, &Application::OnEvent));
+
+        _subsystemCollection = SubsystemCollection::Create();
+    }
 
     void Application::Run()
     {
@@ -99,7 +115,7 @@ namespace Engine
     {
         EventHandler::PushEvent(&e);
 
-        if(e.HasCategory(WindowEvent))
+        if(e.HasCategory(EventCategoryWindow))
         {
             switch (e.GetEventType())
             {
@@ -109,20 +125,20 @@ namespace Engine
                 case EventType::WindowResize:
                     OnWindowResize(dynamic_cast<WindowResizeEvent&>(e));
                 break;
-                case EventType::WindowMoved:
-                    OnWindowMove(dynamic_cast<WindowMovedEvent&>(e));
-                break;
-                case EventType::WindowFocusChange:
-                    OnWindowFocusChange(dynamic_cast<WindowFocusChangeEvent&>(e));
-                break;
-                case EventType::WindowStateChange:
-                    OnWindowStateChange(dynamic_cast<WindowStateChangeEvent&>(e));
-                break;
+                // case EventType::WindowMoved:
+                //     OnWindowMove(dynamic_cast<WindowMovedEvent&>(e));
+                // break;
+                // case EventType::WindowFocusChange:
+                //     OnWindowFocusChange(dynamic_cast<WindowFocusChangeEvent&>(e));
+                // break;
+                // case EventType::WindowStateChange:
+                //     OnWindowStateChange(dynamic_cast<WindowStateChangeEvent&>(e));
+                // break;
             }
         }
 
         //Input debugging
-        // if(e.HasCategory(InputEvent))
+        // if(e.HasCategory(EventCategoryInput))
         // {
         //     switch (e.GetEventType())
         //     {
@@ -178,21 +194,17 @@ namespace Engine
         ANE_ENGINE_LOG_INFO("window focus change {0}", e.IsFocused());
     }
 
-    void Application::OnKeyTest(KeyTriggerEvent& keyTriggerEvent)
+    void Application::OnKeyTest(KeyboardKeyEvent& keyTriggerEvent)
     {
-        const InputValue inputValue = keyTriggerEvent;
-        ANE_ENGINE_LOG_INFO("pressed {0}: {1}", inputValue.GetBindingId(), inputValue.GetIntValue());
-    }
-
-    void Application::OnAxisTest(InputValue inputValue)
-    {
-        ANE_ENGINE_LOG_INFO("pressed {0}: {1}", inputValue.GetBindingId(), inputValue.GetAxis());
+        const InputValue inputValue = keyTriggerEvent.GetInputValue();
+        ANE_ENGINE_LOG_INFO("pressed {0}: {1}", inputValue.GetBindingId(), InputUtilities::ToString(inputValue.GetTriggerState()));
     }
 
     void Application::OnMouseKeyTest(MouseButtonEvent& mouseButtonEvent)
     {
-        const MouseButtonValues inputValue = mouseButtonEvent;
-        ANE_ENGINE_LOG_INFO("pressed mouse key {0}, with state {1}, is doubleclick {2}", inputValue.GetCurrentButtonIndex(), (int)inputValue.GetTriggerState(), inputValue.GetIsDoubleClick());
+        const MouseButtonValues inputValue = mouseButtonEvent.GetInputValue();
+        ANE_ENGINE_LOG_INFO("pressed mouse key {0}, with {1}, is doubleclick {2}", InputUtilities::ToString((MouseButton)inputValue.GetCurrentButtonIndex()),
+            InputUtilities::ToString(inputValue.GetTriggerState()), inputValue.GetIsDoubleClick());
         ANE_ENGINE_LOG_INFO("raw mouse button state {0}", std::bitset<16>(inputValue.GetRawButtonStates()).to_string());
     }
 
@@ -203,7 +215,7 @@ namespace Engine
 
     void Application::OnMouseMoveTest(MouseMovementEvent& mouseMovementEvent)
     {
-        const MouseMoveValue inputValue = mouseMovementEvent;
+        const MouseMoveValue inputValue = mouseMovementEvent.GetInputValue();
         // spdlog formatting not working use explicit glm::to_string
         ANE_ENGINE_LOG_INFO("moved mouse pos:({0}), delta:({1})", glm::to_string(inputValue.GetMousePos()), glm::to_string(inputValue.GetMouseDelta()));
     }

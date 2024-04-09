@@ -7,6 +7,8 @@
 #include <VkBootstrap.h>
 
 #include "Application.h"
+#include "ANE/Input/InputSystem.h"
+#include "ANE/Utilities/InputUtilities.h"
 #include "Platform/Vulkan/VulkanRenderer.h"
 
 namespace Engine
@@ -103,8 +105,8 @@ namespace Engine
 
     void Window::ProcessEvents(float deltaTime)
     {
-        InputManager* inputManager = &Application::Get().GetInputManager();
-        inputManager->OnUpdate();
+        InputHandler* inputHandler = &Application::Get().GetInputHandler();
+        inputHandler->OnUpdate();
 
         const bool prevLostFocus = LostFocus();
 
@@ -131,7 +133,7 @@ namespace Engine
                 case SDL_KEYUP:
                 {
                     if(LostFocus() || event.key.repeat != 0) continue;
-                    inputManager->ProcessKey(event.key.keysym.sym, event.type == SDL_KEYDOWN);
+                    inputHandler->ProcessKey(event.key.keysym.sym, event.type == SDL_KEYDOWN);
                 }
                 continue;
                 case SDL_MOUSEBUTTONDOWN:
@@ -140,7 +142,7 @@ namespace Engine
                     if(LostFocus()) continue;
                     const int keyIndex = MOUSE_BUTTON_TO_SDL_MOUSE_BUTTON(event.button.button);
 
-                    inputManager->ProcessMouseButton(keyIndex, event.type == SDL_MOUSEBUTTONDOWN, event.button.clicks == 2);
+                    inputHandler->ProcessMouseButton(keyIndex, event.type == SDL_MOUSEBUTTONDOWN, event.button.clicks == 2);
                 }
                 continue;
                 case SDL_MOUSEWHEEL:
@@ -149,7 +151,7 @@ namespace Engine
                     const float x = event.wheel.preciseX;
                     const float y = event.wheel.preciseY;
 
-                    inputManager->ProcessMouseScroll(x, y);
+                    inputHandler->ProcessMouseScroll(x, y);
                 }
                 continue;
                 case SDL_MOUSEMOTION:
@@ -159,7 +161,7 @@ namespace Engine
                     const float x = std::clamp((float)event.motion.x/(float)_windowData.Width, 0.f, 1.f);
                     const float y = std::clamp((float)event.motion.y/(float)_windowData.Height, 0.f, 1.f);
 
-                    inputManager->ProcessMouseMovement(x, y, deltaTime);
+                    inputHandler->ProcessMouseMovement(x, y, deltaTime);
                 }
                 continue;
             }
@@ -169,7 +171,7 @@ namespace Engine
         {
             WindowFocusChangeEvent focusChangeEvent(false);
             DispatchEvent(focusChangeEvent);
-            inputManager->FlushInputs();
+            inputHandler->FlushInputs();
         }
         else if(prevLostFocus && !LostFocus())
         {
@@ -177,7 +179,7 @@ namespace Engine
             DispatchEvent(focusChangeEvent);
         }
 
-        if(!LostFocus()) inputManager->PopulateKeyStates(SDL_GetKeyboardState(nullptr));
+        if(!LostFocus()) inputHandler->PopulateKeyStates(SDL_GetKeyboardState(nullptr));
     }
 
     void Window::ProcessWindowEvent(const SDL_WindowEvent& windowEvent, float deltaTime)
@@ -227,8 +229,8 @@ namespace Engine
                 uint32_t newY = (uint32_t)windowEvent.data2;
                 if(_windowData.XPos == newX && _windowData.YPos == newY) break;
 
-                const float xDelta = ((int)_windowData.XPos- (int)newX) * deltaTime;
-                const float yDelta = ((int)_windowData.YPos - (int)newY) * deltaTime;
+                const float xDelta = ((float)newX - (float)_windowData.XPos) * deltaTime;
+                const float yDelta = ((float)newY - (float)_windowData.YPos) * deltaTime;
                 _windowData.XPos = newX;
                 _windowData.YPos = newY;
 
@@ -255,7 +257,7 @@ namespace Engine
 
     void Window::ShowInputDebugOverlay(bool* pOpen)
     {
-        InputManager* inputManager = &Application::Get().GetInputManager();
+        const InputSystem* inputManager = &InputUtilities::GetInputSystem();
         static int location = 0;
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoDocking;
         if (location >= 0)
