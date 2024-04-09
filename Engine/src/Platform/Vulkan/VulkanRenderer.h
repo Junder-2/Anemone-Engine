@@ -93,9 +93,6 @@ namespace Engine
         inline static void Draw(const WindowProperties& props);
         inline static void DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView);
 
-        inline static void RenderFrame(ImGui_ImplVulkanH_Window* wd, ImDrawData* drawData);
-        inline static void RevealFrame(ImGui_ImplVulkanH_Window* wd);
-
         static void CleanupVulkan();
         static void CleanupImGui();
 
