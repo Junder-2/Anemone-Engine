@@ -146,6 +146,8 @@ namespace Engine
         inline static VkPipeline _meshPipeline = VK_NULL_HANDLE;
         inline static VkPipelineLayout _pipelineLayout;
 
+        inline static VmaImage _colorImage;
+
         // VMA
         inline static VmaAllocator _vmaAllocator;
 

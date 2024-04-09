@@ -378,7 +378,6 @@ namespace Engine
 
     PipelineWrapper VulkanRenderer::CreatePipeline(const vkb::Device& logicalDevice)
     {
-        VmaImage drawImage = { }; // Dummy for now
         VkShaderModule meshVertShader;
         if (!VulkanUtils::LoadShaderModule("../shaders/triangle_mesh.vert.spv", _device, _allocator, &meshVertShader))
         {
@@ -405,7 +404,7 @@ namespace Engine
             .SetBlendMode(None)
             .SetDepthTestOperator(VK_COMPARE_OP_ALWAYS)
 
-            .SetColorFormat(drawImage.ImageFormat)
+            .SetColorFormat(_colorImage.ImageFormat)
             .SetDepthFormat(VK_FORMAT_UNDEFINED)
 
             .SetAllocationCallbacks(_allocator)
