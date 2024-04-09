@@ -74,6 +74,7 @@ namespace Engine
         static vkb::Device CreateVkbLogicalDevice(const vkb::PhysicalDevice& physicalDevice);
 
         static void SetupCommandBuffers();
+        static void SetupSyncStructures();
 
         static PipelineWrapper CreatePipeline(const vkb::Device& logicalDevice);
 

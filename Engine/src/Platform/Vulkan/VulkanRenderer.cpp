@@ -331,6 +331,34 @@ namespace Engine
         });
     }
 
+    void VulkanRenderer::SetupSyncStructures()
+    {
+        const VkFenceCreateInfo fenceCreateInfo = VulkanInitializers::FenceCreateInfo(VK_FENCE_CREATE_SIGNALED_BIT);
+        CheckVkResult(vkCreateFence(_device, &fenceCreateInfo, _allocator, &_immBuffer.Fence));
+
+        _mainDeletionQueue.PushFunction([=]
+        {
+            vkDestroyFence(_device, _immBuffer.Fence, _allocator);
+        });
+
+        for (VulkanFrame& frame : _frameData)
+        {
+            CheckVkResult(vkCreateFence(_device, &fenceCreateInfo, _allocator, &frame.Fence));
+
+            VkSemaphoreCreateInfo semaphoreCreateInfo = VulkanInitializers::SemaphoreCreateInfo();
+
+            CheckVkResult(vkCreateSemaphore(_device, &semaphoreCreateInfo, _allocator, &frame.SwapchainSemaphore));
+            CheckVkResult(vkCreateSemaphore(_device, &semaphoreCreateInfo, _allocator, &frame.RenderSemaphore));
+
+            _mainDeletionQueue.PushFunction([=]
+            {
+                vkDestroyFence(_device, frame.Fence, _allocator);
+                vkDestroySemaphore(_device, frame.SwapchainSemaphore, _allocator);
+                vkDestroySemaphore(_device, frame.RenderSemaphore, _allocator);
+            });
+        }
+    }
+
     PipelineWrapper VulkanRenderer::CreatePipeline(const vkb::Device& logicalDevice)
     {
         VkPipelineLayout pipelineLayout = VK_NULL_HANDLE; // Dummy for now
