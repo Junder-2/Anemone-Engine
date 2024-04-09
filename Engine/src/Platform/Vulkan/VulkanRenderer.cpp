@@ -600,6 +600,87 @@ namespace Engine
         _mainDeletionQueue.PushFunction([&]{ vkDestroyDescriptorPool(_device, _imGuiDescriptorPool, _allocator); });
     }
 
+    void VulkanRenderer::Draw(const WindowProperties& props)
+    {
+        if (_rebuildSwapchain)
+        {
+            if (props.Width > 0 && props.Height > 0)
+            {
+                ResizeSwapchain();
+            }
+        }
+
+        ImDrawData* drawData = ImGui::GetDrawData();
+        const bool isMinimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
+        if (isMinimized)
+        {
+            return;
+        }
+
+        const VulkanFrame frame = GetFrame();
+        CheckVkResult(vkWaitForFences(_device, 1, &frame.Fence, true, 1000000000));
+
+        uint32_t swapchainImageIndex;
+        VkResult result = vkAcquireNextImageKHR(_device, _swapchain, 1000000000, frame.SwapchainSemaphore, nullptr, &swapchainImageIndex);
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+        {
+            _rebuildSwapchain = true;
+            return;
+        }
+
+        CheckVkResult(vkResetFences(_device, 1, &frame.Fence));
+
+        const VkCommandBuffer cmd = frame.CommandBuffer;
+
+        CheckVkResult(vkResetCommandBuffer(cmd, 0));
+        const VkCommandBufferBeginInfo cmdBeginInfo = VulkanInitializers::CommandBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+        CheckVkResult(vkBeginCommandBuffer(cmd, &cmdBeginInfo));
+
+        VulkanUtils::TransitionImage(cmd, _colorImage.Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+        VulkanUtils::TransitionImage(cmd, _depthImage.Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
+
+        // TODO: Draw geometry here.
+
+        VulkanUtils::TransitionImage(cmd, _colorImage.Image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+        const VkImage& swapchainImage = _swapchainImages[swapchainImageIndex];
+        VulkanUtils::TransitionImage(cmd, swapchainImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+        VulkanUtils::TransitionImage(cmd, swapchainImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+
+        DrawImGui(cmd, _swapchainImageViews[swapchainImageIndex]);
+
+        VulkanUtils::TransitionImage(cmd, swapchainImage, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+
+        CheckVkResult(vkEndCommandBuffer(cmd));
+
+        const VkCommandBufferSubmitInfo cmdInfo = VulkanInitializers::CommandBufferSubmitInfo(cmd);
+        const VkSemaphoreSubmitInfo waitInfo = VulkanInitializers::SemaphoreSubmitInfo(VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR, frame.SwapchainSemaphore);
+        const VkSemaphoreSubmitInfo signalInfo = VulkanInitializers::SemaphoreSubmitInfo(VK_PIPELINE_STAGE_2_ALL_GRAPHICS_BIT, frame.RenderSemaphore);
+
+        const VkSubmitInfo2 submitInfo = VulkanInitializers::SubmitInfo(&cmdInfo, &signalInfo, &waitInfo);
+
+        CheckVkResult(vkQueueSubmit2(_queue, 1, &submitInfo, frame.Fence));
+
+        VkPresentInfoKHR presentInfo = VulkanInitializers::PresentInfo();
+
+        presentInfo.waitSemaphoreCount = 1;
+        presentInfo.pWaitSemaphores = &frame.RenderSemaphore;
+
+        presentInfo.swapchainCount = 1;
+        presentInfo.pSwapchains = &_swapchain;
+
+        presentInfo.pImageIndices = &swapchainImageIndex;
+
+        result = vkQueuePresentKHR(_queue, &presentInfo);
+        if (result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            _rebuildSwapchain = true;
+            return;
+        }
+
+        _frameIndex++;
+    }
+
     // TODO: Fully integrate ImGui into rendering loop.
     void VulkanRenderer::DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView)
     {
