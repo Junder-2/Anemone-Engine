@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "../ScriptableEntity.h"
-#include "ANE/Input/InputSystem.h"
+#include "ANE/Input/Input.h"
 #include "ANE/Utilities/InputUtilities.h"
 
 namespace Engine

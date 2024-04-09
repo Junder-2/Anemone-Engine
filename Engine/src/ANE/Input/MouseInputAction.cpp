@@ -49,6 +49,9 @@ namespace Engine
                 _buttonValue.SetTriggerState(i, TriggerHolding);
                 changed = true;
             break;
+            case TriggerHolding:
+                changed = true;
+            break;
             case TriggerStopped:
                 _buttonValue.SetTriggerState(i, TriggerNone);
                 changed = true;

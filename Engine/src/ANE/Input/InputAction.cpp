@@ -23,30 +23,39 @@ namespace Engine
 
     bool InputTrigger::PopulateInput(const float input, bool* needProcessing)
     {
-        const bool changed = InputAction::PopulateInput(input, needProcessing);
+        const bool shouldForward = InputAction::PopulateInput(input, needProcessing);
 
         *needProcessing = true;
 
-        return changed;
+        return shouldForward;
     }
 
     bool InputTrigger::ProcessAction(bool* needProcessing)
     {
+        bool shouldForward = false;
+
         switch (_inputValue.GetTriggerState())
         {
             case TriggerStarted:
                 _inputValue = TriggerHolding;
+                *needProcessing = true;
+                shouldForward = true;
+            break;
+            case TriggerHolding:
+                *needProcessing = true;
+                shouldForward = true;
             break;
             case TriggerStopped:
                 _inputValue = TriggerNone;
+            break;
         }
 
-        *needProcessing = false;
-        return true;
+        return shouldForward;
     }
 
     bool InputAxis::PopulateInput(const float input, bool* needProcessing)
     {
+        //should convert in window later
         float axisInput = (input / 32767);
 
         if (_inputValue.GetAxis() == axisInput) return false;

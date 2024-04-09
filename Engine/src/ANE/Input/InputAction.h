@@ -87,18 +87,18 @@ namespace Engine
         /**
         * Populates new input
         * @param needProcessing if this action needs processing next frame
-        * @returns stored data changed
+        * @returns should send forward
         */
         virtual bool PopulateInput(float input, bool* needProcessing);
         /**
         * Processes the input data
         * @param needProcessing if this action needs processing next frame
-        * @returns stored data changed
+        * @returns should send forward
         */
         virtual bool ProcessAction(bool* needProcessing) = 0;
         /**
         * Clears the input data
-        * @returns stored data changed
+        * @returns should send forward
         */
         virtual bool FlushAction();
 
@@ -119,13 +119,13 @@ namespace Engine
         /**
         * Populates new input
         * @param needProcessing if this action needs processing next frame
-        * @returns stored data changed
+        * @returns should send forward
         */
         bool PopulateInput(float input, bool* needProcessing) override;
         /**
         * Processes action by transitions started to hold and stopped to none
         * @param needProcessing if this action needs processing next frame
-        * @returns stored data changed
+        * @returns should send forward
         */
         bool ProcessAction(bool* needProcessing) override;
     };
@@ -141,7 +141,7 @@ namespace Engine
         /**
         * Populates new input
         * @param needProcessing if this action needs processing next frame
-        * @returns stored data changed
+        * @returns should send forward
         */
         bool PopulateInput(float input, bool* needProcessing) override;
     };

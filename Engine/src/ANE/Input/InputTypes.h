@@ -359,3 +359,9 @@ namespace Engine
         */
     } KeyCodes;
 }
+
+template<>
+struct std::hash<Engine::BindingPair>
+{
+    std::size_t operator() (const Engine::BindingPair& v) const { return std::hash<int>()(v.DeviceType) ^ hash<int>()(v.BindingId) << 1; }
+};
