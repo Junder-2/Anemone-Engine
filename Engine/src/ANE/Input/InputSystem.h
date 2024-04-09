@@ -14,10 +14,16 @@ namespace Engine
         void OnEvent(Event& e);
 
         template <class TClass>
-        void BindInput(InputDeviceType deviceType, int bindingId, DelegateMember<TClass, void(InputValue)> delegateMember);
+        void BindInput(BindingPair bindingPair, DelegateMember<TClass, void(InputValue)> delegateMember);
+
+        template <class TClass>
+        void BindAxisInput(BindingPair negativeBindingPair, BindingPair positiveBindingPair, DelegateMember<TClass, void(InputValue)> delegateMember);
 
         template <class TClass>
         void BindKeyboardInput(KeyCodes bindingId, DelegateMember<TClass, void(InputValue)> delegateMember);
+
+        template <class TClass>
+        void BindKeyboardAxisInput(KeyCodes negativeBindingId, KeyCodes positiveBindingId, DelegateMember<TClass, void(InputValue)> delegateMember);
 
         template <class TClass>
         void BindMouseMove(DelegateMember<TClass, void(MouseMoveValue)> delegateMember);
@@ -42,23 +48,26 @@ namespace Engine
         MouseButtonValues GetMouseButtonValues() const { return _inputHandler->GetMouseInputData().GetButtonValue(); }
 
     private:
+        bool IsValidAxisBindings(BindingPair negativeBindingPair, BindingPair positiveBindingPair);
+
+    private:
         InputHandler* _inputHandler;
 
-        std::unordered_map<IntPair, MulticastDelegate<void(InputValue)>> _actionMappingDelegates;
-        MulticastDelegate<void(MouseMoveValue)> _mouseMoveDelegate;
-        MulticastDelegate<void(MouseButtonValues)> _mouseButtonValueDelegate;
-        MulticastDelegate<void(float, float)> _mouseScrollDelegate;
+        std::unordered_map<BindingPair, MulticastDelegate<void(InputValue)>> _actionMappingDelegates {};
+        std::unordered_map<BindingPair, AxisBinding> _bindingToAxisBinding {};
+        std::unordered_map<int, MulticastDelegate<void(InputValue)>> _axisActionMappingDelegates {};
+        MulticastDelegate<void(MouseMoveValue)> _mouseMoveDelegate {};
+        MulticastDelegate<void(MouseButtonValues)> _mouseButtonValueDelegate {};
+        MulticastDelegate<void(float, float)> _mouseScrollDelegate {};
     };
 
     template <class TClass>
-    void InputSystem::BindInput(const InputDeviceType deviceType, const int bindingId, DelegateMember<TClass, void(InputValue)> delegateMember)
+    void InputSystem::BindInput(const BindingPair bindingPair, DelegateMember<TClass, void(InputValue)> delegateMember)
     {
-        const IntPair bindingPair(deviceType, bindingId);
-
-        switch(deviceType)
+        switch(bindingPair.DeviceType)
         {
             case InputDeviceKeyboard:
-                _inputHandler->RegisterKeyboardKey(bindingId);
+                _inputHandler->RegisterKeyboardKey(bindingPair.BindingId);
             break;
         }
 
@@ -66,21 +75,21 @@ namespace Engine
     }
 
     template <class TClass>
-    void InputSystem::BindKeyboardInput(KeyCodes bindingId, DelegateMember<TClass, void(InputValue)> delegateMember)
+    void InputSystem::BindKeyboardInput(const KeyCodes bindingId, DelegateMember<TClass, void(InputValue)> delegateMember)
     {
-        BindInput(InputDeviceKeyboard, bindingId, delegateMember);
+        BindInput(BindingPair(InputDeviceKeyboard, bindingId), delegateMember);
+    }
+
+    template <class TClass>
+    void InputSystem::BindMouseButton(const MouseButton buttonIndex, DelegateMember<TClass, void(InputValue)> delegateMember)
+    {
+        BindInput(BindingPair(InputDeviceMouse, buttonIndex), delegateMember);
     }
 
     template <class TClass>
     void InputSystem::BindMouseMove(DelegateMember<TClass, void(MouseMoveValue)> delegateMember)
     {
         _mouseMoveDelegate += delegateMember;
-    }
-
-    template <class TClass>
-    void InputSystem::BindMouseButton(MouseButton buttonIndex, DelegateMember<TClass, void(InputValue)> delegateMember)
-    {
-        BindInput(InputDeviceMouse, buttonIndex, delegateMember);
     }
 
     template <class TClass>
@@ -93,5 +102,44 @@ namespace Engine
     void InputSystem::BindMouseScroll(DelegateMember<TClass, void(float, float)> delegateMember)
     {
         _mouseScrollDelegate += delegateMember;
+    }
+
+    template <class TClass>
+    void InputSystem::BindAxisInput(const BindingPair negativeBindingPair, const BindingPair positiveBindingPair, DelegateMember<TClass, void(InputValue)> delegateMember)
+    {
+        if (IsValidAxisBindings(negativeBindingPair, positiveBindingPair)) return;
+
+        switch(positiveBindingPair.DeviceType)
+        {
+            case InputDeviceKeyboard:
+                _inputHandler->RegisterKeyboardKey(positiveBindingPair.BindingId);
+            break;
+        }
+
+        switch(negativeBindingPair.DeviceType)
+        {
+            case InputDeviceKeyboard:
+                _inputHandler->RegisterKeyboardKey(negativeBindingPair.BindingId);
+            break;
+        }
+
+        int size = _bindingToAxisBinding.size();
+        if(size != 0 && size % 2 != 0)
+        {
+            ANE_ENGINE_LOG_WARN("axis binding size is not multiple of 2: {}", size);
+            size++;
+        }
+        const int id = size / 2;
+
+        _bindingToAxisBinding.insert_or_assign(positiveBindingPair, AxisBinding(id, true));
+        _bindingToAxisBinding.insert_or_assign(negativeBindingPair, AxisBinding(id, false));
+
+        _axisActionMappingDelegates[id] += delegateMember;
+    }
+
+    template <class TClass>
+    void InputSystem::BindKeyboardAxisInput(const KeyCodes negativeBindingId, const KeyCodes positiveBindingId, DelegateMember<TClass, void(InputValue)> delegateMember)
+    {
+        BindAxisInput(BindingPair(InputDeviceKeyboard, negativeBindingId), BindingPair(InputDeviceKeyboard, positiveBindingId), delegateMember);
     }
 }
