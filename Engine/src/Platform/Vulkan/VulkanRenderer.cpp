@@ -398,6 +398,17 @@ namespace Engine
             ANE_ENGINE_LOG_INFO("Loaded shader module: vertex_color.frag.spv");
         }
 
+        VkPushConstantRange bufferRange;
+        bufferRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        bufferRange.offset = 0;
+        bufferRange.size = sizeof(PushConstantBuffer);
+
+        VkPipelineLayoutCreateInfo pipelineLayoutInfo = VulkanInitializers::PipelineLayoutCreateInfo();
+        pipelineLayoutInfo.pPushConstantRanges = &bufferRange;
+        pipelineLayoutInfo.pushConstantRangeCount = 1;
+
+        CheckVkResult(vkCreatePipelineLayout(_device, &pipelineLayoutInfo, _allocator, &_pipelineLayout));
+
         VulkanPipelineBuilder builder{ logicalDevice, _pipelineLayout };
         vkb::Result<PipelineWrapper> pipeline = builder
             .SetShaders(meshVertShader, meshFragShader)
