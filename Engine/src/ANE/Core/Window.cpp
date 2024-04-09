@@ -7,7 +7,7 @@
 #include <VkBootstrap.h>
 
 #include "Application.h"
-#include "ANE/Input/InputSystem.h"
+#include "ANE/Input/Input.h"
 #include "ANE/Utilities/InputUtilities.h"
 #include "Platform/Vulkan/VulkanRenderer.h"
 
@@ -34,8 +34,9 @@ namespace Engine
             ANE_ENGINE_LOG_ERROR("Could not initialize SDL.");
         }
 
-        SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_VULKAN | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+        const SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_VULKAN | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
         _windowContext = SDL_CreateWindow(props.Title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowData.Width, _windowData.Height, windowFlags);
+
 
         int xPos, yPos;
         SDL_GetWindowPosition(_windowContext, &xPos, &yPos);
@@ -47,10 +48,6 @@ namespace Engine
         {
             ANE_ENGINE_LOG_ERROR("Could not create SDL window.");
         }
-
-        // Vulkan
-        //_vulkanRenderer = std::make_unique<VulkanRenderer>(_windowContext);
-        //_vulkanRenderer->Setup();
     }
 
     void Window::OnUpdate(float deltaTime)
@@ -60,8 +57,6 @@ namespace Engine
         //_vulkanRenderer->NewFrame(_windowData);
 
         return;
-        static bool showSimpleOverlay = true;
-        if (showSimpleOverlay) ShowInputDebugOverlay(&showSimpleOverlay);
 
         // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
         if (_showDemoWindow)
@@ -114,9 +109,6 @@ namespace Engine
         while(SDL_PollEvent(&event))
         {
             ImGui_ImplSDL2_ProcessEvent(&event);
-            //const auto io = _vulkanRenderer->GetImGuiIO();
-
-            //_imGuiLostFocus = (io->WantCaptureKeyboard);
 
             switch (event.type)
             {
@@ -255,66 +247,6 @@ namespace Engine
         if(EventDelegate) EventDelegate(e);
     }
 
-    void Window::ShowInputDebugOverlay(bool* pOpen)
-    {
-        const InputSystem* inputManager = &InputUtilities::GetInputSystem();
-        static int location = 0;
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoDocking;
-        if (location >= 0)
-        {
-            const float PAD = 10.0f;
-            const ImGuiViewport* viewport = ImGui::GetMainViewport();
-            ImVec2 work_pos = viewport->WorkPos; // Use work area to avoid menu-bar/task-bar, if any!
-            ImVec2 work_size = viewport->WorkSize;
-            ImVec2 window_pos, window_pos_pivot;
-            window_pos.x = (location & 1) ? (work_pos.x + work_size.x - PAD) : (work_pos.x + PAD);
-            window_pos.y = (location & 2) ? (work_pos.y + work_size.y - PAD) : (work_pos.y + PAD);
-            window_pos_pivot.x = (location & 1) ? 1.0f : 0.0f;
-            window_pos_pivot.y = (location & 2) ? 1.0f : 0.0f;
-            ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
-            window_flags |= ImGuiWindowFlags_NoMove;
-        }
-        ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
-        if (ImGui::Begin("Example: Simple overlay", pOpen, window_flags))
-        {
-            const glm::vec2 mousePos = inputManager->GetMousePos();
-            ImGui::Text("Mouse Pos: (%.3f,%.3f)", mousePos.x, mousePos.y);
-            const MouseButtonValues mouseButtonValues = inputManager->GetMouseButtonValues();
-            ImGui::Text("Mouse Buttons: (");
-            bool start = true;
-            for (int i = 0; i < MOUSE_BUTTON_MAX; i++)
-            {
-                const int buttonState = mouseButtonValues.GetTriggerState(i);
-                if (buttonState == 0) continue;
-                ImGui::SameLine(0, start ? .0f : -1.0f);
-                ImGui::Text("%d:%d", i, buttonState);
-                start = false;
-            }
-            ImGui::SameLine(0, 0);
-            ImGui::Text(")");
-
-            const auto keyValues = inputManager->GetCurrentTriggeredKeys();
-            ImGui::Text("Keyboard: (");
-            start = true;
-            for (auto keyValue : keyValues)
-            {
-                if(keyValue.GetIntValue() == 0) continue;
-                ImGui::SameLine(0, start ? .0f : -1.0f);
-                ImGui::Text("%d:%d", keyValue.GetBindingId(), keyValue.GetIntValue());
-                start = false;
-            }
-            ImGui::SameLine(0, 0);
-            ImGui::Text(")");
-
-            if (ImGui::BeginPopupContextWindow())
-            {
-                if (pOpen && ImGui::MenuItem("Close")) *pOpen = false;
-                ImGui::EndPopup();
-            }
-        }
-        ImGui::End();
-    }
-
     void Window::Shutdown()
     {
         //_vulkanRenderer->Cleanup();
@@ -334,5 +266,3 @@ namespace Engine
         return std::make_unique<Window>(props);
     }
 }
-
-

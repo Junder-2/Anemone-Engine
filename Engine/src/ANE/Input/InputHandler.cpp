@@ -63,6 +63,10 @@ namespace Engine
                 MouseButtonEvent mouseButtonEvent(_mouseInputAction.GetButtonValue());
                 DispatchEvent(mouseButtonEvent);
             }
+            else
+            {
+                _dirtyMouse = false;
+            }
         }
 
         if(!_dirtyKeys.empty())

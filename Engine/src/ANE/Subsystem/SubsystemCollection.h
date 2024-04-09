@@ -1,6 +1,5 @@
 #pragma once
 #include <entt.hpp>
-
 #include "Subsystem.h"
 
 namespace Engine

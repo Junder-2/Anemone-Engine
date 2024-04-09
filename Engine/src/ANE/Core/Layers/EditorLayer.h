@@ -16,15 +16,11 @@ namespace Engine
 
         void OnAttach() override;
 
-        void OnDetach() override
-        {
-        }
+        void OnDetach() override;
 
         void OnEvent(Event& e) override;
 
         void OnUpdate(float deltaTime) override;
-
-        void OnEventTest(Event& e);
 
         template <class TValue>
         std::enable_if_t<std::is_base_of_v<Scene, TValue>> AddScene(const char* key);
@@ -40,6 +36,11 @@ namespace Engine
         }
 
         std::shared_ptr<Scene> GetActiveScene() { return _activeScene; }
+
+    private:
+        void CreateTestScene();
+
+        static void ShowInputDebugOverlay(bool* pOpen);
 
     protected:
         std::string _debugName;

@@ -6,8 +6,8 @@
 #include <SDL_timer.h>
 
 #include "ANE/Events/EventHandler.h"
-#include "ANE/Input/InputSystem.h"
 #include "ANE/Subsystem/SubsystemCollection.h"
+#include "ANE/Input/Input.h"
 #include "ANE/Utilities/InputUtilities.h"
 #include "Layers/Layer.h"
 #include "Entity/Entity.h"
@@ -28,41 +28,14 @@ namespace Engine
 
         Init();
 
-        //Create a layer
-        EditorLayer* editorLayer = new EditorLayer("EditorLayer");
 
-        //Add scene to layer
-        editorLayer->AddScene<Scene>("Game");
-
-        //Create a Entity
-        Entity ent = editorLayer->GetActiveScene()->Create("Square Entity");
-
-        //Add component to entity
-        ent.AddComponent<RenderComponent>();
-        // ent.AddComponent<NativeScriptComponent>().Bind<CameraController>();
-
-        //Get Component from entity
-        if (RenderComponent comp; ent.TryGetComponent<RenderComponent>(comp))
-        {
-            TagComponent tag;
-            ent.TryGetComponent(tag);
-            ANE_ENGINE_LOG_WARN("We have a renderComponent with tag: {0} on entity: {1}", comp.ToString(), tag.Tag);
-        }
-
-        //editorLayer->AddScene<Scene>("Main Menu");
-        //editorLayer->AddScene<Scene>("Credits");
-        _layerStack.PushLayer(editorLayer);
-
-        //editorLayer->SetActiveScene("roe");
-
-        //Event binding test
-        //EventHandler::BindAppEvent(MakeDelegate(editorLayer, &EditorLayer::OnEventTest));
     }
 
     Application::~Application() = default;
 
     void Application::Init()
     {
+
         _window = Window::Create(WindowProperties(_appSpec.Name));
         _window->EventDelegate = MakeDelegate(this, &Application::OnEvent);
 
@@ -89,6 +62,7 @@ namespace Engine
             //Renderer
             for (Layer* layer : _layerStack) // raw pointers
             {
+
                 layer->OnUpdate(deltaTime);
             }
             //todo frame yap
@@ -171,6 +145,14 @@ namespace Engine
         _isRunning = false;
         EventHandler::ConsumeEvent();
     }
+
+    void Application::PushLayer(Layer* layer)
+    {
+        _layerStack.PushLayer(layer);
+        layer->OnAttach();
+    }
+
+
 
     void Application::OnWindowResize(WindowResizeEvent& e)
     {

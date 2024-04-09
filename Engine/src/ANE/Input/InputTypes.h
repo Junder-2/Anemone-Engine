@@ -35,6 +35,25 @@ namespace Engine
         TriggerStopped,
     } TriggerState;
 
+    struct BindingPair
+    {
+        BindingPair(const int deviceType, const int bindingId) : DeviceType(deviceType), BindingId(bindingId) {}
+        BindingPair(const InputDeviceType deviceType, const int bindingId) : DeviceType(deviceType), BindingId(bindingId) {}
+        int DeviceType;
+        int BindingId;
+
+        bool operator<(const BindingPair& rhs) const { return DeviceType != rhs.DeviceType ? DeviceType < rhs.DeviceType : BindingId < rhs.BindingId; } // for ordered map
+        bool operator==(const BindingPair& rhs) const { return DeviceType == rhs.DeviceType && BindingId == rhs.BindingId;} // for hash
+    };
+
+    struct AxisBinding
+    {
+        AxisBinding(const int id = -1, const bool sign = false) : Id(id), Sign(sign) {}
+
+        int Id;
+        bool Sign;
+    };
+
     /**
     * The mouse button index
     */
@@ -359,3 +378,9 @@ namespace Engine
         */
     } KeyCodes;
 }
+
+template<>
+struct std::hash<Engine::BindingPair>
+{
+    std::size_t operator() (const Engine::BindingPair& v) const { return std::hash<int>()(v.DeviceType) ^ hash<int>()(v.BindingId) << 1; }
+};

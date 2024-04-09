@@ -55,8 +55,6 @@ namespace Engine
 
         void DispatchEvent(Event& e);
 
-        static void ShowInputDebugOverlay(bool* pOpen);
-
     private:
         SDL_Window* _windowContext;
 

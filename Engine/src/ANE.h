@@ -20,7 +20,7 @@
 //----------------------------------
 
 #include "ANE/Events/Event.h"
+#include "ANE/Input/Input.h"
 #include "ANE/Input/InputHandler.h"
-#include "ANE/Input/InputSystem.h"
 
 #include "ANE/Core/EntryPoint.h"

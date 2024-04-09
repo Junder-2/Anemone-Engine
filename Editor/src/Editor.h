@@ -2,9 +2,17 @@
 
 #include <..\..\Engine\src\ANE.h>
 
+#include "ANE/Core/Layers/EditorLayer.h"
+
 class Editor : public Engine::Application
 {
 public:
-    Editor(const Engine::ApplicationSpecification& specification) : Application(specification) { }
+    Editor(const Engine::ApplicationSpecification& specification) : Application(specification)
+    {
+
+        Engine::EditorLayer* editorLayer = new Engine::EditorLayer("EditorLayer");
+
+        PushLayer(editorLayer);
+    }
     ~Editor() { }
 };
