@@ -88,8 +88,6 @@ namespace Engine
 
         static PipelineWrapper CreatePipeline(const vkb::Device& logicalDevice);
 
-        static void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height);
-
         static void CreateImGuiDescriptorPool();
 
         inline static void Draw(const WindowProperties& props);

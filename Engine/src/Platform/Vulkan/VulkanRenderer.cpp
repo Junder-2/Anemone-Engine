@@ -529,37 +529,6 @@ namespace Engine
         return pipeline.value();
     }
 
-    void VulkanRenderer::SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height)
-    {
-        wd->Surface = surface;
-
-        // Check for WSI support
-        VkBool32 res;
-        vkGetPhysicalDeviceSurfaceSupportKHR(_physicalDevice, _queueFamily.GraphicsFamily.value(), wd->Surface, &res);
-        if (res != VK_TRUE)
-        {
-            ANE_ENGINE_LOG_ERROR("Error no WSI support on physical device 0\n");
-        }
-
-        // Select Surface Format
-        constexpr VkFormat requestSurfaceImageFormat[] = { VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_R8G8B8A8_UNORM, VK_FORMAT_B8G8R8_UNORM, VK_FORMAT_R8G8B8_UNORM };
-        constexpr VkColorSpaceKHR requestSurfaceColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
-        wd->SurfaceFormat = ImGui_ImplVulkanH_SelectSurfaceFormat(_physicalDevice, wd->Surface, requestSurfaceImageFormat, (size_t)IM_ARRAYSIZE(requestSurfaceImageFormat), requestSurfaceColorSpace);
-
-        // Select Present Mode
-        #ifdef APP_UNLIMITED_FRAME_RATE
-            VkPresentModeKHR presentModes[] = { VK_PRESENT_MODE_MAILBOX_KHR, VK_PRESENT_MODE_IMMEDIATE_KHR, VK_PRESENT_MODE_FIFO_KHR };
-        #else
-            VkPresentModeKHR presentModes[] = { VK_PRESENT_MODE_FIFO_KHR };
-        #endif
-        wd->PresentMode = ImGui_ImplVulkanH_SelectPresentMode(_physicalDevice, wd->Surface, &presentModes[0], IM_ARRAYSIZE(presentModes));
-        //ANE_ENGINE_LOG_INFO("Vulkan Info: Selected PresentMode = {0}", wd->PresentMode);
-
-        // Create SwapChain, RenderPass, Framebuffer, etc.
-        IM_ASSERT(_minImageCount >= 2);
-        ImGui_ImplVulkanH_CreateOrResizeWindow(_instance, _physicalDevice, _device, wd, _queueFamily.GraphicsFamily.value(), _allocator, width, height, _minImageCount);
-    }
-
     void VulkanRenderer::CreateImGuiDescriptorPool()
     {
         VkDescriptorPoolSize poolSizes[] =
