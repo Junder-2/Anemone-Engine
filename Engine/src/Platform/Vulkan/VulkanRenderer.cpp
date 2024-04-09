@@ -315,6 +315,25 @@ namespace Engine
         return logicalDevice;
     }
 
+    vkb::Swapchain VulkanRenderer::CreateSwapchain(const uint32_t width, const uint32_t height)
+    {
+        vkb::SwapchainBuilder builder{_physicalDevice, _device, _surface};
+
+        _swapchainImageFormat = VK_FORMAT_B8G8R8A8_UNORM;
+
+        const vkb::Swapchain swapchain = builder
+             .set_desired_format(VkSurfaceFormatKHR{ .format = _swapchainImageFormat, .colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR })
+             .set_desired_present_mode(VK_PRESENT_MODE_FIFO_KHR)
+
+             .set_desired_extent(width, height)
+             .add_image_usage_flags(VK_IMAGE_USAGE_TRANSFER_DST_BIT)
+
+             .build()
+             .value();
+
+        return swapchain;
+    }
+
     void VulkanRenderer::DestroySwapchain()
     {
         vkDestroySwapchainKHR(_device, _swapchain, _allocator);

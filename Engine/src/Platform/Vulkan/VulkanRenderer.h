@@ -79,6 +79,7 @@ namespace Engine
         static vkb::PhysicalDevice SelectVkbPhysicalDevice(VkSurfaceKHR surface, vkb::Instance instance);
         static vkb::Device CreateVkbLogicalDevice(const vkb::PhysicalDevice& physicalDevice);
 
+        static vkb::Swapchain CreateSwapchain(uint32_t width, uint32_t height);
         static void DestroySwapchain();
 
         static void SetupCommandBuffers();
