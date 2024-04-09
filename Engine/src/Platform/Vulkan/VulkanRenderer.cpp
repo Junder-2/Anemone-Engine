@@ -194,7 +194,7 @@ namespace Engine
         initInfo.RenderPass = wd->RenderPass;
         initInfo.Subpass = 0;
         initInfo.MinImageCount = _minImageCount;
-        initInfo.ImageCount = wd->ImageCount;
+        initInfo.ImageCount = _minImageCount;
         initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
         initInfo.Allocator = _allocator;
         initInfo.CheckVkResultFn = CheckVkResult;
