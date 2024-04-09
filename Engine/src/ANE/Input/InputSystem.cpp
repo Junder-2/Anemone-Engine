@@ -31,7 +31,7 @@ namespace Engine
 
             if(!_bindingToAxisBinding.empty())
             {
-                AxisBinding axisBinding = _bindingToAxisBinding[bindingPair];
+                const AxisBinding axisBinding = _bindingToAxisBinding[bindingPair];
 
                 InputValue axisValue(InputTypeAxis, (InputDeviceType)bindingPair.DeviceType, keyValue.GetBindingId());
 
@@ -93,7 +93,7 @@ namespace Engine
 
     bool InputSystem::IsValidAxisBindings(const BindingPair negativeBindingPair, const BindingPair positiveBindingPair)
     {
-        // Current system doesnt allow one binding pair to be bound to more than one other binding pair
+        // TODO: Current system doesnt allow one binding pair to be bound to more than one other binding pair
         if(_bindingToAxisBinding.contains(positiveBindingPair) && !_bindingToAxisBinding.contains(negativeBindingPair))
         {
             ANE_ENGINE_LOG_WARN("Trying to bind existing positive binding to different axis, this is not currently supported: ({0}, {1})"
