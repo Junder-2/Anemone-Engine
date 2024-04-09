@@ -19,6 +19,18 @@ namespace Engine
 {
     struct WindowProperties;
 
+    struct VulkanFrame
+    {
+        VkCommandPool CommandPool;
+        VkCommandBuffer CommandBuffer;
+
+        VkSemaphore SwapchainSemaphore, RenderSemaphore;
+        VkFence Fence;
+
+        VkImageView BackbufferView;
+        VkFramebuffer Framebuffer;
+    };
+
     struct VulkanImmediateBuffer
     {
         VkFence Fence;
@@ -77,6 +89,8 @@ namespace Engine
         static void CleanupVulkan();
         static void CleanupImGui();
 
+        static VulkanFrame GetFrame();
+
         // VMA
         // TODO: Isolate VMA code to separate file/class.
         static void CreateVmaAllocator();
@@ -131,6 +145,8 @@ namespace Engine
         // VMA
         inline static VmaAllocator _vmaAllocator;
 
+        inline static int _frameIndex = 0;
+        inline static VulkanFrame _frameData[3];
         inline static VulkanImmediateBuffer _immBuffer;
 
         // ImGui

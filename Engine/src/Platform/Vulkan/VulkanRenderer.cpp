@@ -542,6 +542,11 @@ namespace Engine
         ImGui::DestroyContext();
     }
 
+    VulkanFrame VulkanRenderer::GetFrame()
+    {
+        return _frameData[_frameIndex % 3];
+    }
+
     void VulkanRenderer::CreateVmaAllocator()
     {
         VmaAllocatorCreateInfo allocatorInfo = { };
