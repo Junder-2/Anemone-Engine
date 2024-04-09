@@ -610,7 +610,7 @@ namespace Engine
         VkImageViewCreateInfo viewInfo = VulkanInitializers::ImageViewCreateInfo(format, newImage.Image, aspectFlag);
         viewInfo.subresourceRange.levelCount = imgInfo.mipLevels;
 
-        CheckVkResult(vkCreateImageView(_device, &viewInfo, nullptr, &newImage.ImageView));
+        CheckVkResult(vkCreateImageView(_device, &viewInfo, _allocator, &newImage.ImageView));
 
         return newImage;
     }
