@@ -805,6 +805,8 @@ namespace Engine
 
         DestroySwapchain();
 
+        vkDestroySurfaceKHR(_instance, _surface, _allocator);
+
         vmaDestroyAllocator(_vmaAllocator);
 
         vkDestroyDevice(_device, _allocator);
