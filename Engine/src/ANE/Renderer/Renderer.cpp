@@ -23,8 +23,6 @@ namespace Engine
     void Renderer::Render(const WindowProperties& props)
     {
         _vulkanRenderer->Render(props);
-        //_vulkanRenderer->DrawMain(cmd);
-        //_vulkanRenderer->DrawImGui(cmd, imageView);
     }
 
     void Renderer::BeginUiDataBuffer()
