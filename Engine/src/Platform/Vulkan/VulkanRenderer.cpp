@@ -690,7 +690,7 @@ namespace Engine
     // TODO: Fully integrate ImGui into rendering loop.
     void VulkanRenderer::DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView)
     {
-        VkRenderingAttachmentInfo colorAttachment = VulkanInitializers::AttachmentInfo(targetImageView, nullptr, VK_IMAGE_LAYOUT_GENERAL);
+        VkRenderingAttachmentInfo colorAttachment = VulkanInitializers::AttachmentInfo(targetImageView, &_mainWindowData.ClearValue, VK_IMAGE_LAYOUT_GENERAL);
         VkRenderingInfo renderInfo = VulkanInitializers::RenderingInfo(_windowExtent, &colorAttachment, nullptr);
 
         vkCmdBeginRendering(cmd, &renderInfo);
