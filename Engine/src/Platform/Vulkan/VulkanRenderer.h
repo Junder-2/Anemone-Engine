@@ -38,6 +38,12 @@ namespace Engine
         VkCommandPool CommandPool;
     };
 
+    struct PushConstantBuffer
+    {
+        glm::mat4 WorldMatrix;
+        VkDeviceAddress VertexBuffer;
+    };
+
     class VulkanRenderer
     {
         struct QueueFamilyIndices
