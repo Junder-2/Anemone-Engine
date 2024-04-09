@@ -60,6 +60,9 @@ namespace Engine
         static vkb::Instance CreateVkbInstance(const std::vector<const char*>& extensions);
         static vkb::PhysicalDevice SelectVkbPhysicalDevice(VkSurfaceKHR surface, vkb::Instance instance);
         static vkb::Device CreateVkbLogicalDevice(const vkb::PhysicalDevice& physicalDevice);
+
+        static void SetupCommandBuffers();
+
         static PipelineWrapper CreatePipeline(const vkb::Device& logicalDevice);
 
         static void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height);

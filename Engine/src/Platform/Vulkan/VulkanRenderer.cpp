@@ -146,6 +146,8 @@ namespace Engine
         SDL_GetWindowSize(window, &w, &h);
         ImGui_ImplVulkanH_Window* wd = &_mainWindowData;
         SetupVulkanWindow(wd, _surface, w, h);
+
+        SetupCommandBuffers();
     }
 
     void VulkanRenderer::SetupImGui(SDL_Window* window)
@@ -309,6 +311,24 @@ namespace Engine
             .value();
 
         return logicalDevice;
+    }
+
+    void VulkanRenderer::SetupCommandBuffers()
+    {
+        const uint32_t familyIndex = _queueFamily.GraphicsFamily.value();
+        const VkCommandPoolCreateInfo commandPoolInfo = VulkanInitializers::CommandPoolCreateInfo(familyIndex, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
+
+        // Immediate buffer.
+        CheckVkResult(vkCreateCommandPool(_device, &commandPoolInfo, _allocator, &_immBuffer.CommandPool));
+
+        const VkCommandBufferAllocateInfo cmdAllocInfo = VulkanInitializers::CommandBufferAllocateInfo(_immBuffer.CommandPool, 1);
+
+        CheckVkResult(vkAllocateCommandBuffers(_device, &cmdAllocInfo, &_immBuffer.CommandBuffer));
+
+        _mainDeletionQueue.PushFunction([=]
+        {
+            vkDestroyCommandPool(_device, _immBuffer.CommandPool, _allocator);
+        });
     }
 
     PipelineWrapper VulkanRenderer::CreatePipeline(const vkb::Device& logicalDevice)
