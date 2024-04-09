@@ -59,7 +59,6 @@ namespace Engine
         VulkanRenderer(SDL_Window* window);
 
         void Setup();
-        void NewFrame(const WindowProperties& props);
         void EndFrame(const WindowProperties& props);
         void Cleanup();
 

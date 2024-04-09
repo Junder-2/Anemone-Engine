@@ -35,32 +35,6 @@ namespace Engine
         _initialized = true;
     }
 
-    void VulkanRenderer::NewFrame(const WindowProperties& props)
-    {
-        if (!_initialized)
-        {
-            ANE_ENGINE_LOG_WARN("Unable to begin VulkanRenderer frame as it was never fully initialized.");
-            return;
-        }
-
-        return;
-
-        if (_rebuildSwapchain)
-        {
-            if (props.Width > 0 && props.Height > 0)
-            {
-                ImGui_ImplVulkan_SetMinImageCount(_minImageCount);
-                ImGui_ImplVulkanH_CreateOrResizeWindow(_instance, _physicalDevice, _device, &_mainWindowData, _queueFamily.GraphicsFamily.value(), _allocator, props.Width, props.Height, _minImageCount);
-                _mainWindowData.FrameIndex = 0;
-                _rebuildSwapchain = false;
-            }
-        }
-
-        //ImGui_ImplVulkan_NewFrame();
-        //ImGui_ImplSDL2_NewFrame();
-        //ImGui::NewFrame();
-    }
-
     void VulkanRenderer::EndFrame(const WindowProperties& props)
     {
         if (!_initialized)
