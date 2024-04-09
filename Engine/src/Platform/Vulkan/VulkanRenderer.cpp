@@ -797,6 +797,8 @@ namespace Engine
 
         _mainDeletionQueue.Flush();
 
+        DestroySwapchain();
+
         vmaDestroyAllocator(_vmaAllocator);
 
         vkDestroyDevice(_device, _allocator);
