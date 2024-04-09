@@ -154,7 +154,7 @@ namespace Engine
 
         // ImGui
         inline static ImGui_ImplVulkanH_Window _mainWindowData;
-        inline static uint32_t _minImageCount = 2;
+        inline static uint32_t _minImageCount = 3;
 
         inline static VkDescriptorPool _imGuiDescriptorPool = VK_NULL_HANDLE;
 
