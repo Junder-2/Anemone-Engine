@@ -594,6 +594,8 @@ namespace Engine
         const VkImage& swapchainImage = _swapchainImages[swapchainImageIndex];
         VulkanUtils::TransitionImage(cmd, swapchainImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
+        VulkanUtils::CopyImageToImage(cmd, _colorImage.Image, swapchainImage,_drawExtent ,_swapchainExtent);
+
         VulkanUtils::TransitionImage(cmd, swapchainImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
         DrawImGui(cmd, _swapchainImageViews[swapchainImageIndex]);
