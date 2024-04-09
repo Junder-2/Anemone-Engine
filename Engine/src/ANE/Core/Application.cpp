@@ -38,7 +38,7 @@ namespace Engine
 
         _window = Window::Create(WindowProperties(_appSpec.Name));
         _window->EventDelegate = MakeDelegate(this, &Application::OnEvent);
-        Renderer::Init(_window->GetWindowContext());
+
         _inputHandler = InputHandler::Create();
         _inputHandler->BindOnEvent(MakeDelegate(this, &Application::OnEvent));
 
