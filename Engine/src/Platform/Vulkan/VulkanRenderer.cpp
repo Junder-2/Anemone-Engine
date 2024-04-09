@@ -378,13 +378,30 @@ namespace Engine
 
     PipelineWrapper VulkanRenderer::CreatePipeline(const vkb::Device& logicalDevice)
     {
-        VkShaderModule triangleVertShader; // Dummy for now
-        VkShaderModule triangleFragShader; // Dummy for now
         VmaImage drawImage = { }; // Dummy for now
+        VkShaderModule meshVertShader;
+        if (!VulkanUtils::LoadShaderModule("../shaders/triangle_mesh.vert.spv", _device, _allocator, &meshVertShader))
+        {
+            ANE_ENGINE_LOG_ERROR("Error when building the triangle vertex shader module");
+        }
+        else
+        {
+            ANE_ENGINE_LOG_INFO("Loaded shader module: vertex_color.vert.spv");
+        }
+
+        VkShaderModule meshFragShader;
+        if (!VulkanUtils::LoadShaderModule("../shaders/triangle_mesh.frag.spv", _device, _allocator, &meshFragShader))
+        {
+            ANE_ENGINE_LOG_ERROR("Error when building the triangle fragment shader module.");
+        }
+        else
+        {
+            ANE_ENGINE_LOG_INFO("Loaded shader module: vertex_color.frag.spv");
+        }
 
         VulkanPipelineBuilder builder{ logicalDevice, _pipelineLayout };
         vkb::Result<PipelineWrapper> pipeline = builder
-            .SetShaders(triangleVertShader, triangleFragShader)
+            .SetShaders(meshVertShader, meshFragShader)
             .SetBlendMode(None)
             .SetDepthTestOperator(VK_COMPARE_OP_ALWAYS)
 
@@ -393,6 +410,10 @@ namespace Engine
 
             .SetAllocationCallbacks(_allocator)
             .Build();
+
+        // Cleanup.
+        vkDestroyShaderModule(_device, meshFragShader, _allocator);
+        vkDestroyShaderModule(_device, meshVertShader, _allocator);
 
         _mainDeletionQueue.PushFunction([&]
         {
