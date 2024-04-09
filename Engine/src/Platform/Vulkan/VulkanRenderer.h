@@ -157,6 +157,7 @@ namespace Engine
         inline static VkPipelineLayout _pipelineLayout;
 
         inline static VmaImage _colorImage;
+        inline static VmaImage _depthImage;
 
         // Swapchain
         inline static VkSwapchainKHR _swapchain;
