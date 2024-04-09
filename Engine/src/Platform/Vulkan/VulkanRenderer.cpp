@@ -318,6 +318,21 @@ namespace Engine
         const uint32_t familyIndex = _queueFamily.GraphicsFamily.value();
         const VkCommandPoolCreateInfo commandPoolInfo = VulkanInitializers::CommandPoolCreateInfo(familyIndex, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 
+        // Frame buffers.
+        for (VulkanFrame& frame : _frameData)
+        {
+            CheckVkResult(vkCreateCommandPool(_device, &commandPoolInfo, _allocator, &frame.CommandPool));
+
+            VkCommandBufferAllocateInfo cmdAllocInfo = VulkanInitializers::CommandBufferAllocateInfo(frame.CommandPool, 1);
+
+            CheckVkResult(vkAllocateCommandBuffers(_device, &cmdAllocInfo, &frame.CommandBuffer));
+
+            _mainDeletionQueue.PushFunction([=]
+            {
+                vkDestroyCommandPool(_device, frame.CommandPool, _allocator);
+            });
+        }
+
         // Immediate buffer.
         CheckVkResult(vkCreateCommandPool(_device, &commandPoolInfo, _allocator, &_immBuffer.CommandPool));
 
