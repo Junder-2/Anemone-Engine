@@ -119,6 +119,7 @@ namespace Engine
 
     private:
         inline static SDL_Window* _window;
+        inline static VkExtent2D _windowExtent;
 
         bool _initialized = false;
 
