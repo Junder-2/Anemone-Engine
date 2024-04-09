@@ -8,32 +8,28 @@ namespace Engine
     class CameraController : public ScriptableEntity
     {
     public:
-        void OnCreate() override
-        {
-            InputSystem& inputSystem = GetInputSystem();
-            inputSystem.BindInput(BindingPair(InputDeviceKeyboard, KeyCodeW), MakeDelegate(this, &CameraController::OnKeyTest));
-            inputSystem.BindMouseButton(MouseButtonLeft, MakeDelegate(this, &CameraController::OnKeyTest));
-            inputSystem.BindKeyboardAxisInput(KeyCodeA, KeyCodeD, MakeDelegate(this, &CameraController::OnAxisTest));
-        }
+        CameraController() = default;
+
+        void OnCreate() override;
 
         void OnDestroy() override // has to be solved
         {
 
         }
 
-        void OnUpdate(float deltaTime) override
-        {
+        void OnUpdate(float deltaTime) override;
 
-        }
+        void OnMoveX(InputValue inputValue);
+
+        void OnMoveY(InputValue inputValue);
 
         void OnKeyTest(InputValue inputValue)
         {
             ANE_LOG_INFO("Testing Button device({0}) id({1}): {2}", InputUtilities::ToString(inputValue.GetDeviceType()), inputValue.GetBindingId(), InputUtilities::ToString(inputValue.GetTriggerState()));
         }
 
-        void OnAxisTest(InputValue inputValue)
-        {
-            ANE_LOG_INFO("Testing Axis device({0}) id({1}): {2}", InputUtilities::ToString(inputValue.GetDeviceType()), inputValue.GetBindingId(), inputValue.GetAxis());
-        }
+    private:
+        TransformComponent* _transformComponent {};
+        float _xInput = 0, _yInput = 0;
     };
 }

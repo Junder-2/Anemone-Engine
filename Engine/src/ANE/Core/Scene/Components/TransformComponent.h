@@ -7,7 +7,7 @@ namespace Engine
     struct TransformComponent : std::enable_shared_from_this<TransformComponent>, Component
     {
     public:
-        TransformMatrix Transform;
+        TransformMatrix Transform {};
 
         std::shared_ptr<TransformComponent> Parent;
         std::vector<std::shared_ptr<TransformComponent>> Children;
