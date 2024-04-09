@@ -315,6 +315,15 @@ namespace Engine
         return logicalDevice;
     }
 
+    void VulkanRenderer::DestroySwapchain()
+    {
+        vkDestroySwapchainKHR(_device, _swapchain, _allocator);
+        for (const VkImageView& swapchainImageView : _swapchainImageViews)
+        {
+            vkDestroyImageView(_device, swapchainImageView, _allocator);
+        }
+    }
+
     void VulkanRenderer::SetupCommandBuffers()
     {
         const uint32_t familyIndex = _queueFamily.GraphicsFamily.value();
