@@ -154,6 +154,14 @@ namespace Engine
 
         inline static VmaImage _colorImage;
 
+        // Swapchain
+        inline static VkSwapchainKHR _swapchain;
+        inline static VkFormat _swapchainImageFormat;
+        inline static VkExtent2D _swapchainExtent;
+        //inline static VkExtent2D _drawExtent;
+        inline static std::vector<VkImage> _swapchainImages;
+        inline static std::vector<VkImageView> _swapchainImageViews;
+
         // VMA
         inline static VmaAllocator _vmaAllocator;
 
