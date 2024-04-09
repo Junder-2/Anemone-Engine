@@ -139,13 +139,12 @@ namespace Engine
         _queue = queueResult.value();
 
         CreateVmaAllocator();
-        //const PipelineWrapper pipeline = CreatePipeline(logicalDevice);
-        //_trianglePipeline = pipeline.Pipeline;
 
         int w, h;
         SDL_GetWindowSize(window, &w, &h);
         ImGui_ImplVulkanH_Window* wd = &_mainWindowData;
         SetupVulkanWindow(wd, _surface, w, h);
+        SetupSwapchain();
 
         SetupCommandBuffers();
 
