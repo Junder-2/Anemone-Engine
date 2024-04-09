@@ -510,7 +510,7 @@ namespace Engine
             .SetDepthTestOperator(VK_COMPARE_OP_ALWAYS)
 
             .SetColorFormat(_colorImage.ImageFormat)
-            .SetDepthFormat(VK_FORMAT_UNDEFINED)
+            .SetDepthFormat(_depthImage.ImageFormat)
 
             .SetAllocationCallbacks(_allocator)
             .Build();
