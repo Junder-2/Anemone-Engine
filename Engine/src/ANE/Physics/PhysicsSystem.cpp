@@ -24,7 +24,7 @@ namespace Engine
     {
         Vector3 vec = transformMatrix.GetPosition();
 
-        // Transform transform(transformMatrix.GetPosition(), transformMatrix.GetRotation());
+        Transform transform(transformMatrix.GetPosition(), transformMatrix.GetRotation());
         // _world->createRigidBody()
     }
 }
