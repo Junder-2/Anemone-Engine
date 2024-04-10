@@ -102,8 +102,8 @@ namespace Engine
         ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
         if (ImGui::Begin("Example: Simple overlay", pOpen, window_flags))
         {
-            const glm::vec2 mousePos = inputManager.GetMousePos();
-            ImGui::Text("Mouse Pos: (%.3f,%.3f)", mousePos.x, mousePos.y);
+            const Vector2 mousePos = inputManager.GetMousePos();
+            ImGui::Text("Mouse Pos: (%.3f,%.3f)", mousePos.X, mousePos.Y);
             const MouseButtonValues mouseButtonValues = inputManager.GetMouseButtonValues();
             ImGui::Text("Mouse Buttons: (");
             bool start = true;
