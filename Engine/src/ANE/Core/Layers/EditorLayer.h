@@ -36,6 +36,7 @@ namespace Engine
         }
 
         std::shared_ptr<Scene> GetActiveScene() { return _activeScene; }
+        std::unordered_map<const char*, std::shared_ptr<Scene>> _scenes;
 
     private:
         void CreateTestScene();
@@ -46,7 +47,6 @@ namespace Engine
         std::string _debugName;
 
     private:
-        std::unordered_map<const char*, std::shared_ptr<Scene>> _scenes;
         std::shared_ptr<Scene> _activeScene;
     };
 

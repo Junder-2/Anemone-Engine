@@ -11,6 +11,7 @@
 #include "ANE/Core/Entity/ExampleScripts/CameraController.h"
 #include "ANE/Core/Scene/Components/NativeScriptComponent.h"
 #include "ANE/Core/Scene/Components/RenderComponent.h"
+#include "Panels/InspectorPanel.h"
 
 namespace Engine
 {
@@ -22,13 +23,18 @@ namespace Engine
 
     void EditorLayer::OnAttach()
     {
+
+
         // You would have a "Read from config files to find correct panel layout" method here
+
+
+        CreateTestScene();
+        AttachUIPanel(new InspectorPanel(_scenes));
 
         // Then you would call load methods to load the most recent project
 
         //Then you would load the scene from the file path listed from that project
 
-        CreateTestScene();
     }
 
     void EditorLayer::OnDetach()
@@ -43,14 +49,25 @@ namespace Engine
 
     void EditorLayer::OnUIRender()
     {
-        ImGui::Begin("Hello");
-        ImGui::Button("Button");
-        ImGui::End();
-
-        static bool showSimpleOverlay = true;
-        if (showSimpleOverlay) ShowInputDebugOverlay(&showSimpleOverlay);
-
         ImGui::ShowDemoWindow();
+
+
+        for (UILayerPanel* panel : _UIpanels)
+        {
+            if(panel->_isVisible)
+            {
+                panel->OnPanelRender();
+            }
+
+            /*There is a chance we will have situation where UI is not visible but still needs to do something
+            like maintaining a dockspace or something like that. This loop is for that situation.
+            If it remains empty for ages we can delete it but leaving it HEAP_REALLOC_IN_PLACE_ONLY*/
+            if(panel->_isEnabled)
+            {
+                //panel->doWindowLayoutmaitenance
+            }
+        }
+
     }
 
     void EditorLayer::OnUpdate(float deltaTime)
