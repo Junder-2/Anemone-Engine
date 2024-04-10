@@ -539,7 +539,7 @@ namespace Engine
         vkb::Result<PipelineWrapper> pipeline = builder
             .SetShaders(meshVertShader, meshFragShader)
             .SetBlendMode(None)
-            .SetDepthTestOperator(VK_COMPARE_OP_ALWAYS)
+            .SetDepthTestOperator(VK_COMPARE_OP_GREATER_OR_EQUAL) // Reverse Z for more precision
 
             .SetColorFormat(_colorImage.ImageFormat)
             .SetDepthFormat(_depthImage.ImageFormat)
