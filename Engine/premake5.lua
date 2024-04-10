@@ -33,6 +33,7 @@ project "Engine"
         "%{IncludeDir.VulkanSDK}",
         "%{IncludeDir.VkBootstrap}",
         "%{IncludeDir.VMA}",
+        "%{IncludeDir.reactphysics}",
     }
 
     libdirs
