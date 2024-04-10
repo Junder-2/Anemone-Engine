@@ -71,5 +71,3 @@ namespace Engine
         W = newQuat.w;
     }
 }
-
-

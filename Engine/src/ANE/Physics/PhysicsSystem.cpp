@@ -2,8 +2,7 @@
 #include "PhysicsSystem.h"
 
 #include "PhysicsLogger.h"
-#include "ANE/Core/Math/TransformMatrix.h"
-#include "ANE/Utilities/PhysicsUtilities.h"
+#include "ANE/Core/Math/Matrix/TransformMatrix.h"
 
 namespace Engine
 {
@@ -11,20 +10,19 @@ namespace Engine
     {
         _physicsLogger = new PhysicsLogger();
         _physicsCommon.setLogger(_physicsLogger);
-        _world = std::unique_ptr<PhysicsWorld>(_physicsCommon.createPhysicsWorld(PhysicsWorld::WorldSettings()));
+        _world = _physicsCommon.createPhysicsWorld(PhysicsWorld::WorldSettings());
     }
 
     PhysicsSystem::~PhysicsSystem()
     {
-        _physicsCommon.destroyPhysicsWorld(_world.get());
+        _physicsCommon.destroyPhysicsWorld(_world);
         delete _physicsLogger;
     }
 
     RigidBody& PhysicsSystem::CreateRigidBody(const TransformMatrix& transformMatrix)
     {
-        Vector3 vec = transformMatrix.GetPosition();
+        const Transform transform(transformMatrix.GetPosition(), transformMatrix.GetRotation());
 
-        Transform transform(transformMatrix.GetPosition(), transformMatrix.GetRotation());
-        // _world->createRigidBody()
+        return *_world->createRigidBody(transform);
     }
 }

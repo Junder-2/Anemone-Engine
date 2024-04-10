@@ -22,10 +22,10 @@ namespace Engine
         union {float X, R, Pitch;};
         union {float Y, G, Yaw;};
 
-        inline static Vector2 ZeroVector = {0, 0};
-        inline static Vector2 RightVector = {1, 0};
-        inline static Vector2 UpVector = {0, 1};
-        inline static Vector2 OneVector = {1, 1};
+        static Vector2 ZeroVector() { return {0, 0}; }
+        static Vector2 RightVector() { return {1, 0}; }
+        static Vector2 UpVector() { return {0, 1}; }
+        static Vector2 OneVector() { return {1, 1}; }
 
         float LengthSquare() const;
 

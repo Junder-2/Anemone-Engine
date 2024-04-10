@@ -49,9 +49,9 @@ namespace Engine
 
         void AddRotation(const Vector3 delta)
         {
-            _transformMatrix.Rotate(glm::radians(delta.X), Vector3::RightVector);
-            _transformMatrix.Rotate(glm::radians(delta.Y), Vector3::UpVector);
-            _transformMatrix.Rotate(glm::radians(delta.Z), Vector3::ForwardVector);
+            _transformMatrix.Rotate(glm::radians(delta.X), Vector3::RightVector());
+            _transformMatrix.Rotate(glm::radians(delta.Y), Vector3::UpVector());
+            _transformMatrix.Rotate(glm::radians(delta.Z), Vector3::ForwardVector());
         }
 
         void AddRotation(const Quaternion delta)

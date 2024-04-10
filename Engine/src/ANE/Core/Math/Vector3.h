@@ -24,11 +24,11 @@ namespace Engine
         union {float Y, G, Yaw;};
         union {float Z, B, Roll;};
 
-        inline static Vector3 ZeroVector = {0, 0, 0};
-        inline static Vector3 RightVector = {1, 0, 0};
-        inline static Vector3 UpVector = {0, 1, 0};
-        inline static Vector3 ForwardVector = {0, 0, 1};
-        inline static Vector3 OneVector = {1, 1, 0};
+        static Vector3 ZeroVector() { return {0, 0, 0}; }
+        static Vector3 RightVector() { return {1, 0, 0}; }
+        static Vector3 UpVector() { return {0, 1, 0}; }
+        static Vector3 ForwardVector() { return {0, 0, 1}; }
+        static Vector3 OneVector() { return {1, 1, 0}; }
 
         float LengthSquare() const;
 

@@ -18,7 +18,7 @@ namespace Engine
 
     private:
         PhysicsCommon _physicsCommon {};
-        std::unique_ptr<PhysicsWorld> _world;
+        PhysicsWorld* _world;
 
         PhysicsLogger* _physicsLogger;
     };

@@ -61,12 +61,15 @@ namespace Engine
         void Translate(Vector3 delta);
         void Rotate(float angle, Vector3 axis);
 
-        inline static Matrix4x4 Identity = {1, 0, 0, 0,
-                                            0, 1, 0, 0,
-                                            0, 0, 1, 0,
-                                            0, 0, 0, 1};
+        static Matrix4x4 Identity()
+        {
+            return {1, 0, 0, 0,
+                    0, 1, 0, 0,
+                    0, 0, 1, 0,
+                    0, 0, 0, 1};
+        }
 
-        inline static Matrix4x4 Zero = {0};
+        static Matrix4x4 Zero() { return {0}; }
 
         // Conversion to other matrix types
         static Matrix4x4 Convert(const glm::mat4& mat4);

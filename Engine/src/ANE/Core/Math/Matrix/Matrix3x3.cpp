@@ -41,7 +41,7 @@ namespace Engine
 
     Matrix3x3::operator const Matrix4x4() const
     {
-        return {Vector4(_rows[0]), Vector4(_rows[1]), Vector4(_rows[2]), Vector4::ZeroVector};
+        return {Vector4(_rows[0]), Vector4(_rows[1]), Vector4(_rows[2]), Vector4::ZeroVector()};
     }
 
     Matrix3x3& Matrix3x3::operator*=(const Matrix3x3& matrix)
@@ -60,5 +60,3 @@ namespace Engine
         return Matrix3x3::Convert(static_cast<glm::mat3>(matrix1) * static_cast<glm::mat3>(matrix2));
     }
 }
-
-

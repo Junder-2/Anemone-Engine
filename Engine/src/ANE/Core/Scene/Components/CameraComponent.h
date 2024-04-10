@@ -1,6 +1,6 @@
 #pragma once
 #include "Component.h"
-#include "ANE/Core/Math/TransformMatrix.h"
+#include "ANE/Core/Math/Matrix/TransformMatrix.h"
 
 namespace Engine
 {
@@ -8,9 +8,9 @@ namespace Engine
     {
     public:
         TransformMatrix Transform {};
-        glm::vec4 ViewPos = {};
-        glm::mat4 PerspectiveMatrix = {};
-        glm::mat4 ViewMatrix = {};
+        Vector4 ViewPos = {};
+        Matrix4x4 PerspectiveMatrix = {};
+        Matrix4x4 ViewMatrix = {};
 
 
         ANE_COMPONENT_INIT(CameraComponent)
@@ -22,8 +22,8 @@ namespace Engine
 
         void UpdateAspectRatio(float aspect);
 
-        void SetPosition(glm::vec3 newPosition);
-        void SetRotation(glm::vec3 newRotation);
+        void SetPosition(Vector3 newPosition);
+        void SetRotation(Vector3 newRotation);
 
         float GetFOV() const
         {

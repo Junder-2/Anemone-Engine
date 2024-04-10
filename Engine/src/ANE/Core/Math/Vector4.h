@@ -20,8 +20,14 @@ namespace Engine
         union {float Z, B;};
         union {float W, A;};
 
-        inline static Vector4 ZeroVector = {0, 0, 0, 0};
-        inline static Vector4 OneVector = {1, 1, 1, 1};
+        static Vector4 ZeroVector()
+        {
+            return {0, 0, 0, 0};
+        }
+        static Vector4 OneVector()
+        {
+            return {1, 1, 1, 1};
+        }
 
         float LengthSquare() const;
 

@@ -52,11 +52,14 @@ namespace Engine
 
         Matrix3x3 GetInverse() const;
 
-        inline static Matrix3x3 Identity = {1.0, 0.0, 0.0,
-                                            0.0, 1.0, 0.0,
-                                            0.0, 0.0, 1.0};
+        static Matrix3x3 Identity()
+        {
+            return {1.0, 0.0, 0.0,
+                    0.0, 1.0, 0.0,
+                    0.0, 0.0, 1.0};
+        }
 
-        inline static Matrix3x3 Zero = {0};
+        static Matrix3x3 Zero() { return {0}; }
 
         static Matrix3x3 Convert(const glm::mat3& mat3);
 

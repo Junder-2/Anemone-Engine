@@ -23,7 +23,7 @@ namespace Engine
 
         float X, Y, Z, W;
 
-        inline static Quaternion Identity = {0, 0, 0, 1};
+        static Quaternion Identity() { return {0, 0, 0, 1}; }
 
         Vector3 GetVectorV() const;
 
