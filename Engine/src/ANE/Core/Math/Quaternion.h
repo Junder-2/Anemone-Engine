@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "Matrix3x3.h"
 #include "Vector3.h"
 #include "Matrix/Matrix3x3.h"
 
@@ -24,6 +23,8 @@ namespace Engine
 
         float X, Y, Z, W;
 
+        inline static Quaternion Identity = {0, 0, 0, 1};
+
         Vector3 GetVectorV() const;
 
         float LengthSquare() const;
@@ -41,18 +42,20 @@ namespace Engine
         Quaternion GetInverse() const;
 
         Matrix3x3 GetMatrix() const;
+        Vector3 GetEulerAngles() const;
 
         std::string ToString() const;
-
-        static Quaternion Identity();
 
         static Quaternion FromEulerAngles(float angleX, float angleY, float angleZ);
 
         static Quaternion FromEulerAngles(const Vector3& eulerAngles);
 
-        // Conversion to other vector3 types
-        operator const reactphysics3d::Quaternion&() const;
-        operator const glm::quat&() const;
+        // Conversion to other quaternion types
+        static Quaternion Convert(const reactphysics3d::Quaternion& quat);
+        static Quaternion Convert(const glm::quat& quat);
+
+        operator const reactphysics3d::Quaternion() const;
+        operator const glm::quat() const;
 
         Quaternion operator+(const Quaternion& quaternion) const
         {
@@ -82,17 +85,17 @@ namespace Engine
             return *this;
         }
 
-        Quaternion operator*(const float nb) const
+        Quaternion operator*(const float scalar) const
         {
-            return {nb * X, nb * Y, nb * Z, nb * W};
+            return {scalar * X, scalar * Y, scalar * Z, scalar * W};
         }
 
         Quaternion operator*(const Quaternion& quaternion) const
         {
-            return Quaternion(W * quaternion.X + quaternion.W * X + Y * quaternion.Z - Z * quaternion.Y,
+            return { W * quaternion.X + quaternion.W * X + Y * quaternion.Z - Z * quaternion.Y,
                       W * quaternion.Y + quaternion.W * Y + Z * quaternion.X - X * quaternion.Z,
                       W * quaternion.Z + quaternion.W * Z + X * quaternion.Y - Y * quaternion.X,
-                      W * quaternion.W - X * quaternion.X - Y * quaternion.Y - Z * quaternion.Z);
+                      W * quaternion.W - X * quaternion.X - Y * quaternion.Y - Z * quaternion.Z};
         }
 
         Vector3 operator*(const Vector3& point) const
@@ -166,11 +169,6 @@ namespace Engine
     inline float Quaternion::Dot(const Quaternion& quaternion) const
     {
         return (X*quaternion.X + Y*quaternion.Y + Z*quaternion.Z + W*quaternion.W);
-    }
-
-    inline Quaternion Quaternion::Identity()
-    {
-        return Quaternion(0.0, 0.0, 0.0, 1.0);
     }
 
     inline std::string Quaternion::ToString() const

@@ -11,11 +11,21 @@ namespace reactphysics3d
 
 namespace Engine
 {
+    struct Vector3;
+    struct Vector4;
+
     struct Vector2
     {
-        Vector2(const float newX = 0, const float newY = 0) : X(newX), Y(newY) {}
+        Vector2() : X(0), Y(0) {}
+        Vector2(const float newX, const float newY = 0) : X(newX), Y(newY) {}
 
-        float X, Y;
+        union {float X, R, Pitch;};
+        union {float Y, G, Yaw;};
+
+        inline static Vector2 ZeroVector = {0, 0};
+        inline static Vector2 RightVector = {1, 0};
+        inline static Vector2 UpVector = {0, 1};
+        inline static Vector2 OneVector = {1, 1};
 
         float LengthSquare() const;
 
@@ -27,15 +37,17 @@ namespace Engine
 
         void Normalize();
 
-        std::string ToString() const;
-
-        static Vector2 ZeroVector();
-
         static bool Equal(const Vector2& vec1, const Vector2& vec2, const float epsilon = EPSILON);
 
         // Conversion to other vector2 types
-        operator const reactphysics3d::Vector2&() const;
-        operator const glm::vec2&() const;
+        static Vector2 Convert(const reactphysics3d::Vector2& vec);
+        static Vector2 Convert(const glm::vec2& vec);
+
+        operator const reactphysics3d::Vector2() const;
+        operator const glm::vec2() const;
+
+        operator const Vector3() const;
+        operator const Vector4() const;
 
         bool operator==(const Vector2& vector) const
         {
@@ -98,48 +110,50 @@ namespace Engine
             return (X == vector.X ? Y < vector.Y : X < vector.X);
         }
 
-        Vector2 operator+(const Vector2& vector1, const Vector2& vector2)
+        friend Vector2 operator+(const Vector2& vector1, const Vector2& vector2)
         {
             return {vector1.X + vector2.X, vector1.Y + vector2.Y};
         }
 
-        Vector2 operator-(const Vector2& vector1, const Vector2& vector2)
+        friend Vector2 operator-(const Vector2& vector1, const Vector2& vector2)
         {
             return {vector1.X - vector2.X, vector1.Y - vector2.Y};
         }
 
-        Vector2 operator-(const Vector2& vector)
+        friend Vector2 operator-(const Vector2& vector)
         {
             return {-vector.X, -vector.Y};
         }
 
-        Vector2 operator*(const Vector2& vector, const float scalar)
+        friend Vector2 operator*(const Vector2& vector, const float scalar)
         {
             return {scalar * vector.X, scalar * vector.Y};
         }
 
-        Vector2 operator*(const float scalar, const Vector2& vector)
+        friend Vector2 operator*(const float scalar, const Vector2& vector)
         {
             return {scalar * vector.X, scalar * vector.Y};
         }
 
-        Vector2 operator*(const Vector2& vector1, const Vector2& vector2)
+        friend Vector2 operator*(const Vector2& vector1, const Vector2& vector2)
         {
             return {vector1.X*vector2.X, vector1.Y*vector2.Y};
         }
 
-        Vector2 operator/(const Vector2& vector, const float scalar)
+        friend Vector2 operator/(const Vector2& vector, const float scalar)
         {
             assert(scalar > EPSILON);
             return  {vector.X / scalar, vector.Y / scalar};
         }
 
-        Vector2 operator/(const Vector2& vector1, const Vector2& vector2)
+        friend Vector2 operator/(const Vector2& vector1, const Vector2& vector2)
         {
             assert(vector2.X > EPSILON);
             assert(vector2.Y > EPSILON);
             return {vector1.X / vector2.X, vector1.Y / vector2.Y};
         }
+
+        std::string ToString() const;
     };
 
     inline float Vector2::LengthSquare() const
@@ -177,13 +191,8 @@ namespace Engine
         return "Vector2(" + std::to_string(X) + "," + std::to_string(Y) + ")";
     }
 
-    inline Vector2 Vector2::ZeroVector()
-    {
-        return {0, 0};
-    }
-
     inline bool Vector2::Equal(const Vector2& vec1, const Vector2& vec2, const float epsilon)
     {
-        return Equal(vec1.X, vec2.X, epsilon) && Equal(vec1.Y, vec2.Y, epsilon);
+        return Engine::Equal(vec1.X, vec2.X, epsilon) && Engine::Equal(vec1.Y, vec2.Y, epsilon);
     }
 }

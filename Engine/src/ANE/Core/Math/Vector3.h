@@ -11,11 +11,24 @@ namespace reactphysics3d
 
 namespace Engine
 {
+    struct Vector2;
+    struct Vector4;
+
     struct Vector3
     {
-        Vector3(const float newX = 0, const float newY = 0, const float newZ = 0) : X(newX), Y(newY), Z(newZ) {}
+        Vector3() : X(0), Y(0), Z(0) {}
+        Vector3(const float newX, const float newY = 0, const float newZ = 0) : X(newX), Y(newY), Z(newZ) {}
+        Vector3(Vector2 vector2, float newZ = 0);
 
-        float X, Y, Z;
+        union {float X, R, Pitch;};
+        union {float Y, G, Yaw;};
+        union {float Z, B, Roll;};
+
+        inline static Vector3 ZeroVector = {0, 0, 0};
+        inline static Vector3 RightVector = {1, 0, 0};
+        inline static Vector3 UpVector = {0, 1, 0};
+        inline static Vector3 ForwardVector = {0, 0, 1};
+        inline static Vector3 OneVector = {1, 1, 0};
 
         float LengthSquare() const;
 
@@ -29,15 +42,17 @@ namespace Engine
 
         void Normalize();
 
-        std::string ToString() const;
-
-        static Vector3 ZeroVector();
-
         static bool Equal(const Vector3& vec1, const Vector3& vec2, const float epsilon = EPSILON);
 
+        static Vector3 Convert(const reactphysics3d::Vector3& vec);
+        static Vector3 Convert(const glm::vec3& vec);
+
         // Conversion to other vector3 types
-        operator const reactphysics3d::Vector3&() const;
-        operator const glm::vec3&() const;
+        operator const reactphysics3d::Vector3() const;
+        operator const glm::vec3() const;
+
+        operator const Vector2() const;
+        operator const Vector4() const;
 
         bool operator==(const Vector3& vector) const
         {
@@ -105,49 +120,51 @@ namespace Engine
             return (X == vector.X ? (Y == vector.Y ? Z < vector.Z : Y < vector.Y) : X < vector.X);
         }
 
-        Vector3 operator+(const Vector3& vector1, const Vector3& vector2)
+        friend Vector3 operator+(const Vector3& vector1, const Vector3& vector2)
         {
             return {vector1.X + vector2.X, vector1.Y + vector2.Y, vector1.Z + vector2.Z};
         }
 
-        Vector3 operator-(const Vector3& vector1, const Vector3& vector2)
+        friend Vector3 operator-(const Vector3& vector1, const Vector3& vector2)
         {
             return {vector1.X - vector2.X, vector1.Y - vector2.Y, vector1.Z - vector2.Z};
         }
 
-        Vector3 operator-(const Vector3& vector)
+        friend Vector3 operator-(const Vector3& vector)
         {
             return {-vector.X, -vector.Y, -vector.Z};
         }
 
-        Vector3 operator*(const Vector3& vector, const float scalar)
+        friend Vector3 operator*(const Vector3& vector, const float scalar)
         {
             return {scalar * vector.X, scalar * vector.Y, scalar * vector.Z};
         }
 
-        Vector3 operator*(const float scalar, const Vector3& vector)
+        friend Vector3 operator*(const float scalar, const Vector3& vector)
         {
-            return {scalar * vector.X, scalar * vector.Y, scalar * vector.Z};
+            return vector * scalar;
         }
 
-        Vector3 operator*(const Vector3& vector1, const Vector3& vector2)
+        friend Vector3 operator*(const Vector3& vector1, const Vector3& vector2)
         {
             return {vector1.X*vector2.X, vector1.Y*vector2.Y, vector1.Z*vector2.Z};
         }
 
-        Vector3 operator/(const Vector3& vector, const float scalar)
+        friend Vector3 operator/(const Vector3& vector, const float scalar)
         {
             assert(scalar > EPSILON);
             return {vector.X / scalar, vector.Y / scalar, vector.Z / scalar};
         }
 
-        Vector3 operator/(const Vector3& vector1, const Vector3& vector2)
+        friend Vector3 operator/(const Vector3& vector1, const Vector3& vector2)
         {
             assert(vector2.X > EPSILON);
             assert(vector2.Y > EPSILON);
             assert(vector2.Z > EPSILON);
             return {vector1.X / vector2.X, vector1.Y / vector2.Y, vector1.Z / vector2.Z};
         }
+
+        std::string ToString() const;
     };
 
     inline float Vector3::LengthSquare() const
@@ -193,14 +210,9 @@ namespace Engine
         return "Vector3(" + std::to_string(X) + "," + std::to_string(Y) + "," + std::to_string(Z) + ")";
     }
 
-    inline Vector3 Vector3::ZeroVector()
-    {
-        return {0, 0, 0};
-    }
-
     inline bool Vector3::Equal(const Vector3& vec1, const Vector3& vec2, const float epsilon)
     {
-        return Equal(vec1.X, vec2.X, epsilon) && Equal(vec1.Y, vec2.Y, epsilon) &&
-            Equal(vec1.Z, vec2.Z, epsilon);
+        return Engine::Equal(vec1.X, vec2.X, epsilon) && Engine::Equal(vec1.Y, vec2.Y, epsilon) &&
+            Engine::Equal(vec1.Z, vec2.Z, epsilon);
     }
 }

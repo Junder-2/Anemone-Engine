@@ -1,22 +1,24 @@
 #pragma once
-#include "Vector3.h"
+#include "Matrix4x4.h"
+#include "ANE/Core/Math/Quaternion.h"
+#include "ANE/Core/Math/Vector3.h"
 
 namespace Engine
 {
     struct TransformMatrix
     {
     public:
-        TransformMatrix(const glm::mat4& transform = glm::mat4(1.f)) : _transformMatrix(transform) {}
+        TransformMatrix(const Matrix4x4& transform = Matrix4x4(1.f)) : _transformMatrix(transform) {}
         TransformMatrix(const TransformMatrix&) = default;
 
-        void SetPosition(const glm::vec3 newPosition)
+        void SetPosition(const Vector3 newPosition)
         {
-            _transformMatrix[3] = xyz1(newPosition);
+            _transformMatrix[3] = Vector4(newPosition, 1);
         }
 
-        void AddPosition(const glm::vec3 delta)
+        void AddPosition(const Vector3 delta)
         {
-            _transformMatrix = translate(_transformMatrix, delta);
+            _transformMatrix.Translate(delta);
         }
 
         Vector3 GetPosition() const
@@ -24,39 +26,37 @@ namespace Engine
             return {_transformMatrix[3][0], _transformMatrix[3][1], _transformMatrix[3][2]};
         }
 
-        void SetRotation(const glm::vec3 newRotation) // todo: fix, overwrite rotation
+        void SetRotation(const Vector3 newRotation) // todo: fix, overwrite rotation
         {
-            const glm::vec3 scale = GetScale();
+            const Vector3 scale = GetScale();
 
-            _transformMatrix[0] = glm::vec4(1, 0, 0, 0) * scale.x;
-            _transformMatrix[1] = glm::vec4(0, 1, 0, 0) * scale.y;
-            _transformMatrix[2] = glm::vec4(0, 0, 1, 0) * scale.z;
-            _transformMatrix = rotate(_transformMatrix, glm::radians(newRotation.x), glm::vec3(1.f, 0.f, 0.f));
-            _transformMatrix = rotate(_transformMatrix, glm::radians(newRotation.y), glm::vec3(0.f, 1.f, 0.f));
-            _transformMatrix = rotate(_transformMatrix, glm::radians(newRotation.z), glm::vec3(0.f, 0.f, 1.f));
+            _transformMatrix[0] = Vector4(1, 0, 0, 0) * scale.X;
+            _transformMatrix[1] = Vector4(0, 1, 0, 0) * scale.Y;
+            _transformMatrix[2] = Vector4(0, 0, 1, 0) * scale.Z;
+            AddRotation(newRotation);
         }
 
-        void SetRotation(const glm::quat newRotation)
+        void SetRotation(const Quaternion newRotation)
         {
-            const glm::vec3 scale = GetScale();
+            const Vector3 scale = GetScale();
 
-            glm::mat3 rotMatrix = mat3_cast(newRotation);
+            Matrix3x3 rotMatrix = (newRotation).GetMatrix();
 
-            _transformMatrix[0] = xyz0(rotMatrix[0]) * scale.x;
-            _transformMatrix[1] = xyz0(rotMatrix[1]) * scale.y;
-            _transformMatrix[2] = xyz0(rotMatrix[2]) * scale.z;
+            _transformMatrix[0] = Vector4(rotMatrix[0], 0) * scale.X;
+            _transformMatrix[1] = Vector4(rotMatrix[1], 0) * scale.Y;
+            _transformMatrix[2] = Vector4(rotMatrix[2], 0) * scale.Z;
         }
 
-        void AddRotation(const glm::vec3 delta)
+        void AddRotation(const Vector3 delta)
         {
-            _transformMatrix = rotate(_transformMatrix, glm::radians(delta.x), glm::vec3(1.f, 0.f, 0.f));
-            _transformMatrix = rotate(_transformMatrix, glm::radians(delta.y), glm::vec3(0.f, 1.f, 0.f));
-            _transformMatrix = rotate(_transformMatrix, glm::radians(delta.z), glm::vec3(0.f, 0.f, 1.f));
+            _transformMatrix.Rotate(glm::radians(delta.X), Vector3::RightVector);
+            _transformMatrix.Rotate(glm::radians(delta.Y), Vector3::UpVector);
+            _transformMatrix.Rotate(glm::radians(delta.Z), Vector3::ForwardVector);
         }
 
-        void AddRotation(const glm::quat delta)
+        void AddRotation(const Quaternion delta)
         {
-            glm::mat4 rotMatrix = mat4_cast(delta);
+            Matrix4x4 rotMatrix = (delta).GetMatrix();
             rotMatrix[3][3] = 1;
 
             _transformMatrix *= rotMatrix;
@@ -64,25 +64,25 @@ namespace Engine
 
         Vector3 GetEulerRotation() const
         {
-            const glm::vec3 euler = eulerAngles(quat_cast(_transformMatrix));
-            return {euler.x, euler.y, euler.z};
+            const Vector3 euler = Quaternion(_transformMatrix).GetEulerAngles();
+            return {euler.X, euler.Y, euler.Z};
         }
 
-        glm::quat GetRotation() const
+        Quaternion GetRotation() const
         {
-            return quat_cast(_transformMatrix);
+            return Quaternion(_transformMatrix);
         }
 
         Vector3 GetScale() const
         {
-            const Vector3 scale(length(xyz(_transformMatrix[0])), length(xyz(_transformMatrix[1])), length(xyz(_transformMatrix[2])));
+            const Vector3 scale(Vector3(_transformMatrix[0]).Length(), Vector3(_transformMatrix[1]).Length(), Vector3(_transformMatrix[2]).Length());
             return scale;
         }
 
-        operator const glm::mat4&() const { return _transformMatrix; }
-        operator glm::mat4&() { return _transformMatrix; }
+        operator const Matrix4x4&() const { return _transformMatrix; }
+        operator Matrix4x4&() { return _transformMatrix; }
 
     private:
-        glm::mat4 _transformMatrix;
+        Matrix4x4 _transformMatrix;
     };
 }
