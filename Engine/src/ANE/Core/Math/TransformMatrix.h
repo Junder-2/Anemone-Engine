@@ -18,9 +18,9 @@ namespace Engine
             _transformMatrix = translate(_transformMatrix, delta);
         }
 
-        glm::vec3 GetPosition()
+        glm::vec3 GetPosition() const
         {
-            return xyz(_transformMatrix[3]);
+            return _transformMatrix[3];
         }
 
         void SetRotation(const glm::vec3 newRotation) // todo: fix, overwrite rotation
