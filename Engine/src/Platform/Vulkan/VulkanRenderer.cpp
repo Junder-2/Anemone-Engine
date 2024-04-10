@@ -591,13 +591,6 @@ namespace Engine
             }
         }
 
-        ImDrawData* drawData = ImGui::GetDrawData();
-        const bool isMinimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
-        if (isMinimized)
-        {
-            return;
-        }
-
         const VulkanFrame frame = GetFrame();
         CheckVkResult(vkWaitForFences(_device, 1, &frame.Fence, true, 1000000000));
 
