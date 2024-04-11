@@ -4,6 +4,8 @@
 
 //Modified copy of reactphysics/include/reactphysics3d/mathematics/Vector2.h
 
+struct ImVec2;
+
 namespace reactphysics3d
 {
     struct Vector2;
@@ -42,9 +44,11 @@ namespace Engine
         // Conversion to other vector2 types
         static Vector2 Convert(const reactphysics3d::Vector2& vec);
         static Vector2 Convert(const glm::vec2& vec);
+        static Vector2 Convert(const ImVec2& vec);
 
         operator const reactphysics3d::Vector2() const;
         operator const glm::vec2() const;
+        operator const ImVec2() const;
 
         operator const Vector3() const;
         operator const Vector4() const;

@@ -3,6 +3,8 @@
 
 //Modified copy of reactphysics/include/reactphysics3d/mathematics/Vector3.h
 
+struct ImVec4;
+
 namespace Engine
 {
     struct Vector2;
@@ -42,9 +44,11 @@ namespace Engine
         static bool Equal(const Vector4& vec1, const Vector4& vec2, float epsilon = EPSILON);
 
         static Vector4 Convert(const glm::vec4& vec);
+        static Vector4 Convert(const ImVec4& vec);
 
         // Conversion to other vector4 types
         operator const glm::vec4() const;
+        operator const ImVec4() const;
 
         operator const Vector2() const;
         operator const Vector3() const;
