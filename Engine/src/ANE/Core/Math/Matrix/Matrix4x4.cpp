@@ -73,7 +73,7 @@ namespace Engine
             euler *= DEGREES_TO_RAD;
         }
 
-        Rotate(Quaternion(euler));
+        Rotate(euler, false);
     }
 
     Quaternion Matrix4x4::GetQuaternion() const
