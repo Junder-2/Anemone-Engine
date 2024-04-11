@@ -197,6 +197,6 @@ namespace Engine
     {
         const MouseMoveValue inputValue = mouseMovementEvent.GetInputValue();
         // spdlog formatting not working use explicit glm::to_string
-        ANE_ENGINE_LOG_INFO("moved mouse pos:({0}), delta:({1})", glm::to_string(inputValue.GetMousePos()), glm::to_string(inputValue.GetMouseDelta()));
+        ANE_ENGINE_LOG_INFO("moved mouse pos:({0}), delta:({1})", inputValue.GetMousePos().ToString(), inputValue.GetMouseDelta().ToString());
     }
 }
