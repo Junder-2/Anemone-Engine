@@ -9,6 +9,7 @@
 //Temp includes. Can probably change how these components are referenced. Maybe a scene manager hsould be in charge of that
 //kind of thing
 #include "ANE/Core/Entity/ExampleScripts/CameraController.h"
+#include "ANE/Core/Scene/Components/CameraComponent.h"
 #include "ANE/Core/Scene/Components/NativeScriptComponent.h"
 #include "ANE/Core/Scene/Components/RenderComponent.h"
 
@@ -68,6 +69,7 @@ namespace Engine
 
         //Add component to entity
         ent.AddComponent<RenderComponent>();
+        ent.AddComponent<CameraComponent>();
         ent.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
         //Get Component from entity
