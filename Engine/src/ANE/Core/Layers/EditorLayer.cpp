@@ -68,7 +68,7 @@ namespace Engine
 
         //Add component to entity
         ent.AddComponent<RenderComponent>();
-        // ent.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+        ent.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
         //Get Component from entity
         if (RenderComponent comp; ent.TryGetComponent<RenderComponent>(comp))
