@@ -19,6 +19,10 @@ namespace Engine
         static void BeginUiDataBuffer();
         static void EndUIDataBuffer();
 
+        static void SetCameraPosition(glm::vec3 position);
+
+        static void SetCameraRotation(const float yawDegrees, const float pitchDegrees);
+
     private:
         static std::unique_ptr<VulkanRenderer> _vulkanRenderer;
     };

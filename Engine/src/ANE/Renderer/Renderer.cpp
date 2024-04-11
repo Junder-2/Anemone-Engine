@@ -42,4 +42,14 @@ namespace Engine
             ImGui::RenderPlatformWindowsDefault();
         }
     }
+
+    void Renderer::SetCameraPosition(const glm::vec3 position)
+    {
+        _vulkanRenderer->CameraPosition = position;
+    }
+
+    void Renderer::SetCameraRotation(const float yawDegrees, const float pitchDegrees)
+    {
+        _vulkanRenderer->CameraRotationRadians = glm::vec2{ yawDegrees, pitchDegrees };
+    }
 }
