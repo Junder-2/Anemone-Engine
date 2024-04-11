@@ -46,9 +46,9 @@ namespace Engine
             _transformMatrix.Rotate(delta);
         }
 
-        Vector3 GetEulerAngles() const
+        Vector3 GetEulerAngles(const bool isDegrees = false) const
         {
-            return _transformMatrix.GetEulerAngles();
+            return _transformMatrix.GetEulerAngles(isDegrees);
         }
 
         Quaternion GetQuaternion() const
