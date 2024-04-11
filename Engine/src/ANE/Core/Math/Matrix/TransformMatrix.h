@@ -16,9 +16,13 @@ namespace Engine
             _transformMatrix[3] = Vector4(newPosition, 1);
         }
 
+        /**
+         * Adds a positional offset to the Transform along the coordinate system of the world.
+         * @param delta World space offset
+         */
         void AddPosition(const Vector3 delta)
         {
-            _transformMatrix.Translate(delta);
+            _transformMatrix.Translate((Matrix3x3)_transformMatrix.GetInverse() * delta);
         }
 
         void SetRotation(const Vector3 newRotation, const bool isDegrees = false)
