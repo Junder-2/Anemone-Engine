@@ -4,6 +4,7 @@
 #include <imgui_impl_sdl2.h>
 
 #include "Platform/Vulkan/VulkanRenderer.h"
+#include "ANE/Core/Math/Matrix/Matrix4x4.h"
 
 namespace Engine
 {
@@ -43,13 +44,8 @@ namespace Engine
         }
     }
 
-    void Renderer::SetCameraPosition(const glm::vec3 position)
+    void Renderer::SetViewProjection(const Matrix4x4& matrix)
     {
-        _vulkanRenderer->CameraPosition = position;
-    }
-
-    void Renderer::SetCameraRotation(const float yawDegrees, const float pitchDegrees)
-    {
-        _vulkanRenderer->CameraRotationRadians = glm::vec2{ yawDegrees, pitchDegrees };
+        _vulkanRenderer->ViewProjection = matrix;
     }
 }

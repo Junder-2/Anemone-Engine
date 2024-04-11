@@ -13,6 +13,7 @@
 #include "VulkanInitializers.h"
 #include "VulkanUtils.h"
 #include "ANE/Core/Window.h"
+#include "ANE/Core/Math/Matrix/Matrix4x4.h"
 #include "ANE/Utilities/ImGuiUtilities.h"
 
 namespace Engine
@@ -581,17 +582,16 @@ namespace Engine
         _mainDeletionQueue.PushFunction([&]{ vkDestroyDescriptorPool(_device, _imGuiDescriptorPool, _allocator); });
     }
 
-    glm::mat4 VulkanRenderer::GetViewProjectionMatrix()
+    Matrix4x4 VulkanRenderer::GetViewProjectionMatrix()
     {
-        glm::mat4 modelMat = glm::mat4{ 1.f }; // Identity.
-        glm::mat4 viewMat = glm::mat4{ 1.f };
-        viewMat = rotate(viewMat, CameraRotationRadians.y, glm::vec3{1, 0, 0});
-        viewMat = rotate(viewMat, CameraRotationRadians.x, glm::vec3{0, 1, 0});
-        viewMat = translate(viewMat, glm::vec3{ -CameraPosition.x, -CameraPosition.y, CameraPosition.z - 2.0f }); // X and Y seem to be flipped.
-        //return viewMat;
-        glm::mat4 projMat = glm::perspective(glm::radians(70.f), (float)_windowExtent.width / (float)_windowExtent.height, 10000.f, 0.1f); // Flip clip planes.
-        projMat[1][1] *= -1.f;
-        return projMat * viewMat * modelMat;
+        Matrix4x4 modelMat = Matrix4x4::Identity();
+        //glm::mat4 viewMat = glm::mat4{ 1.f };
+        //viewMat = rotate(viewMat, CameraRotationRadians.y, glm::vec3{1, 0, 0});
+        //viewMat = rotate(viewMat, CameraRotationRadians.x, glm::vec3{0, 1, 0});
+        //viewMat = translate(viewMat, glm::vec3{ -CameraPosition.x, -CameraPosition.y, CameraPosition.z - 2.0f }); // X and Y seem to be flipped.
+        //glm::mat4 projMat = glm::perspective(glm::radians(70.f), (float)_windowExtent.width / (float)_windowExtent.height, 10000.f, 0.1f); // Flip clip planes.
+        //projMat[1][1] *= -1.f;
+        return ViewProjection * modelMat;
     }
 
     void VulkanRenderer::Draw(const WindowProperties& props)

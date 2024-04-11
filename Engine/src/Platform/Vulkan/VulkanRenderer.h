@@ -6,6 +6,7 @@
 #include "VmaTypes.h"
 #include "VulkanDeletionQueue.h"
 #include "VulkanPipelineBuilder.h"
+#include "ANE/Core/Math/Matrix/Matrix4x4.h"
 
 namespace vkb
 {
@@ -90,7 +91,7 @@ namespace Engine
 
         static void CreateImGuiDescriptorPool();
 
-        inline static glm::mat4 GetViewProjectionMatrix();
+        inline static Matrix4x4 GetViewProjectionMatrix();
 
         inline static void Draw(const WindowProperties& props);
         inline static void DrawGeometry(VkCommandBuffer cmd);
@@ -126,8 +127,7 @@ namespace Engine
     public:
         inline static ImVec4 ClearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-        inline static glm::vec3 CameraPosition;
-        inline static glm::vec2 CameraRotationRadians;
+        inline static Matrix4x4 ViewProjection;
 
     private:
         inline static SDL_Window* _window;

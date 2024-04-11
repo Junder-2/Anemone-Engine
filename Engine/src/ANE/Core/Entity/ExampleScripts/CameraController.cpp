@@ -26,6 +26,7 @@ namespace Engine
 
         CameraComponent* camera = &GetComponent<CameraComponent>();
         camera->SetPerspective(70.0f, 900.0f / 500.0f, 10000.f, 0.1f);
+        Renderer::SetViewProjection(ComputeViewProjMatrix(*camera));
     }
 
     void CameraController::OnUpdate(float deltaTime)
@@ -41,7 +42,11 @@ namespace Engine
             const Vector3 forward = transformMat * (Vector3::ForwardVector() * _zInput);
             const Vector3 moveVector = (right + up + forward).GetNormalized();
             _transformComponent->Transform.AddPosition(moveSpeed * moveVector);
-            Renderer::SetCameraPosition(_transformComponent->Transform.GetPosition());
+
+            if (CameraComponent camera; TryGetComponent<CameraComponent>(camera))
+            {
+                Renderer::SetViewProjection(ComputeViewProjMatrix(camera));
+            }
         }
     }
 
@@ -69,8 +74,13 @@ namespace Engine
         constexpr float lookSpeed = 500.0f;
         const float newPitch = _pitchRadians + lookSpeed * delta.Y;
         _pitchRadians = glm::clamp(newPitch, -glm::half_pi<float>(), glm::half_pi<float>());
-        Renderer::SetCameraRotation(_yawRadians, _pitchRadians);
         _yawRadians += lookSpeed * delta.X;
+        _transformComponent->Transform.SetRotation(Vector3{_pitchRadians, _yawRadians, 0});
+
+        if (CameraComponent camera; TryGetComponent<CameraComponent>(camera))
+        {
+            Renderer::SetViewProjection(ComputeViewProjMatrix(camera));
+        }
     }
 
     void CameraController::OnSpeedup(InputValue inputValue)
