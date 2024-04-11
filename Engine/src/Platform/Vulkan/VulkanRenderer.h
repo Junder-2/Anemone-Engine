@@ -90,6 +90,8 @@ namespace Engine
 
         static void CreateImGuiDescriptorPool();
 
+        inline static glm::mat4 GetViewProjectionMatrix();
+
         inline static void Draw(const WindowProperties& props);
         inline static void DrawGeometry(VkCommandBuffer cmd);
         inline static void DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView);
@@ -123,6 +125,9 @@ namespace Engine
 
     public:
         inline static ImVec4 ClearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+        inline static glm::vec3 CameraPosition;
+        inline static glm::vec2 CameraRotationRadians;
 
     private:
         inline static SDL_Window* _window;

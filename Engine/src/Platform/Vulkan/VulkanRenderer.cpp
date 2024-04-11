@@ -581,6 +581,19 @@ namespace Engine
         _mainDeletionQueue.PushFunction([&]{ vkDestroyDescriptorPool(_device, _imGuiDescriptorPool, _allocator); });
     }
 
+    glm::mat4 VulkanRenderer::GetViewProjectionMatrix()
+    {
+        glm::mat4 modelMat = glm::mat4{ 1.f }; // Identity.
+        glm::mat4 viewMat = glm::mat4{ 1.f };
+        viewMat = rotate(viewMat, CameraRotationRadians.y, glm::vec3{1, 0, 0});
+        viewMat = rotate(viewMat, CameraRotationRadians.x, glm::vec3{0, 1, 0});
+        viewMat = translate(viewMat, glm::vec3{ -CameraPosition.x, -CameraPosition.y, CameraPosition.z - 2.0f }); // X and Y seem to be flipped.
+        //return viewMat;
+        glm::mat4 projMat = glm::perspective(glm::radians(70.f), (float)_windowExtent.width / (float)_windowExtent.height, 10000.f, 0.1f); // Flip clip planes.
+        projMat[1][1] *= -1.f;
+        return projMat * viewMat * modelMat;
+    }
+
     void VulkanRenderer::Draw(const WindowProperties& props)
     {
         if (_rebuildSwapchain)
@@ -691,7 +704,7 @@ namespace Engine
         vkCmdSetScissor(cmd, 0, 1, &scissor);
 
         PushConstantBuffer pushConstants;
-        pushConstants.WorldMatrix = glm::mat4{ 1.f };
+        pushConstants.WorldMatrix = GetViewProjectionMatrix();
         pushConstants.VertexBuffer = _rectangleMesh.VertexBufferAddress;
 
         vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstantBuffer), &pushConstants);
