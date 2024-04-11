@@ -21,62 +21,49 @@ namespace Engine
             _transformMatrix.Translate(delta);
         }
 
-        Vector3 GetPosition() const
+        void SetRotation(const Vector3 newRotation, const bool isDegrees = false)
         {
-            return {_transformMatrix[3]};
+            _transformMatrix.SetRotation(newRotation, isDegrees);
         }
 
-        void SetRotation(const Vector3 newRotation) // todo: fix, overwrite rotation
+        Vector3 GetPosition() const
         {
-            const Vector3 scale = GetScale();
-
-            _transformMatrix[0] = Vector4(1, 0, 0, 0) * scale.X;
-            _transformMatrix[1] = Vector4(0, 1, 0, 0) * scale.Y;
-            _transformMatrix[2] = Vector4(0, 0, 1, 0) * scale.Z;
-            AddRotation(newRotation);
+            return _transformMatrix.GetPosition();
         }
 
         void SetRotation(const Quaternion newRotation)
         {
-            const Vector3 scale = GetScale();
-
-            Matrix3x3 rotMatrix = (newRotation).GetMatrix();
-
-            _transformMatrix[0] = Vector4(rotMatrix[0], 0) * scale.X;
-            _transformMatrix[1] = Vector4(rotMatrix[1], 0) * scale.Y;
-            _transformMatrix[2] = Vector4(rotMatrix[2], 0) * scale.Z;
+            _transformMatrix.SetRotation(newRotation);
         }
 
-        void AddRotation(const Vector3 delta)
+        void AddRotation(const Vector3 delta, const bool isDegrees = false)
         {
-            _transformMatrix.Rotate(glm::radians(delta.X), Vector3::RightVector());
-            _transformMatrix.Rotate(glm::radians(delta.Y), Vector3::UpVector());
-            _transformMatrix.Rotate(glm::radians(delta.Z), Vector3::ForwardVector());
+            _transformMatrix.Rotate(delta, isDegrees);
         }
 
         void AddRotation(const Quaternion delta)
         {
-            Matrix4x4 rotMatrix = (delta).GetMatrix();
-            rotMatrix[3][3] = 1;
-
-            _transformMatrix *= rotMatrix;
+            _transformMatrix.Rotate(delta);
         }
 
-        Vector3 GetEulerRotation() const
+        Vector3 GetEulerAngles() const
         {
-            const Vector3 euler = Quaternion(_transformMatrix).GetEulerAngles();
-            return {euler.X, euler.Y, euler.Z};
+            return _transformMatrix.GetEulerAngles();
         }
 
-        Quaternion GetRotation() const
+        Quaternion GetQuaternion() const
         {
-            return Quaternion(_transformMatrix);
+            return _transformMatrix.GetQuaternion();
+        }
+
+        void Scale(const Vector3 scale)
+        {
+            _transformMatrix.Scale(scale);
         }
 
         Vector3 GetScale() const
         {
-            const Vector3 scale(Vector3(_transformMatrix[0]).Length(), Vector3(_transformMatrix[1]).Length(), Vector3(_transformMatrix[2]).Length());
-            return scale;
+            return _transformMatrix.GetScale();
         }
 
         operator const Matrix4x4&() const { return _transformMatrix; }

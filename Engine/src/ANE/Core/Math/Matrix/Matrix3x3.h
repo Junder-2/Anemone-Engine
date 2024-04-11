@@ -11,6 +11,7 @@ namespace reactphysics3d
 namespace Engine
 {
     struct Matrix4x4;
+    struct Quaternion;
 
     struct Matrix3x3
     {
@@ -35,22 +36,31 @@ namespace Engine
 
         Matrix3x3(const Vector3 a, const Vector3 b, const Vector3 c)
         {
-            _rows[0][0] = a.X; _rows[0][1] = a.Y; _rows[0][2] = a.Z;
-            _rows[1][0] = b.X; _rows[1][1] = b.Y; _rows[1][2] = b.Z;
-            _rows[2][0] = c.X; _rows[2][1] = c.Y; _rows[2][2] = c.Z;
+            _rows[0] = a;
+            _rows[1] = b;
+            _rows[2] = c;
         }
 
         void Clear();
 
         Vector3 GetColumn(int i) const;
-
         Vector3 GetRow(int i) const;
 
         Matrix3x3 GetTranspose() const;
-
         float GetDeterminant() const;
-
         Matrix3x3 GetInverse() const;
+
+        void Rotate(float angle, Vector3 axis, bool isDegrees = false);
+        void Rotate(Quaternion quat);
+        void Rotate(Vector3 euler, bool isDegrees = false);
+        void SetRotation(Vector3 euler, bool isDegrees = false);
+        void SetRotation(Quaternion quat);
+        Quaternion GetQuaternion() const;
+        Vector3 GetEulerAngles(bool isDegrees = false) const;
+
+        void Scale(Vector3 scale);
+        void SetScale(Vector3 scale);
+        Vector3 GetScale() const;
 
         static Matrix3x3 Identity()
         {

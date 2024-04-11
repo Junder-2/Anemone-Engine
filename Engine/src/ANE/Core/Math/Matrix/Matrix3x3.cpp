@@ -3,22 +3,110 @@
 
 #include <reactphysics3d/mathematics/Matrix3x3.h>
 #include "Matrix4x4.h"
+#include "ANE/Core/Math/Quaternion.h"
 
 namespace Engine
 {
     Matrix3x3 Matrix3x3::GetTranspose() const
     {
-        return Convert(transpose(static_cast<glm::mat3>(*this)));
+        return Convert(transpose(glm::mat3(*this)));
     }
 
     float Matrix3x3::GetDeterminant() const
     {
-        return determinant(static_cast<glm::mat3>(*this));
+        return determinant(glm::mat3(*this));
     }
 
     Matrix3x3 Matrix3x3::GetInverse() const
     {
-        return Convert(inverse(static_cast<glm::mat3>(*this)));
+        return Convert(inverse(glm::mat3(*this)));
+    }
+
+    void Matrix3x3::Rotate(const Quaternion quat)
+    {
+        const Matrix3x3 rotMatrix = (quat).GetMatrix();
+        *this *= rotMatrix;
+    }
+
+    void Matrix3x3::Rotate(float angle, const Vector3 axis, const bool isDegrees /*= false*/)
+    {
+        if(isDegrees)
+        {
+            angle *= DEGREES_TO_RAD;
+        }
+
+        glm::mat4 newMatrix = rotate(glm::mat4(*this), angle,  glm::vec3(axis));
+
+        _rows[0] = Vector4::Convert(newMatrix[0]);
+        _rows[1] = Vector4::Convert(newMatrix[1]);
+        _rows[2] = Vector4::Convert(newMatrix[2]);
+    }
+
+    void Matrix3x3::Rotate(const Vector3 euler, const bool isDegrees /*= false*/)
+    {
+        Rotate(euler.X, Vector3::RightVector(), isDegrees);
+        Rotate(euler.Y, Vector3::UpVector(), isDegrees);
+        Rotate(euler.Z, Vector3::ForwardVector(), isDegrees);
+    }
+
+    void Matrix3x3::SetRotation(const Quaternion quat)
+    {
+        const Vector3 scale = GetScale();
+
+        _rows[0] = Vector4(1, 0, 0, 0) * scale.X;
+        _rows[1] = Vector4(0, 1, 0, 0) * scale.Y;
+        _rows[2] = Vector4(0, 0, 1, 0) * scale.Z;
+        Rotate(quat);
+    }
+
+    void Matrix3x3::SetRotation(Vector3 euler, const bool isDegrees /*= false*/)
+    {
+        const Vector3 scale = GetScale();
+
+        _rows[0] = Vector4(1, 0, 0, 0) * scale.X;
+        _rows[1] = Vector4(0, 1, 0, 0) * scale.Y;
+        _rows[2] = Vector4(0, 0, 1, 0) * scale.Z;
+
+        if(isDegrees)
+        {
+            euler *= DEGREES_TO_RAD;
+        }
+
+        Rotate(Quaternion(euler));
+    }
+
+    Quaternion Matrix3x3::GetQuaternion() const
+    {
+        return Quaternion::Convert(quat_cast(glm::mat3(*this)));
+    }
+
+    Vector3 Matrix3x3::GetEulerAngles(const bool isDegrees /*= false*/) const
+    {
+        return Vector3::Convert(eulerAngles(quat_cast(glm::mat4(*this)))) * (isDegrees ? RAD_TO_DEGREES : 1.f);
+    }
+
+    void Matrix3x3::SetScale(const Vector3 scale)
+    {
+        _rows[0].Normalize();
+        _rows[1].Normalize();
+        _rows[2].Normalize();
+
+        _rows[0] *= scale.X;
+        _rows[1] *= scale.Y;
+        _rows[2] *= scale.Z;
+    }
+
+    void Matrix3x3::Scale(const Vector3 scale)
+    {
+        _rows[0] *= scale.X;
+        _rows[1] *= scale.Y;
+        _rows[2] *= scale.Z;
+    }
+
+    Vector3 Matrix3x3::GetScale() const
+    {
+        const Vector3 scale(Vector3(_rows[0]).Length(), Vector3(_rows[1]).Length(), Vector3(_rows[2]).Length());
+        return scale;
     }
 
     Matrix3x3 Matrix3x3::Convert(const glm::mat3& mat3)
@@ -46,7 +134,7 @@ namespace Engine
 
     Matrix3x3& Matrix3x3::operator*=(const Matrix3x3& matrix)
     {
-        glm::mat3 newMatrix = Convert(static_cast<glm::mat3>(*this) * static_cast<glm::mat3>(matrix));
+        glm::mat3 newMatrix = Convert(glm::mat3(*this) * glm::mat3(matrix));
 
         _rows[0] = Vector3::Convert(newMatrix[0]);
         _rows[1] = Vector3::Convert(newMatrix[1]);
@@ -57,6 +145,6 @@ namespace Engine
 
     Matrix3x3 operator*(const Matrix3x3& matrix1, const Matrix3x3& matrix2)
     {
-        return Matrix3x3::Convert(static_cast<glm::mat3>(matrix1) * static_cast<glm::mat3>(matrix2));
+        return Matrix3x3::Convert(glm::mat3(matrix1) * glm::mat3(matrix2));
     }
 }

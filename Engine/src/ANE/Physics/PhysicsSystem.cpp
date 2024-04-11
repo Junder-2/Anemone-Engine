@@ -21,7 +21,7 @@ namespace Engine
 
     RigidBody& PhysicsSystem::CreateRigidBody(const TransformMatrix& transformMatrix)
     {
-        const Transform transform(transformMatrix.GetPosition(), transformMatrix.GetRotation());
+        const Transform transform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
 
         return *_world->createRigidBody(transform);
     }

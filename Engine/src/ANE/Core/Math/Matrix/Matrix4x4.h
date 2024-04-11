@@ -3,6 +3,7 @@
 
 //Modified copy of reactphysics/include/reactphysics3d/mathematics/Matrix3x3.h
 
+
 namespace reactphysics3d
 {
     class Matrix4x4;
@@ -11,6 +12,7 @@ namespace reactphysics3d
 namespace Engine
 {
     struct Matrix3x3;
+    struct Quaternion;
 
     struct Matrix4x4
     {
@@ -28,9 +30,9 @@ namespace Engine
         }
 
         Matrix4x4(const float a1, const float a2, const float a3, const float a4,
-            const float b1, const float b2, const float b3, const float b4,
-            const float c1, const float c2, const float c3, const float c4,
-            const float d1, const float d2, const float d3, const float d4)
+                    const float b1, const float b2, const float b3, const float b4,
+                    const float c1, const float c2, const float c3, const float c4,
+                    const float d1, const float d2, const float d3, const float d4)
         {
             _rows[0][0] = a1; _rows[0][1] = a2; _rows[0][2] = a3; _rows[0][3] = a4;
             _rows[1][0] = b1; _rows[1][1] = b2; _rows[1][2] = b3; _rows[1][3] = b4;
@@ -40,26 +42,36 @@ namespace Engine
 
         Matrix4x4(const Vector4 a, const Vector4 b, const Vector4 c, const Vector4 d)
         {
-            _rows[0][0] = a.X; _rows[0][1] = a.Y; _rows[0][2] = a.Z; _rows[0][3] = a.W;
-            _rows[1][0] = b.X; _rows[1][1] = b.Y; _rows[1][2] = b.Z; _rows[1][3] = b.W;
-            _rows[2][0] = c.X; _rows[2][1] = c.Y; _rows[2][2] = c.Z; _rows[2][3] = c.W;
-            _rows[3][0] = d.X; _rows[3][1] = d.Y; _rows[3][2] = d.Z; _rows[3][3] = d.W;
+            _rows[0] = a;
+            _rows[1] = b;
+            _rows[2] = c;
+            _rows[3] = d;
         }
 
         void Clear();
 
         Vector4 GetColumn(int i) const;
-
         Vector4 GetRow(int i) const;
 
         Matrix4x4 GetTranspose() const;
-
         float GetDeterminant() const;
-
         Matrix4x4 GetInverse() const;
 
         void Translate(Vector3 delta);
-        void Rotate(float angle, Vector3 axis);
+        void SetPosition(Vector3 newPos);
+        Vector3 GetPosition() const;
+
+        void Rotate(float angle, Vector3 axis, bool isDegrees = false);
+        void Rotate(Quaternion quat);
+        void Rotate(Vector3 euler, bool isDegrees = false);
+        void SetRotation(Vector3 euler, bool isDegrees = false);
+        void SetRotation(Quaternion quat);
+        Quaternion GetQuaternion() const;
+        Vector3 GetEulerAngles(bool isDegrees = false) const;
+
+        void Scale(Vector3 scale);
+        void SetScale(Vector3 scale);
+        Vector3 GetScale() const;
 
         static Matrix4x4 Identity()
         {
