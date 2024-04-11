@@ -32,10 +32,11 @@ namespace Engine
         {
             const float moveSpeed = _isSpeedUp ? 0.05f : 0.01f;
 
-            const Quaternion orientation = Quaternion(Vector3(_pitchRadians, _yawRadians, 0.0f));
-            const Vector3 right = orientation * (Vector3::RightVector()*_xInput);
-            const Vector3 up = orientation * (Vector3::UpVector()*_yInput);
-            const Vector3 forward = orientation * (Vector3::ForwardVector()*_zInput);
+            const Matrix3x3 transformMat = (Matrix4x4)_transformComponent->Transform;
+
+            const Vector3 right = transformMat * (Vector3::RightVector() * _xInput);
+            const Vector3 up = transformMat * (Vector3::UpVector() * _yInput);
+            const Vector3 forward = transformMat * (Vector3::ForwardVector() * _zInput);
             const Vector3 moveVector = (right + up + forward).GetNormalized();
             _transformComponent->Transform.AddPosition(moveSpeed * moveVector);
             Renderer::SetCameraPosition(_transformComponent->Transform.GetPosition());
