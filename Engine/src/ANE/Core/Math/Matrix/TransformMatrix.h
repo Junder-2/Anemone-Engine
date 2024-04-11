@@ -8,7 +8,7 @@ namespace Engine
     struct TransformMatrix
     {
     public:
-        TransformMatrix(const Matrix4x4& transform = Matrix4x4(1.f)) : _transformMatrix(transform) {}
+        TransformMatrix(const Matrix4x4& transform = Matrix4x4::Identity()) : _transformMatrix(transform) {}
         TransformMatrix(const TransformMatrix&) = default;
 
         void SetPosition(const Vector3 newPosition)
@@ -23,7 +23,7 @@ namespace Engine
 
         Vector3 GetPosition() const
         {
-            return {_transformMatrix[3][0], _transformMatrix[3][1], _transformMatrix[3][2]};
+            return {_transformMatrix[3]};
         }
 
         void SetRotation(const Vector3 newRotation) // todo: fix, overwrite rotation

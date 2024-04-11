@@ -34,7 +34,7 @@ namespace Engine
             glm::vec3 up = rotate(orientation, glm::vec3{ 0, _yInput, 0 });
             glm::vec3 forward = rotate(orientation, glm::vec3{ 0, 0, _zInput });
             glm::vec3 moveVector = right + up + forward;
-            _transformComponent->Transform.AddPosition(moveSpeed * moveVector);
+            _transformComponent->Transform.AddPosition(Vector3::Convert(moveSpeed * moveVector));
             Renderer::SetCameraPosition(_transformComponent->Transform.GetPosition());
         }
     }
