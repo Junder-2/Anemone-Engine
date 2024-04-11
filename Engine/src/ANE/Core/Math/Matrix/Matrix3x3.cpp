@@ -4,6 +4,8 @@
 #include <reactphysics3d/mathematics/Matrix3x3.h>
 #include "Matrix4x4.h"
 #include "ANE/Core/Math/Quaternion.h"
+#include "glm/gtx/euler_angles.hpp"
+#include "glm/gtx/matrix_decompose.hpp"
 
 namespace Engine
 {
@@ -44,9 +46,9 @@ namespace Engine
 
     void Matrix3x3::Rotate(const Vector3 euler, const bool isDegrees /*= false*/)
     {
-        Rotate(euler.X, Vector3::RightVector(), isDegrees);
-        Rotate(euler.Y, Vector3::UpVector(), isDegrees);
-        Rotate(euler.Z, Vector3::ForwardVector(), isDegrees);
+        Rotate(euler.Yaw, Vector3::UpVector(), isDegrees);
+        Rotate(euler.Pitch, Vector3::RightVector(), isDegrees);
+        Rotate(euler.Roll, Vector3::ForwardVector(), isDegrees);
     }
 
     void Matrix3x3::SetRotation(const Quaternion quat)
@@ -82,7 +84,26 @@ namespace Engine
 
     Vector3 Matrix3x3::GetEulerAngles(const bool isDegrees /*= false*/) const
     {
-        return Vector3::Convert(eulerAngles(quat_cast(glm::mat4(*this)))) * (isDegrees ? RAD_TO_DEGREES : 1.f);
+        Matrix3x3 copy = *this;
+
+        copy[0].Normalize();
+        copy[1].Normalize();
+        copy[2].Normalize();
+
+        Vector3 euler;
+
+        euler.Yaw = glm::asin(-copy[0][2]);
+        if (glm::cos(euler.Yaw) != 0) {
+            euler.Pitch = glm::atan2(copy[1][2], copy[2][2]);
+            euler.Roll = glm::atan2(copy[0][1], copy[0][0]);
+        }
+        else {
+            euler.Pitch = glm::atan2(-copy[2][0], copy[1][1]);
+            euler.Roll = 0;
+        }
+
+        return euler * (isDegrees ? RAD_TO_DEGREES : 1);
+        //return Vector3::Convert(eulerAngles(quat_cast(glm::mat4(*this)))) * (isDegrees ? RAD_TO_DEGREES : 1.f);
     }
 
     void Matrix3x3::SetScale(const Vector3 scale)
