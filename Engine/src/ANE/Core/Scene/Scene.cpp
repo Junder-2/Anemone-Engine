@@ -116,4 +116,10 @@ namespace Engine
         Entity ent{this, name}; // here
         return ent;
     }
+    [[nodiscard("Entity never used")]] Entity Scene::Create(std::string stringName)
+    {
+        Entity ent{this, stringName.c_str()}; // here
+        return ent;
+    }
+
 }

@@ -20,6 +20,7 @@ namespace Engine
         void OnUpdate(float timeStep);
 
         Entity Create(const char* name = "Untagged");
+        Entity Create(std::string = "Untagged");
 
     private:
         entt::registry _registry;
