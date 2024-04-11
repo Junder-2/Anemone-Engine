@@ -64,13 +64,13 @@ namespace Engine
 
     void CameraController::OnLook(MouseMoveValue mouseValue)
     {
-        const glm::vec2 delta = mouseValue.GetMouseDelta();
+        const Vector2 delta = mouseValue.GetMouseDelta();
 
         constexpr float lookSpeed = 500.0f;
-        const float newPitch = _pitchRadians + lookSpeed * delta.y;
+        const float newPitch = _pitchRadians + lookSpeed * delta.Y;
         _pitchRadians = glm::clamp(newPitch, -glm::half_pi<float>(), glm::half_pi<float>());
-        _yawRadians += lookSpeed * delta.x;
         Renderer::SetCameraRotation(_yawRadians, _pitchRadians);
+        _yawRadians += lookSpeed * delta.X;
     }
 
     void CameraController::OnSpeedup(InputValue inputValue)
