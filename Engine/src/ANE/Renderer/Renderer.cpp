@@ -22,10 +22,7 @@ namespace Engine
 
     void Renderer::Render(const WindowProperties& props)
     {
-        _vulkanRenderer->NewFrame(props);
-        _vulkanRenderer->EndFrame(props);
-        //_vulkanRenderer->DrawMain(cmd);
-        //_vulkanRenderer->DrawImGui(cmd, imageView);
+        _vulkanRenderer->Render(props);
     }
 
     void Renderer::BeginUiDataBuffer()
@@ -44,5 +41,15 @@ namespace Engine
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
         }
+    }
+
+    void Renderer::SetCameraPosition(const glm::vec3 position)
+    {
+        _vulkanRenderer->CameraPosition = position;
+    }
+
+    void Renderer::SetCameraRotation(const float yawDegrees, const float pitchDegrees)
+    {
+        _vulkanRenderer->CameraRotationRadians = glm::vec2{ yawDegrees, pitchDegrees };
     }
 }

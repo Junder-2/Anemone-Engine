@@ -35,33 +35,7 @@ namespace Engine
         _initialized = true;
     }
 
-    void VulkanRenderer::NewFrame(const WindowProperties& props)
-    {
-        if (!_initialized)
-        {
-            ANE_ELOG_WARN("Unable to begin VulkanRenderer frame as it was never fully initialized.");
-            return;
-        }
-
-        return;
-
-        if (_rebuildSwapchain)
-        {
-            if (props.Width > 0 && props.Height > 0)
-            {
-                ImGui_ImplVulkan_SetMinImageCount(_minImageCount);
-                ImGui_ImplVulkanH_CreateOrResizeWindow(_instance, _physicalDevice, _device, &_mainWindowData, _queueFamily.GraphicsFamily.value(), _allocator, props.Width, props.Height, _minImageCount);
-                _mainWindowData.FrameIndex = 0;
-                _rebuildSwapchain = false;
-            }
-        }
-
-        //ImGui_ImplVulkan_NewFrame();
-        //ImGui_ImplSDL2_NewFrame();
-        //ImGui::NewFrame();
-    }
-
-    void VulkanRenderer::EndFrame(const WindowProperties& props)
+    void VulkanRenderer::Render(const WindowProperties& props)
     {
         if (!_initialized)
         {
@@ -152,6 +126,38 @@ namespace Engine
         CreatePipeline(logicalDevice);
         //const PipelineWrapper pipeline = CreatePipeline(logicalDevice);
         //_trianglePipeline = pipeline.Pipeline;
+
+        // TODO: Import geometry data.
+        {
+            std::array<Vertex, 4> rectVertices;
+
+            rectVertices[0].Position = { .5,-.5, 0 };
+            rectVertices[1].Position = { .5, .5, 0 };
+            rectVertices[2].Position = {-.5,-.5, 0 };
+            rectVertices[3].Position = {-.5, .5, 0 };
+
+            rectVertices[0].Color = {.9,.9, 1, 1 };
+            rectVertices[1].Color = { 1, 0,.5, 1 };
+            rectVertices[2].Color = { 0, 1,.5, 1 };
+            rectVertices[3].Color = { 0, 0, 0, 1 };
+
+            std::array<uint32_t, 6> rectIndices;
+
+            rectIndices[0] = 0;
+            rectIndices[1] = 1;
+            rectIndices[2] = 2;
+
+            rectIndices[3] = 2;
+            rectIndices[4] = 1;
+            rectIndices[5] = 3;
+
+            _rectangleMesh = UploadMesh(rectIndices, rectVertices);
+            _mainDeletionQueue.PushFunction([]
+            {
+                DestroyBuffer(_rectangleMesh.IndexBuffer);
+                DestroyBuffer(_rectangleMesh.VertexBuffer);
+            });
+        }
     }
 
     void VulkanRenderer::SetupImGui(SDL_Window* window)
@@ -505,7 +511,7 @@ namespace Engine
         }
         else
         {
-            ANE_ELOG_INFO("Loaded shader module: vertex_color.vert.spv");
+            ANE_ELOG_INFO("Loaded shader module: triangle_mesh.vert.spv");
         }
 
         VkShaderModule meshFragShader;
@@ -515,7 +521,7 @@ namespace Engine
         }
         else
         {
-            ANE_ELOG_INFO("Loaded shader module: vertex_color.frag.spv");
+            ANE_ELOG_INFO("Loaded shader module: triangle_mesh.frag.spv");
         }
 
         VkPushConstantRange bufferRange;
@@ -533,10 +539,10 @@ namespace Engine
         vkb::Result<PipelineWrapper> pipeline = builder
             .SetShaders(meshVertShader, meshFragShader)
             .SetBlendMode(None)
-            .SetDepthTestOperator(VK_COMPARE_OP_ALWAYS)
+            .SetDepthTestOperator(VK_COMPARE_OP_GREATER_OR_EQUAL) // Reverse Z for more precision
 
             .SetColorFormat(_colorImage.ImageFormat)
-            .SetDepthFormat(VK_FORMAT_UNDEFINED)
+            .SetDepthFormat(_depthImage.ImageFormat)
 
             .SetAllocationCallbacks(_allocator)
             .Build();
@@ -553,37 +559,6 @@ namespace Engine
         });
 
         return pipeline.value();
-    }
-
-    void VulkanRenderer::SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height)
-    {
-        wd->Surface = surface;
-
-        // Check for WSI support
-        VkBool32 res;
-        vkGetPhysicalDeviceSurfaceSupportKHR(_physicalDevice, _queueFamily.GraphicsFamily.value(), wd->Surface, &res);
-        if (res != VK_TRUE)
-        {
-            ANE_ELOG_ERROR("Error no WSI support on physical device 0\n");
-        }
-
-        // Select Surface Format
-        constexpr VkFormat requestSurfaceImageFormat[] = { VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_R8G8B8A8_UNORM, VK_FORMAT_B8G8R8_UNORM, VK_FORMAT_R8G8B8_UNORM };
-        constexpr VkColorSpaceKHR requestSurfaceColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
-        wd->SurfaceFormat = ImGui_ImplVulkanH_SelectSurfaceFormat(_physicalDevice, wd->Surface, requestSurfaceImageFormat, (size_t)IM_ARRAYSIZE(requestSurfaceImageFormat), requestSurfaceColorSpace);
-
-        // Select Present Mode
-        #ifdef APP_UNLIMITED_FRAME_RATE
-            VkPresentModeKHR presentModes[] = { VK_PRESENT_MODE_MAILBOX_KHR, VK_PRESENT_MODE_IMMEDIATE_KHR, VK_PRESENT_MODE_FIFO_KHR };
-        #else
-            VkPresentModeKHR presentModes[] = { VK_PRESENT_MODE_FIFO_KHR };
-        #endif
-        wd->PresentMode = ImGui_ImplVulkanH_SelectPresentMode(_physicalDevice, wd->Surface, &presentModes[0], IM_ARRAYSIZE(presentModes));
-        //ANE_ELOG_INFO("Vulkan Info: Selected PresentMode = {0}", wd->PresentMode);
-
-        // Create SwapChain, RenderPass, Framebuffer, etc.
-        IM_ASSERT(_minImageCount >= 2);
-        ImGui_ImplVulkanH_CreateOrResizeWindow(_instance, _physicalDevice, _device, wd, _queueFamily.GraphicsFamily.value(), _allocator, width, height, _minImageCount);
     }
 
     void VulkanRenderer::CreateImGuiDescriptorPool()
@@ -606,6 +581,19 @@ namespace Engine
         _mainDeletionQueue.PushFunction([&]{ vkDestroyDescriptorPool(_device, _imGuiDescriptorPool, _allocator); });
     }
 
+    glm::mat4 VulkanRenderer::GetViewProjectionMatrix()
+    {
+        glm::mat4 modelMat = glm::mat4{ 1.f }; // Identity.
+        glm::mat4 viewMat = glm::mat4{ 1.f };
+        viewMat = rotate(viewMat, CameraRotationRadians.y, glm::vec3{1, 0, 0});
+        viewMat = rotate(viewMat, CameraRotationRadians.x, glm::vec3{0, 1, 0});
+        viewMat = translate(viewMat, glm::vec3{ -CameraPosition.x, -CameraPosition.y, CameraPosition.z - 2.0f }); // X and Y seem to be flipped.
+        //return viewMat;
+        glm::mat4 projMat = glm::perspective(glm::radians(70.f), (float)_windowExtent.width / (float)_windowExtent.height, 10000.f, 0.1f); // Flip clip planes.
+        projMat[1][1] *= -1.f;
+        return projMat * viewMat * modelMat;
+    }
+
     void VulkanRenderer::Draw(const WindowProperties& props)
     {
         if (_rebuildSwapchain)
@@ -614,13 +602,6 @@ namespace Engine
             {
                 ResizeSwapchain();
             }
-        }
-
-        ImDrawData* drawData = ImGui::GetDrawData();
-        const bool isMinimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
-        if (isMinimized)
-        {
-            return;
         }
 
         const VulkanFrame frame = GetFrame();
@@ -642,19 +623,24 @@ namespace Engine
         const VkCommandBufferBeginInfo cmdBeginInfo = VulkanInitializers::CommandBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
         CheckVkResult(vkBeginCommandBuffer(cmd, &cmdBeginInfo));
 
-        VulkanUtils::TransitionImage(cmd, _colorImage.Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+        VulkanUtils::TransitionImage(cmd, _colorImage.Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
         VulkanUtils::TransitionImage(cmd, _depthImage.Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
 
-        // TODO: Draw geometry here.
+        DrawGeometry(cmd);
 
-        VulkanUtils::TransitionImage(cmd, _colorImage.Image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+        // Prepare and copy color buffer into the active swapchain buffer.
+        VulkanUtils::TransitionImage(cmd, _colorImage.Image, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
         const VkImage& swapchainImage = _swapchainImages[swapchainImageIndex];
         VulkanUtils::TransitionImage(cmd, swapchainImage, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
+        VulkanUtils::CopyImageToImage(cmd, _colorImage.Image, swapchainImage,_drawExtent ,_swapchainExtent);
+
+        // Prepare and draw ImGui into active swapchain buffer.
         VulkanUtils::TransitionImage(cmd, swapchainImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
         DrawImGui(cmd, _swapchainImageViews[swapchainImageIndex]);
 
+        // Prepare and present active swapchain buffer.
         VulkanUtils::TransitionImage(cmd, swapchainImage, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
         CheckVkResult(vkEndCommandBuffer(cmd));
@@ -687,10 +673,52 @@ namespace Engine
         _frameIndex++;
     }
 
+    void VulkanRenderer::DrawGeometry(VkCommandBuffer cmd)
+    {
+        _drawExtent.height = std::min(_swapchainExtent.height, _colorImage.ImageExtent.height);
+        _drawExtent.width = std::min(_swapchainExtent.width, _colorImage.ImageExtent.width);
+
+        VkRenderingAttachmentInfo colorAttachment = VulkanInitializers::AttachmentInfo(_colorImage.ImageView, &_mainWindowData.ClearValue, VK_IMAGE_LAYOUT_GENERAL);
+        VkRenderingAttachmentInfo depthAttachment = VulkanInitializers::DepthAttachmentInfo(_depthImage.ImageView, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
+        VkRenderingInfo renderInfo = VulkanInitializers::RenderingInfo(_drawExtent, &colorAttachment, &depthAttachment);
+        vkCmdBeginRendering(cmd, &renderInfo);
+
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _meshPipeline);
+
+        VkViewport viewport;
+        viewport.x = 0;
+        viewport.y = 0;
+        viewport.width = (float)_drawExtent.width;
+        viewport.height = (float)_drawExtent.height;
+        viewport.minDepth = 0.f;
+        viewport.maxDepth = 1.f;
+
+        vkCmdSetViewport(cmd, 0, 1, &viewport);
+
+        VkRect2D scissor;
+        scissor.offset.x = 0;
+        scissor.offset.y = 0;
+        scissor.extent.width = _drawExtent.width;
+        scissor.extent.height = _drawExtent.height;
+
+        vkCmdSetScissor(cmd, 0, 1, &scissor);
+
+        PushConstantBuffer pushConstants;
+        pushConstants.WorldMatrix = GetViewProjectionMatrix();
+        pushConstants.VertexBuffer = _rectangleMesh.VertexBufferAddress;
+
+        vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstantBuffer), &pushConstants);
+        vkCmdBindIndexBuffer(cmd, _rectangleMesh.IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
+
+        vkCmdDrawIndexed(cmd, 6, 1, 0, 0, 0);
+
+        vkCmdEndRendering(cmd);
+    }
+
     // TODO: Fully integrate ImGui into rendering loop.
     void VulkanRenderer::DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView)
     {
-        VkRenderingAttachmentInfo colorAttachment = VulkanInitializers::AttachmentInfo(targetImageView, &_mainWindowData.ClearValue, VK_IMAGE_LAYOUT_GENERAL);
+        VkRenderingAttachmentInfo colorAttachment = VulkanInitializers::AttachmentInfo(targetImageView, nullptr, VK_IMAGE_LAYOUT_GENERAL);
         VkRenderingInfo renderInfo = VulkanInitializers::RenderingInfo(_windowExtent, &colorAttachment, nullptr);
 
         vkCmdBeginRendering(cmd, &renderInfo);
@@ -698,102 +726,6 @@ namespace Engine
         ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmd);
 
         vkCmdEndRendering(cmd);
-    }
-
-    // TODO: Figure out what most of this code does.
-    void VulkanRenderer::RenderFrame(ImGui_ImplVulkanH_Window* wd, ImDrawData* drawData)
-    {
-        VkSemaphore imageAcquiredSemaphore  = wd->FrameSemaphores[wd->SemaphoreIndex].ImageAcquiredSemaphore;
-        VkSemaphore renderCompleteSemaphore = wd->FrameSemaphores[wd->SemaphoreIndex].RenderCompleteSemaphore;
-        VkResult err = vkAcquireNextImageKHR(_device, wd->Swapchain, UINT64_MAX, imageAcquiredSemaphore, VK_NULL_HANDLE, &wd->FrameIndex);
-        if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR)
-        {
-            _rebuildSwapchain = true;
-            return;
-        }
-        CheckVkResult(err);
-
-        ImGui_ImplVulkanH_Frame* fd = &wd->Frames[wd->FrameIndex];
-        {
-            err = vkWaitForFences(_device, 1, &fd->Fence, VK_TRUE, UINT64_MAX); // Wait indefinitely instead of periodically checking
-            CheckVkResult(err);
-
-            err = vkResetFences(_device, 1, &fd->Fence);
-            CheckVkResult(err);
-        }
-        {
-            err = vkResetCommandPool(_device, fd->CommandPool, 0);
-            CheckVkResult(err);
-
-            VkCommandBufferBeginInfo info = {};
-            info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-            info.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-            err = vkBeginCommandBuffer(fd->CommandBuffer, &info);
-            CheckVkResult(err);
-        }
-        {
-            VkRenderPassBeginInfo info = {};
-            info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-            info.renderPass = wd->RenderPass;
-            info.framebuffer = fd->Framebuffer;
-            info.renderArea.extent.width = wd->Width;
-            info.renderArea.extent.height = wd->Height;
-            info.clearValueCount = 1;
-            info.pClearValues = &wd->ClearValue;
-
-            vkCmdBeginRenderPass(fd->CommandBuffer, &info, VK_SUBPASS_CONTENTS_INLINE);
-        }
-
-        // Record dear imgui primitives into command buffer.
-        ImGui_ImplVulkan_RenderDrawData(drawData, fd->CommandBuffer);
-
-        // Submit command buffer
-        vkCmdEndRenderPass(fd->CommandBuffer);
-        {
-            VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-
-            VkSubmitInfo info = {};
-            info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-            info.waitSemaphoreCount = 1;
-            info.pWaitSemaphores = &imageAcquiredSemaphore;
-            info.pWaitDstStageMask = &waitStage;
-            info.commandBufferCount = 1;
-            info.pCommandBuffers = &fd->CommandBuffer;
-            info.signalSemaphoreCount = 1;
-            info.pSignalSemaphores = &renderCompleteSemaphore;
-
-            err = vkEndCommandBuffer(fd->CommandBuffer);
-            CheckVkResult(err);
-            err = vkQueueSubmit(_queue, 1, &info, fd->Fence);
-            CheckVkResult(err);
-        }
-    }
-
-    // TODO: Figure out what most of this code does.
-    void VulkanRenderer::RevealFrame(ImGui_ImplVulkanH_Window* wd)
-    {
-        if (_rebuildSwapchain) return;
-
-        VkSemaphore renderCompleteSemaphore = wd->FrameSemaphores[wd->SemaphoreIndex].RenderCompleteSemaphore;
-
-        VkPresentInfoKHR info = {};
-        info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-        info.waitSemaphoreCount = 1;
-        info.pWaitSemaphores = &renderCompleteSemaphore;
-        info.swapchainCount = 1;
-        info.pSwapchains = &wd->Swapchain;
-        info.pImageIndices = &wd->FrameIndex;
-
-        VkResult err = vkQueuePresentKHR(_queue, &info);
-        if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR)
-        {
-            _rebuildSwapchain = true;
-            return;
-        }
-        CheckVkResult(err);
-
-        wd->SemaphoreIndex = (wd->SemaphoreIndex + 1) % wd->SemaphoreCount; // Now we can use the next set of semaphores
     }
 
     void VulkanRenderer::CleanupVulkan()

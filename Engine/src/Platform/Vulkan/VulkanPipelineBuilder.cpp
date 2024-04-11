@@ -13,7 +13,7 @@ namespace Engine
 
     vkb::Result<PipelineWrapper> VulkanPipelineBuilder::Build() const
     {
-        VkPipelineViewportStateCreateInfo viewportStateInfo = { VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO, nullptr };
+        VkPipelineViewportStateCreateInfo viewportStateInfo = { .sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO, .pNext = nullptr };
         viewportStateInfo.viewportCount = 1;
         viewportStateInfo.scissorCount = 1;
 
@@ -27,23 +27,25 @@ namespace Engine
         colorBlendAttachment.dstAlphaBlendFactor = _info.DstAlphaFactor;
         colorBlendAttachment.alphaBlendOp = _info.AlphaBlendOp;
 
-        VkPipelineColorBlendStateCreateInfo colorBlendingInfo = { VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO, nullptr };
+        VkPipelineColorBlendStateCreateInfo colorBlendingInfo = { .sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO, .pNext = nullptr };
         colorBlendingInfo.logicOpEnable = VK_FALSE;
         colorBlendingInfo.logicOp = VK_LOGIC_OP_COPY;
         colorBlendingInfo.attachmentCount = 1;
         colorBlendingInfo.pAttachments = &colorBlendAttachment;
 
-        VkPipelineVertexInputStateCreateInfo vertexInputInfo = { VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO };
+        VkPipelineVertexInputStateCreateInfo vertexInputInfo = { .sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO, .pNext = nullptr };
 
-        VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo = { VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO };
+        VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo = { .sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO, .pNext = nullptr };
         inputAssemblyInfo.topology = _info.Topology;
         inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
 
-        VkPipelineRasterizationStateCreateInfo rasterizationInfo = { VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO };
+        VkPipelineRasterizationStateCreateInfo rasterizationInfo = { .sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO, .pNext = nullptr };
         rasterizationInfo.lineWidth = 1.0f;
         rasterizationInfo.polygonMode = _info.PolygonMode;
+        rasterizationInfo.cullMode = _info.CullMode;
+        rasterizationInfo.frontFace = _info.WindingOrder;
 
-        VkPipelineMultisampleStateCreateInfo multisampleInfo = { VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO };
+        VkPipelineMultisampleStateCreateInfo multisampleInfo = { .sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO, .pNext = nullptr };
         multisampleInfo.sampleShadingEnable = VK_FALSE;
         multisampleInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
         multisampleInfo.minSampleShading = 1.0f;
@@ -51,9 +53,9 @@ namespace Engine
         multisampleInfo.alphaToCoverageEnable = VK_FALSE;
         multisampleInfo.alphaToOneEnable = VK_FALSE;
 
-        VkPipelineDepthStencilStateCreateInfo depthStencilInfo = { VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO };
-        depthStencilInfo.depthTestEnable = _info.DepthTestEnabled ? VK_TRUE : VK_FALSE;;
-        depthStencilInfo.depthWriteEnable = _info.DepthWriteEnabled ? VK_TRUE : VK_FALSE;;
+        VkPipelineDepthStencilStateCreateInfo depthStencilInfo = { .sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO, .pNext = nullptr };
+        depthStencilInfo.depthTestEnable = _info.DepthTestEnabled ? VK_TRUE : VK_FALSE;
+        depthStencilInfo.depthWriteEnable = _info.DepthWriteEnabled ? VK_TRUE : VK_FALSE;
         depthStencilInfo.depthCompareOp = _info.DepthTestOperator;
         // Bounds
         depthStencilInfo.depthBoundsTestEnable = VK_FALSE;
@@ -64,11 +66,12 @@ namespace Engine
         depthStencilInfo.front = { };
         depthStencilInfo.back = { };
 
-        VkPipelineRenderingCreateInfo renderingInfo = { VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO };
-        renderingInfo.colorAttachmentCount = 1;
+        VkPipelineRenderingCreateInfo renderingInfo = { .sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO, .pNext = nullptr };
+        renderingInfo.colorAttachmentCount = _info.ColorAttachmentFormat ? 1 : 0;
         renderingInfo.pColorAttachmentFormats = &_info.ColorAttachmentFormat;
+        renderingInfo.depthAttachmentFormat = _info.DepthAttachmentFormat;
 
-        VkGraphicsPipelineCreateInfo pipelineInfo = { VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO };
+        VkGraphicsPipelineCreateInfo pipelineInfo = { .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO };
         pipelineInfo.pNext = &renderingInfo;
 
         pipelineInfo.stageCount = (uint32_t)_info.ShaderStageInfos.size();
@@ -84,7 +87,7 @@ namespace Engine
 
         VkDynamicState state[] = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
 
-        VkPipelineDynamicStateCreateInfo dynamicInfo = { VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO };
+        VkPipelineDynamicStateCreateInfo dynamicInfo = { .sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO, .pNext = nullptr };
         dynamicInfo.pDynamicStates = &state[0];
         dynamicInfo.dynamicStateCount = 2;
 
