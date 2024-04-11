@@ -23,6 +23,12 @@ namespace Engine
 
         void OnMoveY(InputValue inputValue);
 
+        void OnMoveZ(InputValue inputValue);
+
+        void OnLook(MouseMoveValue mouseValue);
+
+        void OnSpeedup(InputValue inputValue);
+
         void OnKeyTest(InputValue inputValue)
         {
             ANE_LOG_INFO("Testing Button device({0}) id({1}): {2}", InputUtilities::ToString(inputValue.GetDeviceType()), inputValue.GetBindingId(), InputUtilities::ToString(inputValue.GetTriggerState()));
@@ -30,6 +36,8 @@ namespace Engine
 
     private:
         TransformComponent* _transformComponent {};
-        float _xInput = 0, _yInput = 0;
+        float _xInput = 0, _yInput = 0, _zInput = 0;
+        float _pitchRadians = 0, _yawRadians = 0;
+        bool _isSpeedUp;
     };
 }
