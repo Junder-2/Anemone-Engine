@@ -18,8 +18,8 @@ namespace Engine
     {
         if(_yInput != 0 || _xInput != 0)
         {
-            _transformComponent->Transform.AddPosition(Vector3(_xInput*deltaTime, _yInput*deltaTime, 0));
-            ANE_LOG_INFO("Pos = {0} ", (_transformComponent->Transform.GetPosition()).ToString());
+            _transformComponent->Transform.AddPosition(glm::vec3(_xInput*deltaTime, _yInput*deltaTime, 0));
+            ANE_LOG_INFO("Pos = {0} ", glm::to_string(_transformComponent->Transform.GetPosition()));
         }
     }
 

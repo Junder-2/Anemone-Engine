@@ -41,9 +41,9 @@ namespace Engine
         // todo: just using for debug now. probably dirty to use array
         std::array<InputValue, 4> GetCurrentTriggeredKeys() const { return _inputHandler->GetCurrentTriggeredKeys(); }
 
-        Vector2 GetMouseDelta() const { return _inputHandler->GetMouseInputData().GetMoveValue().GetMouseDelta(); }
-        Vector2 GetMousePos() const { return _inputHandler->GetMouseInputData().GetMoveValue().GetMousePos(); }
-        Vector2 GetMouseScroll() const { return _inputHandler->GetMouseInputData().GetScrollValue(); }
+        glm::vec2 GetMouseDelta() const { return _inputHandler->GetMouseInputData().GetMoveValue().GetMouseDelta(); }
+        glm::vec2 GetMousePos() const { return _inputHandler->GetMouseInputData().GetMoveValue().GetMousePos(); }
+        glm::vec2 GetMouseScroll() const { return _inputHandler->GetMouseInputData().GetScrollValue(); }
         TriggerState GetMouseTriggerState(const int index) const { return _inputHandler-> GetMouseInputData().GetButtonValue().GetTriggerState(index); }
         MouseButtonValues GetMouseButtonValues() const { return _inputHandler->GetMouseInputData().GetButtonValue(); }
 

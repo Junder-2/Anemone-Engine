@@ -1,6 +1,5 @@
 #pragma once
 #include "InputTypes.h"
-#include "ANE/Core/Math/Vector2.h"
 #include "glm/vec2.hpp"
 
 namespace Engine
@@ -13,22 +12,22 @@ namespace Engine
     public:
         void SetMousePos(const float x, const float y)
         {
-            _mousePosition.X = x;
-            _mousePosition.Y = y;
+            _mousePosition.x = x;
+            _mousePosition.y = y;
         }
 
         void SetMouseDelta(const float x, const float y)
         {
-            _mouseDelta.X = x;
-            _mouseDelta.Y = y;
+            _mouseDelta.x = x;
+            _mouseDelta.y = y;
         }
 
-        Vector2 GetMousePos() const { return _mousePosition; }
-        Vector2 GetMouseDelta() const { return _mouseDelta; }
+        glm::vec2 GetMousePos() const { return _mousePosition; }
+        glm::vec2 GetMouseDelta() const { return _mouseDelta; }
 
     private:
-        Vector2 _mouseDelta = {};
-        Vector2 _mousePosition = {};
+        glm::vec2 _mouseDelta = {};
+        glm::vec2 _mousePosition = {};
     };
 
     /**
@@ -131,11 +130,11 @@ namespace Engine
 
         MouseMoveValue GetMoveValue() const { return _moveValue; }
         MouseButtonValues GetButtonValue() const { return _buttonValue; }
-        Vector2 GetScrollValue() const { return _scrollWheelValue; }
+        glm::vec2 GetScrollValue() const { return _scrollWheelValue; }
 
     protected:
         MouseMoveValue _moveValue {};
         MouseButtonValues _buttonValue {};
-        Vector2 _scrollWheelValue {};
+        glm::vec2 _scrollWheelValue {};
     };
 }
