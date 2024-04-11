@@ -3,6 +3,7 @@
 
 #include <glm/gtx/quaternion.hpp>
 
+#include "ANE/Core/Scene/Components/CameraComponent.h"
 #include "ANE/Renderer/Renderer.h"
 
 namespace Engine
@@ -72,6 +73,14 @@ namespace Engine
     void CameraController::OnSpeedup(InputValue inputValue)
     {
         _isSpeedUp = inputValue.GetTriggerState() == TriggerStarted || inputValue.GetTriggerState() == TriggerHolding;
+    }
+
+    Matrix4x4 CameraController::ComputeViewProjMatrix(CameraComponent camera)
+    {
+        Matrix4x4 transformMatrix = _transformComponent->Transform;
+        Matrix4x4 viewMatrix = transformMatrix.GetInverse();
+        Matrix4x4 projMatrix = camera.PerspectiveMatrix;
+        return projMatrix * viewMatrix;
     }
 }
 

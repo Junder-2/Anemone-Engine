@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "../ScriptableEntity.h"
+#include "ANE/Core/Scene/Components/CameraComponent.h"
 #include "ANE/Input/Input.h"
 #include "ANE/Utilities/InputUtilities.h"
 
@@ -33,6 +34,8 @@ namespace Engine
         {
             ANE_LOG_INFO("Testing Button device({0}) id({1}): {2}", InputUtilities::ToString(inputValue.GetDeviceType()), inputValue.GetBindingId(), InputUtilities::ToString(inputValue.GetTriggerState()));
         }
+
+        Matrix4x4 ComputeViewProjMatrix(CameraComponent camera);
 
     private:
         TransformComponent* _transformComponent {};
