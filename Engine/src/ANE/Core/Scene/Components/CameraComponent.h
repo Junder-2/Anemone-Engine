@@ -45,7 +45,7 @@ namespace Engine
         float _zNear = 0.1f, _zFar = 1000.f;
 
         bool _updated = true;
-        bool _flipY = false;
+        bool _flipY = true;
 
         void UpdateViewMatrix();
     };
