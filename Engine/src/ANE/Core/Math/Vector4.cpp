@@ -1,6 +1,7 @@
 ﻿#include "anepch.h"
 #include "Vector4.h"
 
+#include "imgui.h"
 #include "Vector2.h"
 #include "Vector3.h"
 
@@ -15,9 +16,19 @@ namespace Engine
         return {vec.x, vec.y, vec.z, vec.w};
     }
 
+    Vector4 Vector4::Convert(const ImVec4& vec)
+    {
+        return {vec.x, vec.y, vec.z, vec.w};
+    }
+
     Vector4::operator const glm::vec4() const
     {
         return glm::vec4(X, Y, Z, W);
+    }
+
+    Vector4::operator const ImVec4() const
+    {
+        return ImVec4(X, Y, Z, W);
     }
 
     Vector4::operator const Vector2() const
