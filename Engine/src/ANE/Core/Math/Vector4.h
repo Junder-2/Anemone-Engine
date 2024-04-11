@@ -22,14 +22,11 @@ namespace Engine
         union {float Z, B;};
         union {float W, A;};
 
-        static Vector4 ZeroVector()
-        {
-            return {0, 0, 0, 0};
-        }
-        static Vector4 OneVector()
-        {
-            return {1, 1, 1, 1};
-        }
+        static Vector4 ZeroVector() { return {0, 0, 0, 0}; }
+        static Vector4 RightVector() { return {1, 0, 0, 0}; }
+        static Vector4 UpVector() { return {0, 1, 0, 0}; }
+        static Vector4 ForwardVector() { return {0, 0, 1, 0}; }
+        static Vector4 OneVector() { return {1, 1, 1, 1}; }
 
         float LengthSquare() const;
 

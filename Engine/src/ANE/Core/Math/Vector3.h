@@ -42,6 +42,8 @@ namespace Engine
 
         void Normalize();
 
+        Vector3 GetNormalized() const;
+
         static bool Equal(const Vector3& vec1, const Vector3& vec2, const float epsilon = EPSILON);
 
         static Vector3 Convert(const reactphysics3d::Vector3& vec);
@@ -194,15 +196,23 @@ namespace Engine
         return (std::abs(LengthSquare() - 0) < EPSILON);
     }
 
-    inline void Vector3::Normalize()
+    inline Vector3 Vector3::GetNormalized() const
     {
+        Vector3 copy = *this;
         const float l = Length();
         if (l < EPSILON) {
-            return;
+            return ZeroVector();
         }
-        X /= l;
-        Y /= l;
-        Z /= l;
+        copy.X /= l;
+        copy.Y /= l;
+        copy.Z /= l;
+
+        return copy;
+    }
+
+    inline void Vector3::Normalize()
+    {
+        *this = this->GetNormalized();
     }
 
     inline std::string Vector3::ToString() const

@@ -19,6 +19,8 @@ namespace Engine
 
         Quaternion(const Vector3& v, const float newW) : X(v.X), Y(v.Y), Z(v.Z), W(newW) {}
 
+        Quaternion(const Vector3& eulerAngles);
+
         Quaternion(const Matrix3x3& matrix);
 
         float X, Y, Z, W;
@@ -117,7 +119,7 @@ namespace Engine
         }
 
     private:
-        void InitWithEulerAngles(float angleX, float angleY, float angleZ);
+        void InitWithEulerAngles(float pitch, float yaw, float roll);
     };
 
     inline Vector3 Quaternion::GetVectorV() const

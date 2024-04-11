@@ -25,6 +25,11 @@ namespace Engine
         return glm::quat(X, Y, Z, W);
     }
 
+    Quaternion::Quaternion(const Vector3& eulerAngles)
+    {
+        InitWithEulerAngles(eulerAngles.Pitch, eulerAngles.Yaw, eulerAngles.Roll);
+    }
+
     Quaternion::Quaternion(const Matrix3x3& matrix)
     {
         const glm::qua<float> newQuat = quat_cast(glm::mat3(matrix));
@@ -61,9 +66,9 @@ namespace Engine
         return quaternion;
     }
 
-    void Quaternion::InitWithEulerAngles(const float angleX, const float angleY, const float angleZ)
+    void Quaternion::InitWithEulerAngles(const float pitch, const float yaw, const float roll)
     {
-        const glm::quat newQuat = glm::quat(glm::vec3(angleX, angleY, angleZ));
+        const glm::quat newQuat = glm::quat(glm::vec3(pitch, yaw, roll));
 
         X = newQuat.x;
         Y = newQuat.y;

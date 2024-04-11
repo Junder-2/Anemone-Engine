@@ -29,12 +29,12 @@ namespace Engine
         {
             const float moveSpeed = _isSpeedUp ? 0.05f : 0.01f;
 
-            const glm::quat orientation = glm::quat(glm::vec3(_pitchRadians, _yawRadians, 0.0f));
-            glm::vec3 right = rotate(orientation, glm::vec3{ _xInput, 0, 0 });
-            glm::vec3 up = rotate(orientation, glm::vec3{ 0, _yInput, 0 });
-            glm::vec3 forward = rotate(orientation, glm::vec3{ 0, 0, _zInput });
-            glm::vec3 moveVector = right + up + forward;
-            _transformComponent->Transform.AddPosition(Vector3::Convert(moveSpeed * moveVector));
+            const Quaternion orientation = Quaternion(Vector3(_pitchRadians, _yawRadians, 0.0f));
+            const Vector3 right = orientation * (Vector3::RightVector()*_xInput);
+            const Vector3 up = orientation * (Vector3::UpVector()*_yInput);
+            const Vector3 forward = orientation * (Vector3::ForwardVector()*_zInput);
+            const Vector3 moveVector = (right + up + forward).GetNormalized();
+            _transformComponent->Transform.AddPosition(moveSpeed * moveVector);
             Renderer::SetCameraPosition(_transformComponent->Transform.GetPosition());
         }
     }
