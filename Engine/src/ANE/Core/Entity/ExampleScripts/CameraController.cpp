@@ -21,6 +21,8 @@ namespace Engine
         inputSystem.BindKeyboardInput(KeyCodeLShift, MakeDelegate(this, &CameraController::OnSpeedup));
 
         _transformComponent = &GetComponent<TransformComponent>();
+        _transformComponent->Transform.SetPosition(Vector3{0, 0, -2});
+
     }
 
     void CameraController::OnUpdate(float deltaTime)
