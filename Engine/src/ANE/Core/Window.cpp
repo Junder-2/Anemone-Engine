@@ -105,6 +105,8 @@ namespace Engine
 
         const bool prevLostFocus = LostFocus();
 
+        _imGuiLostFocus = ImGui::GetIO().WantCaptureKeyboard;
+
         SDL_Event event;
         while(SDL_PollEvent(&event))
         {
@@ -169,6 +171,12 @@ namespace Engine
         {
             WindowFocusChangeEvent focusChangeEvent(true);
             DispatchEvent(focusChangeEvent);
+            int newX, newY;
+            SDL_GetMouseState(&newX, &newY);
+            const float x = std::clamp((float)newX/(float)_windowData.Width, 0.f, 1.f);
+            const float y = std::clamp((float)newY/(float)_windowData.Height, 0.f, 1.f);
+
+            inputHandler->ProcessMouseMovement(x, y, 0);
         }
 
         if(!LostFocus()) inputHandler->PopulateKeyStates(SDL_GetKeyboardState(nullptr));
