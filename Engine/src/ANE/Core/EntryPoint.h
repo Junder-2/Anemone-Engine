@@ -5,7 +5,7 @@ extern Engine::Application* Engine::CreateApplication();
 int main(int argc, char* argv[])
 {
     Engine::Logging::InitEngine();
-	ANE_ENGINE_LOG_INFO("Engine Initialized");
+	ANE_ELOG_INFO("Engine Initialized");
 
 	auto app = Engine::CreateApplication();
 

@@ -72,7 +72,7 @@ namespace Engine
     {
         if (HasComponent<T>())
         {
-            ANE_ENGINE_LOG_WARN("Has Component of type: {} returned existing component", typeid(T).name());
+            ANE_ELOG_WARN("Has Component of type: {} returned existing component", typeid(T).name());
             return static_cast<std::optional<std::reference_wrapper<T>>>(GetComponent<T>()).value();
         }
 
@@ -90,7 +90,7 @@ namespace Engine
             SceneHandle->_registry.remove<T>(EntityHandle);
             return;
         }
-        ANE_ENGINE_LOG_WARN("Attempted to remove component of type {} that doesn't exist", typeid(T).name());
+        ANE_ELOG_WARN("Attempted to remove component of type {} that doesn't exist", typeid(T).name());
     }
 
     /**
@@ -118,7 +118,7 @@ namespace Engine
             return true;
         }
 
-        ANE_ENGINE_LOG_WARN("Attempted to remove component of type {} that doesn't exist", typeid(T).name());
+        ANE_ELOG_WARN("Attempted to remove component of type {} that doesn't exist", typeid(T).name());
         return false;
     }
 

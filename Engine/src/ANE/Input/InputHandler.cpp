@@ -187,7 +187,7 @@ namespace Engine
             return TriggerHolding;
         }
 
-        //ANE_ENGINE_LOG_WARN("No registered of key {0}", keyCode);
+        //ANE_ELOG_WARN("No registered of key {0}", keyCode);
 
         return TriggerNone;
     }

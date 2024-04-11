@@ -12,7 +12,7 @@ namespace Engine
     {
         #ifndef ANE_DIST
         if(_engineLogger != nullptr) return;
-        spdlog::set_pattern("%^[%n %T] %v%$");
+        spdlog::set_pattern("%^[%n %L %T] [%s:%#] %v%$");
 
         _engineLogger = spdlog::stdout_color_mt("ENGINE");
         _engineLogger->set_level(spdlog::level::trace);

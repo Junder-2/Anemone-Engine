@@ -79,7 +79,7 @@ namespace Engine
         }
         else
         {
-            ANE_ENGINE_LOG_WARN("TwoKeyInputBinding is incorrectly set up");
+            ANE_ELOG_WARN("TwoKeyInputBinding is incorrectly set up");
             return;
         }
     }

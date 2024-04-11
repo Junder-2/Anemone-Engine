@@ -126,7 +126,7 @@ namespace Engine
         int size = _bindingToAxisBinding.size();
         if(size != 0 && size % 2 != 0)
         {
-            ANE_ENGINE_LOG_WARN("axis binding size is not multiple of 2: {}", size);
+            ANE_ELOG_WARN("axis binding size is not multiple of 2: {}", size);
             size++;
         }
         const int id = size / 2;

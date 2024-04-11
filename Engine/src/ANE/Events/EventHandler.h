@@ -33,7 +33,7 @@ namespace Engine
         {
             if(_currentEvent == nullptr)
             {
-                ANE_ENGINE_LOG_WARN("Cannot consume event outside of event handling");
+                ANE_ELOG_WARN("Cannot consume event outside of event handling");
                 return;
             }
             _currentEvent->Consume();
@@ -56,7 +56,7 @@ namespace Engine
         {
             if(_currentEvent == nullptr)
             {
-                ANE_ENGINE_LOG_WARN("Cannot execute event outside of event handling");
+                ANE_ELOG_WARN("Cannot execute event outside of event handling");
                 return;
             }
 
@@ -67,7 +67,7 @@ namespace Engine
         {
             if(_currentEvent == nullptr)
             {
-                ANE_ENGINE_LOG_WARN("Cannot execute event outside of event handling");
+                ANE_ELOG_WARN("Cannot execute event outside of event handling");
                 return;
             }
 

@@ -33,7 +33,7 @@ namespace Engine
 
         TransformComponent(const TransformMatrix& transform, const std::shared_ptr<TransformComponent>& parent = nullptr) : Component(typeid(*this).name()), Transform(transform), Parent(parent)
         {
-            ANE_ENGINE_LOG_TRACE("We are not getting in here");
+            ANE_ELOG("We are not getting in here");
         };
 
 

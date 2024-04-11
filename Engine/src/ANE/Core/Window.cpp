@@ -26,12 +26,12 @@ namespace Engine
 
     void Window::Init(const WindowProperties& props)
     {
-        ANE_ENGINE_LOG_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
+        ANE_ELOG_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
         // SDL
         if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER))
         {
-            ANE_ENGINE_LOG_ERROR("Could not initialize SDL.");
+            ANE_ELOG_ERROR("Could not initialize SDL.");
         }
 
         const SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_VULKAN | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
@@ -46,7 +46,7 @@ namespace Engine
 
         if (_windowContext == nullptr)
         {
-            ANE_ENGINE_LOG_ERROR("Could not create SDL window.");
+            ANE_ELOG_ERROR("Could not create SDL window.");
         }
     }
 

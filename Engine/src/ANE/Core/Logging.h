@@ -41,27 +41,29 @@ namespace Engine
 }
 
 #ifndef ANE_DIST
+
 // Engine log macros
-#define ANE_ENGINE_LOG_TRACE(...)    ::Engine::Logging::GetEngineLogger()->trace(__VA_ARGS__)
-#define ANE_ENGINE_LOG_INFO(...)     ::Engine::Logging::GetEngineLogger()->info(__VA_ARGS__)
-#define ANE_ENGINE_LOG_WARN(...)     ::Engine::Logging::GetEngineLogger()->warn(__VA_ARGS__)
-#define ANE_ENGINE_LOG_ERROR(...)    ::Engine::Logging::GetEngineLogger()->error(__VA_ARGS__)
-#define ANE_ENGINE_LOG_CRITICAL(...) ::Engine::Logging::GetEngineLogger()->critical(__VA_ARGS__)
+#define ANE_ELOG(...)               SPDLOG_LOGGER_TRACE(::Engine::Logging::GetEngineLogger(), __VA_ARGS__)
+#define ANE_ELOG_INFO(...)          SPDLOG_LOGGER_INFO(::Engine::Logging::GetEngineLogger(), __VA_ARGS__)
+#define ANE_ELOG_WARN(...)          SPDLOG_LOGGER_WARN(::Engine::Logging::GetEngineLogger(), __VA_ARGS__)
+#define ANE_ELOG_ERROR(...)         SPDLOG_LOGGER_ERROR(::Engine::Logging::GetEngineLogger(), __VA_ARGS__)
+#define ANE_ELOG_CRITICAL(...)      SPDLOG_LOGGER_CRITICAL(::Engine::Logging::GetEngineLogger(), __VA_ARGS__)
 
 // App log macros
-#define ANE_LOG_TRACE(...)         ::Engine::Logging::GetAppLogger()->trace(__VA_ARGS__)
-#define ANE_LOG_INFO(...)          ::Engine::Logging::GetAppLogger()->info(__VA_ARGS__)
-#define ANE_LOG_WARN(...)          ::Engine::Logging::GetAppLogger()->warn(__VA_ARGS__)
-#define ANE_LOG_ERROR(...)         ::Engine::Logging::GetAppLogger()->error(__VA_ARGS__)
-#define ANE_LOG_CRITICAL(...)      ::Engine::Logging::GetAppLogger()->critical(__VA_ARGS__)
-#else
-#define ANE_ENGINE_LOG_TRACE(...)
-#define ANE_ENGINE_LOG_INFO(...)
-#define ANE_ENGINE_LOG_WARN(...)
-#define ANE_ENGINE_LOG_ERROR(...)
-#define ANE_ENGINE_LOG_CRITICAL(...)
+#define ANE_LOG(...)                SPDLOG_LOGGER_TRACE(::Engine::Logging::GetAppLogger(), __VA_ARGS__)
+#define ANE_LOG_INFO(...)           SPDLOG_LOGGER_INFO(::Engine::Logging::GetAppLogger(), __VA_ARGS__)
+#define ANE_LOG_WARN(...)           SPDLOG_LOGGER_WARN(::Engine::Logging::GetAppLogger(), __VA_ARGS__)
+#define ANE_LOG_ERROR(...)          SPDLOG_LOGGER_ERROR(::Engine::Logging::GetAppLogger(), __VA_ARGS__)
+#define ANE_LOG_CRITICAL(...)       SPDLOG_LOGGER_CRITICAL(::Engine::Logging::GetAppLogger(), __VA_ARGS__)
 
-#define ANE_LOG_TRACE(...)
+#else
+#define ANE_ELOG(...)
+#define ANE_ELOG_INFO(...)
+#define ANE_ELOG_WARN(...)
+#define ANE_ELOG_ERROR(...)
+#define ANE_ELOG_CRITICAL(...)
+
+#define ANE_LOG(...)
 #define ANE_LOG_INFO(...)
 #define ANE_LOG_WARN(...)
 #define ANE_LOG_ERROR(...)

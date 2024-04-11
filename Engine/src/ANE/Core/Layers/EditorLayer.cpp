@@ -75,7 +75,7 @@ namespace Engine
         {
             TagComponent tag;
             ent.TryGetComponent(tag);
-            ANE_ENGINE_LOG_WARN("We have a renderComponent with tag: {0} on entity: {1}", comp.ToString(), tag.Tag);
+            ANE_ELOG_WARN("We have a renderComponent with tag: {0} on entity: {1}", comp.ToString(), tag.Tag);
         }
     }
 
