@@ -38,7 +38,10 @@ namespace Engine
         void OnUpdate(float deltaTime);
         void SetVSync(bool enabled);
 
-        bool HasFocus() const { return !_imGuiLostFocus && !_windowLostFocus; }
+        bool HasFocus() const { return _imGuiHasFocus && _windowHasFocus; }
+
+        bool HasWindowFocus() const { return _windowHasFocus; }
+        bool ImGuiHasFocus() const { return _imGuiHasFocus; }
 
         bool IsVSync() const { return  _windowData.VSync; }
         uint32_t GetWidth() const { return _windowData.Width; }
@@ -63,8 +66,8 @@ namespace Engine
 
         SinglecastDelegate<void(Event&)> _eventDelegate;
 
-        bool _imGuiLostFocus = false;
-        bool _windowLostFocus = false;
+        bool _imGuiHasFocus = false;
+        bool _windowHasFocus = false;
 
         //ImGuiIO* _io; Moved to VulkanRenderer, so expose getter functions there.
         bool _showDemoWindow = true;

@@ -102,14 +102,15 @@ namespace Engine
         inputHandler->OnUpdate();
 
         const bool prevHasFocus = HasFocus();
+        const bool blockInputs = !HasFocus();
+        const bool imGuiWantMouse = ImGui::GetIO().WantCaptureMouse;
 
-        _imGuiLostFocus = ImGui::GetIO().WantCaptureKeyboard;
+        _imGuiHasFocus = ImGui::GetIO().WantCaptureKeyboard;
 
         SDL_Event event;
         while(SDL_PollEvent(&event))
         {
             ImGui_ImplSDL2_ProcessEvent(&event);
-            const bool blockInputs = !prevHasFocus || !HasFocus();
 
             switch (event.type)
             {
@@ -125,14 +126,14 @@ namespace Engine
                 case SDL_KEYDOWN:
                 case SDL_KEYUP:
                 {
-                    if(!HasFocus() || event.key.repeat != 0) continue;
+                    if(blockInputs || event.key.repeat != 0) continue;
                     inputHandler->ProcessKey(event.key.keysym.sym, event.type == SDL_KEYDOWN);
                 }
                 continue;
                 case SDL_MOUSEBUTTONDOWN:
                 case SDL_MOUSEBUTTONUP:
                 {
-                    if(blockInputs) continue;
+                    if(blockInputs || imGuiWantMouse) continue;
                     const int keyIndex = MOUSE_BUTTON_TO_SDL_MOUSE_BUTTON(event.button.button);
 
                     inputHandler->ProcessMouseButton(keyIndex, event.type == SDL_MOUSEBUTTONDOWN, event.button.clicks == 2);
@@ -238,13 +239,13 @@ namespace Engine
             }
             break;
             case SDL_WINDOWEVENT_ENTER:
-                _windowLostFocus = !isMainWindow;
+                _windowHasFocus = isMainWindow;
             break;
             case SDL_WINDOWEVENT_FOCUS_LOST:
-                _windowLostFocus = true;
+                _windowHasFocus = false;
             break;
             case SDL_WINDOWEVENT_FOCUS_GAINED:
-                _windowLostFocus = false;
+                _windowHasFocus = true;
             break;
         }
     }
@@ -256,8 +257,6 @@ namespace Engine
 
     void Window::Shutdown()
     {
-        //_vulkanRenderer->Cleanup();
-
         SDL_DestroyWindow(_windowContext);
         SDL_Quit();
     }

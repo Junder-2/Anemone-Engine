@@ -29,6 +29,15 @@ namespace Engine
 
         void PushLayer(Layer* layer);
 
+        Window& GetWindow() const { return *_window; }
+        InputHandler& GetInputHandler() const { return *_inputHandler; }
+        SubsystemCollection& GetSubsystemCollection() const { return *_subsystemCollection; }
+
+        static Application& Get() { return *_appInstance; }
+
+        const ApplicationSpecification& GetAppSpecification() const { return _appSpec; }
+
+    private:
         void OnEvent(Event& e);
         void OnWindowResize(WindowResizeEvent& e);
         void OnWindowMove(WindowMovedEvent& e);
@@ -40,14 +49,6 @@ namespace Engine
         void OnMouseKeyTest(MouseButtonEvent& mouseButtonEvent);
         void OnMouseScrollTest(MouseScrollEvent& mouseScrollEvent);
         void OnMouseMoveTest(MouseMovementEvent& mouseMovementEvent);
-
-        Window& GetWindow() const { return *_window; }
-        InputHandler& GetInputHandler() const { return *_inputHandler; }
-        SubsystemCollection& GetSubsystemCollection() const { return *_subsystemCollection; }
-
-        static Application& Get() { return *_appInstance; }
-
-        const ApplicationSpecification& GetAppSpecification() const { return _appSpec; }
 
     private:
         ApplicationSpecification _appSpec;
