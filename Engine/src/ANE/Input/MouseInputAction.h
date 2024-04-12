@@ -126,8 +126,9 @@ namespace Engine
         bool ProcessAction();
         /**
         * Clears input data
+        * @returns should send forward
         */
-        void FlushAction();
+        bool FlushAction();
 
         MouseMoveValue GetMoveValue() const { return _moveValue; }
         MouseButtonValues GetButtonValue() const { return _buttonValue; }

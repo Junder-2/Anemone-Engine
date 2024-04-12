@@ -52,7 +52,6 @@ namespace Engine
             _appEventDelegate += delegateMember;
         }
 
-        static void DispatchEditorEvents()
         {
             if(_currentEvent == nullptr)
             {
@@ -63,16 +62,12 @@ namespace Engine
             if(_editorEventDelegate) _editorEventDelegate(*_currentEvent);
         }
 
-        static void DispatchAppEvents()
-        {
-            if(_currentEvent == nullptr)
-            {
-                ANE_ELOG_WARN("Cannot execute event outside of event handling");
-                return;
-            }
 
-            if(_appEventDelegate) _appEventDelegate(*_currentEvent);
         }
+
+        static void DispatchEditorEvents();
+
+        static void DispatchAppEvents();
 
     private:
         inline static Event* _currentEvent {};

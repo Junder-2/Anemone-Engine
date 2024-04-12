@@ -104,11 +104,17 @@ namespace Engine
             if(val->FlushAction())
             {
                 KeyboardKeyEvent keyTriggerEvent(val->GetInputValue());
+                keyTriggerEvent.MarkFlush();
                 DispatchEvent(keyTriggerEvent);
             }
         }
 
-        _mouseInputAction.FlushAction();
+        if(_mouseInputAction.FlushAction())
+        {
+            MouseButtonEvent mouseButtonEvent(_mouseInputAction.GetButtonValue());
+            mouseButtonEvent.MarkFlush();
+            DispatchEvent(mouseButtonEvent);
+        }
         _currentKeyStates = nullptr;
     }
 

@@ -9,9 +9,7 @@ namespace Engine
     {
     public:
         InputSystem();
-        ~InputSystem() = default;
-
-        void OnEvent(Event& e);
+        ~InputSystem() override = default;
 
         template <class TClass>
         void BindInput(BindingPair bindingPair, DelegateMember<TClass, void(InputValue)> delegateMember);
@@ -47,10 +45,11 @@ namespace Engine
         TriggerState GetMouseTriggerState(const int index) const { return _inputHandler-> GetMouseInputData().GetButtonValue().GetTriggerState(index); }
         MouseButtonValues GetMouseButtonValues() const { return _inputHandler->GetMouseInputData().GetButtonValue(); }
 
-    private:
+    protected:
+        virtual void OnEvent(Event& e);
         bool IsValidAxisBindings(BindingPair negativeBindingPair, BindingPair positiveBindingPair);
 
-    private:
+    protected:
         InputHandler* _inputHandler;
 
         std::unordered_map<BindingPair, MulticastDelegate<void(InputValue)>> _actionMappingDelegates {};

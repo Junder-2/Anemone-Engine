@@ -62,8 +62,9 @@ namespace Engine
         return changed;
     }
 
-    void MouseInputAction::FlushAction()
+    bool MouseInputAction::FlushAction()
     {
+        bool changed = false;
         _moveValue.SetMouseDelta(0, 0);
 
         for (int i = 0; i < MOUSE_BUTTON_MAX; ++i)
@@ -71,6 +72,9 @@ namespace Engine
             auto prevValue = _buttonValue.GetTriggerState(i);
             if(prevValue == TriggerNone) continue;
             _buttonValue.SetTriggerState(i, TriggerNone);
+            changed = true;
         }
+
+        return changed;
     }
 }
