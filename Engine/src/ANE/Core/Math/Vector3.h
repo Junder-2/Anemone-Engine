@@ -44,7 +44,7 @@ namespace Engine
 
         Vector3 GetNormalized() const;
 
-        static bool Equal(const Vector3& vec1, const Vector3& vec2, const float epsilon = EPSILON);
+        static bool Equal(const Vector3& vec1, const Vector3& vec2, const float epsilon = FMath::EPSILON);
 
         static Vector3 Convert(const reactphysics3d::Vector3& vec);
         static Vector3 Convert(const glm::vec3& vec);
@@ -92,7 +92,7 @@ namespace Engine
 
         Vector3& operator/=(const float& scalar)
         {
-            assert(scalar > EPSILON);
+            assert(scalar > FMath::EPSILON);
             X /= scalar;
             Y /= scalar;
             Z /= scalar;
@@ -154,15 +154,15 @@ namespace Engine
 
         friend Vector3 operator/(const Vector3& vector, const float scalar)
         {
-            assert(scalar > EPSILON);
+            assert(scalar > FMath::EPSILON);
             return {vector.X / scalar, vector.Y / scalar, vector.Z / scalar};
         }
 
         friend Vector3 operator/(const Vector3& vector1, const Vector3& vector2)
         {
-            assert(vector2.X > EPSILON);
-            assert(vector2.Y > EPSILON);
-            assert(vector2.Z > EPSILON);
+            assert(vector2.X > FMath::EPSILON);
+            assert(vector2.Y > FMath::EPSILON);
+            assert(vector2.Z > FMath::EPSILON);
             return {vector1.X / vector2.X, vector1.Y / vector2.Y, vector1.Z / vector2.Z};
         }
 
@@ -193,14 +193,14 @@ namespace Engine
 
     inline bool Vector3::IsZero() const
     {
-        return (std::abs(LengthSquare() - 0) < EPSILON);
+        return (std::abs(LengthSquare() - 0) < FMath::EPSILON);
     }
 
     inline Vector3 Vector3::GetNormalized() const
     {
         Vector3 copy = *this;
         const float l = Length();
-        if (l < EPSILON) {
+        if (l < FMath::EPSILON) {
             return ZeroVector();
         }
         copy.X /= l;
@@ -222,7 +222,7 @@ namespace Engine
 
     inline bool Vector3::Equal(const Vector3& vec1, const Vector3& vec2, const float epsilon)
     {
-        return Engine::Equal(vec1.X, vec2.X, epsilon) && Engine::Equal(vec1.Y, vec2.Y, epsilon) &&
-            Engine::Equal(vec1.Z, vec2.Z, epsilon);
+        return FMath::Equal(vec1.X, vec2.X, epsilon) && FMath::Equal(vec1.Y, vec2.Y, epsilon) &&
+            FMath::Equal(vec1.Z, vec2.Z, epsilon);
     }
 }

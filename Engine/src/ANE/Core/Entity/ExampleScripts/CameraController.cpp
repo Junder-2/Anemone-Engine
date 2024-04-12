@@ -71,9 +71,9 @@ namespace Engine
     {
         const Vector2 delta = mouseValue.GetMouseDelta();
 
-        constexpr float lookSpeed = 500.0f;
+        constexpr float lookSpeed = (180.f * FMath::DEGREES_TO_RAD);
         const float newPitch = _pitchRadians + lookSpeed * delta.Y;
-        _pitchRadians = glm::clamp(newPitch, -glm::half_pi<float>(), glm::half_pi<float>());
+        _pitchRadians = glm::clamp(newPitch, -FMath::Half_PI, FMath::Half_PI);
         _yawRadians += lookSpeed * delta.X;
         _transformComponent->Transform.SetRotation(Vector3{_pitchRadians, _yawRadians, 0});
 
