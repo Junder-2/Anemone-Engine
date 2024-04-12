@@ -8,10 +8,12 @@
 
 //Temp includes. Can probably change how these components are referenced. Maybe a scene manager hsould be in charge of that
 //kind of thing
+#include "ANE/Core/Application.h"
 #include "ANE/Core/Entity/ExampleScripts/CameraController.h"
 #include "ANE/Core/Scene/Components/CameraComponent.h"
 #include "ANE/Core/Scene/Components/NativeScriptComponent.h"
 #include "ANE/Core/Scene/Components/RenderComponent.h"
+#include "ANE/Input/EditorInputsystem.h"
 
 namespace Engine
 {
@@ -29,6 +31,10 @@ namespace Engine
 
         //Then you would load the scene from the file path listed from that project
 
+        GetEditorInputSystem().BindKeyboardInput(KeyCodeEscape, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
+        GetEditorInputSystem().BindMouseButton(MouseButtonLeft, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
+        GetEditorInputSystem().BindMouseButton(MouseButtonRight, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
+        GetEditorInputSystem().BindMouseButton(MouseButtonMiddle, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
         CreateTestScene();
     }
 
@@ -48,8 +54,11 @@ namespace Engine
         ImGui::Button("Button");
         ImGui::End();
 
-        static bool showSimpleOverlay = true;
-        if (showSimpleOverlay) ShowInputDebugOverlay(&showSimpleOverlay);
+        entt::dense_map<std::string, bool> _activeMap;
+
+        // These should be moved later
+        if(_showMenuBar) ShowEditorMenuBar();
+        if (_showInputDebugOverlay) ShowInputDebugOverlay();
 
         ImGui::ShowDemoWindow();
     }
@@ -81,9 +90,51 @@ namespace Engine
         }
     }
 
-    //Copied from IMGUI example
-    void EditorLayer::ShowInputDebugOverlay(bool* pOpen)
+    void EditorLayer::OnSwitchEditorFocus(InputValue inputValue)
     {
+        const bool editorHasFocus = EventHandler::IsBlockingAppInputs();
+
+        if(inputValue.GetDeviceType() == InputDeviceKeyboard)
+        {
+            switch (inputValue.GetBindingId())
+            {
+                case KeyCodeEscape:
+                    if(inputValue.GetTriggerState() != TriggerStarted) return;
+                break;
+                default: return;
+            }
+        }
+        else if(inputValue.GetDeviceType() == InputDeviceMouse) //Any mouse click should return focus
+        {
+            if(inputValue.GetTriggerState() != TriggerStarted || !editorHasFocus) return;
+        }
+
+        EventHandler::SetBlockAppInputs(!editorHasFocus);
+        _showMenuBar = !editorHasFocus;
+        EventHandler::ConsumeEvent();
+    }
+
+    //Copied from IMGUI example
+    void EditorLayer::ShowEditorMenuBar()
+    {
+        if (ImGui::BeginMainMenuBar())
+        {
+            if (ImGui::BeginMenu("Debug"))
+            {
+                if (ImGui::MenuItem("Input Debug", nullptr, _showInputDebugOverlay))
+                {
+                    _showInputDebugOverlay = !_showInputDebugOverlay;
+                }
+                ImGui::EndMenu();
+            }
+            ImGui::EndMainMenuBar();
+        }
+    }
+
+    //Copied from IMGUI example
+    void EditorLayer::ShowInputDebugOverlay()
+    {
+        bool open = true;
         const InputSystem& inputManager = GetInputSystem();
         static int location = 0;
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoDocking;
@@ -102,7 +153,7 @@ namespace Engine
             window_flags |= ImGuiWindowFlags_NoMove;
         }
         ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
-        if (ImGui::Begin("Example: Simple overlay", pOpen, window_flags))
+        if (ImGui::Begin("Example: Simple overlay", &open, window_flags))
         {
             const Vector2 mousePos = inputManager.GetMousePos();
             ImGui::Text("Mouse Pos: (%.3f,%.3f)", mousePos.X, mousePos.Y);
@@ -132,12 +183,6 @@ namespace Engine
             }
             ImGui::SameLine(0, 0);
             ImGui::Text(")");
-
-            if (ImGui::BeginPopupContextWindow())
-            {
-                if (pOpen && ImGui::MenuItem("Close")) *pOpen = false;
-                ImGui::EndPopup();
-            }
         }
         ImGui::End();
     }
