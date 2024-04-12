@@ -24,7 +24,7 @@ namespace Engine
 
     Quaternion::operator const glm::quat() const
     {
-        return glm::quat(W, Y, Z, Z);
+        return glm::quat(W, X, Y, W);
     }
 
     Quaternion::Quaternion(const Vector3& eulerAngles)
