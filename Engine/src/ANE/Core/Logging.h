@@ -7,6 +7,8 @@
 #define GLM_FORCE_LEFT_HANDED
 #include "glm/gtx/string_cast.hpp"
 
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+
 //solves warnings
 #pragma warning(push, 0)
 #include <spdlog/spdlog.h>
