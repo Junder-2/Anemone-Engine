@@ -34,6 +34,7 @@ project "Engine"
         "%{IncludeDir.VkBootstrap}",
         "%{IncludeDir.VMA}",
         "%{IncludeDir.reactphysics}",
+        "%{IncludeDir.Assimp}",
     }
 
     libdirs
@@ -48,6 +49,7 @@ project "Engine"
         "ImGui",
         "vulkan-1",
         "VkBootstrap",
+        "Assimp",
     }
 
     filter "files:vendor/imgui/backends/**.cpp or files:vendor/imgui/backends/**.h"
