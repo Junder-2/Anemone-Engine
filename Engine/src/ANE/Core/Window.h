@@ -5,9 +5,6 @@
 #include "ANE/Delegate/Delegate.h"
 #include "ANE/Events/Event.h"
 
-//#include "SDL.h"
-//#include "vulkan/vulkan_core.h"
-
 namespace Engine
 {
     struct ANE_API WindowProperties
@@ -35,8 +32,13 @@ namespace Engine
         Window(const WindowProperties& props);
         ~Window();
 
+        template <class TClass>
+        void BindOnEvent(DelegateMember<TClass, void(Event&)> delegateMember);
+
         void OnUpdate(float deltaTime);
         void SetVSync(bool enabled);
+
+        bool HasFocus() const { return !_imGuiLostFocus && !_windowLostFocus; }
 
         bool IsVSync() const { return  _windowData.VSync; }
         uint32_t GetWidth() const { return _windowData.Width; }
@@ -44,7 +46,6 @@ namespace Engine
         WindowProperties GetProperties() { return _windowData; }
         SDL_Window* GetWindowContext() const { return _windowContext; }
 
-        SinglecastDelegate<void(Event&)> EventDelegate;
 
     private:
         void Init(const WindowProperties& props);
@@ -60,9 +61,8 @@ namespace Engine
 
         WindowProperties _windowData;
 
-        //std::unique_ptr<VulkanRenderer> _vulkanRenderer;
+        SinglecastDelegate<void(Event&)> _eventDelegate;
 
-        bool LostFocus() const { return _imGuiLostFocus || _windowLostFocus; }
         bool _imGuiLostFocus = false;
         bool _windowLostFocus = false;
 
@@ -70,4 +70,10 @@ namespace Engine
         bool _showDemoWindow = true;
         bool _showAnotherWindow = false;
     };
+
+    template <class TClass>
+    void Window::BindOnEvent(DelegateMember<TClass, void(Event&)> delegateMember)
+    {
+        _eventDelegate = delegateMember;
+    }
 }

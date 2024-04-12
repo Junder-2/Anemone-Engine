@@ -59,14 +59,23 @@ namespace Engine
         operator const reactphysics3d::Quaternion() const;
         operator const glm::quat() const;
 
-        Quaternion operator+(const Quaternion& quaternion) const
+        bool operator==(const Quaternion& quaternion) const
         {
-            return {X + quaternion.X, Y + quaternion.Y, Z + quaternion.Z, W + quaternion.W};
+            return (X == quaternion.X && Y == quaternion.Y && Z == quaternion.Z && W == quaternion.W);
         }
 
-        Quaternion operator-(const Quaternion& quaternion) const
+        bool operator!=(const Quaternion& quaternion) const
         {
-            return {X - quaternion.X, Y - quaternion.Y, Z - quaternion.Z, W - quaternion.W};
+            return !(*this == quaternion);
+        }
+
+        Quaternion& operator=(const Quaternion& quaternion)
+        {
+            X = quaternion.X;
+            Y = quaternion.Y;
+            Z = quaternion.Z;
+            W = quaternion.W;
+            return *this;
         }
 
         Quaternion& operator+=(const Quaternion& quaternion)
@@ -87,36 +96,40 @@ namespace Engine
             return *this;
         }
 
+        Quaternion& operator*=(const Quaternion& quaternion);
+        Quaternion& operator*=(float scalar);
+
+        Quaternion operator+(const Quaternion& quaternion) const
+        {
+            return {X + quaternion.X, Y + quaternion.Y, Z + quaternion.Z, W + quaternion.W};
+        }
+
+        Quaternion operator-(const Quaternion& quaternion) const
+        {
+            return {X - quaternion.X, Y - quaternion.Y, Z - quaternion.Z, W - quaternion.W};
+        }
+
+        Quaternion operator-() const
+        {
+            return {-X, -Y, -Z, -W};
+        }
+
         Quaternion operator*(const float scalar) const
         {
             return {scalar * X, scalar * Y, scalar * Z, scalar * W};
         }
 
-        Quaternion operator*(const Quaternion& quaternion) const
+        Quaternion operator*(const Quaternion& quaternion) const;
+        Vector3 operator*(const Vector3& point) const;
+        Vector4 operator*(const Vector4& point) const;
+
+        friend Quaternion operator*(const float scalar, const Quaternion& quaternion)
         {
-            return { W * quaternion.X + quaternion.W * X + Y * quaternion.Z - Z * quaternion.Y,
-                      W * quaternion.Y + quaternion.W * Y + Z * quaternion.X - X * quaternion.Z,
-                      W * quaternion.Z + quaternion.W * Z + X * quaternion.Y - Y * quaternion.X,
-                      W * quaternion.W - X * quaternion.X - Y * quaternion.Y - Z * quaternion.Z};
+            return quaternion * scalar;
         }
 
-        Vector3 operator*(const Vector3& point) const
-        {
-            const float prodX = W * point.X + Y * point.Z - Z * point.Y;
-            const float prodY = W * point.Y + Z * point.X - X * point.Z;
-            const float prodZ = W * point.Z + X * point.Y - Y * point.X;
-            const float prodW = -X * point.X - Y * point.Y - Z * point.Z;
-
-            return      {W * prodX - prodY * Z + prodZ * Y - prodW * X,
-                        W * prodY - prodZ * X + prodX * Z - prodW * Y,
-                        W * prodZ - prodX * Y + prodY * X - prodW * Z};
-        }
-
-        bool operator==(const Quaternion& quaternion) const
-        {
-            return (X == quaternion.X && Y == quaternion.Y &&
-            Z == quaternion.Z && W == quaternion.W);
-        }
+        friend Vector3 operator*(const Vector3& point, const Quaternion& quaternion);
+        friend Vector4 operator*(const Vector4& point, const Quaternion& quaternion);
 
     private:
         void InitWithEulerAngles(float pitch, float yaw, float roll);

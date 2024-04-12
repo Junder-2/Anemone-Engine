@@ -3,6 +3,8 @@
 
 #include <reactphysics3d/mathematics/Quaternion.h>
 
+#include "Vector4.h"
+
 namespace Engine
 {
     Quaternion Quaternion::Convert(const reactphysics3d::Quaternion& quat)
@@ -22,7 +24,7 @@ namespace Engine
 
     Quaternion::operator const glm::quat() const
     {
-        return glm::quat(X, Y, Z, W);
+        return glm::quat(W, X, Y, W);
     }
 
     Quaternion::Quaternion(const Vector3& eulerAngles)
@@ -74,5 +76,42 @@ namespace Engine
         Y = newQuat.y;
         Z = newQuat.z;
         W = newQuat.w;
+    }
+
+    Quaternion& Quaternion::operator*=(const Quaternion& quaternion)
+    {
+        *this = *this * quaternion;
+        return *this;
+    }
+
+    Quaternion& Quaternion::operator*=(const float scalar)
+    {
+        *this = *this * scalar;
+        return *this;
+    }
+
+    Quaternion Quaternion::operator*(const Quaternion& quaternion) const
+    {
+        return Convert(glm::quat(*this) * glm::quat(quaternion));
+    }
+
+    Vector3 Quaternion::operator*(const Vector3& point) const
+    {
+        return Vector3::Convert(glm::quat(*this) * glm::vec3(point));
+    }
+
+    Vector4 Quaternion::operator*(const Vector4& point) const
+    {
+        return Vector4::Convert(glm::quat(*this) * glm::vec4(point));
+    }
+
+    Vector3 operator*(const Vector3& point, const Quaternion& quaternion)
+    {
+        return quaternion.GetInverse() * point;
+    }
+
+    Vector4 operator*(const Vector4& point, const Quaternion& quaternion)
+    {
+        return quaternion.GetInverse() * point;
     }
 }
