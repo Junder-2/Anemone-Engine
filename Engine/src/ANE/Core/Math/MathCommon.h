@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "glm/gtx/fast_trigonometry.hpp"
 
 namespace Engine
 {
@@ -13,7 +14,12 @@ namespace Engine
         const float RAD_TO_DEGREES = (180.f/PI);
         const float DEGREES_TO_RAD = (PI / 180.f);
 
-        inline bool Equal(const float a, const float b, const float epsilon = FMath::EPSILON) {
+        inline float WrapAngle(const float radians)
+        {
+            return glm::wrapAngle(radians);
+        }
+
+        inline bool Equal(const float a, const float b, const float epsilon = EPSILON) {
             return (std::abs(a - b) < epsilon);
         }
     }
