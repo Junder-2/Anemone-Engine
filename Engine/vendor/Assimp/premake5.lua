@@ -11,8 +11,10 @@ project 'Assimp'
 
     files
     {
-        '_config_headers/',
-        '_config_headers/assimp/', -- Location of assimp's config.h, for a template see include/assimp/config.h.in
+        -- Assimp's generated revision.h file is in this directory, not sure what the proper way to set it up is.
+		-- config.h is in the regular include/ directory.
+        'config/**',
+        'config/assimp/**',
         'include/',
 
         -- Dependencies
@@ -40,8 +42,9 @@ project 'Assimp'
 
     includedirs
     {
-        '_config_headers/',
-        '_config_headers/assimp/',
+        'config/',
+        'config/assimp/',
+
         'contrib/',
         'contrib/irrXML/',
         'contrib/unzip/',
