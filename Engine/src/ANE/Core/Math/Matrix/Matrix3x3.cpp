@@ -130,6 +130,21 @@ namespace Engine
         return scale;
     }
 
+    Vector3 Matrix3x3::GetRight() const
+    {
+        return _rows[0];
+    }
+
+    Vector3 Matrix3x3::GetUp() const
+    {
+        return _rows[1];
+    }
+
+    Vector3 Matrix3x3::GetForward() const
+    {
+        return _rows[2];
+    }
+
     Matrix3x3 Matrix3x3::Convert(const glm::mat3& mat3)
     {
         return {Vector3::Convert(mat3[0]), Vector3::Convert(mat3[1]), Vector3::Convert(mat3[2])};
