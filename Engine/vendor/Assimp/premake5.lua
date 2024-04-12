@@ -3,8 +3,7 @@ project 'Assimp'
     language "C++"
     cppdialect "C++20"
     staticruntime "on"
-    warnings 'Off'
-    optimize 'Speed'
+    warnings "off"
 
     targetdir ("bin/" .. OutputDir .. "/%{prj.name}")
     objdir ("bin-int/" .. OutputDir .. "/%{prj.name}")
