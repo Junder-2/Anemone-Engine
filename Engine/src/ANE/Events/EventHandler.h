@@ -52,24 +52,27 @@ namespace Engine
             _appEventDelegate += delegateMember;
         }
 
+        static void SetBlockAllAppEvents(const bool state)
         {
-            if(_currentEvent == nullptr)
-            {
-                ANE_ELOG_WARN("Cannot execute event outside of event handling");
-                return;
-            }
-
-            if(_editorEventDelegate) _editorEventDelegate(*_currentEvent);
+            _blockAllAppEvents = state;
         }
 
+        static bool IsBlockingAllAppEvents() { return _blockAllAppEvents; }
 
+        static void SetBlockAppInputs(const bool state)
+        {
+            _blockAppInputs = state;
         }
+
+        static bool IsBlockingAppInputs() { return _blockAppInputs; }
 
         static void DispatchEditorEvents();
 
         static void DispatchAppEvents();
 
     private:
+        inline static bool _blockAllAppEvents = false;
+        inline static bool _blockAppInputs = false;
         inline static Event* _currentEvent {};
 
         inline static MulticastDelegate<void(Event&)> _editorEventDelegate;

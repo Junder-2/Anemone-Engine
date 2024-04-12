@@ -3,8 +3,19 @@
 
 #include "ANE/Core/Application.h"
 #include "ANE/Subsystem/SubsystemCollection.h"
+#include "ANE/Input/EditorInputsystem.h"
 
-Engine::InputSystem& Engine::GetInputSystem()
+namespace Engine
 {
-    return *Application::Get().GetSubsystemCollection().GetSubSystem<InputSystem>();
+    InputSystem& GetInputSystem()
+    {
+        return *Application::Get().GetSubsystemCollection().GetSubSystem<InputSystem>();
+    }
+
+    EditorInputsystem& GetEditorInputSystem()
+    {
+        return *Application::Get().GetSubsystemCollection().GetSubSystem<EditorInputsystem>();
+    }
 }
+
+
