@@ -27,7 +27,7 @@ project 'Assimp'
         'code/CApi/**',
         'code/Geometry/**',
         -- Importers
-        -- 'code/AssetLib/IQM/**',
+        'code/AssetLib/IQM/**',
         -- 'code/AssetLib/Assbin/**',
 
         --'code/AssetLib/Collada/**',
