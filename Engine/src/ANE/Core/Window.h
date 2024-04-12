@@ -38,7 +38,7 @@ namespace Engine
         void OnUpdate(float deltaTime);
         void SetVSync(bool enabled);
 
-        bool HasFocus() const { return _imGuiHasFocus && _windowHasFocus; }
+        bool HasFocus() const { return !_imGuiHasFocus && _windowHasFocus; }
 
         bool HasWindowFocus() const { return _windowHasFocus; }
         bool ImGuiHasFocus() const { return _imGuiHasFocus; }
