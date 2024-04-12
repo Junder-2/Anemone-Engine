@@ -109,6 +109,8 @@ namespace Engine
 
         _imGuiHasFocus = ImGui::GetIO().WantCaptureKeyboard;
 
+        const Uint32 mainWindowId = SDL_GetWindowID(_windowContext);
+
         SDL_Event event;
         while(SDL_PollEvent(&event))
         {
@@ -152,12 +154,15 @@ namespace Engine
                 continue;
                 case SDL_MOUSEMOTION:
                 {
-                    if(blockInputs) continue;
+                    if(blockInputs || mainWindowId != event.motion.windowID) continue;
 
-                    const float x = std::clamp((float)event.motion.x/(float)_windowData.Width, 0.f, 1.f);
-                    const float y = std::clamp((float)event.motion.y/(float)_windowData.Height, 0.f, 1.f);
+                    // Convert mouse coord to relative
+                    const float relX = std::clamp((float)event.motion.x/(float)_windowData.Width, 0.f, 1.f);
+                    const float relY = std::clamp((float)event.motion.y/(float)_windowData.Height, 0.f, 1.f);
+                    const float relDeltaX = ((float)event.motion.xrel/(float)_windowData.Height) * 60.f * deltaTime;
+                    const float relDeltaY = ((float)event.motion.yrel/(float)_windowData.Height) * 60.f * deltaTime;
 
-                    inputHandler->ProcessMouseMovement(x, y, deltaTime);
+                    inputHandler->ProcessMouseMovement(relX, relY, relDeltaX, relDeltaY);
                 }
                 continue;
             }

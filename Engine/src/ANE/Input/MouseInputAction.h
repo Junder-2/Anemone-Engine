@@ -106,6 +106,7 @@ namespace Engine
         * @returns stored data changed
         */
         bool PopulateMoveInput(bool* needProcessing, float x, float y, float deltaTime);
+        bool PopulateMoveInput(bool* needProcessing, float x, float y, float xDelta, float yDelta);
         /**
         * Populates new mouse button input
         * @param needProcessing if this action needs processing next frame

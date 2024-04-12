@@ -145,6 +145,15 @@ namespace Engine
         }
     }
 
+    void InputHandler::ProcessMouseMovement(const float xPos, const float yPos, const float xDelta, const float yDelta)
+    {
+        if(_mouseInputAction.PopulateMoveInput(&_dirtyMouse, xPos, yPos, xDelta, yDelta))
+        {
+            MouseMovementEvent mouseMovementEvent(_mouseInputAction.GetMoveValue());
+            DispatchEvent(mouseMovementEvent);
+        }
+    }
+
     void InputHandler::ProcessMouseButton(const int index, const bool press, const bool isDoubleClick /*= false */)
     {
         if(_mouseInputAction.PopulateButtonInput(&_dirtyMouse, index, press ? TriggerStarted : TriggerStopped, isDoubleClick))
