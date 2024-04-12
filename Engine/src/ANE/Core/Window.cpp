@@ -106,6 +106,7 @@ namespace Engine
         const bool prevHasFocus = HasFocus();
         const bool blockInputs = !HasFocus();
         const bool imGuiWantMouse = ImGui::GetIO().WantCaptureMouse;
+        const bool relativeMouseMode = SDL_GetRelativeMouseMode();
 
         _imGuiHasFocus = ImGui::GetIO().WantCaptureKeyboard;
 
@@ -114,7 +115,8 @@ namespace Engine
         SDL_Event event;
         while(SDL_PollEvent(&event))
         {
-            ImGui_ImplSDL2_ProcessEvent(&event);
+            // While mouse is hidden we dont want to be able to interact with imgui
+            if(!relativeMouseMode) ImGui_ImplSDL2_ProcessEvent(&event);
 
             switch (event.type)
             {
@@ -272,6 +274,11 @@ namespace Engine
     {
         //todo
         _windowData.VSync = enabled;
+    }
+
+    void Window::SetMouseVisibility(const bool enable)
+    {
+        SDL_SetRelativeMouseMode(enable ? SDL_TRUE : SDL_FALSE);
     }
 
     std::unique_ptr<Window> Window::Create(const WindowProperties& props)

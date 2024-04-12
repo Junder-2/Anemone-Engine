@@ -16,6 +16,16 @@ namespace Engine
     {
         return *Application::Get().GetSubsystemCollection().GetSubSystem<EditorInputsystem>();
     }
+
+    void HideMouse()
+    {
+        Application::Get().GetWindow().SetMouseVisibility(false);
+    }
+
+    void ShowMouse()
+    {
+        Application::Get().GetWindow().SetMouseVisibility(true);
+    }
 }
 
 

@@ -7,6 +7,9 @@ namespace Engine
 
     InputSystem& GetInputSystem();
     EditorInputsystem& GetEditorInputSystem();
+
+    void HideMouse();
+    void ShowMouse();
 }
 
 #include "ANE/Input/InputSystem.h"

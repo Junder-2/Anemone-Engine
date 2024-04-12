@@ -106,10 +106,19 @@ namespace Engine
         }
         else if(inputValue.GetDeviceType() == InputDeviceMouse) //Any mouse click should return focus
         {
+            if(!editorHasFocus && inputValue.GetTriggerState() == TriggerStarted)
+            {
+                ShowMouse();
+            }
+
             if(inputValue.GetTriggerState() != TriggerStarted || !editorHasFocus) return;
         }
 
         EventHandler::SetBlockAppInputs(!editorHasFocus);
+        if(!editorHasFocus)
+        {
+            HideMouse();
+        }
         _showMenuBar = !editorHasFocus;
         EventHandler::ConsumeEvent();
     }
