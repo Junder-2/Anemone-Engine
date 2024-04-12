@@ -24,7 +24,7 @@ IncludeDir["VkBootstrap"] = "%{External.VkBootstrap}/src"
 IncludeDir["entt"] = "%{External.entt}/include"
 IncludeDir["VMA"] = "%{External.VMA}/include"
 IncludeDir["reactphysics"] = "%{External.reactphysics}/include"
-IncludeDir["Assimp"] = "%{External.Assimp}/include/assimp"
+IncludeDir["Assimp"] = "%{External.Assimp}/include"
 
 -- Library Directories
 LibraryDir = {}
