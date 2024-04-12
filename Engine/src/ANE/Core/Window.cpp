@@ -54,8 +54,6 @@ namespace Engine
     {
         ProcessEvents(deltaTime);
 
-        //_vulkanRenderer->NewFrame(_windowData);
-
         return;
 
         // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
@@ -103,7 +101,7 @@ namespace Engine
         InputHandler* inputHandler = &Application::Get().GetInputHandler();
         inputHandler->OnUpdate();
 
-        const bool prevLostFocus = LostFocus();
+        const bool prevHasFocus = HasFocus();
 
         _imGuiLostFocus = ImGui::GetIO().WantCaptureKeyboard;
 
@@ -111,6 +109,7 @@ namespace Engine
         while(SDL_PollEvent(&event))
         {
             ImGui_ImplSDL2_ProcessEvent(&event);
+            const bool blockInputs = !prevHasFocus || !HasFocus();
 
             switch (event.type)
             {
@@ -126,14 +125,14 @@ namespace Engine
                 case SDL_KEYDOWN:
                 case SDL_KEYUP:
                 {
-                    if(LostFocus() || event.key.repeat != 0) continue;
+                    if(!HasFocus() || event.key.repeat != 0) continue;
                     inputHandler->ProcessKey(event.key.keysym.sym, event.type == SDL_KEYDOWN);
                 }
                 continue;
                 case SDL_MOUSEBUTTONDOWN:
                 case SDL_MOUSEBUTTONUP:
                 {
-                    if(LostFocus()) continue;
+                    if(blockInputs) continue;
                     const int keyIndex = MOUSE_BUTTON_TO_SDL_MOUSE_BUTTON(event.button.button);
 
                     inputHandler->ProcessMouseButton(keyIndex, event.type == SDL_MOUSEBUTTONDOWN, event.button.clicks == 2);
@@ -141,7 +140,7 @@ namespace Engine
                 continue;
                 case SDL_MOUSEWHEEL:
                 {
-                    if(LostFocus()) continue;
+                    if(blockInputs) continue;
                     const float x = event.wheel.preciseX;
                     const float y = event.wheel.preciseY;
 
@@ -150,7 +149,7 @@ namespace Engine
                 continue;
                 case SDL_MOUSEMOTION:
                 {
-                    if(LostFocus()) continue;
+                    if(blockInputs) continue;
 
                     const float x = std::clamp((float)event.motion.x/(float)_windowData.Width, 0.f, 1.f);
                     const float y = std::clamp((float)event.motion.y/(float)_windowData.Height, 0.f, 1.f);
@@ -161,13 +160,13 @@ namespace Engine
             }
         }
 
-        if(!prevLostFocus && LostFocus())
+        if(prevHasFocus && !HasFocus())
         {
             WindowFocusChangeEvent focusChangeEvent(false);
             DispatchEvent(focusChangeEvent);
             inputHandler->FlushInputs();
         }
-        else if(prevLostFocus && !LostFocus())
+        else if(!prevHasFocus && HasFocus())
         {
             WindowFocusChangeEvent focusChangeEvent(true);
             DispatchEvent(focusChangeEvent);
@@ -179,7 +178,7 @@ namespace Engine
             inputHandler->ProcessMouseMovement(x, y, 0);
         }
 
-        if(!LostFocus()) inputHandler->PopulateKeyStates(SDL_GetKeyboardState(nullptr));
+        if(HasFocus()) inputHandler->PopulateKeyStates(SDL_GetKeyboardState(nullptr));
     }
 
     void Window::ProcessWindowEvent(const SDL_WindowEvent& windowEvent, float deltaTime)
@@ -252,7 +251,7 @@ namespace Engine
 
     void Window::DispatchEvent(Event& e)
     {
-        if(EventDelegate) EventDelegate(e);
+        if(_eventDelegate) _eventDelegate(e);
     }
 
     void Window::Shutdown()
