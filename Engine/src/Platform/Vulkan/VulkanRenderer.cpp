@@ -7,8 +7,11 @@
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_vulkan.h>
 #include <VkBootstrap.h>
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
+#include <assimp/scene.h>
 
 #include "VulkanInitializers.h"
 #include "VulkanUtils.h"
@@ -91,6 +94,7 @@ namespace Engine
         return _io->Framerate;
     }
 
+    static inline int modelVertexCount = 0;
     void VulkanRenderer::SetupVulkan(SDL_Window* window)
     {
         const std::vector<const char*> extensions = GetAvailableExtensions(window);
@@ -125,34 +129,43 @@ namespace Engine
         SetupSyncStructures();
 
         CreatePipeline(logicalDevice);
-        //const PipelineWrapper pipeline = CreatePipeline(logicalDevice);
-        //_trianglePipeline = pipeline.Pipeline;
 
-        // TODO: Import geometry data.
         {
-            std::array<Vertex, 4> rectVertices;
+            Assimp::Importer importer;
+            aiScene const* scene = importer.ReadFile("C:/Users/Nestor/Documents/Standalone Projects/Anemone-Engine/Meshes/Suzanne.fbx", aiProcessPreset_TargetRealtime_MaxQuality);
 
-            rectVertices[0].Position = { .5,-.5, 0 };
-            rectVertices[1].Position = { .5, .5, 0 };
-            rectVertices[2].Position = {-.5,-.5, 0 };
-            rectVertices[3].Position = {-.5, .5, 0 };
+            std::vector<Vertex> vertexPositions;
+            std::vector<uint32_t> vertexIndices;
+            for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++)
+            {
+                const aiMesh* mesh = scene->mMeshes[meshIndex];
+                vertexPositions.reserve(3 * mesh->mNumVertices);
+                for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; vertexIndex++)
+                {
+                    if (mesh->HasPositions())
+                    {
+                        const aiVector3D* vPos = &(mesh->mVertices[vertexIndex]);
+                        const aiVector3D* pNormal = &(mesh->mNormals[vertexIndex]);
+                        const aiVector3D* vUv = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][vertexIndex]) : nullptr;
+                        Vertex vertex = { };
+                        vertex.Position = glm::vec3{ vPos->x, vPos->y, vPos->z };
+                        vertex.Color = glm::vec4{ pNormal->x, pNormal->y, pNormal->z, 1 } * .5f + .5f;
+                        vertexPositions.push_back(vertex);
+                    }
+                }
 
-            rectVertices[0].Color = {.9,.9, 1, 1 };
-            rectVertices[1].Color = { 1, 0,.5, 1 };
-            rectVertices[2].Color = { 0, 1,.5, 1 };
-            rectVertices[3].Color = { 0, 0, 0, 1 };
+                for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+                {
+                    const aiFace& face = mesh->mFaces[i];
+                    if (face.mNumIndices != 3) continue;
+                    vertexIndices.push_back(face.mIndices[0]);
+                    vertexIndices.push_back(face.mIndices[1]);
+                    vertexIndices.push_back(face.mIndices[2]);
+                    modelVertexCount += 3;
+                }
+            }
 
-            std::array<uint32_t, 6> rectIndices;
-
-            rectIndices[0] = 0;
-            rectIndices[1] = 1;
-            rectIndices[2] = 2;
-
-            rectIndices[3] = 2;
-            rectIndices[4] = 1;
-            rectIndices[5] = 3;
-
-            _rectangleMesh = UploadMesh(rectIndices, rectVertices);
+            _rectangleMesh = UploadMesh(vertexIndices, vertexPositions);
             _mainDeletionQueue.PushFunction([]
             {
                 DestroyBuffer(_rectangleMesh.IndexBuffer);
@@ -710,7 +723,7 @@ namespace Engine
         vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstantBuffer), &pushConstants);
         vkCmdBindIndexBuffer(cmd, _rectangleMesh.IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
 
-        vkCmdDrawIndexed(cmd, 6, 1, 0, 0, 0);
+        vkCmdDrawIndexed(cmd, modelVertexCount, 1, 0, 0, 0);
 
         vkCmdEndRendering(cmd);
     }
