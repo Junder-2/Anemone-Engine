@@ -6,7 +6,7 @@
 #include <SDL_timer.h>
 
 #include "ANE/Events/EventHandler.h"
-#include "ANE/Subsystem/SubsystemCollection.h"
+#include "ANE/Subsystem/SubSystemCollection.h"
 #include "ANE/Input/Input.h"
 #include "ANE/Utilities/InputUtilities.h"
 #include "Layers/Layer.h"
@@ -42,7 +42,7 @@ namespace Engine
         _inputHandler = InputHandler::Create();
         _inputHandler->BindOnEvent(MakeDelegate(this, &Application::OnEvent));
 
-        _subsystemCollection = SubsystemCollection::Create();
+        _subsystemCollection = SubSystemCollection::Create();
 
         Renderer::Init(_window->GetWindowContext());
     }

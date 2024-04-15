@@ -75,6 +75,8 @@ namespace Engine
                 {
                     const MouseButtonValues mouseButtonValues = dynamic_cast<MouseButtonEvent&>(e).GetInputValue();
 
+                    if(_mouseButtonValueDelegate) _mouseButtonValueDelegate(mouseButtonValues);
+
                     const int buttonId = mouseButtonValues.GetCurrentButtonIndex();
 
                     const BindingPair bindingPair(InputDeviceMouse, buttonId);

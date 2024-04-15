@@ -2,8 +2,8 @@
 #include "Input.h"
 
 #include "ANE/Core/Application.h"
-#include "ANE/Subsystem/SubsystemCollection.h"
-#include "ANE/Input/EditorInputsystem.h"
+#include "ANE/Subsystem/SubSystemCollection.h"
+#include "ANE/Input/EditorInputSystem.h"
 
 namespace Engine
 {
@@ -12,9 +12,9 @@ namespace Engine
         return *Application::Get().GetSubsystemCollection().GetSubSystem<InputSystem>();
     }
 
-    EditorInputsystem& GetEditorInputSystem()
+    EditorInputSystem& GetEditorInputSystem()
     {
-        return *Application::Get().GetSubsystemCollection().GetSubSystem<EditorInputsystem>();
+        return *Application::Get().GetSubsystemCollection().GetSubSystem<EditorInputSystem>();
     }
 
     void HideMouse()

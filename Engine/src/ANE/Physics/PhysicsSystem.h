@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "ANE/Subsystem/Subsystem.h"
+#include "ANE/Subsystem/SubSystem.h"
 #include <reactphysics3d/reactphysics3d.h>
 
 namespace Engine
@@ -8,7 +8,7 @@ namespace Engine
     class PhysicsLogger;
     struct TransformMatrix;
 
-    class PhysicsSystem : public Subsystem
+    class PhysicsSystem : public SubSystem
     {
     public:
         PhysicsSystem();

@@ -1,11 +1,11 @@
 #pragma once
-#include "ANE/Subsystem/Subsystem.h"
+#include "ANE/Subsystem/SubSystem.h"
 #include "InputAction.h"
 #include "InputHandler.h"
 
 namespace Engine
 {
-    class InputSystem : public Subsystem
+    class InputSystem : public SubSystem
     {
     public:
         InputSystem();
@@ -18,10 +18,9 @@ namespace Engine
         void BindAxisInput(BindingPair negativeBindingPair, BindingPair positiveBindingPair, DelegateMember<TClass, void(InputValue)> delegateMember);
 
         template <class TClass>
-        void BindKeyboardInput(KeyCodes bindingId, DelegateMember<TClass, void(InputValue)> delegateMember);
-
+        void BindKeyboardInput(KeyCodes keyCode, DelegateMember<TClass, void(InputValue)> delegateMember);
         template <class TClass>
-        void BindKeyboardAxisInput(KeyCodes negativeBindingId, KeyCodes positiveBindingId, DelegateMember<TClass, void(InputValue)> delegateMember);
+        void BindKeyboardAxisInput(KeyCodes negativeKeyCode, KeyCodes positiveKeyCode, DelegateMember<TClass, void(InputValue)> delegateMember);
 
         template <class TClass>
         void BindMouseMove(DelegateMember<TClass, void(MouseMoveValue)> delegateMember);
@@ -74,9 +73,9 @@ namespace Engine
     }
 
     template <class TClass>
-    void InputSystem::BindKeyboardInput(const KeyCodes bindingId, DelegateMember<TClass, void(InputValue)> delegateMember)
+    void InputSystem::BindKeyboardInput(const KeyCodes keyCode, DelegateMember<TClass, void(InputValue)> delegateMember)
     {
-        BindInput(BindingPair(InputDeviceKeyboard, bindingId), delegateMember);
+        BindInput(BindingPair(InputDeviceKeyboard, keyCode), delegateMember);
     }
 
     template <class TClass>
@@ -137,8 +136,8 @@ namespace Engine
     }
 
     template <class TClass>
-    void InputSystem::BindKeyboardAxisInput(const KeyCodes negativeBindingId, const KeyCodes positiveBindingId, DelegateMember<TClass, void(InputValue)> delegateMember)
+    void InputSystem::BindKeyboardAxisInput(const KeyCodes negativeKeyCode, const KeyCodes positiveKeyCode, DelegateMember<TClass, void(InputValue)> delegateMember)
     {
-        BindAxisInput(BindingPair(InputDeviceKeyboard, negativeBindingId), BindingPair(InputDeviceKeyboard, positiveBindingId), delegateMember);
+        BindAxisInput(BindingPair(InputDeviceKeyboard, negativeKeyCode), BindingPair(InputDeviceKeyboard, positiveKeyCode), delegateMember);
     }
 }

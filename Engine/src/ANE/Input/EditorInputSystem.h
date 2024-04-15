@@ -3,10 +3,10 @@
 
 namespace Engine
 {
-    class EditorInputsystem : public InputSystem
+    class EditorInputSystem final : public InputSystem
     {
     public:
-        EditorInputsystem();
+        EditorInputSystem();
 
     private:
         void OnEvent(Event& e) override;

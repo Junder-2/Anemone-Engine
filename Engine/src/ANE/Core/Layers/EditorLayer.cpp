@@ -13,7 +13,7 @@
 #include "ANE/Core/Scene/Components/CameraComponent.h"
 #include "ANE/Core/Scene/Components/NativeScriptComponent.h"
 #include "ANE/Core/Scene/Components/RenderComponent.h"
-#include "ANE/Input/EditorInputsystem.h"
+#include "ANE/Input/EditorInputSystem.h"
 
 namespace Engine
 {

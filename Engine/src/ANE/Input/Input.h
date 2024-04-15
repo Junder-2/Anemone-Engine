@@ -3,10 +3,10 @@
 namespace Engine
 {
     class InputSystem;
-    class EditorInputsystem;
+    class EditorInputSystem;
 
+    EditorInputSystem& GetEditorInputSystem();
     InputSystem& GetInputSystem();
-    EditorInputsystem& GetEditorInputSystem();
 
     void HideMouse();
     void ShowMouse();
