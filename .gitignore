@@ -45,3 +45,4 @@ Engine/vendor/SDL2/docs
 **/imgui.ini
 
 /Profiling/*.json
+/Engine/Logs
