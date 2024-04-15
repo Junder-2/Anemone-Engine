@@ -17,6 +17,15 @@ namespace Engine
         return true;
     }
 
+    bool MouseInputAction::PopulateMoveInput(bool* needProcessing, const float x, const float y, const float xDelta, const float yDelta)
+    {
+        _moveValue.SetMousePos(x, y);
+        _moveValue.SetMouseDelta(xDelta, yDelta);
+
+        *needProcessing = true;
+        return true;
+    }
+
     bool MouseInputAction::PopulateButtonInput(bool* needProcessing, const int buttonIndex, const TriggerState newState, const bool isDoubleClick /*= false */)
     {
         _buttonValue.SetTriggerState(buttonIndex, newState, isDoubleClick);

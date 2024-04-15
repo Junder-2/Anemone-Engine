@@ -40,10 +40,16 @@ namespace Engine
     private:
         void CreateTestScene();
 
-        static void ShowInputDebugOverlay(bool* pOpen);
+        void OnSwitchEditorFocus(InputValue inputValue);
+
+        static void ShowEditorMenuBar();
+        static void ShowInputDebugOverlay();
 
     protected:
         std::string _debugName;
+
+        inline static bool _showMenuBar = false;
+        inline static bool _showInputDebugOverlay = false;
 
     private:
         std::unordered_map<const char*, std::shared_ptr<Scene>> _scenes;

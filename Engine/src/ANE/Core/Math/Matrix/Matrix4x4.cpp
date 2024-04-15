@@ -26,7 +26,7 @@ namespace Engine
     {
         if(isDegrees)
         {
-            angle *= DEGREES_TO_RAD;
+            angle *= FMath::DEGREES_TO_RAD;
         }
 
         glm::mat4 newMatrix = rotate(glm::mat4(*this), angle,  glm::vec3(axis));
@@ -46,9 +46,9 @@ namespace Engine
 
     void Matrix4x4::Rotate(const Vector3 euler, const bool isDegrees /*= false*/)
     {
-        Rotate(euler.Yaw, Vector3::UpVector(), isDegrees);
-        Rotate(euler.Pitch, Vector3::RightVector(), isDegrees);
-        Rotate(euler.Roll, Vector3::ForwardVector(), isDegrees);
+        Rotate(FMath::WrapAngle(euler.Yaw), Vector3::UpVector(), isDegrees);
+        Rotate(FMath::WrapAngle(euler.Pitch), Vector3::RightVector(), isDegrees);
+        Rotate(FMath::WrapAngle(euler.Roll), Vector3::ForwardVector(), isDegrees);
     }
 
     void Matrix4x4::SetRotation(const Quaternion quat)
@@ -71,7 +71,7 @@ namespace Engine
 
         if(isDegrees)
         {
-            euler *= DEGREES_TO_RAD;
+            euler *= FMath::DEGREES_TO_RAD;
         }
 
         Rotate(euler, false);
@@ -102,7 +102,7 @@ namespace Engine
             euler.Roll = 0;
         }
 
-        return euler * (isDegrees ? RAD_TO_DEGREES : 1);
+        return euler * (isDegrees ? FMath::RAD_TO_DEGREES : 1);
         //return Vector3::Convert(eulerAngles(quat_cast(glm::mat4(*this)))) * (isDegrees ? RAD_TO_DEGREES : 1.f);
     }
 
@@ -111,6 +111,11 @@ namespace Engine
         glm::mat4 newMatrix = translate(glm::mat4(*this), glm::vec3(delta));
 
         _rows[3] = Vector4::Convert(newMatrix[3]);
+    }
+
+    void Matrix4x4::AddPosition(const Vector3 delta)
+    {
+        _rows[3] += Vector4(delta, 0);
     }
 
     void Matrix4x4::SetPosition(const Vector3 newPos)
@@ -146,6 +151,21 @@ namespace Engine
     {
         const Vector3 scale(Vector3(_rows[0]).Length(), Vector3(_rows[1]).Length(), Vector3(_rows[2]).Length());
         return scale;
+    }
+
+    Vector3 Matrix4x4::GetRight() const
+    {
+        return _rows[0];
+    }
+
+    Vector3 Matrix4x4::GetUp() const
+    {
+        return _rows[1];
+    }
+
+    Vector3 Matrix4x4::GetForward() const
+    {
+        return _rows[2];
     }
 
     Matrix4x4 Matrix4x4::Convert(const glm::mat4& mat4)

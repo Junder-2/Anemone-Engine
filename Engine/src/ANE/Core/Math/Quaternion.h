@@ -155,7 +155,7 @@ namespace Engine
         const float l = Length();
 
         // Check if the length is not equal to zero
-        assert (l > EPSILON);
+        assert (l > FMath::EPSILON);
 
         X /= l;
         Y /= l;

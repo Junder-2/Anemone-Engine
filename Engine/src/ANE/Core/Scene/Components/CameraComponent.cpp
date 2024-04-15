@@ -48,7 +48,7 @@ namespace Engine
     {
         const Matrix4x4 currentMatrix = ViewMatrix;
 
-        ViewMatrix = Transform;
+        ViewMatrix = Transform.GetWorldToLocal();
 
         if (_flipY) {
             //flip y coord

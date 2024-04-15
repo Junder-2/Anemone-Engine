@@ -38,6 +38,8 @@ namespace Engine
         void OnUpdate(float deltaTime);
         void SetVSync(bool enabled);
 
+        void SetMouseVisibility(bool enable);
+
         bool HasFocus() const { return !_imGuiHasFocus && _windowHasFocus; }
 
         bool HasWindowFocus() const { return _windowHasFocus; }
@@ -48,7 +50,6 @@ namespace Engine
         uint32_t GetHeight() const { return _windowData.Height; }
         WindowProperties GetProperties() { return _windowData; }
         SDL_Window* GetWindowContext() const { return _windowContext; }
-
 
     private:
         void Init(const WindowProperties& props);

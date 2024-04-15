@@ -3,7 +3,6 @@
 
 //Modified copy of reactphysics/include/reactphysics3d/mathematics/Matrix3x3.h
 
-
 namespace reactphysics3d
 {
     class Matrix4x4;
@@ -58,6 +57,7 @@ namespace Engine
         Matrix4x4 GetInverse() const;
 
         void Translate(Vector3 delta);
+        void AddPosition(Vector3 delta);
         void SetPosition(Vector3 newPos);
         Vector3 GetPosition() const;
 
@@ -72,6 +72,10 @@ namespace Engine
         void Scale(Vector3 scale);
         void SetScale(Vector3 scale);
         Vector3 GetScale() const;
+
+        Vector3 GetRight() const;
+        Vector3 GetUp() const;
+        Vector3 GetForward() const;
 
         static Matrix4x4 Identity()
         {

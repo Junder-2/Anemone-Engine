@@ -34,7 +34,7 @@ namespace Engine
     {
         if(isDegrees)
         {
-            angle *= DEGREES_TO_RAD;
+            angle *= FMath::DEGREES_TO_RAD;
         }
 
         glm::mat4 newMatrix = rotate(glm::mat4(*this), angle,  glm::vec3(axis));
@@ -71,7 +71,7 @@ namespace Engine
 
         if(isDegrees)
         {
-            euler *= DEGREES_TO_RAD;
+            euler *= FMath::DEGREES_TO_RAD;
         }
 
         Rotate(Quaternion(euler));
@@ -102,7 +102,7 @@ namespace Engine
             euler.Roll = 0;
         }
 
-        return euler * (isDegrees ? RAD_TO_DEGREES : 1);
+        return euler * (isDegrees ? FMath::RAD_TO_DEGREES : 1);
         //return Vector3::Convert(eulerAngles(quat_cast(glm::mat4(*this)))) * (isDegrees ? RAD_TO_DEGREES : 1.f);
     }
 
@@ -128,6 +128,21 @@ namespace Engine
     {
         const Vector3 scale(Vector3(_rows[0]).Length(), Vector3(_rows[1]).Length(), Vector3(_rows[2]).Length());
         return scale;
+    }
+
+    Vector3 Matrix3x3::GetRight() const
+    {
+        return _rows[0];
+    }
+
+    Vector3 Matrix3x3::GetUp() const
+    {
+        return _rows[1];
+    }
+
+    Vector3 Matrix3x3::GetForward() const
+    {
+        return _rows[2];
     }
 
     Matrix3x3 Matrix3x3::Convert(const glm::mat3& mat3)

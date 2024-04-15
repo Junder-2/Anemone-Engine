@@ -37,6 +37,8 @@ namespace Engine
         const SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_VULKAN | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
         _windowContext = SDL_CreateWindow(props.Title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowData.Width, _windowData.Height, windowFlags);
 
+        // Set minimum size to prevent errors
+        SDL_SetWindowMinimumSize(_windowContext, 180, 80);
 
         int xPos, yPos;
         SDL_GetWindowPosition(_windowContext, &xPos, &yPos);
@@ -104,13 +106,17 @@ namespace Engine
         const bool prevHasFocus = HasFocus();
         const bool blockInputs = !HasFocus();
         const bool imGuiWantMouse = ImGui::GetIO().WantCaptureMouse;
+        const bool relativeMouseMode = SDL_GetRelativeMouseMode();
 
         _imGuiHasFocus = ImGui::GetIO().WantCaptureKeyboard;
+
+        const Uint32 mainWindowId = SDL_GetWindowID(_windowContext);
 
         SDL_Event event;
         while(SDL_PollEvent(&event))
         {
-            ImGui_ImplSDL2_ProcessEvent(&event);
+            // While mouse is hidden we dont want to be able to interact with imgui
+            if(!relativeMouseMode) ImGui_ImplSDL2_ProcessEvent(&event);
 
             switch (event.type)
             {
@@ -150,12 +156,15 @@ namespace Engine
                 continue;
                 case SDL_MOUSEMOTION:
                 {
-                    if(blockInputs) continue;
+                    if(blockInputs || mainWindowId != event.motion.windowID) continue;
 
-                    const float x = std::clamp((float)event.motion.x/(float)_windowData.Width, 0.f, 1.f);
-                    const float y = std::clamp((float)event.motion.y/(float)_windowData.Height, 0.f, 1.f);
+                    // Convert mouse coord to relative
+                    const float relX = std::clamp((float)event.motion.x/(float)_windowData.Width, 0.f, 1.f);
+                    const float relY = std::clamp((float)event.motion.y/(float)_windowData.Height, 0.f, 1.f);
+                    const float relDeltaX = ((float)event.motion.xrel/(float)_windowData.Height) * 60.f * deltaTime;
+                    const float relDeltaY = ((float)event.motion.yrel/(float)_windowData.Height) * 60.f * deltaTime;
 
-                    inputHandler->ProcessMouseMovement(x, y, deltaTime);
+                    inputHandler->ProcessMouseMovement(relX, relY, relDeltaX, relDeltaY);
                 }
                 continue;
             }
@@ -265,6 +274,11 @@ namespace Engine
     {
         //todo
         _windowData.VSync = enabled;
+    }
+
+    void Window::SetMouseVisibility(const bool enable)
+    {
+        SDL_SetRelativeMouseMode(enable ? SDL_TRUE : SDL_FALSE);
     }
 
     std::unique_ptr<Window> Window::Create(const WindowProperties& props)

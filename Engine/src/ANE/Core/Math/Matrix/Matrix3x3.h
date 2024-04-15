@@ -62,6 +62,10 @@ namespace Engine
         void SetScale(Vector3 scale);
         Vector3 GetScale() const;
 
+        Vector3 GetRight() const;
+        Vector3 GetUp() const;
+        Vector3 GetForward() const;
+
         static Matrix3x3 Identity()
         {
             return {1.0, 0.0, 0.0,
