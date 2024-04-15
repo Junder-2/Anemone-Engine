@@ -66,7 +66,6 @@ namespace Engine
         inputHandler->OnUpdate();
 
         const bool prevHasFocus = HasFocus();
-        const bool blockInputs = !HasFocus();
         const bool imGuiWantMouse = ImGui::GetIO().WantCaptureMouse;
         const bool relativeMouseMode = SDL_GetRelativeMouseMode();
 
@@ -94,14 +93,14 @@ namespace Engine
                 case SDL_KEYDOWN:
                 case SDL_KEYUP:
                 {
-                    if(blockInputs || event.key.repeat != 0) continue;
+                    if(event.key.repeat != 0) continue;
                     inputHandler->ProcessKey(event.key.keysym.sym, event.type == SDL_KEYDOWN);
                 }
                 continue;
                 case SDL_MOUSEBUTTONDOWN:
                 case SDL_MOUSEBUTTONUP:
                 {
-                    if(blockInputs || imGuiWantMouse) continue;
+                    if(imGuiWantMouse || mainWindowId != event.button.windowID) continue;
                     const int keyIndex = MOUSE_BUTTON_TO_SDL_MOUSE_BUTTON(event.button.button);
 
                     inputHandler->ProcessMouseButton(keyIndex, event.type == SDL_MOUSEBUTTONDOWN, event.button.clicks == 2);
@@ -109,7 +108,7 @@ namespace Engine
                 continue;
                 case SDL_MOUSEWHEEL:
                 {
-                    if(blockInputs) continue;
+                    if(imGuiWantMouse || mainWindowId != event.wheel.windowID) continue;
                     const float x = event.wheel.preciseX;
                     const float y = event.wheel.preciseY;
 
@@ -118,7 +117,7 @@ namespace Engine
                 continue;
                 case SDL_MOUSEMOTION:
                 {
-                    if(blockInputs || mainWindowId != event.motion.windowID) continue;
+                    if(mainWindowId != event.motion.windowID) continue;
 
                     // Convert mouse coord to relative
                     const float relX = std::clamp((float)event.motion.x/(float)_windowData.Width, 0.f, 1.f);
