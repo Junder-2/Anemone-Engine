@@ -27,4 +27,21 @@ namespace Engine
         _appLogger->set_level(spdlog::level::trace);
         #endif
     }
+
+    std::shared_ptr<spdlog::logger>& Logging::GetEngineLogger()
+    {
+        if(_engineLogger == nullptr)
+        {
+            // We have to use built in as normal logger doesnt exist yet
+            SPDLOG_ERROR("Engine logger not yet initialized");
+            ANE_DEBUG_BREAK();
+        }
+        return _engineLogger;
+    }
+
+    std::shared_ptr<spdlog::logger>& Logging::GetAppLogger()
+    {
+        ANE_EASSERT(_appLogger == nullptr, "App logger not yet initialized");
+        return _appLogger;
+    }
 }

@@ -2,6 +2,7 @@
 
 #include "ANE/Core/Application.h"
 #include "ANE/Core/Logging.h"
+#include "ANE/Core/Assert.h"
 #include "ANE/Core/Window.h"
 
 //------Entity----------------------
