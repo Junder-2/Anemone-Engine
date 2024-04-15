@@ -1,36 +1,48 @@
 #include "anepch.h"
 #include "InspectorPanel.h"
 
-#include <memory>
-#include "entt.hpp"
 #include "imgui.h"
 
-
-Engine::InspectorPanel::InspectorPanel(std::unordered_map<const char*, std::shared_ptr<Engine::Scene>>& currentScenes)
+Engine::InspectorPanel::InspectorPanel()
 {
-    _managedScenes = &currentScenes;
+}
+
+Engine::InspectorPanel::InspectorPanel(EditorLayer* editorLayer)
+{
+    _EditorLayer = editorLayer;
 }
 
 Engine::InspectorPanel::~InspectorPanel()
 {
 }
 
+void Engine::InspectorPanel::RegisterSelect(UUIDComponent selectedEntityID)
+{
+    selected = selectedEntityID.UUID;
+}
+
+void Engine::InspectorPanel::WipeSelect()
+{
+    selected = "";
+}
+
 void Engine::InspectorPanel::OnPanelRender()
 {
-    ImGui::Begin("Scene Hierarchy");
+    ImGui::Begin("Inspection");
+    if(std::strcmp("",selected.c_str()))
+        {
+        ImGui::Text(selected.c_str());
+        _EditorLayer->GetActiveScene();
+        }
+    else
+        {
+        ImGui::Text("Nothing selected");
+
+        }
+
+    ImGui::End();
 
     //ANE_LOG_INFO("Entering panel render phase");
 
-    for (auto& it: *_managedScenes) {
-        if (ImGui::CollapsingHeader(it.first))
-        {
-            ImGui::SeparatorText("General");
-            for(auto entity: it.second->_registry.view<entt::entity>()) {
-                ANE_LOG_INFO("found an entity");
-            }
-        }
 
-    }
-
-    ImGui::End();
 }

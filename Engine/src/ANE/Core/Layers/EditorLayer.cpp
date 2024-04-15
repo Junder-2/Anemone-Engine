@@ -12,9 +12,21 @@
 #include "ANE/Core/Scene/Components/NativeScriptComponent.h"
 #include "ANE/Core/Scene/Components/RenderComponent.h"
 #include "Panels/InspectorPanel.h"
+#include "Panels/SceneHierarchyPanel.h"
 
 namespace Engine
 {
+
+    #ifndef MM_IEEE_ASSERT
+    #define MM_IEEE_ASSERT(x) assert(x)
+    #endif
+
+    #define MM_IEEE_IMGUI_PAYLOAD_TYPE_ENTITY "MM_IEEE_ENTITY"
+
+    #ifndef MM_IEEE_ENTITY_WIDGET
+    #define MM_IEEE_ENTITY_WIDGET ::MM::EntityWidget
+    #endif
+
     EditorLayer::EditorLayer(const std::string& name) : Layer(name)
     {
     }
@@ -24,17 +36,15 @@ namespace Engine
     void EditorLayer::OnAttach()
     {
 
-
         // You would have a "Read from config files to find correct panel layout" method here
 
-
-        CreateTestScene();
-        AttachUIPanel(new InspectorPanel(_scenes));
+        CreateTestScene(50);
+        AttachUIPanel(new SceneHierarchyPanel(_scenes));
+        AttachUIPanel(new InspectorPanel(this));
 
         // Then you would call load methods to load the most recent project
 
         //Then you would load the scene from the file path listed from that project
-
     }
 
     void EditorLayer::OnDetach()
@@ -49,15 +59,19 @@ namespace Engine
 
     void EditorLayer::OnUIRender()
     {
-        ImGui::ShowDemoWindow();
-
-
         for (UILayerPanel* panel : _UIpanels)
         {
             if(panel->_isVisible)
             {
                 panel->OnPanelRender();
             }
+        ImGui::Begin("Hello");
+        if(ImGui::Button("Button"))
+        {
+            Entity ent = GetActiveScene()->Create("Square Entity");
+
+        }
+        ImGui::End();
 
             /*There is a chance we will have situation where UI is not visible but still needs to do something
             like maintaining a dockspace or something like that. This loop is for that situation.
@@ -67,7 +81,10 @@ namespace Engine
                 //panel->doWindowLayoutmaitenance
             }
         }
+        static bool showSimpleOverlay = true;
+        if (showSimpleOverlay) ShowInputDebugOverlay(&showSimpleOverlay);
 
+        ImGui::ShowDemoWindow();
     }
 
     void EditorLayer::OnUpdate(float deltaTime)
@@ -75,14 +92,24 @@ namespace Engine
         if (_activeScene) _activeScene->OnUpdate(deltaTime);
     }
 
-    void EditorLayer::CreateTestScene()
+    void EditorLayer::CreateTestScene(int numEntitiesToTest)
     {
         //Add scene to layer
         AddScene<Scene>("Game");
 
         //Create a Entity
         Entity ent = GetActiveScene()->Create("Square Entity");
+        std::stringstream oss;
 
+        for(int i = 0; i < numEntitiesToTest;i++ )
+        {
+            //ANE_LOG_INFO(UUIDGenerator::get_uuid());
+
+            std::string string = "Entity";
+            string.append(std::to_string(i));
+            string.append("\n");
+            _activeScene->Create(string);
+        }
         //Add component to entity
         ent.AddComponent<RenderComponent>();
         // ent.AddComponent<NativeScriptComponent>().Bind<CameraController>();
@@ -156,4 +183,35 @@ namespace Engine
         }
         ImGui::End();
     }
+
+    template <class EntityType>
+    void EditorLayer::EntityWidget(EntityType& e, entt::basic_registry<EntityType>& reg, bool dropTarget)
+    {
+        ImGui::PushID(static_cast<int>(entt::to_integral(e)));
+
+        if (reg.valid(e)) {
+            ImGui::Text("ID: %d", entt::to_integral(e));
+        } else {
+            ImGui::Text("Invalid Entity");
+        }
+
+        if (reg.valid(e)) {
+            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                ImGui::SetDragDropPayload(MM_IEEE_IMGUI_PAYLOAD_TYPE_ENTITY, &e, sizeof(e));
+                ImGui::Text("ID: %d", entt::to_integral(e));
+                ImGui::EndDragDropSource();
+            }
+        }
+
+        if (dropTarget && ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(MM_IEEE_IMGUI_PAYLOAD_TYPE_ENTITY)) {
+                e = *(EntityType*)payload->Data;
+            }
+
+            ImGui::EndDragDropTarget();
+        }
+
+        ImGui::PopID();
+    }
+
 }

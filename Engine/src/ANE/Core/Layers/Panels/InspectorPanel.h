@@ -1,19 +1,24 @@
 #pragma once
+#include <entt.hpp>
+
 #include "UILayerPanel.h"
-#include "ANE/Core/Scene/Scene.h"
+#include "ANE/Core/Entity/Entity.h"
+#include "ANE/Core/Layers/EditorLayer.h"
 
 namespace Engine
 {
     class InspectorPanel : public UILayerPanel
     {
     public:
-        InspectorPanel(std::unordered_map<const char*, std::shared_ptr<Engine::Scene>>& _currentScenes);
+
+        InspectorPanel();
+        InspectorPanel(EditorLayer* editorLayer);
         ~InspectorPanel();
+static void RegisterSelect(UUIDComponent selectedEntityID);
+static void WipeSelect();
+
+        inline static std::string selected = "";
+        EditorLayer* _EditorLayer;
         void OnPanelRender() override;
-
-
-        std::unordered_map<const char*, std::shared_ptr<Scene>>* _managedScenes;
-
-        Scene* _sceneContext;
     };
 }

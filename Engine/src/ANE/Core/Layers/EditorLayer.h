@@ -22,6 +22,11 @@ namespace Engine
 
         void OnUpdate(float deltaTime) override;
 
+        template <class EntityType>
+        void EntityWidget(EntityType& e, entt::basic_registry<EntityType>& reg, bool dropTarget = false);
+
+
+
         template <class TValue>
         std::enable_if_t<std::is_base_of_v<Scene, TValue>> AddScene(const char* key);
 
@@ -36,10 +41,9 @@ namespace Engine
         }
 
         std::shared_ptr<Scene> GetActiveScene() { return _activeScene; }
-        std::unordered_map<const char*, std::shared_ptr<Scene>> _scenes;
 
     private:
-        void CreateTestScene();
+        void CreateTestScene(int numEntitiesToTest);
 
         static void ShowInputDebugOverlay(bool* pOpen);
 
@@ -47,6 +51,7 @@ namespace Engine
         std::string _debugName;
 
     private:
+        std::unordered_map<const char*, std::shared_ptr<Scene>> _scenes;
         std::shared_ptr<Scene> _activeScene;
     };
 
@@ -56,6 +61,8 @@ namespace Engine
         std::unique_ptr<TValue> tempScene = std::make_unique<TValue>(entities);
         _scenes.emplace(std::make_pair(key, std::move(tempScene)));
     }
+
+
 
     template <class TValue>
     std::enable_if_t<std::is_base_of_v<Scene, TValue>> EditorLayer::AddScene(const char* key)
