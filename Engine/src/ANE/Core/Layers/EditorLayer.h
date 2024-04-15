@@ -42,14 +42,13 @@ namespace Engine
 
         void OnSwitchEditorFocus(InputValue inputValue);
 
-        static void ShowEditorMenuBar();
-        static void ShowInputDebugOverlay();
+       // static void ShowEditorMenuBar();
+
 
     protected:
         std::string _debugName;
 
-        inline static bool _showMenuBar = false;
-        inline static bool _showInputDebugOverlay = false;
+
 
     private:
         std::unordered_map<const char*, std::shared_ptr<Scene>> _scenes;
