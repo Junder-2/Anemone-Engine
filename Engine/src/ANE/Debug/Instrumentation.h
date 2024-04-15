@@ -40,7 +40,7 @@ namespace Engine
 				// profiling output.
 				if (Logging::GetEngineLogger())
 				{
-					//HZ_CORE_ERROR("Instrumentor::BeginSession('{0}') when session '{1}' already open.", name, _currentSession->Name);
+					ANE_ELOG_WARN("Instrumentor::BeginSession('{0}') when session '{1}' already open.", name, _currentSession->Name);
 				}
 				InternalEndSession();
 			}
@@ -55,7 +55,7 @@ namespace Engine
 			{
 				if (Logging::GetEngineLogger())
 				{
-					//HZ_CORE_ERROR("Instrumentor could not open results file '{0}'.", filename);
+					ANE_ELOG_WARN("Instrumentor could not open results file '{0}'.", filename);
 				}
 			}
 		}
@@ -72,13 +72,13 @@ namespace Engine
 
 			json << std::setprecision(3) << std::fixed;
 			json << ",{";
-			json << "\"cat\":\"function\",";
-			json << "\"dur\":" << (result.ElapsedTime.count()) << ',';
-			json << "\"name\":\"" << result.Name << "\",";
-			json << "\"ph\":\"X\",";
-			json << "\"pid\":0,";
-			json << "\"tid\":" << result.ThreadID << ",";
-			json << "\"ts\":" << result.Start.count();
+			json << R"("cat":"function",)";
+			json << R"("dur":)" << (result.ElapsedTime.count()) << ',';
+			json << R"("name":")" << result.Name << "\",";
+			json << R"("ph":"X",)";
+			json << R"("pid":0,)";
+			json << R"("tid":)" << result.ThreadID << ",";
+			json << R"("ts":)" << result.Start.count();
 			json << "}";
 
 			std::lock_guard lock(_mutex);
@@ -107,7 +107,7 @@ namespace Engine
 
 		void WriteHeader()
 		{
-			_outputStream << "{\"otherData\": {},\"traceEvents\":[{}";
+			_outputStream << R"({"otherData": {},"traceEvents":[{})";
 			_outputStream.flush();
 		}
 
