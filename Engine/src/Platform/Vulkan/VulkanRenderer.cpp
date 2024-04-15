@@ -11,12 +11,14 @@
 #include <assimp/postprocess.h>
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
-#include <assimp/scene.h>
+#include <filesystem>
 
+#include "MeshLoader.h"
 #include "VulkanInitializers.h"
 #include "VulkanUtils.h"
 #include "ANE/Core/Window.h"
 #include "ANE/Core/Math/Matrix/Matrix4x4.h"
+#include "ANE/Renderer/Mesh.h"
 #include "ANE/Utilities/ImGuiUtilities.h"
 
 namespace Engine
@@ -131,41 +133,14 @@ namespace Engine
         CreatePipeline(logicalDevice);
 
         {
-            Assimp::Importer importer;
-            aiScene const* scene = importer.ReadFile("C:/Users/Nestor/Documents/Standalone Projects/Anemone-Engine/Meshes/Suzanne.fbx", aiProcessPreset_TargetRealtime_MaxQuality);
+            // TODO: Figure out where to store the model file and how to access it.
+            const std::filesystem::path modelPath = std::filesystem::current_path().append("..\\Meshes\\Suzanne.fbx");
 
-            std::vector<Vertex> vertexPositions;
-            std::vector<uint32_t> vertexIndices;
-            for (uint32_t meshIndex = 0; meshIndex < scene->mNumMeshes; meshIndex++)
-            {
-                const aiMesh* mesh = scene->mMeshes[meshIndex];
-                vertexPositions.reserve(3 * mesh->mNumVertices);
-                for (uint32_t vertexIndex = 0; vertexIndex < mesh->mNumVertices; vertexIndex++)
-                {
-                    if (mesh->HasPositions())
-                    {
-                        const aiVector3D* vPos = &(mesh->mVertices[vertexIndex]);
-                        const aiVector3D* pNormal = &(mesh->mNormals[vertexIndex]);
-                        const aiVector3D* vUv = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][vertexIndex]) : nullptr;
-                        Vertex vertex = { };
-                        vertex.Position = glm::vec3{ vPos->x, vPos->y, vPos->z };
-                        vertex.Color = glm::vec4{ pNormal->x, pNormal->y, pNormal->z, 1 } * .5f + .5f;
-                        vertexPositions.push_back(vertex);
-                    }
-                }
+            const MeshAsset meshAsset = MeshLoader::LoadMesh(modelPath.string().c_str());
+            Mesh mesh = meshAsset.SubMeshes[0]; // Use first submesh for now.
 
-                for (unsigned int i = 0; i < mesh->mNumFaces; i++)
-                {
-                    const aiFace& face = mesh->mFaces[i];
-                    if (face.mNumIndices != 3) continue;
-                    vertexIndices.push_back(face.mIndices[0]);
-                    vertexIndices.push_back(face.mIndices[1]);
-                    vertexIndices.push_back(face.mIndices[2]);
-                    modelVertexCount += 3;
-                }
-            }
-
-            _rectangleMesh = UploadMesh(vertexIndices, vertexPositions);
+            modelVertexCount = mesh.Indices.size();
+            _rectangleMesh = UploadMesh(mesh.Indices, mesh.Vertices);
             _mainDeletionQueue.PushFunction([]
             {
                 DestroyBuffer(_rectangleMesh.IndexBuffer);
