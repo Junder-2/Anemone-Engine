@@ -41,7 +41,7 @@ namespace Engine
 
     std::shared_ptr<spdlog::logger>& Logging::GetAppLogger()
     {
-        ANE_EASSERT(_appLogger == nullptr, "App logger not yet initialized");
+        ANE_EASSERT(_appLogger, "App logger not yet initialized");
         return _appLogger;
     }
 }

@@ -111,10 +111,9 @@ namespace Engine
         _device = logicalDevice.device;
 
         vkb::Result<VkQueue> queueResult = logicalDevice.get_queue(vkb::QueueType::graphics);
-        if (!queueResult.has_value())
-        {
-            ANE_ELOG_ERROR("Queue has no graphics support.\n");
-        }
+
+        ANE_EASSERT(queueResult.has_value(), "Queue has no graphics support")
+
         _queue = queueResult.value();
 
         CreateVmaAllocator();

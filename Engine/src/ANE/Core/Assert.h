@@ -14,4 +14,5 @@
 #else
     #define ANE_ASSERT(cond, msg)
     #define ANE_EASSERT(cond, msg)
+    #define ANE_DEBUG_BREAK()
 #endif

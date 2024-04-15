@@ -48,10 +48,7 @@ namespace Engine
         _windowData.XPos = xPos;
         _windowData.YPos = yPos;
 
-        if (_windowContext == nullptr)
-        {
-            ANE_ELOG_ERROR("Could not create SDL window.");
-        }
+        ANE_EASSERT(_windowContext, "Could not create SDL window.");
     }
 
     void Window::OnUpdate(float deltaTime)
