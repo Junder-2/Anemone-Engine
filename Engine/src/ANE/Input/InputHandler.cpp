@@ -16,6 +16,8 @@ namespace Engine
 
     InputHandler::InputHandler()
     {
+        ANE_PROFILE_FUNCTION();
+
         // input testing
         for (int i = KeyCodeA; i < KeyCodeZ+1; ++i)
         {

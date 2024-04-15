@@ -25,6 +25,7 @@ namespace Engine
 
     void VulkanRenderer::Setup()
     {
+        ANE_PROFILE_FUNCTION();
         if (_initialized)
         {
             ANE_ELOG_WARN("Unable to setup VulkanRenderer as it has already been initialized.");
