@@ -10,7 +10,7 @@ namespace Engine
 {
     //std::queue<std::string_view> Logger::Texts;
 
-    Engine::ImGuiLayer::ImGuiLayer(const char* layerName): Layer(layerName)
+    ImGuiLayer::ImGuiLayer(const char* layerName): Layer(layerName)
     {
         EnableFlag("MainMenuWindow");
         EnableFlag("LogWindow");
@@ -21,39 +21,37 @@ namespace Engine
         // GetInputSystem().BindKeyboardInput(KeyCodeB, MakeDelegate(this, &ImGuiLayer::AddDebugMessage));
     }
 
-    //
     void ImGuiLayer::AddDebugMessage(InputValue value)
     {
         //ANE_ELOG("We are pressing five");
         //std::string_view hey = "yo";
         //Logger::SubmitText(hey);
-        ANE_ELOG("Hey")
+        ANE_ELOG("Hey");
     }
 
-
-    Engine::ImGuiLayer::~ImGuiLayer()
+    ImGuiLayer::~ImGuiLayer()
     {
     }
 
-    void Engine::ImGuiLayer::OnAttach()
+    void ImGuiLayer::OnAttach()
     {
     }
 
-    void Engine::ImGuiLayer::OnDetach()
+    void ImGuiLayer::OnDetach()
     {
     }
 
-    void Engine::ImGuiLayer::OnUpdate(float deltaTime)
+    void ImGuiLayer::OnUpdate(float deltaTime)
     {
         // AddDebugMessage();
     }
 
-    void Engine::ImGuiLayer::OnEvent(Event& e)
+    void ImGuiLayer::OnEvent(Event& e)
     {
     }
 
 
-    void Engine::ImGuiLayer::OnUIRender()
+    void ImGuiLayer::OnUIRender()
     {
         bool open = true;
         DockSpace(&open);
@@ -69,7 +67,7 @@ namespace Engine
         if (GetFlag("ShowDebugOverlay")) ShowInputDebugOverlay();
     }
 
-    void Engine::ImGuiLayer::DockSpace(bool* open)
+    void ImGuiLayer::DockSpace(bool* open)
     {
         static bool opt_fullscreen = true;
         static bool opt_padding = false;
@@ -108,10 +106,10 @@ namespace Engine
         ImGui::End();
     }
 
-    void Engine::ImGuiLayer::ShowInputDebugOverlay()
+    void ImGuiLayer::ShowInputDebugOverlay()
     {
         bool open = true;
-        const Engine::InputSystem& inputManager = GetInputSystem();
+        const InputSystem& inputManager = GetInputSystem();
         static int location = 0;
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoDocking;
         if (location >= 0)
@@ -131,9 +129,9 @@ namespace Engine
         ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
         if (ImGui::Begin("Example: Simple overlay", &open, window_flags))
         {
-            const Engine::Vector2 mousePos = inputManager.GetMousePos();
+            const Vector2 mousePos = inputManager.GetMousePos();
             ImGui::Text("Mouse Pos: (%.3f,%.3f)", mousePos.X, mousePos.Y);
-            const Engine::MouseButtonValues mouseButtonValues = inputManager.GetMouseButtonValues();
+            const MouseButtonValues mouseButtonValues = inputManager.GetMouseButtonValues();
             ImGui::Text("Mouse Buttons: (");
             bool start = true;
             for (int i = 0; i < MOUSE_BUTTON_MAX; i++)
@@ -163,7 +161,7 @@ namespace Engine
         }
     }
 
-    void Engine::ImGuiLayer::MainMenuWindow()
+    void ImGuiLayer::MainMenuWindow()
     {
         if (ImGui::BeginMainMenuBar())
         {
@@ -202,7 +200,7 @@ namespace Engine
         }
     }
 
-    void Engine::ImGuiLayer::LogWindow(bool* open)
+    void ImGuiLayer::LogWindow(bool* open)
     {
         static Logger log;
 
@@ -217,21 +215,21 @@ namespace Engine
         log.Draw("Log", open);
     }
 
-    void Engine::ImGuiLayer::SceneViewWindow()
+    void ImGuiLayer::SceneViewWindow()
     {
         static ImGuiWindowFlags windowflags = ImGuiWindowFlags_NoCollapse;
         ImGui::Begin("Scene View", nullptr, windowflags);
         ImGui::End();
     }
 
-    void Engine::ImGuiLayer::HierarchyWindow()
+    void ImGuiLayer::HierarchyWindow()
     {
         static ImGuiWindowFlags windowflags = ImGuiWindowFlags_NoCollapse;
         ImGui::Begin("HierarchyWindow", nullptr, windowflags);
         ImGui::End();
     }
 
-    void Engine::ImGuiLayer::FileMenuWindow()
+    void ImGuiLayer::FileMenuWindow()
     {
         if (ImGui::BeginMenu("manu"))
         {
@@ -245,7 +243,7 @@ namespace Engine
         }
     }
 
-    void Engine::ImGuiLayer::CreateSceneWindow()
+    void ImGuiLayer::CreateSceneWindow()
     {
         if (ImGui::Begin("Create Scene"))
         {
@@ -254,26 +252,26 @@ namespace Engine
         ImGui::End();
     }
 
-    bool Engine::ImGuiLayer::GetFlag(const char* key)
+    bool ImGuiLayer::GetFlag(const char* key)
     {
         if (_menuFlags.contains(key)) return _menuFlags[key]; // should work.
         _menuFlags.emplace(std::make_pair(key, false));
         return false;
     }
 
-    void Engine::ImGuiLayer::DisableFlag(const char* key)
+    void ImGuiLayer::DisableFlag(const char* key)
     {
         if (_menuFlags.contains(key)) _menuFlags[key] = false;
         else _menuFlags.emplace(std::make_pair(key, false));
     }
 
-    void Engine::ImGuiLayer::EnableFlag(const char* key)
+    void ImGuiLayer::EnableFlag(const char* key)
     {
         if (_menuFlags.contains(key)) _menuFlags[key] = true;
         else _menuFlags.emplace(std::make_pair(key, true));
     }
 
-    void Engine::ImGuiLayer::ToggleFlag(const char* key)
+    void ImGuiLayer::ToggleFlag(const char* key)
     {
         if (_menuFlags.contains(key)) _menuFlags[key] = !_menuFlags[key];
         else _menuFlags.emplace(std::make_pair(key, false));
