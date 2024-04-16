@@ -64,4 +64,5 @@ namespace Engine
     };
 
     Application* CreateApplication();
+    std::string GetApplicationName();
 }
