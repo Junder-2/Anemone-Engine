@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core.h"
-#include "Logging.h"
+#include "Log/Logging.h"
 
 #ifdef ANE_DEBUG
 

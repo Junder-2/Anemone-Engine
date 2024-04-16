@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "ANE/Core/Logging.h"
+#include "ANE/Core/Log/Logging.h"
 #include <fstream>
 
 namespace Engine

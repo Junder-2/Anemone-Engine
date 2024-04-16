@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "ANE/Core/Application.h"
-#include "ANE/Core/Logging.h"
+#include "ANE/Core/Log/Logging.h"
 #include "ANE/Core/Assert.h"
 #include "ANE/Core/Window.h"
 
@@ -9,6 +9,7 @@
 
 #include "ANE/Core/Entity/Entity.h"
 #include "ANE/Core/Entity/ScriptableEntity.h"
+
 //
 // #include "ANE/Core/Scene/Scene.h"
 // #include "ANE/Core/Scene/Components/CameraComponent.h"
