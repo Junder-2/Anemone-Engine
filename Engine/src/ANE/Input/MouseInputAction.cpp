@@ -9,9 +9,9 @@ namespace Engine
 
     bool MouseInputAction::PopulateMoveInput(bool* needProcessing, const float x, const float y, const float deltaTime)
     {
-        const glm::vec2 prevMousePos = _moveValue.GetMousePos();
+        const Vector2 prevMousePos = _moveValue.GetMousePos();
         _moveValue.SetMousePos(x, y);
-        _moveValue.SetMouseDelta((x - prevMousePos.x)*deltaTime, (y - prevMousePos.y)*deltaTime);
+        _moveValue.SetMouseDelta((x - prevMousePos.X)*deltaTime, (y - prevMousePos.Y)*deltaTime);
 
         *needProcessing = true;
         return true;
@@ -36,8 +36,8 @@ namespace Engine
 
     bool MouseInputAction::PopulateScrollInput(bool* needProcessing, const float x, const float y)
     {
-        _scrollWheelValue.x = x;
-        _scrollWheelValue.y = y;
+        _scrollWheelValue.X = x;
+        _scrollWheelValue.Y = y;
 
         *needProcessing = true;
         return true;
@@ -47,8 +47,8 @@ namespace Engine
     {
         bool changed = false;
         _moveValue.SetMouseDelta(0, 0);
-        _scrollWheelValue.x = 0;
-        _scrollWheelValue.y = 0;
+        _scrollWheelValue.X = 0;
+        _scrollWheelValue.Y = 0;
 
         for (int i = 0; i < MOUSE_BUTTON_MAX; ++i)
         {
