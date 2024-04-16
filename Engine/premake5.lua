@@ -36,12 +36,14 @@ project "Engine"
         "%{IncludeDir.VMA}",
         "%{IncludeDir.reactphysics}",
         "%{IncludeDir.Assimp}",
+        "%{IncludeDir.Slang}",
     }
 
     libdirs
     {
         "%{LibraryDir.SDL2}",
         "%{LibraryDir.Vulkan}",
+        "%{LibraryDir.Slang}",
     }
 
     links
@@ -51,6 +53,7 @@ project "Engine"
         "vulkan-1",
         "VkBootstrap",
         "Assimp",
+        "slang",
     }
 
     filter "files:vendor/imgui/backends/**.cpp or files:vendor/imgui/backends/**.h"
@@ -67,7 +70,9 @@ project "Engine"
         postbuildcommands
         {
             ("{COPY} \"%{LibraryDir.SDL2}/SDL2.dll\" \"%{wks.location}/bin/" .. OutputDir .. "/Sandbox/\""),
-            ("{COPY} \"%{LibraryDir.SDL2}/SDL2.dll\" \"%{wks.location}/bin/" .. OutputDir .. "/Editor/\"")
+            ("{COPY} \"%{LibraryDir.SDL2}/SDL2.dll\" \"%{wks.location}/bin/" .. OutputDir .. "/Editor/\""),
+            ("{COPY} \"%{LibraryDir.Slang}/slang.dll\" \"%{wks.location}/bin/" .. OutputDir .. "/Sandbox/\""),
+            ("{COPY} \"%{LibraryDir.Slang}/slang.dll\" \"%{wks.location}/bin/" .. OutputDir .. "/Editor/\""),
         }
 
     filter "configurations:Debug"
