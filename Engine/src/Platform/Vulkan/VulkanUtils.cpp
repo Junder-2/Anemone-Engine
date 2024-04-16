@@ -103,4 +103,20 @@ namespace VulkanUtils
         *outShaderModule = shaderModule;
         return true;
     }
+
+    bool LoadShaderModule(const Slang::ComPtr<slang::IBlob>& program, const VkDevice device, const VkAllocationCallbacks* allocator, VkShaderModule* outShaderModule)
+    {
+        VkShaderModuleCreateInfo createInfo = { .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO, .pNext = nullptr };
+        createInfo.codeSize = program->getBufferSize();
+        createInfo.pCode = static_cast<const uint32_t*>(program->getBufferPointer());
+
+        VkShaderModule shaderModule;
+        if (vkCreateShaderModule(device, &createInfo, allocator, &shaderModule) != VK_SUCCESS)
+        {
+            return false;
+        }
+
+        *outShaderModule = shaderModule;
+        return true;
+    }
 }
