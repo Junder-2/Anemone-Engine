@@ -281,6 +281,38 @@ namespace Engine
         _windowData.VSync = enabled;
     }
 
+    void Window::SetActiveViewport(const uint32_t id)
+    {
+        if(!_viewports.contains(id)) return;
+
+        _activeViewport = &_viewports[id];
+    }
+
+    void Window::SetActiveViewport(const ViewportProperties& props)
+    {
+        if(_viewports.contains(props.Id)) return;
+
+        AddViewport(props);
+
+        SetActiveViewport(props.Id);
+    }
+
+    void Window::AddViewport(const ViewportProperties& props)
+    {
+        if(_viewports.contains(props.Id)) return;
+
+        _viewports[props.Id] = props;
+    }
+
+    void Window::RemoveViewport(const uint32_t id)
+    {
+        if(!_viewports.contains(id)) return;
+
+        _viewports.erase(id);
+
+        _activeViewport = &_viewports[_windowData.Id];
+    }
+
     void Window::SetMouseVisibility(const bool enable)
     {
         SDL_SetRelativeMouseMode(enable ? SDL_TRUE : SDL_FALSE);

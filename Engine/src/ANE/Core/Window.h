@@ -65,6 +65,11 @@ namespace Engine
         void OnUpdate(float deltaTime);
         void SetVSync(bool enabled);
 
+        void SetActiveViewport(uint32_t id);
+        void SetActiveViewport(const ViewportProperties& props);
+        void AddViewport(const ViewportProperties& props);
+        void RemoveViewport(uint32_t id);
+
         void SetMouseVisibility(bool enable);
 
         bool HasFocus() const { return !_imGuiHasFocus && _windowHasFocus; }
