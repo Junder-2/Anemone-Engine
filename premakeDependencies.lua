@@ -11,6 +11,8 @@ External["VkBootstrap"] = "%{wks.location}/Engine/vendor/VkBootstrap"
 External["entt"] = "%{wks.location}/Engine/vendor/entt"
 External["toml"] = "%{wks.location}/Engine/vendor/toml"
 External["VMA"] = "%{wks.location}/Engine/vendor/VMA"
+External["reactphysics"] = "%{wks.location}/Engine/vendor/reactphysics"
+
 
 -- Include Directories
 IncludeDir = {}
@@ -23,6 +25,8 @@ IncludeDir["VkBootstrap"] = "%{External.VkBootstrap}/src"
 IncludeDir["entt"] = "%{External.entt}/include"
 IncludeDir["toml"] = "%{External.toml}/include"
 IncludeDir["VMA"] = "%{External.VMA}/include"
+IncludeDir["reactphysics"] = "%{External.reactphysics}/include"
+
 
 -- Library Directories
 LibraryDir = {}
