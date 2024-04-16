@@ -9,7 +9,7 @@
 
 namespace Engine
 {
-    class SubsystemCollection;
+    class SubSystemCollection;
 
     struct ANE_API ApplicationSpecification
     {
@@ -31,7 +31,7 @@ namespace Engine
 
         Window& GetWindow() const { return *_window; }
         InputHandler& GetInputHandler() const { return *_inputHandler; }
-        SubsystemCollection& GetSubsystemCollection() const { return *_subsystemCollection; }
+        SubSystemCollection& GetSubsystemCollection() const { return *_subsystemCollection; }
 
         static Application& Get() { return *_appInstance; }
 
@@ -54,7 +54,7 @@ namespace Engine
         ApplicationSpecification _appSpec;
         std::unique_ptr<Window> _window;
         std::unique_ptr<InputHandler> _inputHandler;
-        std::unique_ptr<SubsystemCollection> _subsystemCollection;
+        std::unique_ptr<SubSystemCollection> _subsystemCollection;
         bool _isRunning = true;
 
         static Application* _appInstance;
@@ -64,4 +64,5 @@ namespace Engine
     };
 
     Application* CreateApplication();
+    std::string GetApplicationName();
 }

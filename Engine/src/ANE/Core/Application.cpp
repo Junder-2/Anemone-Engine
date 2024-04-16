@@ -6,7 +6,7 @@
 #include <SDL_timer.h>
 
 #include "ANE/Events/EventHandler.h"
-#include "ANE/Subsystem/SubsystemCollection.h"
+#include "ANE/Subsystem/SubSystemCollection.h"
 #include "ANE/Input/Input.h"
 #include "ANE/Utilities/InputUtilities.h"
 #include "Layers/Layer.h"
@@ -27,14 +27,13 @@ namespace Engine
         _appInstance = this;
 
         Init();
-
-
     }
 
     Application::~Application() = default;
 
     void Application::Init()
     {
+        ANE_PROFILE_FUNCTION();
 
         _window = Window::Create(WindowProperties(_appSpec.Name));
         _window->BindOnEvent(MakeDelegate(this, &Application::OnEvent));
@@ -42,7 +41,7 @@ namespace Engine
         _inputHandler = InputHandler::Create();
         _inputHandler->BindOnEvent(MakeDelegate(this, &Application::OnEvent));
 
-        _subsystemCollection = SubsystemCollection::Create();
+        _subsystemCollection = SubSystemCollection::Create();
 
         Renderer::Init(_window->GetWindowContext());
     }
@@ -51,6 +50,8 @@ namespace Engine
     {
         while (_isRunning)
         {
+            ANE_DEEP_PROFILE_SCOPE("Application::Run");
+
             const Uint64 timeStamp = SDL_GetPerformanceCounter();
             const Uint64 timeStep = timeStamp - _lastTimeStamp;
             _lastTimeStamp = timeStamp;
@@ -62,7 +63,6 @@ namespace Engine
             //Renderer
             for (Layer* layer : _layerStack) // raw pointers
             {
-
                 layer->OnUpdate(deltaTime);
             }
             //todo frame yap
@@ -75,8 +75,6 @@ namespace Engine
             Renderer::EndUIDataBuffer();
 
             Renderer::Render(_window->GetProperties());
-            //Renderer::Present()
-            //Split this so inputs get processed before everything else
         }
 
         // TODO: Figure out where this function should go.

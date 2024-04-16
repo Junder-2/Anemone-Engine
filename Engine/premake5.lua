@@ -30,6 +30,7 @@ project "Engine"
         "%{IncludeDir.ImGui}/backends",
         "%{IncludeDir.GLM}",
         "%{IncludeDir.entt}",
+        "%{IncludeDir.toml}",
         "%{IncludeDir.VulkanSDK}",
         "%{IncludeDir.VkBootstrap}",
         "%{IncludeDir.VMA}",
