@@ -10,7 +10,7 @@
     #define ANE_API
 #endif
 
-#include "ANE/Core/Logging.h"
+#include "ANE/Core/Log/Logging.h"
 #include "ANE/Core/Assert.h"
 
 #include "ANE/Debug/Instrumentation.h"

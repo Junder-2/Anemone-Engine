@@ -4,7 +4,7 @@
 #include "imgui_internal.h"
 #include "ANE/Input/EditorInputsystem.h"
 #include "ANE/Input/Input.h"
-#include "ANE/Utilities/Logger.h"
+#include "ANE/Core/Log/Sink.h"
 
 namespace Engine
 {
@@ -202,17 +202,17 @@ namespace Engine
 
     void ImGuiLayer::LogWindow(bool* open)
     {
-        static Logger log;
-
-        ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver);
-
-        ImGui::Begin("Log", open);
-
-        if (std::string_view textToPrint; Logger::GetText(textToPrint))log.AddLog(std::basic_string<char>(textToPrint).c_str());
-
-        ImGui::End();
-
-        log.Draw("Log", open);
+        // static Logger log;
+        //
+        // ImGui::SetNextWindowSize(ImVec2(500, 400), ImGuiCond_FirstUseEver);
+        //
+         ImGui::Begin("Log", open);
+        //
+        // if (std::string_view textToPrint; Logger::GetText(textToPrint))log.AddLog(std::basic_string<char>(textToPrint).c_str());
+        //
+         ImGui::End();
+        //
+        // log.Draw("Log", open);
     }
 
     void ImGuiLayer::SceneViewWindow()

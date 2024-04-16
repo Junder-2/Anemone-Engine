@@ -5,5 +5,5 @@
 
 #include "ANE/Core/Core.h"
 
-#include "ANE/Core/Logging.h"
+#include "ANE/Core/Log/Logging.h"
 #include "ANE/Debug/Instrumentation.h"

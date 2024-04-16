@@ -24,6 +24,7 @@ project "Sandbox"
         "%{IncludeDir.ImGui}/backends",
         "%{IncludeDir.GLM}",
         "%{IncludeDir.entt}",
+        "%{IncludeDir.toml}",
         "%{IncludeDir.VulkanSDK}",
     }
 
