@@ -12,11 +12,13 @@ namespace Engine
 
         Component(const char* name = "No Name Set") : _name(name) {}
 
+
     public:
         [[nodiscard("ToString() value not used")]] const char* ToString() const
         {
             return _name;
         }
+
     };
 }
 

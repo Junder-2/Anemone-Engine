@@ -1,5 +1,6 @@
 #pragma once
 #include "ANE/Events/Event.h"
+#include "Panels/UILayerPanel.h"
 
 namespace Engine
 {
@@ -14,6 +15,11 @@ namespace Engine
         virtual void OnUpdate(float deltaTime) {}
         virtual void OnEvent(Event& e) {}
         virtual void OnUIRender() {}
+
+        void AttachUIPanel(UILayerPanel* newPanel);
+        void DetachUIPanel(UILayerPanel* panelToRemove);
+
+        std::vector<UILayerPanel*> _UIpanels; // todo: make into smartpointer
 
     protected:
         std::string _debugName;
