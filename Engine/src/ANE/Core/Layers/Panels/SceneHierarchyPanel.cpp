@@ -2,6 +2,7 @@
 #include "SceneHierarchyPanel.h"
 
 #include "imgui.h"
+#include "imgui_internal.h"
 #include "InspectorPanel.h"
 #include "ANE/Core/Scene/Components/TagComponent.h"
 #include "ANE/Core/Scene/Components/UUIDComponent.h"
@@ -32,6 +33,7 @@ void Engine::SceneHierarchyPanel::OnPanelRender()
                     ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
 
                     bool node_open = ImGui::TreeNodeEx(Tag.Tag.c_str(), node_flags, Tag.Tag.c_str());
+
                     if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
                     {
                         InspectorPanel::RegisterSelect(UUID);

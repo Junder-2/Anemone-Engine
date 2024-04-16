@@ -21,9 +21,13 @@ namespace Engine
 
         Entity Create(const char* name = "Untagged");
         Entity Create(std::string = "Untagged");
+        Entity GetEntityWithUUID(std::string UUID);
         entt::registry _registry;
 
     private:
         friend class Entity;
+
+        std::map<std::string, Entity> _entityMap;
+
     };
 }

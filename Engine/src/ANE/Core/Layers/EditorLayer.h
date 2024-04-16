@@ -10,6 +10,7 @@ namespace Engine
     public:
         void OnUIRender() override;
 
+        void Init();
         EditorLayer(const std::string& name = "EditorLayer");
 
         ~EditorLayer() override;
@@ -25,7 +26,7 @@ namespace Engine
         template <class EntityType>
         void EntityWidget(EntityType& e, entt::basic_registry<EntityType>& reg, bool dropTarget = false);
 
-
+        std::string GetComponentNameFromEnttId(entt::id_type id);
 
         template <class TValue>
         std::enable_if_t<std::is_base_of_v<Scene, TValue>> AddScene(const char* key);
@@ -53,6 +54,8 @@ namespace Engine
     private:
         std::unordered_map<const char*, std::shared_ptr<Scene>> _scenes;
         std::shared_ptr<Scene> _activeScene;
+        std::map<entt::id_type, std::string> ComponentTypeMap;
+
     };
 
     template <class TValue>

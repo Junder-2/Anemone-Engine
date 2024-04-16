@@ -29,6 +29,7 @@ namespace Engine
 
     EditorLayer::EditorLayer(const std::string& name) : Layer(name)
     {
+        Init();
     }
 
     EditorLayer::~EditorLayer() = default;
@@ -87,9 +88,26 @@ namespace Engine
         ImGui::ShowDemoWindow();
     }
 
+    void EditorLayer::Init()
+    {
+        //Every component type needs to be in here in order for it's text to be rendered
+        //Ideally, Kyle will develop this into component type specific renderering methods
+        //and we can then delete this map because it's kind of stupid, it's just quick and dirty
+        ComponentTypeMap[entt::type_id<TagComponent>().hash()] = "TagComponent";
+        ComponentTypeMap[entt::type_id<TransformComponent>().hash()] = "TransformComponent";
+        ComponentTypeMap[entt::type_id<NativeScriptComponent>().hash()] = "NativeScriptComponent";
+        ComponentTypeMap[entt::type_id<UUIDComponent>().hash()] = "UUIDComponent";
+        ComponentTypeMap[entt::type_id<RenderComponent>().hash()] = "RenderComponent";
+    }
+
     void EditorLayer::OnUpdate(float deltaTime)
     {
         if (_activeScene) _activeScene->OnUpdate(deltaTime);
+    }
+
+    std::string EditorLayer::GetComponentNameFromEnttId(entt::id_type id)
+    {
+        return ComponentTypeMap[id];
     }
 
     void EditorLayer::CreateTestScene(int numEntitiesToTest)
