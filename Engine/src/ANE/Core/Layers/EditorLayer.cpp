@@ -13,19 +13,38 @@
 #include "ANE/Core/Scene/Components/CameraComponent.h"
 #include "ANE/Core/Scene/Components/NativeScriptComponent.h"
 #include "ANE/Core/Scene/Components/RenderComponent.h"
+#include "Panels/InspectorPanel.h"
+#include "Panels/SceneHierarchyPanel.h"
 #include "ANE/Input/EditorInputSystem.h"
 
 namespace Engine
 {
+
+    #ifndef MM_IEEE_ASSERT
+    #define MM_IEEE_ASSERT(x) assert(x)
+    #endif
+
+    #define MM_IEEE_IMGUI_PAYLOAD_TYPE_ENTITY "MM_IEEE_ENTITY"
+
+    #ifndef MM_IEEE_ENTITY_WIDGET
+    #define MM_IEEE_ENTITY_WIDGET ::MM::EntityWidget
+    #endif
+
     EditorLayer::EditorLayer(const std::string& name) : Layer(name)
     {
+        Init();
     }
 
     EditorLayer::~EditorLayer() = default;
 
     void EditorLayer::OnAttach()
     {
+
         // You would have a "Read from config files to find correct panel layout" method here
+
+        CreateTestScene(50);
+        AttachUIPanel(new SceneHierarchyPanel(_scenes));
+        AttachUIPanel(new InspectorPanel(this));
 
         // Then you would call load methods to load the most recent project
 
@@ -35,7 +54,6 @@ namespace Engine
         GetEditorInputSystem().BindMouseButton(MouseButtonLeft, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
         GetEditorInputSystem().BindMouseButton(MouseButtonRight, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
         GetEditorInputSystem().BindMouseButton(MouseButtonMiddle, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
-        CreateTestScene();
     }
 
     void EditorLayer::OnDetach()
@@ -50,11 +68,28 @@ namespace Engine
 
     void EditorLayer::OnUIRender()
     {
-        // ImGui::Begin("Hello");
-        // ImGui::Button("Button");
-        // ImGui::End();
+        for (UILayerPanel* panel : _UIpanels)
+        {
+            if(panel->_isVisible)
+            {
+                panel->OnPanelRender();
+            }
+        ImGui::Begin("Hello");
+        if(ImGui::Button("Button"))
+        {
+            Entity ent = GetActiveScene()->Create("Square Entity");
 
-        //entt::dense_map<std::string, bool> _activeMap;
+        }
+        ImGui::End();
+
+            /*There is a chance we will have situation where UI is not visible but still needs to do something
+            like maintaining a dockspace or something like that. This loop is for that situation.
+            If it remains empty for ages we can delete it but leaving it HEAP_REALLOC_IN_PLACE_ONLY*/
+            if(panel->_isEnabled)
+            {
+                //panel->doWindowLayoutmaitenance
+            }
+        }
 
         // These should be moved later
 
@@ -62,19 +97,46 @@ namespace Engine
         //ImGui::ShowDemoWindow();
     }
 
+    void EditorLayer::Init()
+    {
+        //Every component type needs to be in here in order for it's text to be rendered
+        //Ideally, Kyle will develop this into component type specific renderering methods
+        //and we can then delete this map because it's kind of stupid, it's just quick and dirty
+        ComponentTypeMap[entt::type_id<TagComponent>().hash()] = "TagComponent";
+        ComponentTypeMap[entt::type_id<TransformComponent>().hash()] = "TransformComponent";
+        ComponentTypeMap[entt::type_id<NativeScriptComponent>().hash()] = "NativeScriptComponent";
+        ComponentTypeMap[entt::type_id<UUIDComponent>().hash()] = "UUIDComponent";
+        ComponentTypeMap[entt::type_id<RenderComponent>().hash()] = "RenderComponent";
+    }
+
     void EditorLayer::OnUpdate(float deltaTime)
     {
         if (_activeScene) _activeScene->OnUpdate(deltaTime);
     }
 
-    void EditorLayer::CreateTestScene()
+    std::string EditorLayer::GetComponentNameFromEnttId(entt::id_type id)
+    {
+        return ComponentTypeMap[id];
+    }
+
+    void EditorLayer::CreateTestScene(int numEntitiesToTest)
     {
         //Add scene to layer
         AddScene<Scene>("Game");
 
         //Create a Entity
         Entity ent = GetActiveScene()->Create("Square Entity");
+        std::stringstream oss;
 
+        for(int i = 0; i < numEntitiesToTest;i++ )
+        {
+            //ANE_LOG_INFO(UUIDGenerator::get_uuid());
+
+            std::string string = "Entity";
+            string.append(std::to_string(i));
+            string.append("\n");
+            _activeScene->Create(string);
+        }
         //Add component to entity
         ent.AddComponent<RenderComponent>();
         ent.AddComponent<CameraComponent>();
@@ -122,23 +184,36 @@ namespace Engine
         EventHandler::ConsumeEvent();
     }
 
-    //Copied from IMGUI example
-    // void EditorLayer::ShowEditorMenuBar()
-    // {
-    //     if (ImGui::BeginMainMenuBar())
-    //     {
-    //         if (ImGui::BeginMenu("Debug"))
-    //         {
-    //             if (ImGui::MenuItem("Input Debug", nullptr, _showInputDebugOverlay))
-    //             {
-    //                 _showInputDebugOverlay = !_showInputDebugOverlay;
-    //             }
-    //             ImGui::EndMenu();
-    //         }
-    //         ImGui::EndMainMenuBar();
-    //     }
-    // }
 
-    //Copied from IMGUI example
+
+    template <class EntityType>
+    void EditorLayer::EntityWidget(EntityType& e, entt::basic_registry<EntityType>& reg, bool dropTarget)
+    {
+        ImGui::PushID(static_cast<int>(entt::to_integral(e)));
+
+        if (reg.valid(e)) {
+            ImGui::Text("ID: %d", entt::to_integral(e));
+        } else {
+            ImGui::Text("Invalid Entity");
+        }
+
+        if (reg.valid(e)) {
+            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                ImGui::SetDragDropPayload(MM_IEEE_IMGUI_PAYLOAD_TYPE_ENTITY, &e, sizeof(e));
+                ImGui::Text("ID: %d", entt::to_integral(e));
+                ImGui::EndDragDropSource();
+            }
+        }
+
+        if (dropTarget && ImGui::BeginDragDropTarget()) {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(MM_IEEE_IMGUI_PAYLOAD_TYPE_ENTITY)) {
+                e = *(EntityType*)payload->Data;
+            }
+
+            ImGui::EndDragDropTarget();
+        }
+
+        ImGui::PopID();
+    }
 
 }

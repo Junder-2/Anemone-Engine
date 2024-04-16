@@ -10,6 +10,7 @@ namespace Engine
     public:
         void OnUIRender() override;
 
+        void Init();
         EditorLayer(const std::string& name = "EditorLayer");
 
         ~EditorLayer() override;
@@ -21,6 +22,11 @@ namespace Engine
         void OnEvent(Event& e) override;
 
         void OnUpdate(float deltaTime) override;
+
+        template <class EntityType>
+        void EntityWidget(EntityType& e, entt::basic_registry<EntityType>& reg, bool dropTarget = false);
+
+        std::string GetComponentNameFromEnttId(entt::id_type id);
 
         template <class TValue>
         std::enable_if_t<std::is_base_of_v<Scene, TValue>> AddScene(const char* key);
@@ -38,7 +44,7 @@ namespace Engine
         std::shared_ptr<Scene> GetActiveScene() { return _activeScene; }
 
     private:
-        void CreateTestScene();
+        void CreateTestScene(int numEntitiesToTest);
 
         void OnSwitchEditorFocus(InputValue inputValue);
 
@@ -53,6 +59,8 @@ namespace Engine
     private:
         std::unordered_map<const char*, std::shared_ptr<Scene>> _scenes;
         std::shared_ptr<Scene> _activeScene;
+        std::map<entt::id_type, std::string> ComponentTypeMap;
+
     };
 
     template <class TValue>
@@ -61,6 +69,8 @@ namespace Engine
         std::unique_ptr<TValue> tempScene = std::make_unique<TValue>(entities);
         _scenes.emplace(std::make_pair(key, std::move(tempScene)));
     }
+
+
 
     template <class TValue>
     std::enable_if_t<std::is_base_of_v<Scene, TValue>> EditorLayer::AddScene(const char* key)
