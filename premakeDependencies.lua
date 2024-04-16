@@ -14,6 +14,7 @@ External["VMA"] = "%{wks.location}/Engine/vendor/VMA"
 External["reactphysics"] = "%{wks.location}/Engine/vendor/reactphysics"
 External["Assimp"] = "%{wks.location}/Engine/vendor/Assimp"
 
+
 -- Include Directories
 IncludeDir = {}
 IncludeDir["SDL2"] = "%{External.SDL2}/include"
@@ -27,6 +28,7 @@ IncludeDir["toml"] = "%{External.toml}/include"
 IncludeDir["VMA"] = "%{External.VMA}/include"
 IncludeDir["reactphysics"] = "%{External.reactphysics}/include"
 IncludeDir["Assimp"] = "%{External.Assimp}/include"
+
 
 -- Library Directories
 LibraryDir = {}

@@ -138,18 +138,14 @@ namespace Engine
         }
     }
 
-    void InputHandler::ProcessMouseMovement(const float xPos, const float yPos, const float deltaTime)
+    void InputHandler::ProcessAbsoluteMouseMovement(Vector2 pos)
     {
-        if(_mouseInputAction.PopulateMoveInput(&_dirtyMouse, xPos, yPos, deltaTime))
-        {
-            MouseMovementEvent mouseMovementEvent(_mouseInputAction.GetMoveValue());
-            DispatchEvent(mouseMovementEvent);
-        }
+
     }
 
-    void InputHandler::ProcessMouseMovement(const float xPos, const float yPos, const float xDelta, const float yDelta)
+    void InputHandler::ProcessMouseMovement(const Vector2 pos, const Vector2 delta)
     {
-        if(_mouseInputAction.PopulateMoveInput(&_dirtyMouse, xPos, yPos, xDelta, yDelta))
+        if(_mouseInputAction.PopulateMoveInput(&_dirtyMouse, pos, delta))
         {
             MouseMovementEvent mouseMovementEvent(_mouseInputAction.GetMoveValue());
             DispatchEvent(mouseMovementEvent);
@@ -165,9 +161,9 @@ namespace Engine
         }
     }
 
-    void InputHandler::ProcessMouseScroll(const float xDelta, const float yDelta)
+    void InputHandler::ProcessMouseScroll(const Vector2 delta)
     {
-        if(_mouseInputAction.PopulateScrollInput(&_dirtyMouse, xDelta, yDelta))
+        if(_mouseInputAction.PopulateScrollInput(&_dirtyMouse, delta))
         {
             MouseScrollEvent mouseWheelEvent(_mouseInputAction.GetScrollValue());
             DispatchEvent(mouseWheelEvent);

@@ -1,7 +1,6 @@
 #pragma once
 #include "InputTypes.h"
 #include "ANE/Core/Math/Vector2.h"
-#include "glm/vec2.hpp"
 
 namespace Engine
 {
@@ -11,24 +10,32 @@ namespace Engine
     struct MouseMoveValue
     {
     public:
-        void SetMousePos(const float x, const float y)
+        void SetAbsoluteMousePos(const Vector2 pos)
         {
-            _mousePosition.X = x;
-            _mousePosition.Y = y;
+            _mouseAbsolutePosition.X = pos.X;
+            _mouseAbsolutePosition.Y = pos.Y;
         }
 
-        void SetMouseDelta(const float x, const float y)
+        void SetMousePos(const Vector2 pos)
         {
-            _mouseDelta.X = x;
-            _mouseDelta.Y = y;
+            _mousePosition.X = pos.X;
+            _mousePosition.Y = pos.Y;
+        }
+
+        void SetMouseDelta(const Vector2 delta)
+        {
+            _mouseDelta.X = delta.X;
+            _mouseDelta.Y = delta.Y;
         }
 
         Vector2 GetMousePos() const { return _mousePosition; }
+        Vector2 GetAbsoluteMousePos() const { return _mouseAbsolutePosition; }
         Vector2 GetMouseDelta() const { return _mouseDelta; }
 
     private:
-        Vector2 _mouseDelta = {};
         Vector2 _mousePosition = {};
+        Vector2 _mouseAbsolutePosition = {};
+        Vector2 _mouseDelta = {};
     };
 
     /**
@@ -100,13 +107,13 @@ namespace Engine
         MouseInputAction();
         ~MouseInputAction();
 
+        void PopulateAbsoluteMove(Vector2 pos);
         /**
         * Populates new move input
         * @param needProcessing if this action needs processing next frame
         * @returns stored data changed
         */
-        bool PopulateMoveInput(bool* needProcessing, float x, float y, float deltaTime);
-        bool PopulateMoveInput(bool* needProcessing, float x, float y, float xDelta, float yDelta);
+        bool PopulateMoveInput(bool* needProcessing, Vector2 pos, Vector2 delta);
         /**
         * Populates new mouse button input
         * @param needProcessing if this action needs processing next frame
@@ -119,7 +126,7 @@ namespace Engine
         * @param needProcessing if this action needs processing next frame
         * @returns stored data changed
         */
-        bool PopulateScrollInput(bool* needProcessing, float x, float y);
+        bool PopulateScrollInput(bool* needProcessing, Vector2 delta);
         /**
         * Processes actions by clearing deltas
         * * @returns stored data changed
