@@ -126,8 +126,6 @@ namespace Engine
                     const float viewportWidth = viewport.Width;
                     const float viewportHeight = viewport.Height;
 
-                    ANE_LOG("Viewport size {0} {1} id:{2}", viewportWidth, viewportHeight, event.motion.windowID);
-
                     const Vector2 absolutePos = GetAbsoluteMousePos();
 
                     // Convert mouse coord to relative
@@ -138,8 +136,6 @@ namespace Engine
 
                     inputHandler->ProcessAbsoluteMouseMovement(absolutePos);
                     inputHandler->ProcessMouseMovement(Vector2(relX, relY), Vector2(relDeltaX, relDeltaY));
-
-                    ANE_ELOG("Viewport move {0} {1}", Vector2(relX, relY).ToString(), Vector2(relDeltaX, relDeltaY).ToString());
                 }
             }
             continue;
