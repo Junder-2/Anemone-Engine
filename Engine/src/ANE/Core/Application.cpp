@@ -6,7 +6,7 @@
 #include <SDL_timer.h>
 
 #include "ANE/Events/EventHandler.h"
-#include "ANE/Subsystem/SubsystemCollection.h"
+#include "ANE/Subsystem/SubSystemCollection.h"
 #include "ANE/Input/Input.h"
 #include "ANE/Utilities/InputUtilities.h"
 #include "Layers/Layer.h"
@@ -27,22 +27,21 @@ namespace Engine
         _appInstance = this;
 
         Init();
-
-
     }
 
     Application::~Application() = default;
 
     void Application::Init()
     {
+        ANE_PROFILE_FUNCTION();
 
         _window = Window::Create(WindowProperties(_appSpec.Name));
-        _window->EventDelegate = MakeDelegate(this, &Application::OnEvent);
+        _window->BindOnEvent(MakeDelegate(this, &Application::OnEvent));
 
         _inputHandler = InputHandler::Create();
         _inputHandler->BindOnEvent(MakeDelegate(this, &Application::OnEvent));
 
-        _subsystemCollection = SubsystemCollection::Create();
+        _subsystemCollection = SubSystemCollection::Create();
 
         Renderer::Init(_window->GetWindowContext());
     }
@@ -51,6 +50,8 @@ namespace Engine
     {
         while (_isRunning)
         {
+            ANE_DEEP_PROFILE_SCOPE("Application::Run");
+
             const Uint64 timeStamp = SDL_GetPerformanceCounter();
             const Uint64 timeStep = timeStamp - _lastTimeStamp;
             _lastTimeStamp = timeStamp;
@@ -62,7 +63,6 @@ namespace Engine
             //Renderer
             for (Layer* layer : _layerStack) // raw pointers
             {
-
                 layer->OnUpdate(deltaTime);
             }
             //todo frame yap
@@ -75,8 +75,6 @@ namespace Engine
             Renderer::EndUIDataBuffer();
 
             Renderer::Render(_window->GetProperties());
-            //Renderer::Present()
-            //Split this so inputs get processed before everything else
         }
 
         // TODO: Figure out where this function should go.
@@ -152,51 +150,49 @@ namespace Engine
         layer->OnAttach();
     }
 
-
-
     void Application::OnWindowResize(WindowResizeEvent& e)
     {
-        ANE_ENGINE_LOG_INFO("new size ({0}, {1})", e.GetWidth(), e.GetHeight());
+        ANE_ELOG_INFO("new size ({0}, {1})", e.GetWidth(), e.GetHeight());
     }
 
     void Application::OnWindowMove(WindowMovedEvent& e)
     {
-        ANE_ENGINE_LOG_INFO("new pos ({0}, {1}) : ({2}, {3})", e.GetX(), e.GetY(), e.GetXDelta(), e.GetYDelta());
+        ANE_ELOG_INFO("new pos ({0}, {1}) : ({2}, {3})", e.GetX(), e.GetY(), e.GetXDelta(), e.GetYDelta());
     }
 
     void Application::OnWindowStateChange(WindowStateChangeEvent& e)
     {
-        ANE_ENGINE_LOG_INFO("window state change {0}", (int)e.GetState());
+        ANE_ELOG_INFO("window state change {0}", (int)e.GetState());
     }
 
     void Application::OnWindowFocusChange(WindowFocusChangeEvent& e)
     {
-        ANE_ENGINE_LOG_INFO("window focus change {0}", e.IsFocused());
+        ANE_ELOG_INFO("window focus change {0}", e.IsFocused());
     }
 
     void Application::OnKeyTest(KeyboardKeyEvent& keyTriggerEvent)
     {
         const InputValue inputValue = keyTriggerEvent.GetInputValue();
-        ANE_ENGINE_LOG_INFO("pressed {0}: {1}", inputValue.GetBindingId(), InputUtilities::ToString(inputValue.GetTriggerState()));
+        ANE_ELOG_INFO("pressed {0}: {1}", inputValue.GetBindingId(), InputUtilities::ToString(inputValue.GetTriggerState()));
     }
 
     void Application::OnMouseKeyTest(MouseButtonEvent& mouseButtonEvent)
     {
         const MouseButtonValues inputValue = mouseButtonEvent.GetInputValue();
-        ANE_ENGINE_LOG_INFO("pressed mouse key {0}, with {1}, is doubleclick {2}", InputUtilities::ToString((MouseButton)inputValue.GetCurrentButtonIndex()),
+        ANE_ELOG_INFO("pressed mouse key {0}, with {1}, is doubleclick {2}", InputUtilities::ToString((MouseButton)inputValue.GetCurrentButtonIndex()),
             InputUtilities::ToString(inputValue.GetTriggerState()), inputValue.GetIsDoubleClick());
-        ANE_ENGINE_LOG_INFO("raw mouse button state {0}", std::bitset<16>(inputValue.GetRawButtonStates()).to_string());
+        ANE_ELOG_INFO("raw mouse button state {0}", std::bitset<16>(inputValue.GetRawButtonStates()).to_string());
     }
 
     void Application::OnMouseScrollTest(MouseScrollEvent& mouseScrollEvent)
     {
-        ANE_ENGINE_LOG_INFO("scrolled mouse ({0}, {1})", mouseScrollEvent.GetXDelta(), mouseScrollEvent.GetYDelta());
+        ANE_ELOG_INFO("scrolled mouse ({0}, {1})", mouseScrollEvent.GetXDelta(), mouseScrollEvent.GetYDelta());
     }
 
     void Application::OnMouseMoveTest(MouseMovementEvent& mouseMovementEvent)
     {
         const MouseMoveValue inputValue = mouseMovementEvent.GetInputValue();
         // spdlog formatting not working use explicit glm::to_string
-        ANE_ENGINE_LOG_INFO("moved mouse pos:({0}), delta:({1})", glm::to_string(inputValue.GetMousePos()), glm::to_string(inputValue.GetMouseDelta()));
+        ANE_ELOG_INFO("moved mouse pos:({0}), delta:({1})", inputValue.GetMousePos().ToString(), inputValue.GetMouseDelta().ToString());
     }
 }

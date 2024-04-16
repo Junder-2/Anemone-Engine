@@ -25,6 +25,7 @@ project "Editor"
         "%{IncludeDir.GLM}",
         "%{IncludeDir.VulkanSDK}",
         "%{IncludeDir.entt}",
+        "%{IncludeDir.toml}",
     }
 
     links

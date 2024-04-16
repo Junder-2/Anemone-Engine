@@ -75,6 +75,8 @@ namespace Engine
                 {
                     const MouseButtonValues mouseButtonValues = dynamic_cast<MouseButtonEvent&>(e).GetInputValue();
 
+                    if(_mouseButtonValueDelegate) _mouseButtonValueDelegate(mouseButtonValues);
+
                     const int buttonId = mouseButtonValues.GetCurrentButtonIndex();
 
                     const BindingPair bindingPair(InputDeviceMouse, buttonId);
@@ -96,19 +98,19 @@ namespace Engine
         // TODO: Current system doesnt allow one binding pair to be bound to more than one other binding pair
         if(_bindingToAxisBinding.contains(positiveBindingPair) && !_bindingToAxisBinding.contains(negativeBindingPair))
         {
-            ANE_ENGINE_LOG_WARN("Trying to bind existing positive binding to different axis, this is not currently supported: ({0}, {1})"
+            ANE_ELOG_WARN("Trying to bind existing positive binding to different axis, this is not currently supported: ({0}, {1})"
                                 , InputUtilities::ToString((InputDeviceType)positiveBindingPair.DeviceType), positiveBindingPair.BindingId);
             return true;
         }
         else if(!_bindingToAxisBinding.contains(positiveBindingPair) && _bindingToAxisBinding.contains(negativeBindingPair))
         {
-            ANE_ENGINE_LOG_WARN("Trying to bind existing negative binding to different axis, this is not currently supported: ({0}, {1})"
+            ANE_ELOG_WARN("Trying to bind existing negative binding to different axis, this is not currently supported: ({0}, {1})"
                                 , InputUtilities::ToString((InputDeviceType)negativeBindingPair.DeviceType), negativeBindingPair.BindingId);
             return true;
         }
         else if(_bindingToAxisBinding[positiveBindingPair].Id != _bindingToAxisBinding[negativeBindingPair].Id)
         {
-            ANE_ENGINE_LOG_WARN("Trying to bind existing binding to different axis, this is not currently supported: ({0}, {1}) and ({2}, {3})"
+            ANE_ELOG_WARN("Trying to bind existing binding to different axis, this is not currently supported: ({0}, {1}) and ({2}, {3})"
                                 , InputUtilities::ToString((InputDeviceType)positiveBindingPair.DeviceType), positiveBindingPair.BindingId
                                 , InputUtilities::ToString((InputDeviceType)negativeBindingPair.DeviceType), negativeBindingPair.BindingId);
             return true;

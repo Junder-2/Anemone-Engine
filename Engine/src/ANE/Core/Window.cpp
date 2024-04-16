@@ -26,17 +26,21 @@ namespace Engine
 
     void Window::Init(const WindowProperties& props)
     {
-        ANE_ENGINE_LOG_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
+        ANE_PROFILE_FUNCTION();
+
+        ANE_ELOG_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
         // SDL
         if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER))
         {
-            ANE_ENGINE_LOG_ERROR("Could not initialize SDL.");
+            ANE_ELOG_ERROR("Could not initialize SDL.");
         }
 
         const SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_VULKAN | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
         _windowContext = SDL_CreateWindow(props.Title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowData.Width, _windowData.Height, windowFlags);
 
+        // Set minimum size to prevent errors
+        SDL_SetWindowMinimumSize(_windowContext, 180, 80);
 
         int xPos, yPos;
         SDL_GetWindowPosition(_windowContext, &xPos, &yPos);
@@ -44,71 +48,36 @@ namespace Engine
         _windowData.XPos = xPos;
         _windowData.YPos = yPos;
 
-        if (_windowContext == nullptr)
-        {
-            ANE_ENGINE_LOG_ERROR("Could not create SDL window.");
-        }
+        ANE_EASSERT(_windowContext, "Could not create SDL window.");
     }
 
     void Window::OnUpdate(float deltaTime)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         ProcessEvents(deltaTime);
-
-        //_vulkanRenderer->NewFrame(_windowData);
-
-        return;
-
-        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-        if (_showDemoWindow)
-            ImGui::ShowDemoWindow(&_showDemoWindow);
-
-        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
-        static float f = 0.0f;
-        static int counter = 0;
-
-        ImGui::Begin("Hello, world!"); // Create a window called "Hello, world!" and append into it.
-
-        ImGui::Text("This is some useful text."); // Display some text (you can use a format strings too)
-        ImGui::Checkbox("Demo Window", &_showDemoWindow); // Edit bools storing our window open/close state
-        ImGui::Checkbox("Another Window", &_showAnotherWindow);
-
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f); // Edit 1 float using a slider from 0.0f to 1.0f
-        //ImGui::ColorEdit3("clear color", (float*)&_vulkanRenderer->ClearColor); // Edit 3 floats representing a color
-
-        if (ImGui::Button("Button")) // Buttons return true when clicked (most widgets return true when edited/activated)
-            counter++;
-        ImGui::SameLine();
-        ImGui::Text("counter = %d", counter);
-
-        //ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / _vulkanRenderer->GetFramerate(), _vulkanRenderer->GetFramerate());
-        //ImGui::Text("Engine %.3f ms/frame", deltaTime * 1000.f);
-        ImGui::End();
-
-        // 3. Show another simple window.
-        if (_showAnotherWindow)
-        {
-            ImGui::Begin("Another Window", &_showAnotherWindow);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-            ImGui::Text("Hello from another window!");
-            if (ImGui::Button("Close Me"))
-                _showAnotherWindow = false;
-            ImGui::End();
-        }
-
-        // Rendering
-        //_vulkanRenderer->EndFrame();
     }
 
     void Window::ProcessEvents(float deltaTime)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         InputHandler* inputHandler = &Application::Get().GetInputHandler();
         inputHandler->OnUpdate();
 
-        const bool prevLostFocus = LostFocus();
+        const bool prevHasFocus = HasFocus();
+        const bool imGuiWantMouse = ImGui::GetIO().WantCaptureMouse;
+        const bool relativeMouseMode = SDL_GetRelativeMouseMode();
+
+        _imGuiHasFocus = ImGui::GetIO().WantCaptureKeyboard;
+
+        const Uint32 mainWindowId = SDL_GetWindowID(_windowContext);
 
         SDL_Event event;
         while(SDL_PollEvent(&event))
         {
-            ImGui_ImplSDL2_ProcessEvent(&event);
+            // While mouse is hidden we dont want to be able to interact with imgui
+            if(!relativeMouseMode) ImGui_ImplSDL2_ProcessEvent(&event);
 
             switch (event.type)
             {
@@ -124,14 +93,14 @@ namespace Engine
                 case SDL_KEYDOWN:
                 case SDL_KEYUP:
                 {
-                    if(LostFocus() || event.key.repeat != 0) continue;
+                    if(event.key.repeat != 0) continue;
                     inputHandler->ProcessKey(event.key.keysym.sym, event.type == SDL_KEYDOWN);
                 }
                 continue;
                 case SDL_MOUSEBUTTONDOWN:
                 case SDL_MOUSEBUTTONUP:
                 {
-                    if(LostFocus()) continue;
+                    if(imGuiWantMouse || mainWindowId != event.button.windowID) continue;
                     const int keyIndex = MOUSE_BUTTON_TO_SDL_MOUSE_BUTTON(event.button.button);
 
                     inputHandler->ProcessMouseButton(keyIndex, event.type == SDL_MOUSEBUTTONDOWN, event.button.clicks == 2);
@@ -139,7 +108,7 @@ namespace Engine
                 continue;
                 case SDL_MOUSEWHEEL:
                 {
-                    if(LostFocus()) continue;
+                    if(imGuiWantMouse || mainWindowId != event.wheel.windowID) continue;
                     const float x = event.wheel.preciseX;
                     const float y = event.wheel.preciseY;
 
@@ -148,34 +117,45 @@ namespace Engine
                 continue;
                 case SDL_MOUSEMOTION:
                 {
-                    if(LostFocus()) continue;
+                    if(mainWindowId != event.motion.windowID) continue;
 
-                    const float x = std::clamp((float)event.motion.x/(float)_windowData.Width, 0.f, 1.f);
-                    const float y = std::clamp((float)event.motion.y/(float)_windowData.Height, 0.f, 1.f);
+                    // Convert mouse coord to relative
+                    const float relX = std::clamp((float)event.motion.x/(float)_windowData.Width, 0.f, 1.f);
+                    const float relY = std::clamp((float)event.motion.y/(float)_windowData.Height, 0.f, 1.f);
+                    const float relDeltaX = ((float)event.motion.xrel/(float)_windowData.Height) * 60.f * deltaTime;
+                    const float relDeltaY = ((float)event.motion.yrel/(float)_windowData.Height) * 60.f * deltaTime;
 
-                    inputHandler->ProcessMouseMovement(x, y, deltaTime);
+                    inputHandler->ProcessMouseMovement(relX, relY, relDeltaX, relDeltaY);
                 }
                 continue;
             }
         }
 
-        if(!prevLostFocus && LostFocus())
+        if(prevHasFocus && !HasFocus())
         {
             WindowFocusChangeEvent focusChangeEvent(false);
             DispatchEvent(focusChangeEvent);
             inputHandler->FlushInputs();
         }
-        else if(prevLostFocus && !LostFocus())
+        else if(!prevHasFocus && HasFocus())
         {
             WindowFocusChangeEvent focusChangeEvent(true);
             DispatchEvent(focusChangeEvent);
+            int newX, newY;
+            SDL_GetMouseState(&newX, &newY);
+            const float x = std::clamp((float)newX/(float)_windowData.Width, 0.f, 1.f);
+            const float y = std::clamp((float)newY/(float)_windowData.Height, 0.f, 1.f);
+
+            inputHandler->ProcessMouseMovement(x, y, 0);
         }
 
-        if(!LostFocus()) inputHandler->PopulateKeyStates(SDL_GetKeyboardState(nullptr));
+        if(HasFocus()) inputHandler->PopulateKeyStates(SDL_GetKeyboardState(nullptr));
     }
 
     void Window::ProcessWindowEvent(const SDL_WindowEvent& windowEvent, float deltaTime)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         const bool isMainWindow = windowEvent.windowID == SDL_GetWindowID(_windowContext);
         switch (windowEvent.event)
         {
@@ -231,26 +211,24 @@ namespace Engine
             }
             break;
             case SDL_WINDOWEVENT_ENTER:
-                _windowLostFocus = !isMainWindow;
+                _windowHasFocus = isMainWindow;
             break;
             case SDL_WINDOWEVENT_FOCUS_LOST:
-                _windowLostFocus = true;
+                _windowHasFocus = false;
             break;
             case SDL_WINDOWEVENT_FOCUS_GAINED:
-                _windowLostFocus = false;
+                _windowHasFocus = true;
             break;
         }
     }
 
     void Window::DispatchEvent(Event& e)
     {
-        if(EventDelegate) EventDelegate(e);
+        if(_eventDelegate) _eventDelegate(e);
     }
 
     void Window::Shutdown()
     {
-        //_vulkanRenderer->Cleanup();
-
         SDL_DestroyWindow(_windowContext);
         SDL_Quit();
     }
@@ -259,6 +237,11 @@ namespace Engine
     {
         //todo
         _windowData.VSync = enabled;
+    }
+
+    void Window::SetMouseVisibility(const bool enable)
+    {
+        SDL_SetRelativeMouseMode(enable ? SDL_TRUE : SDL_FALSE);
     }
 
     std::unique_ptr<Window> Window::Create(const WindowProperties& props)

@@ -8,11 +8,14 @@
 
 //Temp includes. Can probably change how these components are referenced. Maybe a scene manager hsould be in charge of that
 //kind of thing
+#include "ANE/Core/Application.h"
 #include "ANE/Core/Entity/ExampleScripts/CameraController.h"
+#include "ANE/Core/Scene/Components/CameraComponent.h"
 #include "ANE/Core/Scene/Components/NativeScriptComponent.h"
 #include "ANE/Core/Scene/Components/RenderComponent.h"
 #include "Panels/InspectorPanel.h"
 #include "Panels/SceneHierarchyPanel.h"
+#include "ANE/Input/EditorInputSystem.h"
 
 namespace Engine
 {
@@ -46,6 +49,12 @@ namespace Engine
         // Then you would call load methods to load the most recent project
 
         //Then you would load the scene from the file path listed from that project
+
+        GetEditorInputSystem().BindKeyboardInput(KeyCodeEscape, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
+        GetEditorInputSystem().BindMouseButton(MouseButtonLeft, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
+        GetEditorInputSystem().BindMouseButton(MouseButtonRight, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
+        GetEditorInputSystem().BindMouseButton(MouseButtonMiddle, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
+        CreateTestScene();
     }
 
     void EditorLayer::OnDetach()
@@ -82,10 +91,11 @@ namespace Engine
                 //panel->doWindowLayoutmaitenance
             }
         }
-        static bool showSimpleOverlay = true;
-        if (showSimpleOverlay) ShowInputDebugOverlay(&showSimpleOverlay);
 
-        ImGui::ShowDemoWindow();
+        // These should be moved later
+
+
+        //ImGui::ShowDemoWindow();
     }
 
     void EditorLayer::Init()
@@ -130,77 +140,52 @@ namespace Engine
         }
         //Add component to entity
         ent.AddComponent<RenderComponent>();
-        // ent.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+        ent.AddComponent<CameraComponent>();
+        ent.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
         //Get Component from entity
         if (RenderComponent comp; ent.TryGetComponent<RenderComponent>(comp))
         {
             TagComponent tag;
             ent.TryGetComponent(tag);
-            ANE_ENGINE_LOG_WARN("We have a renderComponent with tag: {0} on entity: {1}", comp.ToString(), tag.Tag);
+            ANE_ELOG_WARN("We have a renderComponent with tag: {0} on entity: {1}", comp.ToString(), tag.Tag);
         }
     }
 
-    //Copied from IMGUI example
-    void EditorLayer::ShowInputDebugOverlay(bool* pOpen)
+    void EditorLayer::OnSwitchEditorFocus(InputValue inputValue)
     {
-        const InputSystem& inputManager = GetInputSystem();
-        static int location = 0;
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoDocking;
-        if (location >= 0)
-        {
-            const float PAD = 10.0f;
-            const ImGuiViewport* viewport = ImGui::GetMainViewport();
-            ImVec2 work_pos = viewport->WorkPos; // Use work area to avoid menu-bar/task-bar, if any!
-            ImVec2 work_size = viewport->WorkSize;
-            ImVec2 window_pos, window_pos_pivot;
-            window_pos.x = (location & 1) ? (work_pos.x + work_size.x - PAD) : (work_pos.x + PAD);
-            window_pos.y = (location & 2) ? (work_pos.y + work_size.y - PAD) : (work_pos.y + PAD);
-            window_pos_pivot.x = (location & 1) ? 1.0f : 0.0f;
-            window_pos_pivot.y = (location & 2) ? 1.0f : 0.0f;
-            ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
-            window_flags |= ImGuiWindowFlags_NoMove;
-        }
-        ImGui::SetNextWindowBgAlpha(0.35f); // Transparent background
-        if (ImGui::Begin("Example: Simple overlay", pOpen, window_flags))
-        {
-            const glm::vec2 mousePos = inputManager.GetMousePos();
-            ImGui::Text("Mouse Pos: (%.3f,%.3f)", mousePos.x, mousePos.y);
-            const MouseButtonValues mouseButtonValues = inputManager.GetMouseButtonValues();
-            ImGui::Text("Mouse Buttons: (");
-            bool start = true;
-            for (int i = 0; i < MOUSE_BUTTON_MAX; i++)
-            {
-                const int buttonState = mouseButtonValues.GetTriggerState(i);
-                if (buttonState == 0) continue;
-                ImGui::SameLine(0, start ? .0f : -1.0f);
-                ImGui::Text("%d:%d", i, buttonState);
-                start = false;
-            }
-            ImGui::SameLine(0, 0);
-            ImGui::Text(")");
+        const bool editorHasFocus = EventHandler::IsBlockingAppInputs();
 
-            const auto keyValues = inputManager.GetCurrentTriggeredKeys();
-            ImGui::Text("Keyboard: (");
-            start = true;
-            for (auto keyValue : keyValues)
+        if(inputValue.GetDeviceType() == InputDeviceKeyboard)
+        {
+            switch (inputValue.GetBindingId())
             {
-                if(keyValue.GetIntValue() == 0) continue;
-                ImGui::SameLine(0, start ? .0f : -1.0f);
-                ImGui::Text("%d:%d", keyValue.GetBindingId(), keyValue.GetIntValue());
-                start = false;
-            }
-            ImGui::SameLine(0, 0);
-            ImGui::Text(")");
-
-            if (ImGui::BeginPopupContextWindow())
-            {
-                if (pOpen && ImGui::MenuItem("Close")) *pOpen = false;
-                ImGui::EndPopup();
+                case KeyCodeEscape:
+                    if(inputValue.GetTriggerState() != TriggerStarted) return;
+                break;
+                default: return;
             }
         }
-        ImGui::End();
+        else if(inputValue.GetDeviceType() == InputDeviceMouse) //Any mouse click should return focus
+        {
+            if(!editorHasFocus && inputValue.GetTriggerState() == TriggerStarted)
+            {
+                ShowMouse();
+            }
+
+            if(inputValue.GetTriggerState() != TriggerStarted || !editorHasFocus) return;
+        }
+
+        EventHandler::SetBlockAppInputs(!editorHasFocus);
+        if(!editorHasFocus)
+        {
+            HideMouse();
+        }
+       // _showMenuBar = !editorHasFocus;
+        EventHandler::ConsumeEvent();
     }
+
+
 
     template <class EntityType>
     void EditorLayer::EntityWidget(EntityType& e, entt::basic_registry<EntityType>& reg, bool dropTarget)

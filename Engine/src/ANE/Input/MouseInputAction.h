@@ -105,6 +105,7 @@ namespace Engine
         * @returns stored data changed
         */
         bool PopulateMoveInput(bool* needProcessing, float x, float y, float deltaTime);
+        bool PopulateMoveInput(bool* needProcessing, float x, float y, float xDelta, float yDelta);
         /**
         * Populates new mouse button input
         * @param needProcessing if this action needs processing next frame
@@ -125,8 +126,9 @@ namespace Engine
         bool ProcessAction();
         /**
         * Clears input data
+        * @returns should send forward
         */
-        void FlushAction();
+        bool FlushAction();
 
         MouseMoveValue GetMoveValue() const { return _moveValue; }
         MouseButtonValues GetButtonValue() const { return _buttonValue; }

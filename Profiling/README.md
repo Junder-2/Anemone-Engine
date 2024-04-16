@@ -1,0 +1,1 @@
+Go to chrome://tracing to view profiling data

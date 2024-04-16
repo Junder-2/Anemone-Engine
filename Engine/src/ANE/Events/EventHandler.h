@@ -4,12 +4,24 @@
 
 namespace Engine
 {
+    //TODO: might turn this into a subsystem and not a static class
+
     /**
     * Global class to handle current event
     */
     class EventHandler
     {
     public:
+        /**
+        * Sends out events to editor subscribers in the editor stage
+        */
+        static void DispatchEditorEvents();
+
+        /**
+        * Sends out events to app subscribers in the app stage
+        */
+        static void DispatchAppEvents();
+
         /**
         * Sets the new current event
         */
@@ -27,54 +39,59 @@ namespace Engine
         }
 
         /**
-        * Consumes current event
+        * Consumes current event (certain events will be marked as flush and cannot be consumed)
         */
         static void ConsumeEvent()
         {
             if(_currentEvent == nullptr)
             {
-                ANE_ENGINE_LOG_WARN("Cannot consume event outside of event handling");
+                ANE_ELOG_WARN("Cannot consume event outside of event handling");
                 return;
             }
             _currentEvent->Consume();
         }
 
-        //TODO: TEMPORARY, bindings and execution should probably be moved to something thats not a static class
+        /**
+        * Subscribes to the OnEvent call at the editor stage
+        * @param delegateMember method with void(Event&)
+        */
         template <class TClass>
         static void BindEditorEvent(DelegateMember<TClass, void(Event&)> delegateMember)
         {
             _editorEventDelegate += delegateMember;
         }
 
+        /**
+        * Subscribes to the OnEvent call at the app stage
+        * @param delegateMember method with void(Event&)
+        */
         template <class TClass>
         static void BindAppEvent(DelegateMember<TClass, void(Event&)> delegateMember)
         {
             _appEventDelegate += delegateMember;
         }
 
-        static void DispatchEditorEvents()
+        /**
+        * Blocks all events from passing into the app stage (certain events will be marked as flush and will still pass)
+        */
+        static void SetBlockAllAppEvents(const bool enable)
         {
-            if(_currentEvent == nullptr)
-            {
-                ANE_ENGINE_LOG_WARN("Cannot execute event outside of event handling");
-                return;
-            }
-
-            if(_editorEventDelegate) _editorEventDelegate(*_currentEvent);
+            _blockAllAppEvents = enable;
         }
+        static bool IsBlockingAllAppEvents() { return _blockAllAppEvents; }
 
-        static void DispatchAppEvents()
+        /**
+        * Blocks all input events from passing into the app stage (certain events will be marked as flush and will still pass)
+        */
+        static void SetBlockAppInputs(const bool enable)
         {
-            if(_currentEvent == nullptr)
-            {
-                ANE_ENGINE_LOG_WARN("Cannot execute event outside of event handling");
-                return;
-            }
-
-            if(_appEventDelegate) _appEventDelegate(*_currentEvent);
+            _blockAppInputs = enable;
         }
+        static bool IsBlockingAppInputs() { return _blockAppInputs; }
 
     private:
+        inline static bool _blockAllAppEvents = false;
+        inline static bool _blockAppInputs = false;
         inline static Event* _currentEvent {};
 
         inline static MulticastDelegate<void(Event&)> _editorEventDelegate;

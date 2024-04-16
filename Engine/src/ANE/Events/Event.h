@@ -46,10 +46,14 @@ namespace Engine
         bool HasCategory(const EventCategory category) const { return GetEventCategories() & category; }
 
         void Consume() { _consumed = true; }
-        bool IsConsumed() const { return _consumed; }
+        bool IsConsumed() const { return _consumed && !_isFlush; }
+
+        void MarkFlush() { _isFlush = true; }
+        bool IsFlush() const { return _isFlush; }
 
     private:
         bool _consumed = false;
+        bool _isFlush = false;
     };
 }
 

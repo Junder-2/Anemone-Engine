@@ -19,6 +19,8 @@ namespace Engine
         static void BeginUiDataBuffer();
         static void EndUIDataBuffer();
 
+        static void SetViewProjection(const Matrix4x4& matrix);
+
     private:
         static std::unique_ptr<VulkanRenderer> _vulkanRenderer;
     };

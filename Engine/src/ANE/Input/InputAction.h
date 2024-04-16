@@ -128,6 +128,11 @@ namespace Engine
         * @returns should send forward
         */
         bool ProcessAction(bool* needProcessing) override;
+        /**
+        * Clears the input data
+        * @returns should send forward
+        */
+        bool FlushAction() override;
     };
 
     /**

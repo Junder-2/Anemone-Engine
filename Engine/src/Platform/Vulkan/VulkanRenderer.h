@@ -6,6 +6,7 @@
 #include "VmaTypes.h"
 #include "VulkanDeletionQueue.h"
 #include "VulkanPipelineBuilder.h"
+#include "ANE/Core/Math/Matrix/Matrix4x4.h"
 
 namespace vkb
 {
@@ -59,8 +60,7 @@ namespace Engine
         VulkanRenderer(SDL_Window* window);
 
         void Setup();
-        void NewFrame(const WindowProperties& props);
-        void EndFrame(const WindowProperties& props);
+        void Render(const WindowProperties& props);
         void Cleanup();
 
         float GetFramerate();
@@ -89,15 +89,13 @@ namespace Engine
 
         static PipelineWrapper CreatePipeline(const vkb::Device& logicalDevice);
 
-        static void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height);
-
         static void CreateImGuiDescriptorPool();
 
-        inline static void Draw(const WindowProperties& props);
-        inline static void DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView);
+        inline static Matrix4x4 GetViewProjectionMatrix();
 
-        inline static void RenderFrame(ImGui_ImplVulkanH_Window* wd, ImDrawData* drawData);
-        inline static void RevealFrame(ImGui_ImplVulkanH_Window* wd);
+        inline static void Draw(const WindowProperties& props);
+        inline static void DrawGeometry(VkCommandBuffer cmd);
+        inline static void DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView);
 
         static void CleanupVulkan();
         static void CleanupImGui();
@@ -128,6 +126,8 @@ namespace Engine
 
     public:
         inline static ImVec4 ClearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+        inline static Matrix4x4 ViewProjection;
 
     private:
         inline static SDL_Window* _window;
@@ -165,7 +165,7 @@ namespace Engine
         inline static VkSwapchainKHR _swapchain;
         inline static VkFormat _swapchainImageFormat;
         inline static VkExtent2D _swapchainExtent;
-        //inline static VkExtent2D _drawExtent;
+        inline static VkExtent2D _drawExtent;
         inline static std::vector<VkImage> _swapchainImages;
         inline static std::vector<VkImageView> _swapchainImageViews;
 
@@ -175,6 +175,8 @@ namespace Engine
         inline static int _frameIndex = 0;
         inline static VulkanFrame _frameData[3];
         inline static VulkanImmediateBuffer _immBuffer;
+
+        inline static VmaMeshBuffers _rectangleMesh;
 
         // ImGui
         inline static ImGui_ImplVulkanH_Window _mainWindowData;

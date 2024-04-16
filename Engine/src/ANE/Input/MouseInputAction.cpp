@@ -17,6 +17,15 @@ namespace Engine
         return true;
     }
 
+    bool MouseInputAction::PopulateMoveInput(bool* needProcessing, const float x, const float y, const float xDelta, const float yDelta)
+    {
+        _moveValue.SetMousePos(x, y);
+        _moveValue.SetMouseDelta(xDelta, yDelta);
+
+        *needProcessing = true;
+        return true;
+    }
+
     bool MouseInputAction::PopulateButtonInput(bool* needProcessing, const int buttonIndex, const TriggerState newState, const bool isDoubleClick /*= false */)
     {
         _buttonValue.SetTriggerState(buttonIndex, newState, isDoubleClick);
@@ -62,8 +71,9 @@ namespace Engine
         return changed;
     }
 
-    void MouseInputAction::FlushAction()
+    bool MouseInputAction::FlushAction()
     {
+        bool changed = false;
         _moveValue.SetMouseDelta(0, 0);
 
         for (int i = 0; i < MOUSE_BUTTON_MAX; ++i)
@@ -71,6 +81,9 @@ namespace Engine
             auto prevValue = _buttonValue.GetTriggerState(i);
             if(prevValue == TriggerNone) continue;
             _buttonValue.SetTriggerState(i, TriggerNone);
+            changed = true;
         }
+
+        return changed;
     }
 }

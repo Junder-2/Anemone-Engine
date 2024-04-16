@@ -24,6 +24,7 @@ namespace Engine
         Entity GetEntityWithUUID(std::string UUID);
         entt::registry _registry;
 
+
     private:
         friend class Entity;
 

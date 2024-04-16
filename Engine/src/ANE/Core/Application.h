@@ -9,7 +9,7 @@
 
 namespace Engine
 {
-    class SubsystemCollection;
+    class SubSystemCollection;
 
     struct ANE_API ApplicationSpecification
     {
@@ -29,6 +29,15 @@ namespace Engine
 
         void PushLayer(Layer* layer);
 
+        Window& GetWindow() const { return *_window; }
+        InputHandler& GetInputHandler() const { return *_inputHandler; }
+        SubSystemCollection& GetSubsystemCollection() const { return *_subsystemCollection; }
+
+        static Application& Get() { return *_appInstance; }
+
+        const ApplicationSpecification& GetAppSpecification() const { return _appSpec; }
+
+    private:
         void OnEvent(Event& e);
         void OnWindowResize(WindowResizeEvent& e);
         void OnWindowMove(WindowMovedEvent& e);
@@ -41,19 +50,11 @@ namespace Engine
         void OnMouseScrollTest(MouseScrollEvent& mouseScrollEvent);
         void OnMouseMoveTest(MouseMovementEvent& mouseMovementEvent);
 
-        Window& GetWindow() const { return *_window; }
-        InputHandler& GetInputHandler() const { return *_inputHandler; }
-        SubsystemCollection& GetSubsystemCollection() const { return *_subsystemCollection; }
-
-        static Application& Get() { return *_appInstance; }
-
-        const ApplicationSpecification& GetAppSpecification() const { return _appSpec; }
-
     private:
         ApplicationSpecification _appSpec;
         std::unique_ptr<Window> _window;
         std::unique_ptr<InputHandler> _inputHandler;
-        std::unique_ptr<SubsystemCollection> _subsystemCollection;
+        std::unique_ptr<SubSystemCollection> _subsystemCollection;
         bool _isRunning = true;
 
         static Application* _appInstance;
@@ -63,4 +64,5 @@ namespace Engine
     };
 
     Application* CreateApplication();
+    std::string GetApplicationName();
 }

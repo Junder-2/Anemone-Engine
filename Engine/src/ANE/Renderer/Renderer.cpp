@@ -4,6 +4,7 @@
 #include <imgui_impl_sdl2.h>
 
 #include "Platform/Vulkan/VulkanRenderer.h"
+#include "ANE/Core/Math/Matrix/Matrix4x4.h"
 
 namespace Engine
 {
@@ -22,10 +23,7 @@ namespace Engine
 
     void Renderer::Render(const WindowProperties& props)
     {
-        _vulkanRenderer->NewFrame(props);
-        _vulkanRenderer->EndFrame(props);
-        //_vulkanRenderer->DrawMain(cmd);
-        //_vulkanRenderer->DrawImGui(cmd, imageView);
+        _vulkanRenderer->Render(props);
     }
 
     void Renderer::BeginUiDataBuffer()
@@ -44,5 +42,10 @@ namespace Engine
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
         }
+    }
+
+    void Renderer::SetViewProjection(const Matrix4x4& matrix)
+    {
+        _vulkanRenderer->ViewProjection = matrix;
     }
 }

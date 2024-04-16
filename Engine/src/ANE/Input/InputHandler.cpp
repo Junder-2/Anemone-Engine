@@ -16,6 +16,8 @@ namespace Engine
 
     InputHandler::InputHandler()
     {
+        ANE_PROFILE_FUNCTION();
+
         // input testing
         for (int i = KeyCodeA; i < KeyCodeZ+1; ++i)
         {
@@ -104,11 +106,17 @@ namespace Engine
             if(val->FlushAction())
             {
                 KeyboardKeyEvent keyTriggerEvent(val->GetInputValue());
+                keyTriggerEvent.MarkFlush();
                 DispatchEvent(keyTriggerEvent);
             }
         }
 
-        _mouseInputAction.FlushAction();
+        if(_mouseInputAction.FlushAction())
+        {
+            MouseButtonEvent mouseButtonEvent(_mouseInputAction.GetButtonValue());
+            mouseButtonEvent.MarkFlush();
+            DispatchEvent(mouseButtonEvent);
+        }
         _currentKeyStates = nullptr;
     }
 
@@ -133,6 +141,15 @@ namespace Engine
     void InputHandler::ProcessMouseMovement(const float xPos, const float yPos, const float deltaTime)
     {
         if(_mouseInputAction.PopulateMoveInput(&_dirtyMouse, xPos, yPos, deltaTime))
+        {
+            MouseMovementEvent mouseMovementEvent(_mouseInputAction.GetMoveValue());
+            DispatchEvent(mouseMovementEvent);
+        }
+    }
+
+    void InputHandler::ProcessMouseMovement(const float xPos, const float yPos, const float xDelta, const float yDelta)
+    {
+        if(_mouseInputAction.PopulateMoveInput(&_dirtyMouse, xPos, yPos, xDelta, yDelta))
         {
             MouseMovementEvent mouseMovementEvent(_mouseInputAction.GetMoveValue());
             DispatchEvent(mouseMovementEvent);
@@ -187,7 +204,7 @@ namespace Engine
             return TriggerHolding;
         }
 
-        //ANE_ENGINE_LOG_WARN("No registered of key {0}", keyCode);
+        //ANE_ELOG_WARN("No registered of key {0}", keyCode);
 
         return TriggerNone;
     }

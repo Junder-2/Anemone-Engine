@@ -35,6 +35,9 @@ namespace Engine
         TriggerStopped,
     } TriggerState;
 
+    /**
+    * Structure holding InputDeviceType and bindingId (KeyCodes, MouseButton)
+    */
     struct BindingPair
     {
         BindingPair(const int deviceType, const int bindingId) : DeviceType(deviceType), BindingId(bindingId) {}
@@ -46,6 +49,9 @@ namespace Engine
         bool operator==(const BindingPair& rhs) const { return DeviceType == rhs.DeviceType && BindingId == rhs.BindingId;} // for hash
     };
 
+    /**
+    * Structure a unique id and the sign of the axis output. Used to link inputs to an axis
+    */
     struct AxisBinding
     {
         AxisBinding(const int id = -1, const bool sign = false) : Id(id), Sign(sign) {}

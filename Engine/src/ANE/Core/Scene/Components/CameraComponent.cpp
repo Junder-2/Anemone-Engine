@@ -48,7 +48,7 @@ namespace Engine
     {
         const glm::mat4 currentMatrix = ViewMatrix;
 
-        ViewMatrix = Transform;
+        ViewMatrix = Transform.GetWorldToLocal();
 
         if (_flipY) {
             //flip y coord

@@ -22,11 +22,11 @@ namespace Engine
         // //auto Gety = ent.TryGetComponent<RenderComponent>(comp);
         // if (RenderComponent comp; ent.TryGetComponent(comp))
         // {
-        //     ANE_ENGINE_LOG_TRACE("WE have component: {}", comp.ToString());
+        //     ANE_ELOG("WE have component: {}", comp.ToString());
         // }
         // else
         // {
-        //     ANE_ENGINE_LOG_TRACE("We do not have component");
+        //     ANE_ELOG("We do not have component");
         // }
         // auto component = ent.GetComponent<TransformComponent>();
         // if (ent.HasComponent<TransformComponent>())
@@ -36,11 +36,11 @@ namespace Engine
 
         // if (componentR nullptr)
         // {
-        //     ANE_ENGINE_LOG_TRACE("We have component");
+        //     ANE_ELOG("We have component");
         // }
         // else
         // {
-        //     ANE_ENGINE_LOG_TRACE("We don't have component");
+        //     ANE_ELOG("We don't have component");
         // }
         // auto component2 = _registry.emplace<TransformComponent>(entit2);
         // add a component to an entity
@@ -50,7 +50,7 @@ namespace Engine
         // // adds a component and calls the constructor
         //auto componentChanged = Registry.emplace<TransformComponent>(entity, TransformMatrix());
         //componentChanged.ToString();
-        //ANE_ENGINE_LOG_TRACE(componentChanged.ToString());
+        //ANE_ELOG(componentChanged.ToString());
 
         //
         // // calls a method on the component
@@ -123,8 +123,7 @@ namespace Engine
     [[nodiscard("Entity never used")]] Entity Scene::Create(std::string stringName)
     {
 
-        Entity ent{this, stringName.c_str()};
-        _entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent;// here
+        Entity ent{this, stringName.c_str()}; // here
         return ent;
     }
 
