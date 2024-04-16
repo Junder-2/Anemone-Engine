@@ -7,20 +7,15 @@ namespace Engine
 
     MouseInputAction::~MouseInputAction() = default;
 
-    bool MouseInputAction::PopulateMoveInput(bool* needProcessing, const float x, const float y, const float deltaTime)
+    void MouseInputAction::PopulateAbsoluteMove(const Vector2 pos)
     {
-        const Vector2 prevMousePos = _moveValue.GetMousePos();
-        _moveValue.SetMousePos(x, y);
-        _moveValue.SetMouseDelta((x - prevMousePos.X)*deltaTime, (y - prevMousePos.Y)*deltaTime);
-
-        *needProcessing = true;
-        return true;
+        _moveValue.SetAbsoluteMousePos(pos);
     }
 
-    bool MouseInputAction::PopulateMoveInput(bool* needProcessing, const float x, const float y, const float xDelta, const float yDelta)
+    bool MouseInputAction::PopulateMoveInput(bool* needProcessing, const Vector2 pos, const Vector2 delta)
     {
-        _moveValue.SetMousePos(x, y);
-        _moveValue.SetMouseDelta(xDelta, yDelta);
+        _moveValue.SetMousePos(pos);
+        _moveValue.SetMouseDelta(delta);
 
         *needProcessing = true;
         return true;
@@ -34,10 +29,9 @@ namespace Engine
         return true;
     }
 
-    bool MouseInputAction::PopulateScrollInput(bool* needProcessing, const float x, const float y)
+    bool MouseInputAction::PopulateScrollInput(bool* needProcessing, const Vector2 delta)
     {
-        _scrollWheelValue.X = x;
-        _scrollWheelValue.Y = y;
+        _scrollWheelValue = delta;
 
         *needProcessing = true;
         return true;
@@ -46,7 +40,7 @@ namespace Engine
     bool MouseInputAction::ProcessAction()
     {
         bool changed = false;
-        _moveValue.SetMouseDelta(0, 0);
+        _moveValue.SetMouseDelta(Vector2::ZeroVector());
         _scrollWheelValue.X = 0;
         _scrollWheelValue.Y = 0;
 
@@ -74,11 +68,11 @@ namespace Engine
     bool MouseInputAction::FlushAction()
     {
         bool changed = false;
-        _moveValue.SetMouseDelta(0, 0);
+        _moveValue.SetMouseDelta(Vector2::ZeroVector());
 
         for (int i = 0; i < MOUSE_BUTTON_MAX; ++i)
         {
-            auto prevValue = _buttonValue.GetTriggerState(i);
+            const auto prevValue = _buttonValue.GetTriggerState(i);
             if(prevValue == TriggerNone) continue;
             _buttonValue.SetTriggerState(i, TriggerNone);
             changed = true;

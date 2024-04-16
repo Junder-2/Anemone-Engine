@@ -32,10 +32,10 @@ namespace Engine
 
         void PopulateKeyStates(const Uint8* newKeyStates);
         void ProcessKey(int keyCode, bool press);
-        void ProcessMouseMovement(float xPos, float yPos, float deltaTime);
-        void ProcessMouseMovement(float xPos, float yPos, float xDelta, float yDelta);
+        void ProcessMouseMovement(Vector2 pos, Vector2 delta);
+        void ProcessAbsoluteMouseMovement(Vector2 pos);
         void ProcessMouseButton(int index, bool press, bool isDoubleClick = false);
-        void ProcessMouseScroll(float xDelta, float yDelta);
+        void ProcessMouseScroll(Vector2 delta);
         /**
         * Clears current inputs
         */
