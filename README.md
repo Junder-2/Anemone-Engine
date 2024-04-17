@@ -20,6 +20,7 @@ The main goals with the Anemone Engine is to use Vulkan for rendering and to cre
 * [Assimp](https://github.com/assimp/assimp) [![License: Modified BSD 3-Clause][Modified BSD 3-Clause Badge]](https://github.com/assimp/assimp/blob/master/LICENSE)
 * [Slang](https://github.com/shader-slang/slang) [![License: MIT][MIT Badge]](https://github.com/shader-slang/slang/blob/master/LICENSE)
 * [toml++](https://marzer.github.io/tomlplusplus/) [![License: MIT][MIT Badge]](https://github.com/marzer/tomlplusplus/blob/master/LICENSE)
+* [ReactPhysics3D](https://github.com/DanielChappuis/reactphysics3d) [![License: Zlib][Zlib Badge]](https://github.com/DanielChappuis/reactphysics3d/blob/master/LICENSE)
 
 [Apache 2 Badge]: https://img.shields.io/badge/License-Apache_2.0-blue.svg
 [HBL MIT Badge]: https://img.shields.io/badge/License-Happy_Bunny_License%20or%20MIT-yellow
