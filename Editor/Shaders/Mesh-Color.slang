@@ -43,6 +43,7 @@ Varyings vertexMain(uint vid : SV_VertexID)
     Vertex v = vertices[vid];
     output.sv_position = mul(render_matrix, float4(v.position, 1));
     output.color = v.color.rgb;
+    output.uv = float2(v.uv_x, v.uv_y);
 
     return output;
 }
