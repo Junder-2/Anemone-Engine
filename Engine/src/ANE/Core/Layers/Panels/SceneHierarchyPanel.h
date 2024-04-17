@@ -1,5 +1,6 @@
 #pragma once
 #include "UILayerPanel.h"
+#include "ANE/Core/Editor/SelectionManager.h"
 #include "ANE/Core/Scene/Scene.h"
 
 namespace Engine
@@ -19,6 +20,7 @@ namespace Engine
         std::unordered_map<const char*, std::shared_ptr<Scene>>* _managedScenes;
 
         Scene* _sceneContext;
+        SelectionManager::selectionContext _SelectionContext = SelectionManager::selectionContext::UI;
     };
 }
 

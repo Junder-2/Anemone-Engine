@@ -70,6 +70,10 @@ namespace Engine
     void EditorLayer::OnUIRender()
     {
         ImGuiIO& io = ImGui::GetIO();
+        ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
+
+        ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(),dockspace_flags);
+
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) || (ImGui::IsMouseClicked(ImGuiMouseButton_Right)))
         {
             ImGui::FocusWindow(GImGui->HoveredWindow);
