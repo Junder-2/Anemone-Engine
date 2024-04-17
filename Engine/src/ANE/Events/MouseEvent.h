@@ -45,7 +45,7 @@ namespace Engine
     {
     public:
         MouseScrollEvent(const float xDelta, const float yDelta) : _xDelta(xDelta), _yDelta(yDelta) {}
-        MouseScrollEvent(const Vector2 delta) : _xDelta(delta.X), _yDelta(delta.Y) {}
+        MouseScrollEvent(const glm::vec2 delta) : _xDelta(delta.x), _yDelta(delta.y) {}
 
         EventType GetEventType() const override { return EventType::MouseScrolled; }
         int GetEventCategories() const override { return (EventCategoryInput | EventCategoryMouse); }

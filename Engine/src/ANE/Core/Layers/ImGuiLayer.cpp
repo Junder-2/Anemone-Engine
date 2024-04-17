@@ -12,10 +12,10 @@ namespace Engine
 
     ImGuiLayer::ImGuiLayer(const char* layerName): Layer(layerName)
     {
-        EnableFlag("MainMenuWindow");
-        EnableFlag("LogWindow");
-        EnableFlag("SceneViewWindow");
-        EnableFlag("HierarchyWindow");
+        //EnableFlag("MainMenuWindow");
+        //EnableFlag("LogWindow");
+        //EnableFlag("SceneViewWindow");
+        //EnableFlag("HierarchyWindow");
 
         GetEditorInputSystem().BindKeyboardInput(KeyCodeB, MakeDelegate(this, &ImGuiLayer::AddDebugMessage));
         // GetInputSystem().BindKeyboardInput(KeyCodeB, MakeDelegate(this, &ImGuiLayer::AddDebugMessage));
@@ -51,20 +51,27 @@ namespace Engine
     }
 
 
+    ImGuiLayer* ImGuiLayer::Create(const char* str)
+    {
+        return new ImGuiLayer(str);
+
+    }
+
+
     void ImGuiLayer::OnUIRender()
     {
         bool open = true;
-        DockSpace(&open);
+        //DockSpace(&open);
 
         // ImGui::ShowDemoWindow()
 
-        if (GetFlag("MainMenuWindow")) MainMenuWindow();
-        if (GetFlag("FileMenuWindow")) FileMenuWindow();
-        if (GetFlag("CreateSceneWindow")) CreateSceneWindow();
-        if (GetFlag("LogWindow")) LogWindow(&open);
-        if (GetFlag("SceneViewWindow")) SceneViewWindow();
-        if (GetFlag("HierarchyWindow")) HierarchyWindow();
-        if (GetFlag("ShowDebugOverlay")) ShowInputDebugOverlay();
+        //if (GetFlag("MainMenuWindow")) MainMenuWindow();
+        //if (GetFlag("FileMenuWindow")) FileMenuWindow();
+        //if (GetFlag("CreateSceneWindow")) CreateSceneWindow();
+        //if (GetFlag("LogWindow")) LogWindow(&open);
+        //if (GetFlag("SceneViewWindow")) SceneViewWindow();
+        //if (GetFlag("HierarchyWindow")) HierarchyWindow();
+        //if (GetFlag("ShowDebugOverlay")) ShowInputDebugOverlay();
     }
 
     void ImGuiLayer::DockSpace(bool* open)
@@ -82,7 +89,7 @@ namespace Engine
             ImGui::SetNextWindowViewport(viewport->ID);
             ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
             ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-            window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+            window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;
             window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus; /*| ImGuiWindowFlags_no;*/
         }
         else dockspace_flags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
@@ -226,6 +233,7 @@ namespace Engine
     {
         static ImGuiWindowFlags windowflags = ImGuiWindowFlags_NoCollapse;
         ImGui::Begin("HierarchyWindow", nullptr, windowflags);
+
         ImGui::End();
     }
 

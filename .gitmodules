@@ -6,4 +6,4 @@
 	url = https://github.com/g-truc/glm
 [submodule "Engine/vendor/reactphysics"]
 	path = Engine/vendor/reactphysics
-	url = https://github.com/DanielChappuis/reactphysics3d
+	url = https://github.com/DanielChappuis/reactphysics3d.git

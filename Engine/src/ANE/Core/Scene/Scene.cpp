@@ -3,12 +3,15 @@
 
 #include "ANE/Core/Entity/Entity.h"
 #include "Components/NativeScriptComponent.h"
+#include "Components/RenderComponent.h"
+#include "Components/UUIDComponent.h"
 
 
 namespace Engine
 {
     Engine::Scene::Scene()
     {
+
         //create an entity
         //entt::entity entity = Registry.create();
         // entt::entity entit2 = _registry.create();
@@ -113,13 +116,21 @@ namespace Engine
      */
     [[nodiscard("Entity never used")]] Entity Scene::Create(const char* name)
     {
-        Entity ent{this, name}; // here
+        Entity ent{this, name};
+        _entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent;// here
         return ent;
     }
     [[nodiscard("Entity never used")]] Entity Scene::Create(std::string stringName)
     {
-        Entity ent{this, stringName.c_str()}; // here
+
+        Entity ent{this, stringName.c_str()};
+        _entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent;
         return ent;
+    }
+
+    Entity Scene::GetEntityWithUUID(std::string UUID)
+    {
+        return _entityMap[UUID];
     }
 
 }

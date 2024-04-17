@@ -82,13 +82,17 @@ namespace Engine
         std::array<InputValue, 4> GetCurrentTriggeredKeys() const { return _inputHandler->GetCurrentTriggeredKeys(); }
 
         /**
-        * Returns current mouse delta
+        * Returns current mouse pos
         */
-        Vector2 GetMouseDelta() const { return _inputHandler->GetMouseInputData().GetMoveValue().GetMouseDelta(); }
+        Vector2 GetAbsoluteMousePos() const { return _inputHandler->GetMouseInputData().GetMoveValue().GetAbsoluteMousePos(); }
         /**
         * Returns current mouse pos
         */
         Vector2 GetMousePos() const { return _inputHandler->GetMouseInputData().GetMoveValue().GetMousePos(); }
+        /**
+        * Returns current mouse delta
+        */
+        Vector2 GetMouseDelta() const { return _inputHandler->GetMouseInputData().GetMoveValue().GetMouseDelta(); }
         /**
         * Returns current mouse scroll deltas
         */

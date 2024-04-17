@@ -33,6 +33,7 @@ namespace Engine
     {
         if((_xInput != 0) || (_yInput != 0) || (_zInput != 0))
         {
+
             const float moveSpeed = _isSpeedUp ? 0.05f : 0.01f;
 
             //const auto transformMat = _transformComponent->Transform.GetQuaternion();
