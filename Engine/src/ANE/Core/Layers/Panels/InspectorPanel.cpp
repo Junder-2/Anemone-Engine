@@ -2,6 +2,7 @@
 #include "InspectorPanel.h"
 
 #include "imgui.h"
+#include "ANE/Core/Editor/SelectionManager.h"
 #include "ANE/Core/Scene/Components/RenderComponent.h"
 
 Engine::InspectorPanel::InspectorPanel()
@@ -30,10 +31,16 @@ void Engine::InspectorPanel::WipeSelect()
 void Engine::InspectorPanel::OnPanelRender()
 {
     ImGui::Begin("Inspection");
-    if(std::strcmp("",selected.c_str()) != 0) {
-        Entity selectedEntity = _EditorLayer->GetActiveScene()->GetEntityWithUUID(selected);
-
-        ImGui::Text(selected.c_str());
+    std::vector<std::string>* selectedEntityUUIDS = SelectionManager::GetSelection(SelectionManager::UI);
+    if(selectedEntityUUIDS->size() > 0){
+        const char* name = "Untagged entity";
+        Entity selectedEntity = _EditorLayer->GetActiveScene()->GetEntityWithUUID(selectedEntityUUIDS->at(0));
+        TagComponent Tag;
+        if(selectedEntity.TryGetComponent<TagComponent>(Tag))
+        {
+            name = Tag.Tag.c_str();
+        }
+        ImGui::Text("%s\n", name);
 
         for(auto&& curr : _EditorLayer->GetActiveScene()->_registry.storage())
         {
@@ -47,16 +54,16 @@ void Engine::InspectorPanel::OnPanelRender()
             selectedEntity.AddComponent<RenderComponent>();
         }
     }
-
     else
-        {
+    {
         ImGui::Text("Nothing selected");
 
-        }
-
+    }
     ImGui::End();
+
+}
 
     //ANE_LOG_INFO("Entering panel render phase");
 
 
-}
+
