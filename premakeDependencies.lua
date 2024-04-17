@@ -36,4 +36,4 @@ IncludeDir["Slang"] = "%{External.Slang}"
 LibraryDir = {}
 LibraryDir["SDL2"] = "%{External.SDL2}/lib/x64"
 LibraryDir["Vulkan"] = "%{VULKAN_SDK}/Lib/"
-LibraryDir["Slang"] = "%{External.Slang}/bin/windows-x64/release/"
+LibraryDir["Slang"] = "%{External.Slang}/lib/x64"
