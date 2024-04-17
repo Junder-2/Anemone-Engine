@@ -41,6 +41,7 @@ namespace Engine
 
     private:
         TransformComponent* _transformComponent {};
+        CameraComponent* _cameraComponent {};
         float _xInput = 0, _yInput = 0, _zInput = 0;
         float _pitchRadians = 0, _yawRadians = 0;
         bool _isSpeedUp;

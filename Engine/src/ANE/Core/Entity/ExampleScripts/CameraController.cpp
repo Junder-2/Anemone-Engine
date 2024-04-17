@@ -28,12 +28,13 @@ namespace Engine
         _transformComponent = &GetComponent<TransformComponent>();
         _transformComponent->Transform.SetPosition(Vector3{0, 0, -5});
 
-        const WindowProperties windowProps = Application::Get().GetWindow().GetProperties();
-        float w = (float)windowProps.Width, h = (float)windowProps.Height;
+        _cameraComponent = &GetComponent<CameraComponent>();
 
-        CameraComponent* camera = &GetComponent<CameraComponent>();
-        camera->SetPerspective(70.0f, w / h, 10000.f, 0.1f);
-        Renderer::SetViewProjection(ComputeViewProjMatrix(*camera));
+        const WindowProperties windowProps = Application::Get().GetWindow().GetProperties();
+        const float w = (float)windowProps.Width, h = (float)windowProps.Height;
+
+        _cameraComponent->SetPerspective(70.0f, w / h, 10000.f, 0.1f);
+        Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
     }
 
     void CameraController::OnUpdate(float deltaTime)
@@ -53,9 +54,9 @@ namespace Engine
             const Vector3 moveVector = (right + up + forward).GetNormalized();
             _transformComponent->Transform.AddPosition(moveVector* moveSpeed);
 
-            if (CameraComponent camera; TryGetComponent<CameraComponent>(camera))
+            if (_cameraComponent)
             {
-                Renderer::SetViewProjection(ComputeViewProjMatrix(camera));
+                Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
             }
         }
     }
@@ -87,9 +88,9 @@ namespace Engine
         _yawRadians += lookSpeed * delta.X;
         _transformComponent->Transform.SetRotation(Vector3{_pitchRadians, _yawRadians, 0});
 
-        if (CameraComponent camera; TryGetComponent<CameraComponent>(camera))
+        if (_cameraComponent)
         {
-            Renderer::SetViewProjection(ComputeViewProjMatrix(camera));
+            Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
         }
     }
 
@@ -105,9 +106,8 @@ namespace Engine
         const WindowResizeEvent& resizeEvent = dynamic_cast<WindowResizeEvent&>(event);
         const float w = (float)resizeEvent.GetWidth(), h = (float)resizeEvent.GetHeight();
 
-        CameraComponent* camera = &GetComponent<CameraComponent>();
-        camera->SetPerspective(70.0f, w / h, 10000.f, 0.1f);
-        Renderer::SetViewProjection(ComputeViewProjMatrix(*camera));
+        _cameraComponent->SetPerspective(70.0f, w / h, 10000.f, 0.1f);
+        Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
     }
 
     Matrix4x4 CameraController::ComputeViewProjMatrix(CameraComponent camera)
