@@ -274,14 +274,25 @@ namespace Engine
         features12.bufferDeviceAddress = true;
         features12.descriptorIndexing = true;
 
+        // Vulkan 1.1 features.
+        VkPhysicalDeviceVulkan11Features features11 = {};
+        features11.variablePointersStorageBuffer = VK_TRUE;
+        features11.variablePointers = VK_TRUE;
+
+        VkPhysicalDeviceFeatures deviceFeatures = {};
+        deviceFeatures.shaderInt64 = VK_TRUE;
+
         // Use VkBootstrap to select a gpu.
         // We want a gpu that can write to the SDL surface and supports vulkan 1.3 with the correct features.
         vkb::PhysicalDeviceSelector selector{ instance };
         vkb::PhysicalDevice physicalDevice = selector
             .set_minimum_version(1, 3)
 
+            .set_required_features(deviceFeatures)
+
             .set_required_features_13(features)
             .set_required_features_12(features12)
+            .set_required_features_11(features11)
 
             .prefer_gpu_device_type(vkb::PreferredDeviceType::discrete)
             .add_required_extension("VK_KHR_swapchain")
