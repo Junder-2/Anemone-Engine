@@ -519,10 +519,10 @@ namespace Engine
         slang::SessionDesc sessionDesc = { };
         sessionDesc.targets = &targetDesc;
         sessionDesc.targetCount = 1;
+        sessionDesc.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR;
         const char* paths[] = { "Shaders/" };
         sessionDesc.searchPaths = paths;
         sessionDesc.searchPathCount = 1;
-        sessionDesc.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR;
 
         ComPtr<slang::ISession> session;
         slangGlobalSession->createSession(sessionDesc, session.writeRef());
@@ -788,24 +788,7 @@ namespace Engine
         vkCmdSetScissor(cmd, 0, 1, &scissor);
 
         PushConstantBuffer pushConstants;
-        Matrix4x4 mat = GetViewProjectionMatrix();
-        // HLSL is column-major, GLSL, and thus GLM, are row-major, so we need to flip our matrix.
-        pushConstants.WorldMatrix[0][0] = mat[0][0];
-        pushConstants.WorldMatrix[0][1] = mat[1][0];
-        pushConstants.WorldMatrix[0][2] = mat[2][0];
-        pushConstants.WorldMatrix[0][3] = mat[3][0];
-        pushConstants.WorldMatrix[1][0] = mat[0][1];
-        pushConstants.WorldMatrix[1][1] = mat[1][1];
-        pushConstants.WorldMatrix[1][2] = mat[2][1];
-        pushConstants.WorldMatrix[1][3] = mat[3][1];
-        pushConstants.WorldMatrix[2][0] = mat[0][2];
-        pushConstants.WorldMatrix[2][1] = mat[1][2];
-        pushConstants.WorldMatrix[2][2] = mat[2][2];
-        pushConstants.WorldMatrix[2][3] = mat[3][2];
-        pushConstants.WorldMatrix[3][0] = mat[0][3];
-        pushConstants.WorldMatrix[3][1] = mat[1][3];
-        pushConstants.WorldMatrix[3][2] = mat[2][3];
-        pushConstants.WorldMatrix[3][3] = mat[3][3];
+        pushConstants.WorldMatrix = GetViewProjectionMatrix();
         pushConstants.VertexBuffer = _rectangleMesh.VertexBufferAddress;
 
         vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstantBuffer), &pushConstants);
