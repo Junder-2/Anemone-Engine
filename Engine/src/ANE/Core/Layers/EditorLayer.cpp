@@ -54,6 +54,9 @@ namespace Engine
         GetEditorInputSystem().BindMouseButton(MouseButtonLeft, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
         GetEditorInputSystem().BindMouseButton(MouseButtonRight, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
         GetEditorInputSystem().BindMouseButton(MouseButtonMiddle, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
+
+        //TEMP need to set the initial state should be elsewhere
+        EventHandler::SetBlockAppInputs(true);
     }
 
     void EditorLayer::OnDetach()
@@ -156,16 +159,16 @@ namespace Engine
 
     void EditorLayer::OnSwitchEditorFocus(InputValue inputValue)
     {
-        bool mouseVisible = IsMouseVisible();
+        bool blockingAppInputs = IsMouseVisible();
 
         if(inputValue.GetDeviceType() == InputDeviceKeyboard)
         {
+            if(inputValue.GetTriggerState() != TriggerStarted || blockingAppInputs) return;
             switch (inputValue.GetBindingId())
             {
                 case KeyCodeEscape:
-                    if(inputValue.GetTriggerState() != TriggerStarted) return;
                     ShowMouse();
-                    mouseVisible = true;
+                    blockingAppInputs = true;
                 break;
                 default: return;
             }
@@ -173,15 +176,15 @@ namespace Engine
         else if(inputValue.GetDeviceType() == InputDeviceMouse) //Any mouse click should return focus
         {
             //Reject any refocus it is not a doubleclick or if the mouse is not over viewport
-            if(inputValue.GetTriggerState() != TriggerStarted || !mouseVisible) return;
+            if(inputValue.GetTriggerState() != TriggerStarted || !blockingAppInputs) return;
             if(!GetInputSystem().GetMouseButtonValues().GetIsDoubleClick()) return;
             if(!Application::Get().GetWindow().IsOverViewport()) return;
 
             HideMouse();
-            mouseVisible = false;
+            blockingAppInputs = false;
         }
 
-        EventHandler::SetBlockAppInputs(mouseVisible);
+        EventHandler::SetBlockAppInputs(blockingAppInputs);
         EventHandler::ConsumeEvent();
     }
 

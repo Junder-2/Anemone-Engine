@@ -71,7 +71,7 @@ namespace Engine
         const bool prevHasFocus = HasFocus();
         const bool relativeMouseMode = SDL_GetRelativeMouseMode();
 
-        _imGuiHasFocus = ImGui::GetIO().WantCaptureKeyboard;
+        _imGuiHasFocus = ImGui::GetIO().WantCaptureKeyboard && !IsOverViewport();
 
         SDL_Event event;
         while(SDL_PollEvent(&event))
@@ -273,7 +273,7 @@ namespace Engine
         }
 
         const ImGuiWindow* imGuiWindow = ImGui::FindWindowByID(_activeViewportId);
-        return ViewportProperties(_activeViewportId, imGuiWindow->ContentSize.x, imGuiWindow->ContentSize.y, imGuiWindow->Pos.x, imGuiWindow->Pos.y);
+        return ViewportProperties(_activeViewportId, imGuiWindow->Size.x, imGuiWindow->Size.y, imGuiWindow->Pos.x, imGuiWindow->Pos.y);
     }
 
     void Window::SetActiveViewport(const uint32_t id)
@@ -310,6 +310,7 @@ namespace Engine
 
     void Window::SetMouseVisibility(const bool enable)
     {
+        // TODO: This seems to unfocus out of the window
         SDL_SetRelativeMouseMode(enable ? SDL_FALSE : SDL_TRUE);
     }
 

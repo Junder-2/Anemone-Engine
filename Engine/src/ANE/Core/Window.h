@@ -102,8 +102,8 @@ namespace Engine
         SDL_Window* _windowContext;
         WindowProperties _windowData;
 
-        uint32_t _activeViewportId;
-        uint32_t _previousViewportId;
+        uint32_t _activeViewportId = 0;
+        uint32_t _previousViewportId = 0;
         entt::dense_set<uint32_t> _viewports;
 
         SinglecastDelegate<void(Event&)> _eventDelegate;
