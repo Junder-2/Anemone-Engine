@@ -70,7 +70,8 @@ namespace Engine
         void AddViewport(const ViewportProperties& props);
         void RemoveViewport(uint32_t id);
 
-        void SetMouseVisibility(bool enable);
+        static void SetMouseVisibility(bool enable);
+        static bool IsMouseVisible();
 
         bool HasFocus() const { return !_imGuiHasFocus && _windowHasFocus; }
 

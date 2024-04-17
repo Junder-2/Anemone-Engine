@@ -19,12 +19,17 @@ namespace Engine
 
     void HideMouse()
     {
-        Application::Get().GetWindow().SetMouseVisibility(false);
+        Window::SetMouseVisibility(false);
     }
 
     void ShowMouse()
     {
-        Application::Get().GetWindow().SetMouseVisibility(true);
+        Window::SetMouseVisibility(true);
+    }
+
+    bool IsMouseVisible()
+    {
+        return Window::IsMouseVisible();
     }
 }
 

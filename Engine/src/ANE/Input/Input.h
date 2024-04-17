@@ -22,6 +22,11 @@ namespace Engine
     * Shows mouse/allows mouse to exit window
     */
     void ShowMouse();
+
+    /**
+    * Is mouse Visible
+    */
+    bool IsMouseVisible();
 }
 
 #include "ANE/Input/InputSystem.h"

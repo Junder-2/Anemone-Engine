@@ -311,11 +311,23 @@ namespace Engine
         _viewports.erase(id);
 
         _activeViewport = &_viewports[_windowData.Id];
+
+    bool Window::IsOverViewport() const
+    {
+        if(_activeViewportId == _windowData.Id) return !ImGui::GetIO().WantCaptureMouse;
+        const auto& rect = ImGui::FindWindowByID(_activeViewportId)->InnerRect;
+
+        return ImGui::IsMouseHoveringRect(rect.Min, rect.Max, false);
     }
 
     void Window::SetMouseVisibility(const bool enable)
     {
-        SDL_SetRelativeMouseMode(enable ? SDL_TRUE : SDL_FALSE);
+        SDL_SetRelativeMouseMode(enable ? SDL_FALSE : SDL_TRUE);
+    }
+
+    bool Window::IsMouseVisible()
+    {
+        return !SDL_GetRelativeMouseMode();
     }
 
     std::unique_ptr<Window> Window::Create(const WindowProperties& props)
