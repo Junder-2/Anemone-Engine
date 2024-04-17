@@ -3,7 +3,9 @@
 
 #include <glm/gtx/quaternion.hpp>
 
+#include "ANE/Core/Application.h"
 #include "ANE/Core/Scene/Components/CameraComponent.h"
+#include "ANE/Events/EventHandler.h"
 #include "ANE/Renderer/Renderer.h"
 
 namespace Engine
@@ -21,11 +23,16 @@ namespace Engine
 
         inputSystem.BindKeyboardInput(KeyCodeLShift, MakeDelegate(this, &CameraController::OnSpeedup));
 
+        EventHandler::BindEditorEvent(MakeDelegate(this, &CameraController::OnEditorEvent));
+
         _transformComponent = &GetComponent<TransformComponent>();
         _transformComponent->Transform.SetPosition(Vector3{0, 0, -5});
 
+        const WindowProperties windowProps = Application::Get().GetWindow().GetProperties();
+        float w = (float)windowProps.Width, h = (float)windowProps.Height;
+
         CameraComponent* camera = &GetComponent<CameraComponent>();
-        camera->SetPerspective(70.0f, 900.0f / 500.0f, 10000.f, 0.1f);
+        camera->SetPerspective(70.0f, w / h, 10000.f, 0.1f);
         Renderer::SetViewProjection(ComputeViewProjMatrix(*camera));
     }
 
@@ -89,6 +96,18 @@ namespace Engine
     void CameraController::OnSpeedup(InputValue inputValue)
     {
         _isSpeedUp = inputValue.GetTriggerState() == TriggerStarted || inputValue.GetTriggerState() == TriggerHolding;
+    }
+
+    void CameraController::OnEditorEvent(Event& event)
+    {
+        if (event.GetEventType() != EventType::WindowResize) return;
+
+        const WindowResizeEvent& resizeEvent = dynamic_cast<WindowResizeEvent&>(event);
+        const float w = (float)resizeEvent.GetWidth(), h = (float)resizeEvent.GetHeight();
+
+        CameraComponent* camera = &GetComponent<CameraComponent>();
+        camera->SetPerspective(70.0f, w / h, 10000.f, 0.1f);
+        Renderer::SetViewProjection(ComputeViewProjMatrix(*camera));
     }
 
     Matrix4x4 CameraController::ComputeViewProjMatrix(CameraComponent camera)

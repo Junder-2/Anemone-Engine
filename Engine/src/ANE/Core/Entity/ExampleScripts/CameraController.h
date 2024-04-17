@@ -35,6 +35,8 @@ namespace Engine
             ANE_LOG_INFO("Testing Button device({0}) id({1}): {2}", InputUtilities::ToString(inputValue.GetDeviceType()), inputValue.GetBindingId(), InputUtilities::ToString(inputValue.GetTriggerState()));
         }
 
+        void OnEditorEvent(Event& event);
+
         Matrix4x4 ComputeViewProjMatrix(CameraComponent camera);
 
     private:
