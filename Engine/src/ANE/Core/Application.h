@@ -4,7 +4,7 @@
 #include "Layers/LayerStack.h"
 #include "Window.h"
 #include "ANE/Events/Event.h"
-
+#include "ANE/Core/Layers/ImGuiLayer.h"
 #include "ANE/Input/InputHandler.h"
 
 namespace Engine
@@ -31,6 +31,7 @@ namespace Engine
 
         Window& GetWindow() const { return *_window; }
         InputHandler& GetInputHandler() const { return *_inputHandler; }
+        ImGuiLayer& GetImGuiLayer() const { return *_ImGuiLayer; }
         SubSystemCollection& GetSubsystemCollection() const { return *_subsystemCollection; }
 
         static Application& Get() { return *_appInstance; }
@@ -61,6 +62,7 @@ namespace Engine
 
         Uint64 _lastTimeStamp;
         LayerStack _layerStack;
+        ImGuiLayer* _ImGuiLayer;
     };
 
     Application* CreateApplication();

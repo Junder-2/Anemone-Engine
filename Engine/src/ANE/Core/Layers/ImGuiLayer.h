@@ -16,6 +16,7 @@ namespace Engine
         void OnDetach() override;
         void OnUpdate(float deltaTime) override;
         void OnEvent(Event& e) override;
+        static ImGuiLayer* Create(const char* str);
     private:
         void LogWindow(bool* open);
         void SceneViewWindow();

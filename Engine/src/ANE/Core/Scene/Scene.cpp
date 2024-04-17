@@ -123,7 +123,8 @@ namespace Engine
     [[nodiscard("Entity never used")]] Entity Scene::Create(std::string stringName)
     {
 
-        Entity ent{this, stringName.c_str()}; // here
+        Entity ent{this, stringName.c_str()};
+        _entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent;
         return ent;
     }
 
