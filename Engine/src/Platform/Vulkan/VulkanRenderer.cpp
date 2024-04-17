@@ -12,6 +12,10 @@
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
 #include <filesystem>
+#include <slang.h>
+#include <slang-com-ptr.h>
+
+using Slang::ComPtr;
 
 #include "MeshLoader.h"
 #include "VulkanInitializers.h"
@@ -504,24 +508,105 @@ namespace Engine
 
     PipelineWrapper VulkanRenderer::CreatePipeline(const vkb::Device& logicalDevice)
     {
-        VkShaderModule meshVertShader;
-        if (!VulkanUtils::LoadShaderModule("../shaders/triangle_mesh.vert.spv", _device, _allocator, &meshVertShader))
+        ComPtr<slang::IGlobalSession> slangGlobalSession;
+        createGlobalSession(slangGlobalSession.writeRef());
+
+        slang::TargetDesc targetDesc = { };
+        targetDesc.format = SLANG_SPIRV;
+        targetDesc.profile = slangGlobalSession->findProfile("glsl_440");
+        targetDesc.flags = SLANG_TARGET_FLAG_GENERATE_SPIRV_DIRECTLY;
+
+        slang::SessionDesc sessionDesc = { };
+        sessionDesc.targets = &targetDesc;
+        sessionDesc.targetCount = 1;
+        const char* paths[] = { "Shaders/" };
+        sessionDesc.searchPaths = paths;
+        sessionDesc.searchPathCount = 1;
+        sessionDesc.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR;
+
+        ComPtr<slang::ISession> session;
+        slangGlobalSession->createSession(sessionDesc, session.writeRef());
+
+        ComPtr<slang::IBlob> spirvVertProgram;
+        ComPtr<slang::IBlob> spirvFragProgram;
         {
-            ANE_ELOG_ERROR("Error when building the triangle vertex shader module");
+            const char* moduleName = "Mesh_Color";
+            ComPtr<slang::IBlob> diagnosticBlob;
+            slang::IModule* slangModule = session->loadModule(moduleName, diagnosticBlob.writeRef());
+            //diagnoseIfNeeded(diagnosticBlob);
+
+            if (!slangModule)
+            {
+                ANE_ELOG_ERROR("Error when loading shader module: {}", moduleName);
+            }
+
+            ComPtr<slang::IEntryPoint> vertEntry;
+            slangModule->findEntryPointByName("vertexMain", vertEntry.writeRef());
+
+            slang::IComponentType* components[] = { slangModule, vertEntry };
+            ComPtr<slang::IComponentType> program;
+            {
+                ComPtr<slang::IBlob> diagnosticsBlob;
+                SlangResult result = session->createCompositeComponentType(
+                    components,
+                    2,
+                    program.writeRef(),
+                    diagnosticsBlob.writeRef());
+                // diagnoseIfNeeded(diagnosticsBlob);
+                // RETURN_ON_FAIL(result);
+            }
+
+            {
+                ComPtr<slang::IBlob> diagnosticsBlob;
+                SlangResult result = program->getEntryPointCode(
+                    0, 0, spirvVertProgram.writeRef(), diagnosticsBlob.writeRef());
+                //diagnoseIfNeeded(diagnosticsBlob);
+                //RETURN_ON_FAIL(result);
+            }
+
+            ComPtr<slang::IEntryPoint> fragEntry;
+            slangModule->findEntryPointByName("fragmentMain", fragEntry.writeRef());
+
+            slang::IComponentType* components2[] = { slangModule, fragEntry };
+            ComPtr<slang::IComponentType> program2;
+            {
+                ComPtr<slang::IBlob> diagnosticsBlob;
+                SlangResult result = session->createCompositeComponentType(
+                    components2,
+                    2,
+                    program2.writeRef(),
+                    diagnosticsBlob.writeRef());
+                // diagnoseIfNeeded(diagnosticsBlob);
+                // RETURN_ON_FAIL(result);
+            }
+
+            {
+                ComPtr<slang::IBlob> diagnosticsBlob;
+                SlangResult result = program2->getEntryPointCode(
+                    0, 0, spirvFragProgram.writeRef(), diagnosticsBlob.writeRef());
+                //diagnoseIfNeeded(diagnosticsBlob);
+                //RETURN_ON_FAIL(result);
+            }
+        }
+
+        VkShaderModule meshVertShader;
+        if (!VulkanUtils::LoadShaderModule(spirvVertProgram, _device, _allocator, &meshVertShader))
+        {
+            ANE_ELOG_ERROR("Error when building vertex shader module: Mesh-Color.slang");
         }
         else
         {
-            ANE_ELOG_INFO("Loaded shader module: triangle_mesh.vert.spv");
+            ANE_ELOG_INFO("Built vertex shader module: Mesh-Color.slang");
         }
 
         VkShaderModule meshFragShader;
-        if (!VulkanUtils::LoadShaderModule("../shaders/triangle_mesh.frag.spv", _device, _allocator, &meshFragShader))
+        if (!VulkanUtils::LoadShaderModule(spirvFragProgram, _device, _allocator, &meshFragShader))
         {
-            ANE_ELOG_ERROR("Error when building the triangle fragment shader module.");
+            ANE_ELOG_ERROR("Error when building fragment shader module: Mesh-Color.slang");
         }
         else
         {
-            ANE_ELOG_INFO("Loaded shader module: triangle_mesh.frag.spv");
+            ANE_ELOG_INFO("Built fragment shader module: Mesh-Color.slang");
         }
 
         VkPushConstantRange bufferRange;
