@@ -22,7 +22,7 @@ namespace Engine
         inputSystem.BindKeyboardInput(KeyCodeLShift, MakeDelegate(this, &CameraController::OnSpeedup));
 
         _transformComponent = &GetComponent<TransformComponent>();
-        _transformComponent->Transform.SetPosition(Vector3{0, 0, -2});
+        _transformComponent->Transform.SetPosition(Vector3{0, 0, -5});
 
         CameraComponent* camera = &GetComponent<CameraComponent>();
         camera->SetPerspective(70.0f, 900.0f / 500.0f, 10000.f, 0.1f);
