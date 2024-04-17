@@ -1,7 +1,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="/Resources/Branding/anemone_logo_turquoise_white.png">
   <source media="(prefers-color-scheme: light)" srcset="/Resources/Branding/anemone_logo_turquoise_black.png">
-  <img alt="Shows the logo which reads 'ANEMONE engine' and has the 'o' in 'ANEMONE' replaced with a turquoise anemone flower." src="/Resources/Branding/anemone_logo_turquoise_black.png">
+  <img alt="Shows the logo which reads 'ANEMONE engine' and has the 'o' in 'ANEMONE' replaced with a turquoise anemone flower." title="Anemone Engine logo designed by Terese Jerfström" src="/Resources/Branding/anemone_logo_turquoise_black.png">
 </picture>
 
 # Anemone Engine [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/Junder-2/Anemone-Engine/blob/main/LICENSE)
