@@ -51,6 +51,13 @@ namespace Engine
     }
 
 
+    ImGuiLayer* ImGuiLayer::Create(const char* str)
+    {
+        return new ImGuiLayer(str);
+
+    }
+
+
     void ImGuiLayer::OnUIRender()
     {
         bool open = true;
@@ -226,6 +233,7 @@ namespace Engine
     {
         static ImGuiWindowFlags windowflags = ImGuiWindowFlags_NoCollapse;
         ImGui::Begin("HierarchyWindow", nullptr, windowflags);
+
         ImGui::End();
     }
 

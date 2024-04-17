@@ -14,6 +14,8 @@ namespace Engine
         InspectorPanel();
         InspectorPanel(EditorLayer* editorLayer);
         ~InspectorPanel();
+
+
 static void RegisterSelect(UUIDComponent selectedEntityID);
 static void WipeSelect();
 

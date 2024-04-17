@@ -12,10 +12,7 @@ public:
     {
 
         Engine::EditorLayer* editorLayer = new Engine::EditorLayer("EditorLayer");
-        Engine::ImGuiLayer* ImGuiLayer = new Engine::ImGuiLayer("ImGuiLayer");
-
         PushLayer(editorLayer);
-        PushLayer(ImGuiLayer);
     }
     ~Editor() { }
 };

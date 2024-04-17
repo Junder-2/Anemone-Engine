@@ -43,6 +43,8 @@ namespace Engine
 
         _subsystemCollection = SubSystemCollection::Create();
 
+        _ImGuiLayer = ImGuiLayer::Create("ImGuiLayer");
+        PushLayer(_ImGuiLayer);
         Renderer::Init(_window->GetWindowContext());
     }
 

@@ -8,6 +8,7 @@
 
 //Temp includes. Can probably change how these components are referenced. Maybe a scene manager hsould be in charge of that
 //kind of thing
+#include "imgui_internal.h"
 #include "ANE/Core/Application.h"
 #include "ANE/Core/Entity/ExampleScripts/CameraController.h"
 #include "ANE/Core/Scene/Components/CameraComponent.h"
@@ -23,7 +24,6 @@ namespace Engine
     #ifndef MM_IEEE_ASSERT
     #define MM_IEEE_ASSERT(x) assert(x)
     #endif
-
     #define MM_IEEE_IMGUI_PAYLOAD_TYPE_ENTITY "MM_IEEE_ENTITY"
 
     #ifndef MM_IEEE_ENTITY_WIDGET
@@ -58,6 +58,7 @@ namespace Engine
 
     void EditorLayer::OnDetach()
     {
+
     }
 
     void EditorLayer::OnEvent(Event& e)
@@ -68,34 +69,32 @@ namespace Engine
 
     void EditorLayer::OnUIRender()
     {
+        ImGuiIO& io = ImGui::GetIO();
+        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) || (ImGui::IsMouseClicked(ImGuiMouseButton_Right)))
+        {
+            ImGui::FocusWindow(GImGui->HoveredWindow);
+        }
         for (UILayerPanel* panel : _UIpanels)
         {
             if(panel->_isVisible)
             {
                 panel->OnPanelRender();
             }
-        ImGui::Begin("Hello");
-        if(ImGui::Button("Button"))
-        {
-            Entity ent = GetActiveScene()->Create("Square Entity");
-
-        }
-        ImGui::End();
-
             /*There is a chance we will have situation where UI is not visible but still needs to do something
-            like maintaining a dockspace or something like that. This loop is for that situation.
-            If it remains empty for ages we can delete it but leaving it HEAP_REALLOC_IN_PLACE_ONLY*/
+          like maintaining a dockspace or something like that. This loop is for that situation.
+          If it remains empty for ages we can delete it but leaving it for now*/
+
             if(panel->_isEnabled)
             {
-                //panel->doWindowLayoutmaitenance
+                //panel->doWindowMaintenance
             }
         }
+        ImGui::Begin("Editor");
+        ImGui::End();
 
-        // These should be moved later
 
-
-        //ImGui::ShowDemoWindow();
     }
+
 
     void EditorLayer::Init()
     {
@@ -135,10 +134,10 @@ namespace Engine
             std::string string = "Entity";
             string.append(std::to_string(i));
             string.append("\n");
-            _activeScene->Create(string);
+            GetActiveScene()->Create(string);
         }
         //Add component to entity
-        ent.AddComponent<RenderComponent>();
+        //ent.AddComponent<RenderComponent>();
         ent.AddComponent<CameraComponent>();
         ent.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 

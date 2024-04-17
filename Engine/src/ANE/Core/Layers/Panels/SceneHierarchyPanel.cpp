@@ -17,8 +17,16 @@ Engine::SceneHierarchyPanel::SceneHierarchyPanel(std::unordered_map<const char*,
 void Engine::SceneHierarchyPanel::OnPanelRender()
 {
     ImGui::Begin("Scene Hierarchy");
+    static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+    dockspace_flags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
 
-    //ANE_LOG_INFO("Entering panel render phase");
+    ImGuiIO& io = ImGui::GetIO();
+    if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+    {
+        ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+        ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+    }
+     //ANE_LOG_INFO("Entering panel render phase");
 
         for (auto& it: *_managedScenes) {
             if (ImGui::CollapsingHeader(it.first))
