@@ -156,7 +156,7 @@ namespace Engine
 
     void EditorLayer::OnSwitchEditorFocus(InputValue inputValue)
     {
-        const bool editorHasFocus = EventHandler::IsBlockingAppInputs();
+        bool mouseVisible = IsMouseVisible();
 
         if(inputValue.GetDeviceType() == InputDeviceKeyboard)
         {
@@ -164,26 +164,24 @@ namespace Engine
             {
                 case KeyCodeEscape:
                     if(inputValue.GetTriggerState() != TriggerStarted) return;
+                    ShowMouse();
+                    mouseVisible = true;
                 break;
                 default: return;
             }
         }
         else if(inputValue.GetDeviceType() == InputDeviceMouse) //Any mouse click should return focus
         {
-            if(!editorHasFocus && inputValue.GetTriggerState() == TriggerStarted)
-            {
-                ShowMouse();
-            }
+            //Reject any refocus it is not a doubleclick or if the mouse is not over viewport
+            if(inputValue.GetTriggerState() != TriggerStarted || !mouseVisible) return;
+            if(!GetInputSystem().GetMouseButtonValues().GetIsDoubleClick()) return;
+            if(!Application::Get().GetWindow().IsOverViewport()) return;
 
-            if(inputValue.GetTriggerState() != TriggerStarted || !editorHasFocus) return;
-        }
-
-        EventHandler::SetBlockAppInputs(!editorHasFocus);
-        if(!editorHasFocus)
-        {
             HideMouse();
+            mouseVisible = false;
         }
-       // _showMenuBar = !editorHasFocus;
+
+        EventHandler::SetBlockAppInputs(mouseVisible);
         EventHandler::ConsumeEvent();
     }
 
