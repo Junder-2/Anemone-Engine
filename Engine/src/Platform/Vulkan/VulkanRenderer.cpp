@@ -348,53 +348,7 @@ namespace Engine
         _swapchainImages = swapchain.get_images().value();
         _swapchainImageViews = swapchain.get_image_views().value();
 
-        const VkExtent3D imageExtent = { (uint32_t)w, (uint32_t)h, 1 };
-
-        // Setup color buffer.
-        _colorImage.ImageFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
-        _colorImage.ImageExtent = imageExtent;
-
-        VkImageUsageFlags drawImageUsages{};
-        drawImageUsages |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-        drawImageUsages |= VK_IMAGE_USAGE_STORAGE_BIT;
-        drawImageUsages |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-
-        const VkImageCreateInfo cImgInfo = VulkanInitializers::ImageCreateInfo(_colorImage.ImageFormat, drawImageUsages, imageExtent);
-
-        VmaAllocationCreateInfo cImgAllocInfo = { };
-        cImgAllocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
-        cImgAllocInfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-        CheckVkResult(vmaCreateImage(_vmaAllocator, &cImgInfo, &cImgAllocInfo, &_colorImage.Image, &_colorImage.Allocation, nullptr));
-
-        const VkImageViewCreateInfo cViewInfo = VulkanInitializers::ImageViewCreateInfo(_colorImage.ImageFormat, _colorImage.Image, VK_IMAGE_ASPECT_COLOR_BIT);
-
-        CheckVkResult(vkCreateImageView(_device, &cViewInfo, _allocator, &_colorImage.ImageView));
-
-        // Setup depth buffer.
-        _depthImage.ImageFormat = VK_FORMAT_D32_SFLOAT;
-        _depthImage.ImageExtent = imageExtent;
-
-        VkImageUsageFlags depthImageUsages{};
-        depthImageUsages |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-
-        const VkImageCreateInfo dImgInfo = VulkanInitializers::ImageCreateInfo(_depthImage.ImageFormat, depthImageUsages, imageExtent);
-
-        CheckVkResult(vmaCreateImage(_vmaAllocator, &dImgInfo, &cImgAllocInfo, &_depthImage.Image, &_depthImage.Allocation, nullptr));
-
-        const VkImageViewCreateInfo dViewInfo = VulkanInitializers::ImageViewCreateInfo(_depthImage.ImageFormat, _depthImage.Image, VK_IMAGE_ASPECT_DEPTH_BIT);
-
-        CheckVkResult(vkCreateImageView(_device, &dViewInfo, _allocator, &_depthImage.ImageView));
-
-        // Cleanup.
-        _mainDeletionQueue.PushFunction([=]
-        {
-            vkDestroyImageView(_device, _colorImage.ImageView, _allocator);
-            vmaDestroyImage(_vmaAllocator, _colorImage.Image, _colorImage.Allocation);
-
-            vkDestroyImageView(_device, _depthImage.ImageView, _allocator);
-            vmaDestroyImage(_vmaAllocator, _depthImage.Image, _depthImage.Allocation);
-        });
+        CreateMainBuffers(w, h);
     }
 
     vkb::Swapchain VulkanRenderer::CreateSwapchain(const uint32_t width, const uint32_t height)
@@ -443,6 +397,75 @@ namespace Engine
         _swapchainImageViews = swapchain.get_image_views().value();
 
         _rebuildSwapchain = false;
+    }
+
+    void VulkanRenderer::CreateMainBuffers(const uint32_t width, const uint32_t height)
+    {
+        const VkExtent3D imageExtent = { width, height, 1 };
+
+        // Setup color buffer.
+        _colorImage.ImageFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
+        _colorImage.ImageExtent = imageExtent;
+
+        VkImageUsageFlags drawImageUsages{};
+        drawImageUsages |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+        drawImageUsages |= VK_IMAGE_USAGE_STORAGE_BIT;
+        drawImageUsages |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+        const VkImageCreateInfo cImgInfo = VulkanInitializers::ImageCreateInfo(_colorImage.ImageFormat, drawImageUsages, imageExtent);
+
+        VmaAllocationCreateInfo cImgAllocInfo = { };
+        cImgAllocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+        cImgAllocInfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+        CheckVkResult(vmaCreateImage(_vmaAllocator, &cImgInfo, &cImgAllocInfo, &_colorImage.Image, &_colorImage.Allocation, nullptr));
+
+        const VkImageViewCreateInfo cViewInfo = VulkanInitializers::ImageViewCreateInfo(_colorImage.ImageFormat, _colorImage.Image, VK_IMAGE_ASPECT_COLOR_BIT);
+
+        CheckVkResult(vkCreateImageView(_device, &cViewInfo, _allocator, &_colorImage.ImageView));
+
+        // Setup depth buffer.
+        _depthImage.ImageFormat = VK_FORMAT_D32_SFLOAT;
+        _depthImage.ImageExtent = imageExtent;
+
+        VkImageUsageFlags depthImageUsages{};
+        depthImageUsages |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+
+        const VkImageCreateInfo dImgInfo = VulkanInitializers::ImageCreateInfo(_depthImage.ImageFormat, depthImageUsages, imageExtent);
+
+        CheckVkResult(vmaCreateImage(_vmaAllocator, &dImgInfo, &cImgAllocInfo, &_depthImage.Image, &_depthImage.Allocation, nullptr));
+
+        const VkImageViewCreateInfo dViewInfo = VulkanInitializers::ImageViewCreateInfo(_depthImage.ImageFormat, _depthImage.Image, VK_IMAGE_ASPECT_DEPTH_BIT);
+
+        CheckVkResult(vkCreateImageView(_device, &dViewInfo, _allocator, &_depthImage.ImageView));
+    }
+
+    void VulkanRenderer::DestroyMainBuffers()
+    {
+        vkDestroyImageView(_device, _colorImage.ImageView, _allocator);
+        vmaDestroyImage(_vmaAllocator, _colorImage.Image, _colorImage.Allocation);
+
+        vkDestroyImageView(_device, _depthImage.ImageView, _allocator);
+        vmaDestroyImage(_vmaAllocator, _depthImage.Image, _depthImage.Allocation);
+    }
+
+    void VulkanRenderer::ResizeMainBuffers()
+    {
+        int w, h;
+        SDL_GetWindowSize(_window, &w, &h);
+        _windowExtent.width = w;
+        _windowExtent.height = h;
+
+        ResizeMainBuffers(w, h);
+    }
+
+    void VulkanRenderer::ResizeMainBuffers(const uint32_t width, const uint32_t height)
+    {
+        vkDeviceWaitIdle(_device);
+
+        DestroyMainBuffers();
+
+        CreateMainBuffers(width, height);
     }
 
     void VulkanRenderer::SetupCommandBuffers()
@@ -685,6 +708,7 @@ namespace Engine
             if (props.Width > 0 && props.Height > 0)
             {
                 ResizeSwapchain();
+                ResizeMainBuffers();
             }
         }
 
@@ -818,6 +842,8 @@ namespace Engine
         ImGui_ImplVulkanH_DestroyWindow(_instance, _device, &_mainWindowData, _allocator);
 
         _mainDeletionQueue.Flush();
+
+        DestroyMainBuffers();
 
         DestroySwapchain();
 
