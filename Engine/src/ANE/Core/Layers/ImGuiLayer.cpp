@@ -16,7 +16,6 @@ namespace Engine
         //EnableFlag("LogWindow");
         //EnableFlag("SceneViewWindow");
         //EnableFlag("HierarchyWindow");
-
         GetEditorInputSystem().BindKeyboardInput(KeyCodeB, MakeDelegate(this, &ImGuiLayer::AddDebugMessage));
         // GetInputSystem().BindKeyboardInput(KeyCodeB, MakeDelegate(this, &ImGuiLayer::AddDebugMessage));
     }
