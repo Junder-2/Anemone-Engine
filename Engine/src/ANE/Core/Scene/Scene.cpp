@@ -107,6 +107,25 @@ namespace Engine
                 scriptComponent.OnUpdateFunction(timeStep);
             });
         }
+
+        SubmitDrawCommands();
+    }
+
+    void Scene::SubmitDrawCommands()
+    {
+        // TODO: Sort based on pivot or bounds.
+        const auto view = _registry.view<TransformComponent, RenderComponent>();
+        for (entt::entity entity : view)
+        {
+            auto [transform, renderer] = view.get<TransformComponent, RenderComponent>(entity);
+
+            DrawCommand draw = {};
+            draw.ModelMatrix = transform.Transform.GetLocalToWorld();
+            draw.VertexCount = renderer.Model.NumVertices;
+            draw.MeshBuffers = renderer.Model.MeshBuffers;
+
+            Renderer::SubmitDrawCommand(draw);
+        }
     }
 
     /**
