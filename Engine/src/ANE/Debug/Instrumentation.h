@@ -2,6 +2,8 @@
 
 #pragma once
 
+#ifdef ANE_DEBUG
+
 #include "ANE/Core/Log/Logging.h"
 #include <fstream>
 
@@ -196,6 +198,8 @@ namespace Engine
 	}
 }
 
+#endif
+
 // Set the level of profiling
 #define ANE_ACTIVE_PROFILE_LEVEL PROFILE_LEVEL_OFF
 
@@ -248,4 +252,8 @@ namespace Engine
 #else
     #define ANE_DEEP_PROFILE_SCOPE(name)
     #define ANE_DEEP_PROFILE_FUNCTION()
+#endif
+
+#ifndef ANE_DEBUG
+#define ANE_ACTIVE_PROFILE_LEVEL 0  // NOLINT(clang-diagnostic-macro-redefined)
 #endif
