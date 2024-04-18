@@ -96,8 +96,6 @@ namespace Engine
 
         static void CreateImGuiDescriptorPool();
 
-        inline static Matrix4x4 GetViewProjectionMatrix();
-
         inline static void Draw(const WindowProperties& props);
         inline static void DrawGeometry(VkCommandBuffer cmd);
         inline static void DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView);
