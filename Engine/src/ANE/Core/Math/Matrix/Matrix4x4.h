@@ -180,10 +180,10 @@ namespace Engine
 
         friend Vector4 operator*(const Matrix4x4& matrix, const Vector4& vector)
         {
-            return {matrix[0][0]*vector.X + matrix[0][1]*vector.Y + matrix[0][2]*vector.Z + matrix[0][3]*vector.W,
-                    matrix[1][0]*vector.X + matrix[1][1]*vector.Y + matrix[1][2]*vector.Z + matrix[1][3]*vector.W,
-                    matrix[2][0]*vector.X + matrix[2][1]*vector.Y + matrix[2][2]*vector.Z + matrix[2][3]*vector.W,
-                    matrix[3][0]*vector.X + matrix[3][1]*vector.Y + matrix[3][2]*vector.Z + matrix[3][3]*vector.W};
+            return {matrix[0][0]*vector.X + matrix[0][1]*vector.Y + matrix[2][0]*vector.Z + matrix[3][0]*vector.W,
+                    matrix[0][1]*vector.X + matrix[1][1]*vector.Y + matrix[2][1]*vector.Z + matrix[3][1]*vector.W,
+                    matrix[0][2]*vector.X + matrix[1][2]*vector.Y + matrix[2][2]*vector.Z + matrix[3][2]*vector.W,
+                    matrix[0][3]*vector.X + matrix[1][3]*vector.Y + matrix[2][3]*vector.Z + matrix[3][3]*vector.W};
         }
 
         std::string ToString() const;

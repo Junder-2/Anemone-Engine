@@ -164,9 +164,9 @@ namespace Engine
 
         friend Vector3 operator*(const Matrix3x3& matrix, const Vector3& vector)
         {
-            return {matrix[0][0]*vector.X + matrix[0][1]*vector.Y + matrix[0][2]*vector.Z,
-                    matrix[1][0]*vector.X + matrix[1][1]*vector.Y + matrix[1][2]*vector.Z,
-                   matrix[2][0]*vector.X + matrix[2][1]*vector.Y + matrix[2][2]*vector.Z};
+            return {matrix[0][0]*vector.X + matrix[1][0]*vector.Y + matrix[2][0]*vector.Z,
+                    matrix[0][1]*vector.X + matrix[1][1]*vector.Y + matrix[2][1]*vector.Z,
+                   matrix[0][2]*vector.X + matrix[1][2]*vector.Y + matrix[2][2]*vector.Z};
         }
 
         std::string ToString() const;
