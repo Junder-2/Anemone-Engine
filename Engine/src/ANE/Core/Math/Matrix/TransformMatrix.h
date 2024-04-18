@@ -8,7 +8,7 @@ namespace Engine
     struct TransformMatrix
     {
     public:
-        TransformMatrix(const Matrix4x4& transform = Matrix4x4::Identity()) : _worldToLocal(transform) {}
+        TransformMatrix(const Matrix4x4& transform = Matrix4x4::Identity()) : _localToWorld(transform) {}
         TransformMatrix(const TransformMatrix&) = default;
 
         /**
@@ -17,7 +17,7 @@ namespace Engine
          */
         void SetPosition(const Vector3 newPosition)
         {
-            _worldToLocal[3] = Vector4(newPosition, 1);
+            _localToWorld[3] = Vector4(newPosition, 1);
         }
 
         /**
@@ -26,7 +26,7 @@ namespace Engine
          */
         void AddPosition(const Vector3 delta)
         {
-            _worldToLocal.AddPosition(delta);
+            _localToWorld.AddPosition(delta);
         }
 
         /**
@@ -35,81 +35,81 @@ namespace Engine
          */
         void AddLocalPosition(const Vector3 delta)
         {
-            _worldToLocal.Translate(delta);
+            _localToWorld.Translate(delta);
         }
 
         void SetRotation(const Vector3 newRotation, const bool isDegrees = false)
         {
-            _worldToLocal.SetRotation(newRotation, isDegrees);
+            _localToWorld.SetRotation(newRotation, isDegrees);
         }
 
         Vector3 GetPosition() const
         {
-            return _worldToLocal.GetPosition();
+            return _localToWorld.GetPosition();
         }
 
         void SetRotation(const Quaternion newRotation)
         {
-            _worldToLocal.SetRotation(newRotation);
+            _localToWorld.SetRotation(newRotation);
         }
 
         //TODO: Add rotation are not properly working
         void AddRotation(const Vector3 delta, const bool isDegrees = false)
         {
-            _worldToLocal.SetRotation(delta, isDegrees);
+            _localToWorld.SetRotation(delta, isDegrees);
         }
 
         void AddRotation(const Quaternion delta)
         {
-            _worldToLocal.Rotate(delta);
+            _localToWorld.Rotate(delta);
         }
 
         Vector3 GetEulerAngles(const bool isDegrees = false) const
         {
-            return _worldToLocal.GetEulerAngles(isDegrees);
+            return _localToWorld.GetEulerAngles(isDegrees);
         }
 
         Quaternion GetQuaternion() const
         {
-            return _worldToLocal.GetQuaternion();
+            return _localToWorld.GetQuaternion();
         }
 
         void Scale(const Vector3 scale)
         {
-            _worldToLocal.Scale(scale);
+            _localToWorld.Scale(scale);
         }
 
         Vector3 GetScale() const
         {
-            return _worldToLocal.GetScale();
+            return _localToWorld.GetScale();
         }
 
         Matrix4x4 GetWorldToLocal() const
         {
-            return _worldToLocal;
+            return _localToWorld.GetInverse();
         }
 
         Matrix4x4 GetLocalToWorld() const
         {
-            return _worldToLocal.GetInverse();
+            return _localToWorld;
         }
 
         Vector3 GetRight() const
         {
-            return _worldToLocal.GetRight();
+            return _localToWorld.GetRight();
         }
 
         Vector3 GetUp() const
         {
-            return _worldToLocal.GetUp();
+            return _localToWorld.GetUp();
         }
 
         Vector3 GetForward() const
         {
-            return _worldToLocal.GetForward();
+            return _localToWorld.GetForward();
         }
 
     private:
-        Matrix4x4 _worldToLocal;
+        Matrix4x4 _localToWorld;
     };
 }
