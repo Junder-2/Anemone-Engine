@@ -5,11 +5,8 @@ extern Engine::Application* Engine::CreateApplication();
 
 int main(int argc, char* argv[])
 {
-    Engine::Logging::InitEngine();
-	ANE_ELOG_INFO("Engine Initialized");
-    const std::string appName = Engine::GetApplicationName();
-	Engine::Logging::InitApp(appName);
-	ANE_LOG_INFO(appName + " Initialized");
+    Engine::Logging::Init(Engine::GetApplicationName());
+	ANE_ELOG_INFO("Logging initialized");
 
     ANE_PROFILE_BEGIN_SESSION("Startup", appName + "-Profile-Startup.json");
 	auto app = Engine::CreateApplication();

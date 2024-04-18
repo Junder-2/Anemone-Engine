@@ -1,47 +1,93 @@
 #include "anepch.h"
 #include "Logging.h"
 
+#include "LogSink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 
 namespace Engine
 {
-    std::shared_ptr<spdlog::logger> Logging::_engineLogger;
-    std::shared_ptr<spdlog::logger> Logging::_appLogger;
+    const std::string DEFAULT_PATTERN = "%^[%n %L %T] [%s:%#] %v%$";
+    const std::string ENGINE_LOGGER_NAME = "Engine";
+    static std::string _appLoggerName = "app";
 
-    void Logging::InitEngine()
+    const std::string LOGGER_NAME_PATTERN = "%n %L";
+    const std::string SOURCE_PATTERN = "%s:%#";
+    const std::string TIME_PATTERN = "%T";
+
+    static spdlog::pattern_formatter LoggerNameFormatter(LOGGER_NAME_PATTERN);
+    static spdlog::pattern_formatter SourceFormatter(SOURCE_PATTERN);
+    static spdlog::pattern_formatter TimeFormatter(TIME_PATTERN);
+
+    void Logging::Init(const std::string& appName)
     {
-        #ifndef ANE_DIST
-        if(_engineLogger != nullptr) return;
-        spdlog::set_pattern("%^[%n %L %T] [%s:%#] %v%$");
+        spdlog::set_pattern(DEFAULT_PATTERN);
+        spdlog::set_level(spdlog::level::trace);
 
-        _engineLogger = spdlog::stdout_color_mt("ENGINE");
-        _engineLogger->set_level(spdlog::level::trace);
-        #endif
+        std::shared_ptr<spdlog::logger> engineLogger = CreateLogger(ENGINE_LOGGER_NAME);
+        std::shared_ptr<spdlog::logger> appLogger = CreateLogger(appName);
+
+        _appLoggerName = appName;
     }
 
-    void Logging::InitApp(const std::string& appName)
+    std::shared_ptr<spdlog::logger> Logging::CreateLogger(const std::string& loggerName)
     {
-        #ifndef ANE_DIST
-        if(GetEngineLogger() == nullptr || _appLogger != nullptr) return;
-        _appLogger = spdlog::stdout_color_mt(appName);
-        _appLogger->set_level(spdlog::level::trace);
-        #endif
+        auto defaultSink = std::make_shared<spdlog::sinks::wincolor_stdout_sink_mt>();
+        auto newLogger = std::make_shared<spdlog::logger>(loggerName, std::move(defaultSink));
+        auto loggerSink = std::make_shared<LogSink>();
+        loggerSink->BindSink(MakeDelegate(&Logging::OnSink));
+        newLogger->sinks().push_back(std::move(loggerSink));
+
+        spdlog::details::registry::instance().initialize_logger(newLogger);
+
+        return newLogger;
     }
 
-    std::shared_ptr<spdlog::logger>& Logging::GetEngineLogger()
+    spdlog::logger& Logging::GetEngineLogger()
     {
-        if(_engineLogger == nullptr)
+        return GetLogger(ENGINE_LOGGER_NAME);
+    }
+
+    spdlog::logger& Logging::GetAppLogger()
+    {
+        return GetLogger(_appLoggerName);
+    }
+
+    spdlog::logger& Logging::GetLogger(std::string const& name)
+    {
+        auto logger = spdlog::get(name);
+        if(logger == nullptr)
         {
-            // We have to use built in as normal logger doesnt exist yet
-            SPDLOG_ERROR("Engine logger not yet initialized");
-            ANE_DEBUG_BREAK();
+            logger = CreateLogger(name);
         }
-        return _engineLogger;
+        return *logger;
     }
 
-    std::shared_ptr<spdlog::logger>& Logging::GetAppLogger()
+    const std::list<LogMessage>& Logging::GetMessages()
     {
-        ANE_EASSERT(_appLogger, "App logger not yet initialized");
-        return _appLogger;
+        return _logMessages;
+    }
+
+    void Logging::OnSink(const log_msg& logMsg)
+    {
+        if(_logMessages.size() >= 100)
+        {
+            _logMessages.pop_back();
+        }
+
+        LogMessage newLogMessage;
+
+        LoggerNameFormatter.format(logMsg, newLogMessage.LoggerName);
+        newLogMessage.LoggerName.erase(newLogMessage.LoggerName.length()-2); //spdlog appends linebreaks
+
+        TimeFormatter.format(logMsg, newLogMessage.Time);
+        newLogMessage.Time.erase(newLogMessage.Time.length()-2);
+
+        SourceFormatter.format(logMsg, newLogMessage.Source);
+        newLogMessage.Source.erase(newLogMessage.Source.length()-2);
+
+        newLogMessage.Message = logMsg.payload;
+        newLogMessage.Level = logMsg.level;
+
+        _logMessages.push_front(newLogMessage);
     }
 }
