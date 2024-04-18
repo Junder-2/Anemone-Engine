@@ -54,6 +54,9 @@ namespace Engine
         GetEditorInputSystem().BindMouseButton(MouseButtonLeft, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
         GetEditorInputSystem().BindMouseButton(MouseButtonRight, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
         GetEditorInputSystem().BindMouseButton(MouseButtonMiddle, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
+
+        //TEMP need to set the initial state should be elsewhere
+        EventHandler::SetBlockAppInputs(true);
     }
 
     void EditorLayer::OnDetach()
@@ -156,34 +159,32 @@ namespace Engine
 
     void EditorLayer::OnSwitchEditorFocus(InputValue inputValue)
     {
-        const bool editorHasFocus = EventHandler::IsBlockingAppInputs();
+        bool blockingAppInputs = IsMouseVisible();
 
         if(inputValue.GetDeviceType() == InputDeviceKeyboard)
         {
+            if(inputValue.GetTriggerState() != TriggerStarted || blockingAppInputs) return;
             switch (inputValue.GetBindingId())
             {
                 case KeyCodeEscape:
-                    if(inputValue.GetTriggerState() != TriggerStarted) return;
+                    ShowMouse();
+                    blockingAppInputs = true;
                 break;
                 default: return;
             }
         }
         else if(inputValue.GetDeviceType() == InputDeviceMouse) //Any mouse click should return focus
         {
-            if(!editorHasFocus && inputValue.GetTriggerState() == TriggerStarted)
-            {
-                ShowMouse();
-            }
+            //Reject any refocus it is not a doubleclick or if the mouse is not over viewport
+            if(inputValue.GetTriggerState() != TriggerStarted || !blockingAppInputs) return;
+            if(!GetInputSystem().GetMouseButtonValues().GetIsDoubleClick()) return;
+            if(!Application::Get().GetWindow().IsOverViewport()) return;
 
-            if(inputValue.GetTriggerState() != TriggerStarted || !editorHasFocus) return;
-        }
-
-        EventHandler::SetBlockAppInputs(!editorHasFocus);
-        if(!editorHasFocus)
-        {
             HideMouse();
+            blockingAppInputs = false;
         }
-       // _showMenuBar = !editorHasFocus;
+
+        EventHandler::SetBlockAppInputs(blockingAppInputs);
         EventHandler::ConsumeEvent();
     }
 

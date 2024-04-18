@@ -35,10 +35,13 @@ namespace Engine
             ANE_LOG_INFO("Testing Button device({0}) id({1}): {2}", InputUtilities::ToString(inputValue.GetDeviceType()), inputValue.GetBindingId(), InputUtilities::ToString(inputValue.GetTriggerState()));
         }
 
+        void OnEditorEvent(Event& event);
+
         Matrix4x4 ComputeViewProjMatrix(CameraComponent camera);
 
     private:
         TransformComponent* _transformComponent {};
+        CameraComponent* _cameraComponent {};
         float _xInput = 0, _yInput = 0, _zInput = 0;
         float _pitchRadians = 0, _yawRadians = 0;
         bool _isSpeedUp;

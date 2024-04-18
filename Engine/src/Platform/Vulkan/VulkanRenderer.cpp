@@ -12,6 +12,10 @@
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
 #include <filesystem>
+#include <slang.h>
+#include <slang-com-ptr.h>
+
+using Slang::ComPtr;
 
 #include "MeshLoader.h"
 #include "VulkanInitializers.h"
@@ -274,14 +278,25 @@ namespace Engine
         features12.bufferDeviceAddress = true;
         features12.descriptorIndexing = true;
 
+        // Vulkan 1.1 features.
+        VkPhysicalDeviceVulkan11Features features11 = {};
+        features11.variablePointersStorageBuffer = VK_TRUE;
+        features11.variablePointers = VK_TRUE;
+
+        VkPhysicalDeviceFeatures deviceFeatures = {};
+        deviceFeatures.shaderInt64 = VK_TRUE;
+
         // Use VkBootstrap to select a gpu.
         // We want a gpu that can write to the SDL surface and supports vulkan 1.3 with the correct features.
         vkb::PhysicalDeviceSelector selector{ instance };
         vkb::PhysicalDevice physicalDevice = selector
             .set_minimum_version(1, 3)
 
+            .set_required_features(deviceFeatures)
+
             .set_required_features_13(features)
             .set_required_features_12(features12)
+            .set_required_features_11(features11)
 
             .prefer_gpu_device_type(vkb::PreferredDeviceType::discrete)
             .add_required_extension("VK_KHR_swapchain")
@@ -333,53 +348,7 @@ namespace Engine
         _swapchainImages = swapchain.get_images().value();
         _swapchainImageViews = swapchain.get_image_views().value();
 
-        const VkExtent3D imageExtent = { (uint32_t)w, (uint32_t)h, 1 };
-
-        // Setup color buffer.
-        _colorImage.ImageFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
-        _colorImage.ImageExtent = imageExtent;
-
-        VkImageUsageFlags drawImageUsages{};
-        drawImageUsages |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-        drawImageUsages |= VK_IMAGE_USAGE_STORAGE_BIT;
-        drawImageUsages |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-
-        const VkImageCreateInfo cImgInfo = VulkanInitializers::ImageCreateInfo(_colorImage.ImageFormat, drawImageUsages, imageExtent);
-
-        VmaAllocationCreateInfo cImgAllocInfo = { };
-        cImgAllocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
-        cImgAllocInfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-        CheckVkResult(vmaCreateImage(_vmaAllocator, &cImgInfo, &cImgAllocInfo, &_colorImage.Image, &_colorImage.Allocation, nullptr));
-
-        const VkImageViewCreateInfo cViewInfo = VulkanInitializers::ImageViewCreateInfo(_colorImage.ImageFormat, _colorImage.Image, VK_IMAGE_ASPECT_COLOR_BIT);
-
-        CheckVkResult(vkCreateImageView(_device, &cViewInfo, _allocator, &_colorImage.ImageView));
-
-        // Setup depth buffer.
-        _depthImage.ImageFormat = VK_FORMAT_D32_SFLOAT;
-        _depthImage.ImageExtent = imageExtent;
-
-        VkImageUsageFlags depthImageUsages{};
-        depthImageUsages |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-
-        const VkImageCreateInfo dImgInfo = VulkanInitializers::ImageCreateInfo(_depthImage.ImageFormat, depthImageUsages, imageExtent);
-
-        CheckVkResult(vmaCreateImage(_vmaAllocator, &dImgInfo, &cImgAllocInfo, &_depthImage.Image, &_depthImage.Allocation, nullptr));
-
-        const VkImageViewCreateInfo dViewInfo = VulkanInitializers::ImageViewCreateInfo(_depthImage.ImageFormat, _depthImage.Image, VK_IMAGE_ASPECT_DEPTH_BIT);
-
-        CheckVkResult(vkCreateImageView(_device, &dViewInfo, _allocator, &_depthImage.ImageView));
-
-        // Cleanup.
-        _mainDeletionQueue.PushFunction([=]
-        {
-            vkDestroyImageView(_device, _colorImage.ImageView, _allocator);
-            vmaDestroyImage(_vmaAllocator, _colorImage.Image, _colorImage.Allocation);
-
-            vkDestroyImageView(_device, _depthImage.ImageView, _allocator);
-            vmaDestroyImage(_vmaAllocator, _depthImage.Image, _depthImage.Allocation);
-        });
+        CreateMainBuffers(w, h);
     }
 
     vkb::Swapchain VulkanRenderer::CreateSwapchain(const uint32_t width, const uint32_t height)
@@ -428,6 +397,75 @@ namespace Engine
         _swapchainImageViews = swapchain.get_image_views().value();
 
         _rebuildSwapchain = false;
+    }
+
+    void VulkanRenderer::CreateMainBuffers(const uint32_t width, const uint32_t height)
+    {
+        const VkExtent3D imageExtent = { width, height, 1 };
+
+        // Setup color buffer.
+        _colorImage.ImageFormat = VK_FORMAT_R16G16B16A16_SFLOAT;
+        _colorImage.ImageExtent = imageExtent;
+
+        VkImageUsageFlags drawImageUsages{};
+        drawImageUsages |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+        drawImageUsages |= VK_IMAGE_USAGE_STORAGE_BIT;
+        drawImageUsages |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+        const VkImageCreateInfo cImgInfo = VulkanInitializers::ImageCreateInfo(_colorImage.ImageFormat, drawImageUsages, imageExtent);
+
+        VmaAllocationCreateInfo cImgAllocInfo = { };
+        cImgAllocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+        cImgAllocInfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+        CheckVkResult(vmaCreateImage(_vmaAllocator, &cImgInfo, &cImgAllocInfo, &_colorImage.Image, &_colorImage.Allocation, nullptr));
+
+        const VkImageViewCreateInfo cViewInfo = VulkanInitializers::ImageViewCreateInfo(_colorImage.ImageFormat, _colorImage.Image, VK_IMAGE_ASPECT_COLOR_BIT);
+
+        CheckVkResult(vkCreateImageView(_device, &cViewInfo, _allocator, &_colorImage.ImageView));
+
+        // Setup depth buffer.
+        _depthImage.ImageFormat = VK_FORMAT_D32_SFLOAT;
+        _depthImage.ImageExtent = imageExtent;
+
+        VkImageUsageFlags depthImageUsages{};
+        depthImageUsages |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+
+        const VkImageCreateInfo dImgInfo = VulkanInitializers::ImageCreateInfo(_depthImage.ImageFormat, depthImageUsages, imageExtent);
+
+        CheckVkResult(vmaCreateImage(_vmaAllocator, &dImgInfo, &cImgAllocInfo, &_depthImage.Image, &_depthImage.Allocation, nullptr));
+
+        const VkImageViewCreateInfo dViewInfo = VulkanInitializers::ImageViewCreateInfo(_depthImage.ImageFormat, _depthImage.Image, VK_IMAGE_ASPECT_DEPTH_BIT);
+
+        CheckVkResult(vkCreateImageView(_device, &dViewInfo, _allocator, &_depthImage.ImageView));
+    }
+
+    void VulkanRenderer::DestroyMainBuffers()
+    {
+        vkDestroyImageView(_device, _colorImage.ImageView, _allocator);
+        vmaDestroyImage(_vmaAllocator, _colorImage.Image, _colorImage.Allocation);
+
+        vkDestroyImageView(_device, _depthImage.ImageView, _allocator);
+        vmaDestroyImage(_vmaAllocator, _depthImage.Image, _depthImage.Allocation);
+    }
+
+    void VulkanRenderer::ResizeMainBuffers()
+    {
+        int w, h;
+        SDL_GetWindowSize(_window, &w, &h);
+        _windowExtent.width = w;
+        _windowExtent.height = h;
+
+        ResizeMainBuffers(w, h);
+    }
+
+    void VulkanRenderer::ResizeMainBuffers(const uint32_t width, const uint32_t height)
+    {
+        vkDeviceWaitIdle(_device);
+
+        DestroyMainBuffers();
+
+        CreateMainBuffers(width, height);
     }
 
     void VulkanRenderer::SetupCommandBuffers()
@@ -493,24 +531,105 @@ namespace Engine
 
     PipelineWrapper VulkanRenderer::CreatePipeline(const vkb::Device& logicalDevice)
     {
-        VkShaderModule meshVertShader;
-        if (!VulkanUtils::LoadShaderModule("../shaders/triangle_mesh.vert.spv", _device, _allocator, &meshVertShader))
+        ComPtr<slang::IGlobalSession> slangGlobalSession;
+        createGlobalSession(slangGlobalSession.writeRef());
+
+        slang::TargetDesc targetDesc = { };
+        targetDesc.format = SLANG_SPIRV;
+        targetDesc.profile = slangGlobalSession->findProfile("glsl_440");
+        targetDesc.flags = SLANG_TARGET_FLAG_GENERATE_SPIRV_DIRECTLY;
+
+        slang::SessionDesc sessionDesc = { };
+        sessionDesc.targets = &targetDesc;
+        sessionDesc.targetCount = 1;
+        sessionDesc.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR;
+        const char* paths[] = { "Shaders/" };
+        sessionDesc.searchPaths = paths;
+        sessionDesc.searchPathCount = 1;
+
+        ComPtr<slang::ISession> session;
+        slangGlobalSession->createSession(sessionDesc, session.writeRef());
+
+        ComPtr<slang::IBlob> spirvVertProgram;
+        ComPtr<slang::IBlob> spirvFragProgram;
         {
-            ANE_ELOG_ERROR("Error when building the triangle vertex shader module");
+            const char* moduleName = "Mesh_Color";
+            ComPtr<slang::IBlob> diagnosticBlob;
+            slang::IModule* slangModule = session->loadModule(moduleName, diagnosticBlob.writeRef());
+            //diagnoseIfNeeded(diagnosticBlob);
+
+            if (!slangModule)
+            {
+                ANE_ELOG_ERROR("Error when loading shader module: {}", moduleName);
+            }
+
+            ComPtr<slang::IEntryPoint> vertEntry;
+            slangModule->findEntryPointByName("vertexMain", vertEntry.writeRef());
+
+            slang::IComponentType* components[] = { slangModule, vertEntry };
+            ComPtr<slang::IComponentType> program;
+            {
+                ComPtr<slang::IBlob> diagnosticsBlob;
+                SlangResult result = session->createCompositeComponentType(
+                    components,
+                    2,
+                    program.writeRef(),
+                    diagnosticsBlob.writeRef());
+                // diagnoseIfNeeded(diagnosticsBlob);
+                // RETURN_ON_FAIL(result);
+            }
+
+            {
+                ComPtr<slang::IBlob> diagnosticsBlob;
+                SlangResult result = program->getEntryPointCode(
+                    0, 0, spirvVertProgram.writeRef(), diagnosticsBlob.writeRef());
+                //diagnoseIfNeeded(diagnosticsBlob);
+                //RETURN_ON_FAIL(result);
+            }
+
+            ComPtr<slang::IEntryPoint> fragEntry;
+            slangModule->findEntryPointByName("fragmentMain", fragEntry.writeRef());
+
+            slang::IComponentType* components2[] = { slangModule, fragEntry };
+            ComPtr<slang::IComponentType> program2;
+            {
+                ComPtr<slang::IBlob> diagnosticsBlob;
+                SlangResult result = session->createCompositeComponentType(
+                    components2,
+                    2,
+                    program2.writeRef(),
+                    diagnosticsBlob.writeRef());
+                // diagnoseIfNeeded(diagnosticsBlob);
+                // RETURN_ON_FAIL(result);
+            }
+
+            {
+                ComPtr<slang::IBlob> diagnosticsBlob;
+                SlangResult result = program2->getEntryPointCode(
+                    0, 0, spirvFragProgram.writeRef(), diagnosticsBlob.writeRef());
+                //diagnoseIfNeeded(diagnosticsBlob);
+                //RETURN_ON_FAIL(result);
+            }
+        }
+
+        VkShaderModule meshVertShader;
+        if (!VulkanUtils::LoadShaderModule(spirvVertProgram, _device, _allocator, &meshVertShader))
+        {
+            ANE_ELOG_ERROR("Error when building vertex shader module: Mesh-Color.slang");
         }
         else
         {
-            ANE_ELOG_INFO("Loaded shader module: triangle_mesh.vert.spv");
+            ANE_ELOG_INFO("Built vertex shader module: Mesh-Color.slang");
         }
 
         VkShaderModule meshFragShader;
-        if (!VulkanUtils::LoadShaderModule("../shaders/triangle_mesh.frag.spv", _device, _allocator, &meshFragShader))
+        if (!VulkanUtils::LoadShaderModule(spirvFragProgram, _device, _allocator, &meshFragShader))
         {
-            ANE_ELOG_ERROR("Error when building the triangle fragment shader module.");
+            ANE_ELOG_ERROR("Error when building fragment shader module: Mesh-Color.slang");
         }
         else
         {
-            ANE_ELOG_INFO("Loaded shader module: triangle_mesh.frag.spv");
+            ANE_ELOG_INFO("Built fragment shader module: Mesh-Color.slang");
         }
 
         VkPushConstantRange bufferRange;
@@ -589,6 +708,7 @@ namespace Engine
             if (props.Width > 0 && props.Height > 0)
             {
                 ResizeSwapchain();
+                ResizeMainBuffers();
             }
         }
 
@@ -722,6 +842,8 @@ namespace Engine
         ImGui_ImplVulkanH_DestroyWindow(_instance, _device, &_mainWindowData, _allocator);
 
         _mainDeletionQueue.Flush();
+
+        DestroyMainBuffers();
 
         DestroySwapchain();
 

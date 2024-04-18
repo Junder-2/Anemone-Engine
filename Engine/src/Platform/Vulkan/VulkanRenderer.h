@@ -84,6 +84,11 @@ namespace Engine
         static void DestroySwapchain();
         static void ResizeSwapchain();
 
+        static void CreateMainBuffers(uint32_t width, uint32_t height);
+        static void DestroyMainBuffers();
+        static void ResizeMainBuffers();
+        static void ResizeMainBuffers(uint32_t width, uint32_t height);
+
         static void SetupCommandBuffers();
         static void SetupSyncStructures();
 

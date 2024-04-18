@@ -3,7 +3,9 @@
 
 #include <glm/gtx/quaternion.hpp>
 
+#include "ANE/Core/Application.h"
 #include "ANE/Core/Scene/Components/CameraComponent.h"
+#include "ANE/Events/EventHandler.h"
 #include "ANE/Renderer/Renderer.h"
 
 namespace Engine
@@ -21,12 +23,18 @@ namespace Engine
 
         inputSystem.BindKeyboardInput(KeyCodeLShift, MakeDelegate(this, &CameraController::OnSpeedup));
 
-        _transformComponent = &GetComponent<TransformComponent>();
-        _transformComponent->Transform.SetPosition(Vector3{0, 0, -2});
+        EventHandler::BindEditorEvent(MakeDelegate(this, &CameraController::OnEditorEvent));
 
-        CameraComponent* camera = &GetComponent<CameraComponent>();
-        camera->SetPerspective(70.0f, 900.0f / 500.0f, 10000.f, 0.1f);
-        Renderer::SetViewProjection(ComputeViewProjMatrix(*camera));
+        _transformComponent = &GetComponent<TransformComponent>();
+        _transformComponent->Transform.SetPosition(Vector3{0, 0, -5});
+
+        _cameraComponent = &GetComponent<CameraComponent>();
+
+        const WindowProperties windowProps = Application::Get().GetWindow().GetProperties();
+        const float w = (float)windowProps.Width, h = (float)windowProps.Height;
+
+        _cameraComponent->SetPerspective(70.0f, w / h, 10000.f, 0.1f);
+        Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
     }
 
     void CameraController::OnUpdate(float deltaTime)
@@ -46,9 +54,9 @@ namespace Engine
             const Vector3 moveVector = (right + up + forward).GetNormalized();
             _transformComponent->Transform.AddPosition(moveVector* moveSpeed);
 
-            if (CameraComponent camera; TryGetComponent<CameraComponent>(camera))
+            if (_cameraComponent)
             {
-                Renderer::SetViewProjection(ComputeViewProjMatrix(camera));
+                Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
             }
         }
     }
@@ -80,15 +88,26 @@ namespace Engine
         _yawRadians += lookSpeed * delta.X;
         _transformComponent->Transform.SetRotation(Vector3{_pitchRadians, _yawRadians, 0});
 
-        if (CameraComponent camera; TryGetComponent<CameraComponent>(camera))
+        if (_cameraComponent)
         {
-            Renderer::SetViewProjection(ComputeViewProjMatrix(camera));
+            Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
         }
     }
 
     void CameraController::OnSpeedup(InputValue inputValue)
     {
         _isSpeedUp = inputValue.GetTriggerState() == TriggerStarted || inputValue.GetTriggerState() == TriggerHolding;
+    }
+
+    void CameraController::OnEditorEvent(Event& event)
+    {
+        if (event.GetEventType() != EventType::WindowResize) return;
+
+        const WindowResizeEvent& resizeEvent = dynamic_cast<WindowResizeEvent&>(event);
+        const float w = (float)resizeEvent.GetWidth(), h = (float)resizeEvent.GetHeight();
+
+        _cameraComponent->UpdateAspectRatio(w / h);
+        Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
     }
 
     Matrix4x4 CameraController::ComputeViewProjMatrix(CameraComponent camera)

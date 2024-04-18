@@ -66,11 +66,11 @@ namespace Engine
         void SetVSync(bool enabled);
 
         void SetActiveViewport(uint32_t id);
-        void SetActiveViewport(const ViewportProperties& props);
-        void AddViewport(const ViewportProperties& props);
+        void AddViewport(uint32_t id);
         void RemoveViewport(uint32_t id);
 
-        void SetMouseVisibility(bool enable);
+        static void SetMouseVisibility(bool enable);
+        static bool IsMouseVisible();
 
         bool HasFocus() const { return !_imGuiHasFocus && _windowHasFocus; }
 
@@ -82,7 +82,10 @@ namespace Engine
         uint32_t GetHeight() const { return _windowData.Height; }
         WindowProperties GetProperties() { return _windowData; }
         SDL_Window* GetWindowContext() const { return _windowContext; }
-        ViewportProperties& GetActiveViewport() const { return *_activeViewport; }
+
+        ViewportProperties GetActiveViewportProperties() const;
+        bool IsViewportMainWindow() const { return _activeViewportId == _windowData.Id; }
+        bool IsOverViewport() const;
 
     private:
         void Init(const WindowProperties& props);
@@ -99,8 +102,9 @@ namespace Engine
         SDL_Window* _windowContext;
         WindowProperties _windowData;
 
-        ViewportProperties* _activeViewport;
-        entt::dense_map<uint32_t, ViewportProperties> _viewports;
+        uint32_t _activeViewportId = 0;
+        uint32_t _previousViewportId = 0;
+        entt::dense_set<uint32_t> _viewports;
 
         SinglecastDelegate<void(Event&)> _eventDelegate;
 

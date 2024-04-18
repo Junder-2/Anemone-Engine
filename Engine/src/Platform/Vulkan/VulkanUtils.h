@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vulkan/vulkan.h>
+#include <slang-com-ptr.h>
 
 namespace VulkanUtils
 {
@@ -9,4 +10,6 @@ namespace VulkanUtils
     void CopyImageToImage(VkCommandBuffer cmd, VkImage source, VkImage destination, VkExtent2D srcSize, VkExtent2D dstSize);
 
     bool LoadShaderModule(const char* filePath, VkDevice device, const VkAllocationCallbacks* allocator, VkShaderModule* outShaderModule);
+
+    bool LoadShaderModule(const Slang::ComPtr<slang::IBlob>& program, VkDevice device, const VkAllocationCallbacks* allocator, VkShaderModule* outShaderModule);
 }
