@@ -411,16 +411,15 @@ namespace Engine
     #define STRINGIZE(x) #x
     #define LINE_STRING DO_STRINGIZE(__LINE__)
     #ifndef NDEBUG
-    auto FormatFileAndLine(char const* file, char const* line)
-        -> std::string;
-    #define LOG_PREFIX Engine::LogSinkBase::FormatFileAndLine(__FILE__, LINE_STRING)
+
+    #define LOG_PREFIX Engine::FormatFileAndLine(__FILE__, LINE_STRING)
     #else
 #define LOG_PREFIX " "
     #endif // NDEBUG
 
     #define ASLOG_COMP_LEVEL(LOGGER, LEVEL)                                        \
   (static_cast<spdlog::level::level_enum>(                                     \
-       asap::logging::Logger::Level::LEVEL) >= ((LOGGER).level()))
+        Engine::Logger::Level::LEVEL) >= ((LOGGER).level()))
 
     // Compare levels before invoking logger. This is an optimization to avoid
     // executing expressions computing log contents when they would be suppressed.
@@ -456,15 +455,46 @@ namespace Engine
     }                                                                          \
   } while (0)
     #endif // NDEBUG
-
-    #define GET_MISC_LOGGER() asap::logging::Registry::GetLogger("misc")
+    #define GET_MISC_LOGGER() Engine::Registry::GetLogger("misc");
 
     #endif // DOXYGEN_DOCUMENTATION_BUILD
 
     // ---------------------------------------------------------------------------
     // User Convenience Macros
     // ---------------------------------------------------------------------------
-
+    // ---------------------------------------------------------------------------
+    // Helper for file name and line number formatting
+    // ---------------------------------------------------------------------------
+    #ifndef NDEBUG
+    /*!
+     * @brief Make a string with the source code file name and line number at which
+     * the log message was produced.
+     * @param file source code file name.
+     * @param line source code line number.
+     * @return a formatted string with the file name and line number.
+     */
+    // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
+    inline auto FormatFileAndLine(char const* file, char const* line) -> std::string
+    {
+        constexpr static int FILE_MAX_LENGTH = 70;
+        std::ostringstream ostr;
+        std::string fstr(file);
+        if (fstr.length() > FILE_MAX_LENGTH)
+        {
+            constexpr auto shortened_prefix_length = 10;
+            fstr = fstr.substr(0, shortened_prefix_length - 3)
+                       .append("...")
+                       .append(fstr.substr(
+                           fstr.length() - FILE_MAX_LENGTH + shortened_prefix_length,
+                           FILE_MAX_LENGTH - shortened_prefix_length));
+        }
+        constexpr auto line_number_length = 5;
+        ostr << "[" << std::setw(FILE_MAX_LENGTH) << std::right << fstr << ":"
+            << std::setw(line_number_length) << std::setfill('0') << std::right
+            << line << "] ";
+        return ostr.str();
+    }
+    #endif // NDEBUG
     /// @name Logging macros
     //@{
 
