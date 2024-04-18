@@ -1,8 +1,7 @@
 #pragma once
-#include <assimp/Logger.hpp>
 
+#include "imgui.h"
 #include "UILayerPanel.h"
-#include "ANE/Core/Log/LogSinkBase.h"
 
 namespace Engine
 {
@@ -13,8 +12,9 @@ namespace Engine
         ~EditorLogPanel();
         void OnPanelRender() override;
 
+    private:
+        static const ImVec4 COLOR_INFO;
+        static const ImVec4 COLOR_WARN;
+        static const ImVec4 COLOR_ERROR;
     };
-
-
-
 }

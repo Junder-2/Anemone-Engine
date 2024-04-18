@@ -10,7 +10,7 @@ namespace Engine
     const std::string ENGINE_LOGGER_NAME = "Engine";
     static std::string _appLoggerName = "app";
 
-    const std::string LOGGER_NAME_PATTERN = "%n %L";
+    const std::string LOGGER_NAME_PATTERN = "%n";
     const std::string SOURCE_PATTERN = "%s:%#";
     const std::string TIME_PATTERN = "%T";
 

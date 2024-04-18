@@ -17,6 +17,7 @@
 #include "Panels/InspectorPanel.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "ANE/Input/EditorInputSystem.h"
+#include "Panels/EditorLogPanel.h"
 
 namespace Engine
 {
@@ -45,6 +46,7 @@ namespace Engine
         CreateTestScene(50);
         AttachUIPanel(new SceneHierarchyPanel(_scenes));
         AttachUIPanel(new InspectorPanel(this));
+        AttachUIPanel(new EditorLogPanel());
 
         // Then you would call load methods to load the most recent project
 
