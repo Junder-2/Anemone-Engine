@@ -31,9 +31,9 @@ namespace Engine
 
         glm::mat4 newMatrix = rotate(glm::mat4(*this), angle,  glm::vec3(axis));
 
-        _rows[0] = Vector4::Convert(newMatrix[0]);
-        _rows[1] = Vector4::Convert(newMatrix[1]);
-        _rows[2] = Vector4::Convert(newMatrix[2]);
+        _columns[0] = Vector4::Convert(newMatrix[0]);
+        _columns[1] = Vector4::Convert(newMatrix[1]);
+        _columns[2] = Vector4::Convert(newMatrix[2]);
     }
 
     void Matrix4x4::Rotate(const Quaternion quat)
@@ -55,9 +55,9 @@ namespace Engine
     {
         const Vector3 scale = GetScale();
 
-        _rows[0] = Vector4(1, 0, 0, 0) * scale.X;
-        _rows[1] = Vector4(0, 1, 0, 0) * scale.Y;
-        _rows[2] = Vector4(0, 0, 1, 0) * scale.Z;
+        _columns[0] = Vector4(1, 0, 0, 0) * scale.X;
+        _columns[1] = Vector4(0, 1, 0, 0) * scale.Y;
+        _columns[2] = Vector4(0, 0, 1, 0) * scale.Z;
         Rotate(quat);
     }
 
@@ -65,9 +65,9 @@ namespace Engine
     {
         const Vector3 scale = GetScale();
 
-        _rows[0] = Vector4(1, 0, 0, 0) * scale.X;
-        _rows[1] = Vector4(0, 1, 0, 0) * scale.Y;
-        _rows[2] = Vector4(0, 0, 1, 0) * scale.Z;
+        _columns[0] = Vector4(1, 0, 0, 0) * scale.X;
+        _columns[1] = Vector4(0, 1, 0, 0) * scale.Y;
+        _columns[2] = Vector4(0, 0, 1, 0) * scale.Z;
 
         if(isDegrees)
         {
@@ -110,62 +110,62 @@ namespace Engine
     {
         glm::mat4 newMatrix = translate(glm::mat4(*this), glm::vec3(delta));
 
-        _rows[3] = Vector4::Convert(newMatrix[3]);
+        _columns[3] = Vector4::Convert(newMatrix[3]);
     }
 
     void Matrix4x4::AddPosition(const Vector3 delta)
     {
-        _rows[3] += Vector4(delta, 0);
+        _columns[3] += Vector4(delta, 0);
     }
 
     void Matrix4x4::SetPosition(const Vector3 newPos)
     {
-        const float w = _rows[3][3];
-        _rows[3] = Vector4(newPos, w);
+        const float w = _columns[3][3];
+        _columns[3] = Vector4(newPos, w);
     }
 
     Vector3 Matrix4x4::GetPosition() const
     {
-        return {_rows[3]};
+        return {_columns[3]};
     }
 
     void Matrix4x4::Scale(const Vector3 scale)
     {
-        _rows[0] *= scale.X;
-        _rows[1] *= scale.Y;
-        _rows[2] *= scale.Z;
+        _columns[0] *= scale.X;
+        _columns[1] *= scale.Y;
+        _columns[2] *= scale.Z;
     }
 
     void Matrix4x4::SetScale(const Vector3 scale)
     {
-        _rows[0].Normalize();
-        _rows[1].Normalize();
-        _rows[2].Normalize();
+        _columns[0].Normalize();
+        _columns[1].Normalize();
+        _columns[2].Normalize();
 
-        _rows[0] *= scale.X;
-        _rows[1] *= scale.Y;
-        _rows[2] *= scale.Z;
+        _columns[0] *= scale.X;
+        _columns[1] *= scale.Y;
+        _columns[2] *= scale.Z;
     }
 
     Vector3 Matrix4x4::GetScale() const
     {
-        const Vector3 scale(Vector3(_rows[0]).Length(), Vector3(_rows[1]).Length(), Vector3(_rows[2]).Length());
+        const Vector3 scale(Vector3(_columns[0]).Length(), Vector3(_columns[1]).Length(), Vector3(_columns[2]).Length());
         return scale;
     }
 
     Vector3 Matrix4x4::GetRight() const
     {
-        return _rows[0];
+        return _columns[0];
     }
 
     Vector3 Matrix4x4::GetUp() const
     {
-        return _rows[1];
+        return _columns[1];
     }
 
     Vector3 Matrix4x4::GetForward() const
     {
-        return _rows[2];
+        return _columns[2];
     }
 
     Matrix4x4 Matrix4x4::Convert(const glm::mat4& mat4)
@@ -175,22 +175,22 @@ namespace Engine
 
     Matrix4x4::operator const glm::mat4() const
     {
-        return glm::mat4(_rows[0], _rows[1], _rows[2], _rows[3]);
+        return glm::mat4(_columns[0], _columns[1], _columns[2], _columns[3]);
     }
 
     Matrix4x4::operator const Matrix3x3() const
     {
-        return {_rows[0], _rows[1], _rows[2]};
+        return {_columns[0], _columns[1], _columns[2]};
     }
 
     Matrix4x4& Matrix4x4::operator*=(const Matrix4x4& matrix)
     {
         glm::mat4 newMatrix = Convert(glm::mat4(*this) * glm::mat4(matrix));
 
-        _rows[0] = Vector4::Convert(newMatrix[0]);
-        _rows[1] = Vector4::Convert(newMatrix[1]);
-        _rows[2] = Vector4::Convert(newMatrix[2]);
-        _rows[3] = Vector4::Convert(newMatrix[3]);
+        _columns[0] = Vector4::Convert(newMatrix[0]);
+        _columns[1] = Vector4::Convert(newMatrix[1]);
+        _columns[2] = Vector4::Convert(newMatrix[2]);
+        _columns[3] = Vector4::Convert(newMatrix[3]);
 
         return *this;
     }

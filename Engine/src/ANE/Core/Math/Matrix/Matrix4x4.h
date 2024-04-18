@@ -22,10 +22,10 @@ namespace Engine
 
         Matrix4x4(const float value)
         {
-            _rows[0] = value;
-            _rows[1] = value;
-            _rows[2] = value;
-            _rows[3] = value;
+            _columns[0] = value;
+            _columns[1] = value;
+            _columns[2] = value;
+            _columns[3] = value;
         }
 
         Matrix4x4(const float a1, const float a2, const float a3, const float a4,
@@ -33,18 +33,18 @@ namespace Engine
                     const float c1, const float c2, const float c3, const float c4,
                     const float d1, const float d2, const float d3, const float d4)
         {
-            _rows[0][0] = a1; _rows[0][1] = a2; _rows[0][2] = a3; _rows[0][3] = a4;
-            _rows[1][0] = b1; _rows[1][1] = b2; _rows[1][2] = b3; _rows[1][3] = b4;
-            _rows[2][0] = c1; _rows[2][1] = c2; _rows[2][2] = c3; _rows[2][3] = c4;
-            _rows[3][0] = d1; _rows[3][1] = d2; _rows[3][2] = d3; _rows[3][3] = d4;
+            _columns[0][0] = a1; _columns[0][1] = a2; _columns[0][2] = a3; _columns[0][3] = a4;
+            _columns[1][0] = b1; _columns[1][1] = b2; _columns[1][2] = b3; _columns[1][3] = b4;
+            _columns[2][0] = c1; _columns[2][1] = c2; _columns[2][2] = c3; _columns[2][3] = c4;
+            _columns[3][0] = d1; _columns[3][1] = d2; _columns[3][2] = d3; _columns[3][3] = d4;
         }
 
         Matrix4x4(const Vector4 a, const Vector4 b, const Vector4 c, const Vector4 d)
         {
-            _rows[0] = a;
-            _rows[1] = b;
-            _rows[2] = c;
-            _rows[3] = d;
+            _columns[0] = a;
+            _columns[1] = b;
+            _columns[2] = c;
+            _columns[3] = d;
         }
 
         void Clear();
@@ -95,7 +95,7 @@ namespace Engine
 
         bool operator==(const Matrix4x4& matrix) const
         {
-            return (_rows[0] == matrix[0] && _rows[1] == matrix[1] && _rows[2] == matrix[2] && _rows[3] == matrix[3]);
+            return (_columns[0] == matrix[0] && _columns[1] == matrix[1] && _columns[2] == matrix[2] && _columns[3] == matrix[3]);
         }
 
         bool operator!= (const Matrix4x4& matrix) const
@@ -105,28 +105,28 @@ namespace Engine
 
         Matrix4x4& operator+=(const Matrix4x4& matrix)
         {
-            _rows[0] += matrix[0];
-            _rows[1] += matrix[1];
-            _rows[2] += matrix[2];
-            _rows[3] += matrix[3];
+            _columns[0] += matrix[0];
+            _columns[1] += matrix[1];
+            _columns[2] += matrix[2];
+            _columns[3] += matrix[3];
             return *this;
         }
 
         Matrix4x4& operator-=(const Matrix4x4& matrix)
         {
-            _rows[0] -= matrix[0];
-            _rows[1] -= matrix[1];
-            _rows[2] -= matrix[2];
-            _rows[3] -= matrix[3];
+            _columns[0] -= matrix[0];
+            _columns[1] -= matrix[1];
+            _columns[2] -= matrix[2];
+            _columns[3] -= matrix[3];
             return *this;
         }
 
         Matrix4x4& operator*=(const float scalar)
         {
-            _rows[0] *= scalar;
-            _rows[1] *= scalar;
-            _rows[2] *= scalar;
-            _rows[3] *= scalar;
+            _columns[0] *= scalar;
+            _columns[1] *= scalar;
+            _columns[2] *= scalar;
+            _columns[3] *= scalar;
             return *this;
         }
 
@@ -134,12 +134,12 @@ namespace Engine
 
         const Vector4& operator[](const int row) const
         {
-            return _rows[row];
+            return _columns[row];
         }
 
         Vector4& operator[](const int row)
         {
-            return _rows[row];
+            return _columns[row];
         }
 
         friend Matrix4x4 operator+(const Matrix4x4& matrix1, const Matrix4x4& matrix2)
@@ -189,35 +189,35 @@ namespace Engine
         std::string ToString() const;
 
     private:
-        Vector4 _rows[4];
+        Vector4 _columns[4];
     };
 
     inline void Matrix4x4::Clear()
     {
-        _rows[0] = 0;
-        _rows[1] = 0;
-        _rows[2] = 0;
-        _rows[3] = 0;
+        _columns[0] = 0;
+        _columns[1] = 0;
+        _columns[2] = 0;
+        _columns[3] = 0;
     }
 
     inline Vector4 Matrix4x4::GetColumn(int i) const
     {
         assert(i>= 0 && i<3);
-        return Vector4(_rows[0][i], _rows[1][i], _rows[2][i]);
+        return Vector4(_columns[0][i], _columns[1][i], _columns[2][i]);
     }
 
     inline Vector4 Matrix4x4::GetRow(int i) const
     {
         assert(i>= 0 && i<3);
-        return _rows[i];
+        return _columns[i];
     }
 
     inline std::string Matrix4x4::ToString() const
     {
         return "Matrix4x4(" +
-            std::to_string(_rows[0][0]) + "," + std::to_string(_rows[0][1]) + "," + std::to_string(_rows[0][2]) + "," + std::to_string(_rows[0][3]) + "," +
-           std::to_string(_rows[1][0]) + "," + std::to_string(_rows[1][1]) + "," + std::to_string(_rows[1][2]) + "," + std::to_string(_rows[1][3]) + "," +
-           std::to_string(_rows[2][0]) + "," + std::to_string(_rows[2][1]) + "," + std::to_string(_rows[2][2]) + "," + std::to_string(_rows[2][3]) + "," +
-            std::to_string(_rows[3][0]) + "," + std::to_string(_rows[3][1]) + "," + std::to_string(_rows[3][2]) + "," + std::to_string(_rows[3][3]) + "," + ")";
+            std::to_string(_columns[0][0]) + "," + std::to_string(_columns[0][1]) + "," + std::to_string(_columns[0][2]) + "," + std::to_string(_columns[0][3]) + "," +
+           std::to_string(_columns[1][0]) + "," + std::to_string(_columns[1][1]) + "," + std::to_string(_columns[1][2]) + "," + std::to_string(_columns[1][3]) + "," +
+           std::to_string(_columns[2][0]) + "," + std::to_string(_columns[2][1]) + "," + std::to_string(_columns[2][2]) + "," + std::to_string(_columns[2][3]) + "," +
+            std::to_string(_columns[3][0]) + "," + std::to_string(_columns[3][1]) + "," + std::to_string(_columns[3][2]) + "," + std::to_string(_columns[3][3]) + "," + ")";
     }
 }
