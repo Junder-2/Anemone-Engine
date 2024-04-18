@@ -1,6 +1,7 @@
 #include "anepch.h"
 #include "Renderer.h"
 
+#include <filesystem>
 #include <imgui_impl_sdl2.h>
 
 #include "Platform/Vulkan/VulkanRenderer.h"
@@ -28,6 +29,11 @@ namespace Engine
     {
         _vulkanRenderer->Render(props);
         FlushDrawCommands();
+    }
+
+    VmaMeshAsset Renderer::LoadModel(const std::string& modelPath)
+    {
+        return _vulkanRenderer->LoadModel(modelPath);
     }
 
     void Renderer::SubmitDrawCommand(const DrawCommand& command)

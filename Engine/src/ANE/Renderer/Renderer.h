@@ -19,6 +19,8 @@ namespace Engine
         static void Shutdown();
         static void Render(const WindowProperties& props);
 
+        static VmaMeshAsset LoadModel(const std::string& modelPath);
+
         static void SubmitDrawCommand(const DrawCommand& command);
 
         //These methods are sandwiched around the UI Layer render loops

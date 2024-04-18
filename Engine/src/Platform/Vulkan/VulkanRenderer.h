@@ -63,6 +63,8 @@ namespace Engine
         void Render(const WindowProperties& props);
         void Cleanup();
 
+        VmaMeshAsset LoadModel(const std::string& modelPath);
+
         float GetFramerate();
         static ImGuiIO* GetImGuiIO() { return _io; }
 
@@ -180,6 +182,8 @@ namespace Engine
         inline static VulkanImmediateBuffer _immBuffer;
 
         inline static VmaMeshBuffers _rectangleMesh;
+
+        inline static entt::dense_map<std::string, VmaMeshAsset> _loadedModelMap;
 
         // ImGui
         inline static ImGui_ImplVulkanH_Window _mainWindowData;

@@ -24,6 +24,7 @@ using Slang::ComPtr;
 #include "ANE/Core/Math/Matrix/Matrix4x4.h"
 #include "ANE/Renderer/Mesh.h"
 #include "ANE/Utilities/ImGuiUtilities.h"
+#include "ANE/Renderer/Renderer.h"
 
 namespace Engine
 {
@@ -96,6 +97,40 @@ namespace Engine
         _initialized = false;
     }
 
+    VmaMeshAsset VulkanRenderer::LoadModel(const std::string& modelPath)
+    {
+        if (_loadedModelMap.contains(modelPath))
+        {
+            return _loadedModelMap[modelPath];
+        }
+
+        const std::filesystem::path absolutePath = std::filesystem::current_path().append("..\\Meshes\\").append(modelPath);
+
+        const MeshAsset meshAsset = MeshLoader::LoadMesh(absolutePath.string().c_str());
+        Mesh mesh = meshAsset.SubMeshes[0]; // Use first submesh for now.
+
+        const VmaMeshBuffers meshBuffers = UploadMesh(mesh.Indices, mesh.Vertices);
+
+        VmaMeshAsset vmaMeshAsset;
+        vmaMeshAsset.Name = modelPath;
+        vmaMeshAsset.NumVertices = mesh.Indices.size();
+        vmaMeshAsset.SubMeshes = meshAsset.SubMeshes;
+        vmaMeshAsset.MeshBuffers = meshBuffers;
+
+        //modelVertexCount = mesh.Indices.size();
+        //_rectangleMesh = meshBuffers;
+        _mainDeletionQueue.PushFunction([=]
+        {
+            const VmaMeshBuffers buffers = vmaMeshAsset.MeshBuffers;
+            DestroyBuffer(buffers.IndexBuffer);
+            DestroyBuffer(buffers.VertexBuffer);
+        });
+
+        _loadedModelMap[modelPath] = vmaMeshAsset;
+
+        return vmaMeshAsset;
+    }
+
     float VulkanRenderer::GetFramerate()
     {
         return _io->Framerate;
@@ -136,21 +171,7 @@ namespace Engine
 
         CreatePipeline(logicalDevice);
 
-        {
-            // TODO: Figure out where to store the model file and how to access it.
-            const std::filesystem::path modelPath = std::filesystem::current_path().append("..\\Meshes\\Suzanne.fbx");
-
-            const MeshAsset meshAsset = MeshLoader::LoadMesh(modelPath.string().c_str());
-            Mesh mesh = meshAsset.SubMeshes[0]; // Use first submesh for now.
-
-            modelVertexCount = mesh.Indices.size();
-            _rectangleMesh = UploadMesh(mesh.Indices, mesh.Vertices);
-            _mainDeletionQueue.PushFunction([]
-            {
-                DestroyBuffer(_rectangleMesh.IndexBuffer);
-                DestroyBuffer(_rectangleMesh.VertexBuffer);
-            });
-        }
+        Renderer::LoadModel("Suzanne.fbx");
     }
 
     void VulkanRenderer::SetupImGui(SDL_Window* window)
