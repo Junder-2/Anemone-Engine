@@ -8,12 +8,15 @@ namespace Engine
     class EditorLayer : public Layer
     {
     public:
-        void OnUIRender() override;
 
-        void Init();
         EditorLayer(const std::string& name = "EditorLayer");
 
         ~EditorLayer() override;
+
+        void OnUIRender() override;
+        void DockSpace();
+
+        void Init();
 
         void OnAttach() override;
 
