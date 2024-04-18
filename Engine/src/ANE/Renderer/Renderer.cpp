@@ -27,7 +27,7 @@ namespace Engine
 
     void Renderer::Render(const WindowProperties& props)
     {
-        _vulkanRenderer->Render(props);
+        _vulkanRenderer->Render(props, _drawCommands);
         FlushDrawCommands();
     }
 

@@ -25,6 +25,7 @@ using Slang::ComPtr;
 #include "ANE/Renderer/Mesh.h"
 #include "ANE/Utilities/ImGuiUtilities.h"
 #include "ANE/Renderer/Renderer.h"
+#include "ANE/Renderer/Draw.h"
 
 namespace Engine
 {
@@ -47,7 +48,7 @@ namespace Engine
         _initialized = true;
     }
 
-    void VulkanRenderer::Render(const WindowProperties& props)
+    void VulkanRenderer::Render(const WindowProperties& props, const DrawContext& drawCommands)
     {
         if (!_initialized)
         {
@@ -64,7 +65,7 @@ namespace Engine
             _mainWindowData.ClearValue.color.float32[1] = ClearColor.y * ClearColor.w;
             _mainWindowData.ClearValue.color.float32[2] = ClearColor.z * ClearColor.w;
             _mainWindowData.ClearValue.color.float32[3] = ClearColor.w;
-            Draw(props);
+            Draw(props, drawCommands);
             //RenderFrame(&_mainWindowData, drawData);
         }
 
@@ -117,8 +118,6 @@ namespace Engine
         vmaMeshAsset.SubMeshes = meshAsset.SubMeshes;
         vmaMeshAsset.MeshBuffers = meshBuffers;
 
-        //modelVertexCount = mesh.Indices.size();
-        //_rectangleMesh = meshBuffers;
         _mainDeletionQueue.PushFunction([=]
         {
             const VmaMeshBuffers buffers = vmaMeshAsset.MeshBuffers;
@@ -136,7 +135,6 @@ namespace Engine
         return _io->Framerate;
     }
 
-    static inline int modelVertexCount = 0;
     void VulkanRenderer::SetupVulkan(SDL_Window* window)
     {
         const std::vector<const char*> extensions = GetAvailableExtensions(window);
@@ -710,7 +708,7 @@ namespace Engine
         _mainDeletionQueue.PushFunction([&]{ vkDestroyDescriptorPool(_device, _imGuiDescriptorPool, _allocator); });
     }
 
-    void VulkanRenderer::Draw(const WindowProperties& props)
+    void VulkanRenderer::Draw(const WindowProperties& props, const DrawContext& drawCommands)
     {
         if (_rebuildSwapchain)
         {
@@ -743,7 +741,7 @@ namespace Engine
         VulkanUtils::TransitionImage(cmd, _colorImage.Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
         VulkanUtils::TransitionImage(cmd, _depthImage.Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
 
-        DrawGeometry(cmd);
+        DrawGeometry(cmd, drawCommands);
 
         // Prepare and copy color buffer into the active swapchain buffer.
         VulkanUtils::TransitionImage(cmd, _colorImage.Image, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
@@ -790,7 +788,7 @@ namespace Engine
         _frameIndex++;
     }
 
-    void VulkanRenderer::DrawGeometry(VkCommandBuffer cmd)
+    void VulkanRenderer::DrawGeometry(VkCommandBuffer cmd, const DrawContext& drawCommands)
     {
         _drawExtent.height = std::min(_swapchainExtent.height, _colorImage.ImageExtent.height);
         _drawExtent.width = std::min(_swapchainExtent.width, _colorImage.ImageExtent.width);
@@ -820,14 +818,17 @@ namespace Engine
 
         vkCmdSetScissor(cmd, 0, 1, &scissor);
 
-        PushConstantBuffer pushConstants;
-        pushConstants.WorldMatrix = ViewProjection * Matrix4x4::Identity(); // VP * M
-        pushConstants.VertexBuffer = _rectangleMesh.VertexBufferAddress;
+        for (DrawCommand drawCommand : drawCommands.Commands)
+        {
+            PushConstantBuffer pushConstants;
+            pushConstants.WorldMatrix = ViewProjection * drawCommand.ModelMatrix; // VP * M
+            pushConstants.VertexBuffer = drawCommand.MeshBuffers.VertexBufferAddress;
 
-        vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstantBuffer), &pushConstants);
-        vkCmdBindIndexBuffer(cmd, _rectangleMesh.IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
+            vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstantBuffer), &pushConstants);
+            vkCmdBindIndexBuffer(cmd, drawCommand.MeshBuffers.IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
 
-        vkCmdDrawIndexed(cmd, modelVertexCount, 1, 0, 0, 0);
+            vkCmdDrawIndexed(cmd, drawCommand.VertexCount, 1, 0, 0, 0);
+        }
 
         vkCmdEndRendering(cmd);
     }
