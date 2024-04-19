@@ -19,7 +19,8 @@ namespace Engine
     struct Vector2
     {
         Vector2() : X(0), Y(0) {}
-        Vector2(const float newX, const float newY = 0) : X(newX), Y(newY) {}
+        Vector2(const float scalar) : X(scalar), Y(scalar) {}
+        Vector2(const float newX, const float newY) : X(newX), Y(newY) {}
 
         union {float X, R, Pitch;};
         union {float Y, G, Yaw;};

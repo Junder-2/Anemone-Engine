@@ -17,7 +17,8 @@ namespace Engine
     struct Vector3
     {
         Vector3() : X(0), Y(0), Z(0) {}
-        Vector3(const float newX, const float newY = 0, const float newZ = 0) : X(newX), Y(newY), Z(newZ) {}
+        Vector3(const float scalar) : X(scalar), Y(scalar), Z(scalar) {}
+        Vector3(const float newX, const float newY, const float newZ) : X(newX), Y(newY), Z(newZ) {}
         Vector3(Vector2 vector2, float newZ = 0);
 
         union {float X, R, Pitch;};

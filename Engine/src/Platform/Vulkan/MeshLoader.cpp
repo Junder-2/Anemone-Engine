@@ -72,7 +72,7 @@ namespace Engine
             Vertex vertex = { };
             vertex.Position = { pos->x, pos->y, pos->z };
             vertex.Normal = { normal->x, normal->y, normal->z };
-            vertex.Color = Vector4::Convert(glm::vec4{ (glm::vec3)vertex.Normal, 1 } * .5f + .5f); // TODO: Weird vector stuff?
+            vertex.Color = Vector4{ vertex.Normal, 1 } * .5f + .5f;
             vertex.UvX = uv->x;
             vertex.UvY = uv->y;
 
