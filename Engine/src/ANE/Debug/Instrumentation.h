@@ -2,6 +2,8 @@
 
 #pragma once
 
+#ifdef ANE_DEBUG
+
 #include "ANE/Core/Log/Logging.h"
 #include <fstream>
 
@@ -38,10 +40,10 @@ namespace Engine
 				// Subsequent profiling output meant for the original session will end up in the
 				// newly opened session instead.  That's better than having badly formatted
 				// profiling output.
-				if (Logging::GetEngineLogger())
-				{
-					ANE_ELOG_WARN("Instrumentor::BeginSession('{0}') when session '{1}' already open.", name, _currentSession->Name);
-				}
+
+			    ANE_ELOG("Hello");
+			    ANE_ELOG_WARN("Instrumentor::BeginSession('{0}') when session '{1}' already open.", name, _currentSession->Name);
+
 				InternalEndSession();
 			}
 			_outputStream.open("../Profiling/" + filename);
@@ -53,10 +55,7 @@ namespace Engine
 			}
 			else
 			{
-				if (Logging::GetEngineLogger())
-				{
-					ANE_ELOG_WARN("Instrumentor could not open results file '{0}'.", filename);
-				}
+			    ANE_ELOG_WARN("Instrumentor could not open results file '{0}'.", filename);
 			}
 		}
 
@@ -196,6 +195,8 @@ namespace Engine
 	}
 }
 
+#endif
+
 // Set the level of profiling
 #define ANE_ACTIVE_PROFILE_LEVEL PROFILE_LEVEL_OFF
 
@@ -248,4 +249,8 @@ namespace Engine
 #else
     #define ANE_DEEP_PROFILE_SCOPE(name)
     #define ANE_DEEP_PROFILE_FUNCTION()
+#endif
+
+#ifndef ANE_DEBUG
+#define ANE_ACTIVE_PROFILE_LEVEL 0  // NOLINT(clang-diagnostic-macro-redefined)
 #endif

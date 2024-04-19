@@ -1,14 +1,18 @@
 #include "anepch.h"
 #include "Renderer.h"
 
+#include <filesystem>
 #include <imgui_impl_sdl2.h>
 
 #include "Platform/Vulkan/VulkanRenderer.h"
 #include "ANE/Core/Math/Matrix/Matrix4x4.h"
+#include "Mesh.h"
+#include "Draw.h"
 
 namespace Engine
 {
     std::unique_ptr<VulkanRenderer> Renderer::_vulkanRenderer;
+    DrawContext Renderer::_drawCommands;
 
     void Renderer::Init(SDL_Window* window)
     {
@@ -23,7 +27,18 @@ namespace Engine
 
     void Renderer::Render(const WindowProperties& props)
     {
-        _vulkanRenderer->Render(props);
+        _vulkanRenderer->Render(props, _drawCommands);
+        FlushDrawCommands();
+    }
+
+    VmaMeshAsset Renderer::LoadModel(const std::string& modelPath)
+    {
+        return _vulkanRenderer->LoadModel(modelPath);
+    }
+
+    void Renderer::SubmitDrawCommand(const DrawCommand& command)
+    {
+        _drawCommands.Commands.push_back(command);
     }
 
     void Renderer::BeginUiDataBuffer()
@@ -47,5 +62,10 @@ namespace Engine
     void Renderer::SetViewProjection(const Matrix4x4& matrix)
     {
         _vulkanRenderer->ViewProjection = matrix;
+    }
+
+    void Renderer::FlushDrawCommands()
+    {
+        _drawCommands.Commands.clear();
     }
 }

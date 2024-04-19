@@ -39,9 +39,9 @@ namespace Engine
 
         glm::mat4 newMatrix = rotate(glm::mat4(*this), angle,  glm::vec3(axis));
 
-        _rows[0] = Vector4::Convert(newMatrix[0]);
-        _rows[1] = Vector4::Convert(newMatrix[1]);
-        _rows[2] = Vector4::Convert(newMatrix[2]);
+        _columns[0] = Vector4::Convert(newMatrix[0]);
+        _columns[1] = Vector4::Convert(newMatrix[1]);
+        _columns[2] = Vector4::Convert(newMatrix[2]);
     }
 
     void Matrix3x3::Rotate(const Vector3 euler, const bool isDegrees /*= false*/)
@@ -55,9 +55,9 @@ namespace Engine
     {
         const Vector3 scale = GetScale();
 
-        _rows[0] = Vector4(1, 0, 0, 0) * scale.X;
-        _rows[1] = Vector4(0, 1, 0, 0) * scale.Y;
-        _rows[2] = Vector4(0, 0, 1, 0) * scale.Z;
+        _columns[0] = Vector4(1, 0, 0, 0) * scale.X;
+        _columns[1] = Vector4(0, 1, 0, 0) * scale.Y;
+        _columns[2] = Vector4(0, 0, 1, 0) * scale.Z;
         Rotate(quat);
     }
 
@@ -65,9 +65,9 @@ namespace Engine
     {
         const Vector3 scale = GetScale();
 
-        _rows[0] = Vector4(1, 0, 0, 0) * scale.X;
-        _rows[1] = Vector4(0, 1, 0, 0) * scale.Y;
-        _rows[2] = Vector4(0, 0, 1, 0) * scale.Z;
+        _columns[0] = Vector4(1, 0, 0, 0) * scale.X;
+        _columns[1] = Vector4(0, 1, 0, 0) * scale.Y;
+        _columns[2] = Vector4(0, 0, 1, 0) * scale.Z;
 
         if(isDegrees)
         {
@@ -108,41 +108,41 @@ namespace Engine
 
     void Matrix3x3::SetScale(const Vector3 scale)
     {
-        _rows[0].Normalize();
-        _rows[1].Normalize();
-        _rows[2].Normalize();
+        _columns[0].Normalize();
+        _columns[1].Normalize();
+        _columns[2].Normalize();
 
-        _rows[0] *= scale.X;
-        _rows[1] *= scale.Y;
-        _rows[2] *= scale.Z;
+        _columns[0] *= scale.X;
+        _columns[1] *= scale.Y;
+        _columns[2] *= scale.Z;
     }
 
     void Matrix3x3::Scale(const Vector3 scale)
     {
-        _rows[0] *= scale.X;
-        _rows[1] *= scale.Y;
-        _rows[2] *= scale.Z;
+        _columns[0] *= scale.X;
+        _columns[1] *= scale.Y;
+        _columns[2] *= scale.Z;
     }
 
     Vector3 Matrix3x3::GetScale() const
     {
-        const Vector3 scale(Vector3(_rows[0]).Length(), Vector3(_rows[1]).Length(), Vector3(_rows[2]).Length());
+        const Vector3 scale(Vector3(_columns[0]).Length(), Vector3(_columns[1]).Length(), Vector3(_columns[2]).Length());
         return scale;
     }
 
     Vector3 Matrix3x3::GetRight() const
     {
-        return _rows[0];
+        return _columns[0];
     }
 
     Vector3 Matrix3x3::GetUp() const
     {
-        return _rows[1];
+        return _columns[1];
     }
 
     Vector3 Matrix3x3::GetForward() const
     {
-        return _rows[2];
+        return _columns[2];
     }
 
     Matrix3x3 Matrix3x3::Convert(const glm::mat3& mat3)
@@ -153,28 +153,28 @@ namespace Engine
     Matrix3x3::operator const reactphysics3d::Matrix3x3() const
     {
         return reactphysics3d::Matrix3x3(
-        _rows[0][0], _rows[0][1], _rows[0][2],
-        _rows[1][0], _rows[1][1], _rows[1][2],
-        _rows[2][0], _rows[2][1], _rows[2][2]);
+        _columns[0][0], _columns[0][1], _columns[0][2],
+        _columns[1][0], _columns[1][1], _columns[1][2],
+        _columns[2][0], _columns[2][1], _columns[2][2]);
     }
 
     Matrix3x3::operator const glm::mat3() const
     {
-        return glm::mat3(_rows[0], _rows[1], _rows[2]);
+        return glm::mat3(_columns[0], _columns[1], _columns[2]);
     }
 
     Matrix3x3::operator const Matrix4x4() const
     {
-        return {Vector4(_rows[0]), Vector4(_rows[1]), Vector4(_rows[2]), Vector4::ZeroVector()};
+        return {Vector4(_columns[0]), Vector4(_columns[1]), Vector4(_columns[2]), Vector4::ZeroVector()};
     }
 
     Matrix3x3& Matrix3x3::operator*=(const Matrix3x3& matrix)
     {
         glm::mat3 newMatrix = Convert(glm::mat3(*this) * glm::mat3(matrix));
 
-        _rows[0] = Vector3::Convert(newMatrix[0]);
-        _rows[1] = Vector3::Convert(newMatrix[1]);
-        _rows[2] = Vector3::Convert(newMatrix[2]);
+        _columns[0] = Vector3::Convert(newMatrix[0]);
+        _columns[1] = Vector3::Convert(newMatrix[1]);
+        _columns[2] = Vector3::Convert(newMatrix[2]);
 
         return *this;
     }

@@ -24,6 +24,8 @@ using Slang::ComPtr;
 #include "ANE/Core/Math/Matrix/Matrix4x4.h"
 #include "ANE/Renderer/Mesh.h"
 #include "ANE/Utilities/ImGuiUtilities.h"
+#include "ANE/Renderer/Renderer.h"
+#include "ANE/Renderer/Draw.h"
 
 namespace Engine
 {
@@ -46,7 +48,7 @@ namespace Engine
         _initialized = true;
     }
 
-    void VulkanRenderer::Render(const WindowProperties& props)
+    void VulkanRenderer::Render(const WindowProperties& props, const DrawContext& drawCommands)
     {
         if (!_initialized)
         {
@@ -63,7 +65,7 @@ namespace Engine
             _mainWindowData.ClearValue.color.float32[1] = ClearColor.y * ClearColor.w;
             _mainWindowData.ClearValue.color.float32[2] = ClearColor.z * ClearColor.w;
             _mainWindowData.ClearValue.color.float32[3] = ClearColor.w;
-            Draw(props);
+            Draw(props, drawCommands);
             //RenderFrame(&_mainWindowData, drawData);
         }
 
@@ -96,12 +98,43 @@ namespace Engine
         _initialized = false;
     }
 
+    VmaMeshAsset VulkanRenderer::LoadModel(const std::string& modelPath)
+    {
+        if (_loadedModelMap.contains(modelPath))
+        {
+            return _loadedModelMap[modelPath];
+        }
+
+        const std::filesystem::path absolutePath = std::filesystem::current_path().append("..\\Meshes\\").append(modelPath);
+
+        const MeshAsset meshAsset = MeshLoader::LoadMesh(absolutePath.string().c_str());
+        Mesh mesh = meshAsset.SubMeshes[0]; // Use first submesh for now.
+
+        const VmaMeshBuffers meshBuffers = UploadMesh(mesh.Indices, mesh.Vertices);
+
+        VmaMeshAsset vmaMeshAsset;
+        vmaMeshAsset.Name = modelPath;
+        vmaMeshAsset.NumVertices = mesh.Indices.size();
+        vmaMeshAsset.SubMeshes = meshAsset.SubMeshes;
+        vmaMeshAsset.MeshBuffers = meshBuffers;
+
+        _mainDeletionQueue.PushFunction([=]
+        {
+            const VmaMeshBuffers buffers = vmaMeshAsset.MeshBuffers;
+            DestroyBuffer(buffers.IndexBuffer);
+            DestroyBuffer(buffers.VertexBuffer);
+        });
+
+        _loadedModelMap[modelPath] = vmaMeshAsset;
+
+        return vmaMeshAsset;
+    }
+
     float VulkanRenderer::GetFramerate()
     {
         return _io->Framerate;
     }
 
-    static inline int modelVertexCount = 0;
     void VulkanRenderer::SetupVulkan(SDL_Window* window)
     {
         const std::vector<const char*> extensions = GetAvailableExtensions(window);
@@ -136,21 +169,7 @@ namespace Engine
 
         CreatePipeline(logicalDevice);
 
-        {
-            // TODO: Figure out where to store the model file and how to access it.
-            const std::filesystem::path modelPath = std::filesystem::current_path().append("..\\Meshes\\Suzanne.fbx");
-
-            const MeshAsset meshAsset = MeshLoader::LoadMesh(modelPath.string().c_str());
-            Mesh mesh = meshAsset.SubMeshes[0]; // Use first submesh for now.
-
-            modelVertexCount = mesh.Indices.size();
-            _rectangleMesh = UploadMesh(mesh.Indices, mesh.Vertices);
-            _mainDeletionQueue.PushFunction([]
-            {
-                DestroyBuffer(_rectangleMesh.IndexBuffer);
-                DestroyBuffer(_rectangleMesh.VertexBuffer);
-            });
-        }
+        Renderer::LoadModel("Suzanne.fbx");
     }
 
     void VulkanRenderer::SetupImGui(SDL_Window* window)
@@ -689,19 +708,7 @@ namespace Engine
         _mainDeletionQueue.PushFunction([&]{ vkDestroyDescriptorPool(_device, _imGuiDescriptorPool, _allocator); });
     }
 
-    Matrix4x4 VulkanRenderer::GetViewProjectionMatrix()
-    {
-        Matrix4x4 modelMat = Matrix4x4::Identity();
-        //glm::mat4 viewMat = glm::mat4{ 1.f };
-        //viewMat = rotate(viewMat, CameraRotationRadians.y, glm::vec3{1, 0, 0});
-        //viewMat = rotate(viewMat, CameraRotationRadians.x, glm::vec3{0, 1, 0});
-        //viewMat = translate(viewMat, glm::vec3{ -CameraPosition.x, -CameraPosition.y, CameraPosition.z - 2.0f }); // X and Y seem to be flipped.
-        //glm::mat4 projMat = glm::perspective(glm::radians(70.f), (float)_windowExtent.width / (float)_windowExtent.height, 10000.f, 0.1f); // Flip clip planes.
-        //projMat[1][1] *= -1.f;
-        return ViewProjection * modelMat;
-    }
-
-    void VulkanRenderer::Draw(const WindowProperties& props)
+    void VulkanRenderer::Draw(const WindowProperties& props, const DrawContext& drawCommands)
     {
         if (_rebuildSwapchain)
         {
@@ -734,7 +741,7 @@ namespace Engine
         VulkanUtils::TransitionImage(cmd, _colorImage.Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
         VulkanUtils::TransitionImage(cmd, _depthImage.Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
 
-        DrawGeometry(cmd);
+        DrawGeometry(cmd, drawCommands);
 
         // Prepare and copy color buffer into the active swapchain buffer.
         VulkanUtils::TransitionImage(cmd, _colorImage.Image, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
@@ -781,7 +788,7 @@ namespace Engine
         _frameIndex++;
     }
 
-    void VulkanRenderer::DrawGeometry(VkCommandBuffer cmd)
+    void VulkanRenderer::DrawGeometry(VkCommandBuffer cmd, const DrawContext& drawCommands)
     {
         _drawExtent.height = std::min(_swapchainExtent.height, _colorImage.ImageExtent.height);
         _drawExtent.width = std::min(_swapchainExtent.width, _colorImage.ImageExtent.width);
@@ -811,14 +818,17 @@ namespace Engine
 
         vkCmdSetScissor(cmd, 0, 1, &scissor);
 
-        PushConstantBuffer pushConstants;
-        pushConstants.WorldMatrix = GetViewProjectionMatrix();
-        pushConstants.VertexBuffer = _rectangleMesh.VertexBufferAddress;
+        for (DrawCommand drawCommand : drawCommands.Commands)
+        {
+            PushConstantBuffer pushConstants;
+            pushConstants.WorldMatrix = ViewProjection * drawCommand.ModelMatrix; // VP * M
+            pushConstants.VertexBuffer = drawCommand.MeshBuffers.VertexBufferAddress;
 
-        vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstantBuffer), &pushConstants);
-        vkCmdBindIndexBuffer(cmd, _rectangleMesh.IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
+            vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstantBuffer), &pushConstants);
+            vkCmdBindIndexBuffer(cmd, drawCommand.MeshBuffers.IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
 
-        vkCmdDrawIndexed(cmd, modelVertexCount, 1, 0, 0, 0);
+            vkCmdDrawIndexed(cmd, drawCommand.VertexCount, 1, 0, 0, 0);
+        }
 
         vkCmdEndRendering(cmd);
     }

@@ -112,7 +112,7 @@ namespace Engine
 
     Matrix4x4 CameraController::ComputeViewProjMatrix(CameraComponent camera)
     {
-        Matrix4x4 transformMatrix = _transformComponent->Transform.GetLocalToWorld();
+        Matrix4x4 transformMatrix = _transformComponent->Transform.GetWorldToLocal();
         Matrix4x4 viewMatrix = transformMatrix;
         Matrix4x4 projMatrix = camera.PerspectiveMatrix;
         return projMatrix * viewMatrix;

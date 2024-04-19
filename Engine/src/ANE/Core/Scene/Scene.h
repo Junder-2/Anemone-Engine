@@ -19,6 +19,8 @@ namespace Engine
         void OnEvent(Event& e);
         void OnUpdate(float timeStep);
 
+        void SubmitDrawCommands();
+
         Entity Create(const char* name = "Untagged");
         Entity Create(std::string = "Untagged");
         Entity GetEntityWithUUID(std::string UUID);

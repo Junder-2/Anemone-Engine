@@ -50,8 +50,9 @@ void Engine::InspectorPanel::OnPanelRender()
                 ImGui::Text(_EditorLayer->GetComponentNameFromEnttId(id).c_str());
             }
         }
+
         if(ImGui::Button("Add Component")){
-            selectedEntity.AddComponent<RenderComponent>();
+            selectedEntity.AddComponent<RenderComponent>("Suzanne.fbx");
         }
     }
     else

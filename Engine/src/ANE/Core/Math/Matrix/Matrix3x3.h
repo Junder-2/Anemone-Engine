@@ -22,23 +22,23 @@ namespace Engine
 
         Matrix3x3(const float value)
         {
-            _rows[0] = value;
-            _rows[1] = value;
-            _rows[2] = value;
+            _columns[0] = value;
+            _columns[1] = value;
+            _columns[2] = value;
         }
 
         Matrix3x3(const float a1, const float a2, const float a3, const float b1, const float b2, const float b3, const float c1, const float c2, const float c3)
         {
-            _rows[0][0] = a1; _rows[0][1] = a2; _rows[0][2] = a3;
-            _rows[1][0] = b1; _rows[1][1] = b2; _rows[1][2] = b3;
-            _rows[2][0] = c1; _rows[2][1] = c2; _rows[2][2] = c3;
+            _columns[0][0] = a1; _columns[0][1] = a2; _columns[0][2] = a3;
+            _columns[1][0] = b1; _columns[1][1] = b2; _columns[1][2] = b3;
+            _columns[2][0] = c1; _columns[2][1] = c2; _columns[2][2] = c3;
         }
 
         Matrix3x3(const Vector3 a, const Vector3 b, const Vector3 c)
         {
-            _rows[0] = a;
-            _rows[1] = b;
-            _rows[2] = c;
+            _columns[0] = a;
+            _columns[1] = b;
+            _columns[2] = c;
         }
 
         void Clear();
@@ -85,7 +85,7 @@ namespace Engine
 
         bool operator==(const Matrix3x3& matrix) const
         {
-            return (_rows[0] == matrix[0] && _rows[1] == matrix[1] && _rows[2] == matrix[2]);
+            return (_columns[0] == matrix[0] && _columns[1] == matrix[1] && _columns[2] == matrix[2]);
         }
 
         bool operator!= (const Matrix3x3& matrix) const
@@ -95,25 +95,25 @@ namespace Engine
 
         Matrix3x3& operator+=(const Matrix3x3& matrix)
         {
-            _rows[0] += matrix[0];
-            _rows[1] += matrix[1];
-            _rows[2] += matrix[2];
+            _columns[0] += matrix[0];
+            _columns[1] += matrix[1];
+            _columns[2] += matrix[2];
             return *this;
         }
 
         Matrix3x3& operator-=(const Matrix3x3& matrix)
         {
-            _rows[0] -= matrix[0];
-            _rows[1] -= matrix[1];
-            _rows[2] -= matrix[2];
+            _columns[0] -= matrix[0];
+            _columns[1] -= matrix[1];
+            _columns[2] -= matrix[2];
             return *this;
         }
 
         Matrix3x3& operator*=(const float scalar)
         {
-            _rows[0] *= scalar;
-            _rows[1] *= scalar;
-            _rows[2] *= scalar;
+            _columns[0] *= scalar;
+            _columns[1] *= scalar;
+            _columns[2] *= scalar;
             return *this;
         }
 
@@ -121,12 +121,12 @@ namespace Engine
 
         const Vector3& operator[](const int row) const
         {
-            return _rows[row];
+            return _columns[row];
         }
 
         Vector3& operator[](const int row)
         {
-            return _rows[row];
+            return _columns[row];
         }
 
         friend Matrix3x3 operator+(const Matrix3x3& matrix1, const Matrix3x3& matrix2)
@@ -164,40 +164,40 @@ namespace Engine
 
         friend Vector3 operator*(const Matrix3x3& matrix, const Vector3& vector)
         {
-            return {matrix[0][0]*vector.X + matrix[0][1]*vector.Y + matrix[0][2]*vector.Z,
-                    matrix[1][0]*vector.X + matrix[1][1]*vector.Y + matrix[1][2]*vector.Z,
-                   matrix[2][0]*vector.X + matrix[2][1]*vector.Y + matrix[2][2]*vector.Z};
+            return {matrix[0][0]*vector.X + matrix[1][0]*vector.Y + matrix[2][0]*vector.Z,
+                    matrix[0][1]*vector.X + matrix[1][1]*vector.Y + matrix[2][1]*vector.Z,
+                   matrix[0][2]*vector.X + matrix[1][2]*vector.Y + matrix[2][2]*vector.Z};
         }
 
         std::string ToString() const;
 
     private:
-        Vector3 _rows[3];
+        Vector3 _columns[3];
     };
 
     inline void Matrix3x3::Clear()
     {
-        _rows[0] = 0;
-        _rows[1] = 0;
-        _rows[2] = 0;
+        _columns[0] = 0;
+        _columns[1] = 0;
+        _columns[2] = 0;
     }
 
     inline Vector3 Matrix3x3::GetColumn(int i) const
     {
         assert(i>= 0 && i<3);
-        return Vector3(_rows[0][i], _rows[1][i], _rows[2][i]);
+        return Vector3(_columns[0][i], _columns[1][i], _columns[2][i]);
     }
 
     inline Vector3 Matrix3x3::GetRow(int i) const
     {
         assert(i>= 0 && i<3);
-        return _rows[i];
+        return _columns[i];
     }
 
     inline std::string Matrix3x3::ToString() const
     {
-        return "Matrix3x3(" + std::to_string(_rows[0][0]) + "," + std::to_string(_rows[0][1]) + "," + std::to_string(_rows[0][2]) + "," +
-           std::to_string(_rows[1][0]) + "," + std::to_string(_rows[1][1]) + "," + std::to_string(_rows[1][2]) + "," +
-           std::to_string(_rows[2][0]) + "," + std::to_string(_rows[2][1]) + "," + std::to_string(_rows[2][2]) + ")";
+        return "Matrix3x3(" + std::to_string(_columns[0][0]) + "," + std::to_string(_columns[0][1]) + "," + std::to_string(_columns[0][2]) + "," +
+           std::to_string(_columns[1][0]) + "," + std::to_string(_columns[1][1]) + "," + std::to_string(_columns[1][2]) + "," +
+           std::to_string(_columns[2][0]) + "," + std::to_string(_columns[2][1]) + "," + std::to_string(_columns[2][2]) + ")";
     }
 }

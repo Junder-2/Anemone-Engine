@@ -1,4 +1,5 @@
 #pragma once
+#include <entt.hpp>
 #include <SDL_video.h>
 #include <imgui_impl_vulkan.h>
 #include <span>
@@ -7,6 +8,8 @@
 #include "VulkanDeletionQueue.h"
 #include "VulkanPipelineBuilder.h"
 #include "ANE/Core/Math/Matrix/Matrix4x4.h"
+#include "ANE/Renderer/Draw.h"
+#include "ANE/Renderer/Mesh.h"
 
 namespace vkb
 {
@@ -60,8 +63,10 @@ namespace Engine
         VulkanRenderer(SDL_Window* window);
 
         void Setup();
-        void Render(const WindowProperties& props);
+        void Render(const WindowProperties& props, const DrawContext& drawCommands);
         void Cleanup();
+
+        VmaMeshAsset LoadModel(const std::string& modelPath);
 
         float GetFramerate();
         static ImGuiIO* GetImGuiIO() { return _io; }
@@ -96,10 +101,8 @@ namespace Engine
 
         static void CreateImGuiDescriptorPool();
 
-        inline static Matrix4x4 GetViewProjectionMatrix();
-
-        inline static void Draw(const WindowProperties& props);
-        inline static void DrawGeometry(VkCommandBuffer cmd);
+        inline static void Draw(const WindowProperties& props, const DrawContext& drawCommands);
+        inline static void DrawGeometry(VkCommandBuffer cmd, const DrawContext& drawCommands);
         inline static void DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView);
 
         static void CleanupVulkan();
@@ -181,7 +184,7 @@ namespace Engine
         inline static VulkanFrame _frameData[3];
         inline static VulkanImmediateBuffer _immBuffer;
 
-        inline static VmaMeshBuffers _rectangleMesh;
+        inline static entt::dense_map<std::string, VmaMeshAsset> _loadedModelMap;
 
         // ImGui
         inline static ImGui_ImplVulkanH_Window _mainWindowData;

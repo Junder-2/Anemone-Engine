@@ -22,6 +22,7 @@ namespace Engine
     {
         std::string Name;
 
+        uint32_t NumVertices;
         std::vector<Mesh> SubMeshes;
         VmaMeshBuffers MeshBuffers;
     };
