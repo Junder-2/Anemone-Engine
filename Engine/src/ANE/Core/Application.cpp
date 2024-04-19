@@ -34,8 +34,6 @@ namespace Engine
     void Application::Init()
     {
         ANE_PROFILE_FUNCTION();
-        auto &MainLogger = Registry::GetLogger("Editor Console Log");
-        ASLOG_TO_LOGGER(MainLogger,debug, "starting...");
         _window = Window::Create(WindowProperties(_appSpec.Name));
         _window->BindOnEvent(MakeDelegate(this, &Application::OnEvent));
 

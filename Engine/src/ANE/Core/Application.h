@@ -6,9 +6,6 @@
 #include "ANE/Events/Event.h"
 #include "ANE/Core/Layers/ImGuiLayer.h"
 #include "ANE/Input/InputHandler.h"
-#include "Log/Sink.h"
-#include "Log/LogSinkBase.h"
-
 namespace Engine
 {
     class SubSystemCollection;
