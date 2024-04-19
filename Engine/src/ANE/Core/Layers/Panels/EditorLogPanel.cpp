@@ -8,9 +8,10 @@
 
 namespace Engine
 {
+    //TODO: I just choose some random colors
     const ImVec4 EditorLogPanel::colorInfo {0.3f, 0.8f, 0.3f, 1.f };
     const ImVec4 EditorLogPanel::colorWarn {0.8f, 0.8f, 0.f, 1.f};
-    const ImVec4 EditorLogPanel::colorError {8.0f, 0.1f, 0.1f, 1.f};
+    const ImVec4 EditorLogPanel::colorError {1.0f, 0.1f, 0.1f, 1.f};
 
     EditorLogPanel::EditorLogPanel()
     {
@@ -33,6 +34,7 @@ namespace Engine
 
         const auto logMessages = Logging::GetMessages();
 
+        // Using a reverse iterator because imgui draws the text top to bottom and the latest message is first
         for (const LogMessage& logMessage : logMessages | std::views::reverse)
         {
             if(logMessage.LevelCategory == LogLevelCategory::LevelNone) continue;
@@ -41,6 +43,7 @@ namespace Engine
             DrawLogMessage(logMessage);
         }
 
+        // TODO: auto scroll could be improved. Maybe cancel when manually scrolling or disabling it
         if (_autoScroll)
         {
             ImGui::SetScrollHereY(1.f);
@@ -105,6 +108,7 @@ namespace Engine
 
         const std::string levelName = LoggingUtilities::ToString(logMessage.LevelCategory);
 
+        // Right now using append, from searches ostream is slower?
         std::string fullMessage;
         if(_displayLoggerName && _displayLevel)
         {
@@ -190,7 +194,7 @@ namespace Engine
 
         ImGui::SameLine();
         ImGui::Checkbox("Wrap", &_wrap);
-        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Toggle soft wraps");
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Wraps log messages");
 
         ImGui::SameLine();
         ImGui::Checkbox("Auto Scroll", &_autoScroll);
@@ -204,7 +208,7 @@ namespace Engine
 
     void EditorLogPanel::LoadSettings()
     {
-
+        // If we want to save log display options add here
     }
 
     void EditorLogPanel::SaveSettings()
