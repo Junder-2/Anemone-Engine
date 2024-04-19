@@ -11,9 +11,9 @@
 
 //solves warnings
 #pragma warning(push, 0)
-#include <entt.hpp>
 #include <spdlog/spdlog.h>
 
+#include "LoggingTypes.h"
 #include "LogSink.h"
 #pragma warning(pop)
 
@@ -21,26 +21,35 @@ namespace Engine
 {
     using log_msg = spdlog::details::log_msg;
 
-    //log_msg
-    struct LogMessage
-    {
-        std::string Time;
-        std::string Source;
-        std::string LoggerName;
-        spdlog::level::level_enum Level;
-        std::string Message;
-    };
-
     class ANE_API Logging
     {
     public:
+        /**
+        * Initializes formatting and fixed loggers
+        */
         static void Init(const std::string& appName = "App");
 
+        /**
+        * Returns the fixed engine logger
+        */
         static spdlog::logger& GetEngineLogger();
+        /**
+        * Returns the fixed app logger
+        */
         static spdlog::logger& GetAppLogger();
+        /**
+        * Returns a logger from the registry. If none of type exist its created
+        */
         static spdlog::logger& GetLogger(std::string const& name);
 
+        /**
+        * Returns a list of unformatted logging messages
+        */
         static const std::list<LogMessage>& GetMessages();
+        /**
+        * Clears the list of logging messages
+        */
+        static void ClearMessages();
 
     private:
         static std::shared_ptr<spdlog::logger> CreateLogger(const std::string& loggerName);

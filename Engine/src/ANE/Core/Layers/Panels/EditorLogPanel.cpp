@@ -1,16 +1,20 @@
 #include "anepch.h"
 #include "EditorLogPanel.h"
 
+#include <ranges>
+
 #include "imgui.h"
+#include "ANE/Utilities/LoggingUtilities.h"
 
 namespace Engine
 {
-    const ImVec4 EditorLogPanel::COLOR_INFO {0.3f, 0.8f, 0.3f, 1.f };
-    const ImVec4 EditorLogPanel::COLOR_WARN {0.8f, 0.8f, 0.f, 1.f};
-    const ImVec4 EditorLogPanel::COLOR_ERROR {8.0f, 0.1f, 0.1f, 1.f};
+    const ImVec4 EditorLogPanel::colorInfo {0.3f, 0.8f, 0.3f, 1.f };
+    const ImVec4 EditorLogPanel::colorWarn {0.8f, 0.8f, 0.f, 1.f};
+    const ImVec4 EditorLogPanel::colorError {8.0f, 0.1f, 0.1f, 1.f};
 
     EditorLogPanel::EditorLogPanel()
     {
+        _levelFilter = ((int)LogLevelCategory::LevelError | (int)LogLevelCategory::LevelWarn | (int)LogLevelCategory::LevelInfo);
     }
 
     EditorLogPanel::~EditorLogPanel()
@@ -20,40 +24,191 @@ namespace Engine
 
     void EditorLogPanel::OnPanelRender()
     {
-        auto logMessages = Logging::GetMessages();
         ImGui::Begin("Log Window");
 
-        for (auto logMessage : logMessages)
+        DrawToolBar();
+
+        ImGui::Separator();
+        ImGui::BeginChild("Scrolling", ImVec2(0, 0), false, _wrap ? 0 : ImGuiWindowFlags_HorizontalScrollbar);
+
+        const auto logMessages = Logging::GetMessages();
+
+        for (const LogMessage& logMessage : logMessages | std::views::reverse)
         {
-            if(logMessage.Level == 0) break;
+            if(logMessage.LevelCategory == LogLevelCategory::LevelNone) continue;
+            if(!((int)logMessage.LevelCategory & _levelFilter)) continue;
 
-            ImVec4 currentColor;
-
-            switch (logMessage.Level)
-            {
-                case spdlog::level::trace:
-                case spdlog::level::debug:
-                case spdlog::level::info:
-                currentColor = COLOR_INFO;
-                break;
-                case spdlog::level::warn:
-                currentColor = COLOR_WARN;
-                break;
-                case spdlog::level::err:
-                case spdlog::level::critical:
-                currentColor = COLOR_ERROR;
-                break;
-            }
-
-            ImGui::TextColored(currentColor, "[%s ", logMessage.LoggerName.c_str());
-            ImGui::SameLine(0, 0);
-            ImGui::TextColored(currentColor, "%s]", logMessage.Time.c_str());
-            ImGui::SameLine(0, 0);
-            ImGui::TextColored(currentColor, " [%s]", logMessage.Source.c_str());
-            ImGui::SameLine(0, 0);
-            ImGui::TextColored(currentColor, " [%s]", logMessage.Message.c_str());
+            DrawLogMessage(logMessage);
         }
 
+        if (_autoScroll)
+        {
+            ImGui::SetScrollHereY(1.f);
+        }
+        ImGui::EndChild();
+
         ImGui::End();
+    }
+
+    void EditorLogPanel::ShowLogLevelsPopup()
+    {
+        ImGui::MenuItem("Filter Levels", nullptr, false, false);
+        bool filterInfo = _levelFilter & (int)LogLevelCategory::LevelInfo;
+        if(ImGui::Checkbox("Info", &filterInfo))
+        {
+            _levelFilter ^= (int)LogLevelCategory::LevelInfo;
+        }
+        bool filterWarn = _levelFilter & (int)LogLevelCategory::LevelWarn;
+        if(ImGui::Checkbox("Warn", &filterWarn))
+        {
+            _levelFilter ^= (int)LogLevelCategory::LevelWarn;
+        }
+        bool filterError = _levelFilter & (int)LogLevelCategory::LevelError;
+        if(ImGui::Checkbox("Error", &filterError))
+        {
+            _levelFilter ^= (int)LogLevelCategory::LevelError;
+        }
+    }
+
+    void EditorLogPanel::ShowLogFormatPopup()
+    {
+        ImGui::MenuItem("Logging Format", nullptr, false, false);
+        ImGui::Checkbox("Time", &_displayTime);
+        ImGui::Checkbox("Level", &_displayLevel);
+        ImGui::Checkbox("Source", &_displaySource);
+        ImGui::Checkbox("Logger", &_displayLoggerName);
+    }
+
+    void EditorLogPanel::DrawLogMessage(const LogMessage& logMessage)
+    {
+        ImGui::BeginGroup();
+
+        if(_wrap)
+        {
+            ImGui::PushTextWrapPos(0);
+        }
+
+        ImVec4 currentColor = colorError;
+
+        switch (logMessage.LevelCategory)
+        {
+            case LogLevelCategory::LevelInfo:
+                currentColor = colorInfo;
+                break;
+            case LogLevelCategory::LevelWarn:
+                currentColor = colorWarn;
+                break;
+            case LogLevelCategory::LevelError:
+                currentColor = colorError;
+                break;
+        }
+
+        const std::string levelName = LoggingUtilities::ToString(logMessage.LevelCategory);
+
+        std::string fullMessage;
+        if(_displayLoggerName && _displayLevel)
+        {
+            fullMessage.append(std::format("[{0} {1}", logMessage.LoggerName, levelName));
+        }
+        else if(_displayLoggerName)
+        {
+            fullMessage.append(std::format("[{0}", logMessage.LoggerName));
+        }
+        else if(_displayLevel)
+        {
+            fullMessage.append(std::format("[{0}", levelName));
+        }
+
+        if(_displayTime && (_displayLevel || _displayLoggerName))
+        {
+            fullMessage.append(std::format(" {0}] ", logMessage.Time));
+        }
+        else if(_displayTime)
+        {
+            fullMessage.append(std::format("[{0}] ", logMessage.Time));
+        }
+        else if((_displayLevel || _displayLoggerName))
+        {
+            fullMessage.append("] ");
+        }
+
+        if(_displaySource)
+        {
+            fullMessage.append(std::format("[{0}] ", logMessage.Source));
+        }
+
+        fullMessage.append(logMessage.Message);
+
+        ImGui::TextColored(currentColor, "%s", fullMessage.c_str());
+
+        if(_wrap)
+        {
+            ImGui::PopTextWrapPos();
+        }
+
+        ImGui::EndGroup();
+
+        if (ImGui::IsItemHovered())
+        {
+            ImGui::SetTooltip("%s", logMessage.Source.c_str());
+        }
+    }
+
+    void EditorLogPanel::DrawToolBar()
+    {
+        if (ImGui::Button("Levels"))
+        {
+            ImGui::OpenPopup("LogLevelsPopup");
+        }
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Change the logging levels");
+
+        if (ImGui::BeginPopup("LogLevelsPopup"))
+        {
+            ShowLogLevelsPopup();
+            ImGui::EndPopup();
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Display"))
+        {
+            ImGui::OpenPopup("LogFormatPopup");
+        }
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Log message display options");
+
+        if (ImGui::BeginPopup("LogFormatPopup"))
+        {
+            ShowLogFormatPopup();
+            ImGui::EndPopup();
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Clear"))
+        {
+            Clear();
+        }
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Clears log message list");
+
+        ImGui::SameLine();
+        ImGui::Checkbox("Wrap", &_wrap);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Toggle soft wraps");
+
+        ImGui::SameLine();
+        ImGui::Checkbox("Auto Scroll", &_autoScroll);
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Auto scrolling");
+    }
+
+    void EditorLogPanel::Clear()
+    {
+        Logging::ClearMessages();
+    }
+
+    void EditorLogPanel::LoadSettings()
+    {
+
+    }
+
+    void EditorLogPanel::SaveSettings()
+    {
+
     }
 }
