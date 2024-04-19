@@ -93,8 +93,12 @@ namespace Engine
         newLogMessage.Message = logMsg.payload;
         switch (logMsg.level)
         {
-            case spdlog::level::debug:
             case spdlog::level::trace:
+                newLogMessage.LevelCategory = LogLevelCategory::LevelTrace;
+            break;
+            case spdlog::level::debug:
+                newLogMessage.LevelCategory = LogLevelCategory::LevelDebug;
+            break;
             case spdlog::level::info:
                 newLogMessage.LevelCategory = LogLevelCategory::LevelInfo;
             break;

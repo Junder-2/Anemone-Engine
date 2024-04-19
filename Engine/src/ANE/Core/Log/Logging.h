@@ -75,6 +75,7 @@ namespace Engine
 
 // Engine log macros
 #define ANE_ELOG(...)               ANE_INTERNAL_LOGGER_CALL(ENGINE_LOGGER(), spdlog::level::trace, __VA_ARGS__)
+#define ANE_ELOG_DEBUG(...)         ANE_INTERNAL_LOGGER_CALL(ENGINE_LOGGER(), spdlog::level::debug, __VA_ARGS__)
 #define ANE_ELOG_INFO(...)          ANE_INTERNAL_LOGGER_CALL(ENGINE_LOGGER(), spdlog::level::info, __VA_ARGS__)
 #define ANE_ELOG_WARN(...)          ANE_INTERNAL_LOGGER_CALL(ENGINE_LOGGER(), spdlog::level::warn, __VA_ARGS__)
 #define ANE_ELOG_ERROR(...)         ANE_INTERNAL_LOGGER_CALL(ENGINE_LOGGER(), spdlog::level::err, __VA_ARGS__)
@@ -82,6 +83,7 @@ namespace Engine
 
 // App log macros
 #define ANE_LOG(...)                ANE_INTERNAL_LOGGER_CALL(APP_LOGGER(), spdlog::level::trace, __VA_ARGS__)
+#define ANE_LOG_DEBUG(...)          ANE_INTERNAL_LOGGER_CALL(APP_LOGGER(), spdlog::level::debug, __VA_ARGS__)
 #define ANE_LOG_INFO(...)           ANE_INTERNAL_LOGGER_CALL(APP_LOGGER(), spdlog::level::info, __VA_ARGS__)
 #define ANE_LOG_WARN(...)           ANE_INTERNAL_LOGGER_CALL(APP_LOGGER(), spdlog::level::warn, __VA_ARGS__)
 #define ANE_LOG_ERROR(...)          ANE_INTERNAL_LOGGER_CALL(APP_LOGGER(), spdlog::level::err, __VA_ARGS__)
@@ -89,12 +91,14 @@ namespace Engine
 
 #else
 #define ANE_ELOG(...)
+#define ANE_ELOG_DEBUG(...)
 #define ANE_ELOG_INFO(...)
 #define ANE_ELOG_WARN(...)
 #define ANE_ELOG_ERROR(...)
 #define ANE_ELOG_CRITICAL(...)
 
 #define ANE_LOG(...)
+#define ANE_LOG_DEBUG(...)
 #define ANE_LOG_INFO(...)
 #define ANE_LOG_WARN(...)
 #define ANE_LOG_ERROR(...)

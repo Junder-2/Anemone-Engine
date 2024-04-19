@@ -3,13 +3,14 @@
 
 namespace Engine
 {
-    // TODO: Talk about log levels and decide on what we want
     enum class LogLevelCategory
     {
         LevelNone = 0,
-        LevelInfo = BIT(0),
-        LevelWarn = BIT(1),
-        LevelError = BIT(2)
+        LevelTrace = BIT(0),
+        LevelDebug = BIT(1),
+        LevelInfo = BIT(2),
+        LevelWarn = BIT(3),
+        LevelError = BIT(4)
     };
 
     //log_msg

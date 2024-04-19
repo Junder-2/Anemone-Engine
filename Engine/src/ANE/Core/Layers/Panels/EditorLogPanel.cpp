@@ -15,7 +15,8 @@ namespace Engine
 
     EditorLogPanel::EditorLogPanel()
     {
-        _levelFilter = ((int)LogLevelCategory::LevelError | (int)LogLevelCategory::LevelWarn | (int)LogLevelCategory::LevelInfo);
+        _levelFilter = (int)LogLevelCategory::LevelError | (int)LogLevelCategory::LevelWarn | (int)LogLevelCategory::LevelInfo
+                            | (int)LogLevelCategory::LevelDebug | (int)LogLevelCategory::LevelTrace;
     }
 
     EditorLogPanel::~EditorLogPanel()
@@ -56,6 +57,16 @@ namespace Engine
     void EditorLogPanel::ShowLogLevelsPopup()
     {
         ImGui::MenuItem("Filter Levels", nullptr, false, false);
+        bool filterTrace = _levelFilter & (int)LogLevelCategory::LevelTrace;
+        if(ImGui::Checkbox("Trace", &filterTrace))
+        {
+            _levelFilter ^= (int)LogLevelCategory::LevelTrace;
+        }
+        bool filterDebug = _levelFilter & (int)LogLevelCategory::LevelDebug;
+        if(ImGui::Checkbox("Debug", &filterDebug))
+        {
+            _levelFilter ^= (int)LogLevelCategory::LevelDebug;
+        }
         bool filterInfo = _levelFilter & (int)LogLevelCategory::LevelInfo;
         if(ImGui::Checkbox("Info", &filterInfo))
         {
@@ -95,6 +106,8 @@ namespace Engine
 
         switch (logMessage.LevelCategory)
         {
+            case LogLevelCategory::LevelTrace:
+            case LogLevelCategory::LevelDebug:
             case LogLevelCategory::LevelInfo:
                 currentColor = colorInfo;
                 break;
