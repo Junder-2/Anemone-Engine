@@ -13,7 +13,10 @@ workspace "Anemone-Engine"
 
     defines
     {
-        "SPDLOG_USE_STD_FORMAT"
+        "SPDLOG_USE_STD_FORMAT",
+        "GLM_ENABLE_EXPERIMENTAL",
+        "GLM_FORCE_DEPTH_ZERO_TO_ONE",
+        "GLM_FORCE_LEFT_HANDED"
     }
 
 OutputDir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"

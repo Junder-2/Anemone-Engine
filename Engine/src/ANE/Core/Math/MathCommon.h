@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <glm/glm.hpp>
 #include "glm/gtx/fast_trigonometry.hpp"
 
 namespace Engine

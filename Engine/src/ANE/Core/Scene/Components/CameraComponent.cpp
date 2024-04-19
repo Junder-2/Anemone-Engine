@@ -1,6 +1,8 @@
 #include "anepch.h"
 #include "CameraComponent.h"
 
+#include "glm/ext/matrix_clip_space.hpp"
+
 namespace Engine
 {
     void CameraComponent::SetPosition(const Vector3 newPosition)
