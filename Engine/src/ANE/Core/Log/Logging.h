@@ -67,9 +67,6 @@ namespace Engine
 #define ENGINE_LOGGER() Engine::Logging::GetEngineLogger()
 #define APP_LOGGER() Engine::Logging::GetAppLogger()
 
-#define ANE_INTERNAL_ELOG(LEVEL, ...) ASLOG_TO_LOGGER(ENGINE_LOGGER(), LEVEL, __VA_ARGS__)
-#define ANE_INTERNAL_LOG(LEVEL, ...) ASLOG_TO_LOGGER(APP_LOGGER(), LEVEL, __VA_ARGS__)
-
 #define ANE_INTERNAL_LOGGER_CALL(logger, level, ...) \
 (logger).log(spdlog::source_loc{__FILE__, __LINE__, SPDLOG_FUNCTION}, level, __VA_ARGS__)
 
