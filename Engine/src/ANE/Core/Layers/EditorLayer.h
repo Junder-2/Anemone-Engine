@@ -48,7 +48,7 @@ namespace Engine
 
         void OnSwitchEditorFocus(InputValue inputValue);
 
-       // static void ShowEditorMenuBar();
+        // static void ShowEditorMenuBar();
 
 
     protected:

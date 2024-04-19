@@ -3,6 +3,11 @@
 //#include "../Entity/Entity.h"
 #include "entt.hpp"
 
+namespace reactphysics3d
+{
+    class PhysicsWorld;
+}
+
 namespace Engine
 {
     class Entity;
@@ -26,9 +31,16 @@ namespace Engine
         Entity GetEntityWithUUID(std::string UUID);
         entt::registry _registry;
 
+    private:
+        void OnFixedUpdate(float timeStep);
 
     private:
         friend class Entity;
+
+        reactphysics3d::PhysicsWorld* _physicsWorld;
+
+        float _accumulator = 0;
+        float _timeStep = 1/60.f;
 
         std::map<std::string, Entity> _entityMap;
 

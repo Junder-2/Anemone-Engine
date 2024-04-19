@@ -1,10 +1,12 @@
 ﻿#pragma once
+#include <entt.hpp>
+
 #include "ANE/Subsystem/SubSystem.h"
 #include <reactphysics3d/reactphysics3d.h>
 
 namespace Engine
 {
-    using namespace reactphysics3d;
+    class Entity;
     class PhysicsLogger;
     struct TransformMatrix;
 
@@ -14,11 +16,13 @@ namespace Engine
         PhysicsSystem();
         ~PhysicsSystem() override;
 
-        RigidBody& CreateRigidBody(const TransformMatrix& transformMatrix);
+        reactphysics3d::PhysicsWorld& GetPhysicsWorld() const;
+
+        reactphysics3d::RigidBody& CreateRigidBody(Entity entity);
 
     private:
-        PhysicsCommon _physicsCommon {};
-        PhysicsWorld* _world;
+        reactphysics3d::PhysicsCommon _physicsCommon {};
+        reactphysics3d::PhysicsWorld* _world;
 
         PhysicsLogger* _physicsLogger;
     };

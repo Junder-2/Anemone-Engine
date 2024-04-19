@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "../ScriptableEntity.h"
+#include "ANE/Core/Entity/ScriptableEntity.h"
 #include "ANE/Core/Scene/Components/CameraComponent.h"
 #include "ANE/Input/Input.h"
 #include "ANE/Utilities/InputUtilities.h"
@@ -19,6 +19,8 @@ namespace Engine
         }
 
         void OnUpdate(float deltaTime) override;
+
+        void OnFixedUpdate(float timeStep) override;
 
         void OnMoveX(InputValue inputValue);
 

@@ -2,6 +2,7 @@
 #include "PhysicsSystem.h"
 
 #include "PhysicsLogger.h"
+#include "ANE/Core/Entity/Entity.h"
 #include "ANE/Core/Math/Matrix/TransformMatrix.h"
 
 namespace Engine
@@ -10,7 +11,7 @@ namespace Engine
     {
         _physicsLogger = new PhysicsLogger();
         _physicsCommon.setLogger(_physicsLogger);
-        _world = _physicsCommon.createPhysicsWorld(PhysicsWorld::WorldSettings());
+        _world = _physicsCommon.createPhysicsWorld(reactphysics3d::PhysicsWorld::WorldSettings());
     }
 
     PhysicsSystem::~PhysicsSystem()
@@ -19,10 +20,16 @@ namespace Engine
         delete _physicsLogger;
     }
 
-    RigidBody& PhysicsSystem::CreateRigidBody(const TransformMatrix& transformMatrix)
+    reactphysics3d::PhysicsWorld& PhysicsSystem::GetPhysicsWorld() const
     {
-        const Transform transform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
+        return *_world;
+    }
 
-        return *_world->createRigidBody(transform);
+    reactphysics3d::RigidBody& PhysicsSystem::CreateRigidBody(Entity entity)
+    {
+        const TransformMatrix transform = entity.GetComponent<TransformComponent>().Transform;
+        const reactphysics3d::Transform reactTransform(transform.GetPosition(), transform.GetQuaternion());
+
+        return *_world->createRigidBody(reactTransform);
     }
 }

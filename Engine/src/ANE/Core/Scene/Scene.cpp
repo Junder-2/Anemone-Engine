@@ -4,6 +4,7 @@
 #include "ANE/Core/Entity/Entity.h"
 #include "Components/NativeScriptComponent.h"
 #include "Components/RenderComponent.h"
+#include "Components/RigidBodyComponent.h"
 #include "Components/UUIDComponent.h"
 
 
@@ -109,6 +110,41 @@ namespace Engine
         }
 
         SubmitDrawCommands();
+
+        _accumulator += timeStep;
+
+        // Fixed update
+        while (_accumulator >= _timeStep)
+        {
+            OnFixedUpdate(_timeStep);
+
+            _accumulator -= _timeStep;
+        }
+    }
+
+    void Scene::OnFixedUpdate(float timeStep)
+    {
+        //_physicsWorld->update(timeStep);
+
+        _registry.view<NativeScriptComponent>().each([&](auto entity, auto& scriptComponent)
+        {
+            if (!scriptComponent.Instance)
+            {
+                scriptComponent.Instantiate();
+                scriptComponent.Instance->_entity = { entity, this };
+                scriptComponent.OnCreateFunction();
+            }
+            scriptComponent.OnFixedUpdateFunction(timeStep);
+        });
+
+        auto group = _registry.view<TransformComponent, RigidBodyComponent>();
+        for (auto entt : group)
+        {
+            auto[transform, body] = group.get<TransformComponent, RigidBodyComponent>(entt);
+
+            // transform.Transform.SetPosition(Vector3::Convert(body.Rigidbody->getTransform().getPosition()));
+            // transform.Transform.SetRotation(Quaternion::Convert(body.Rigidbody->getTransform().getOrientation()));
+        }
     }
 
     void Scene::SubmitDrawCommands()
