@@ -6,6 +6,7 @@
 
 #include "VmaTypes.h"
 #include "VulkanDeletionQueue.h"
+#include "VulkanDescriptors.h"
 #include "VulkanPipelineBuilder.h"
 #include "ANE/Core/Math/Matrix/Matrix4x4.h"
 #include "ANE/Renderer/Draw.h"
@@ -34,6 +35,7 @@ namespace Engine
         VkImageView BackbufferView;
         VkFramebuffer Framebuffer;
 
+        // TODO: Add deletion queue for frame-scoped objects.
         DescriptorAllocator Descriptors;
     };
 
@@ -98,6 +100,7 @@ namespace Engine
 
         static void SetupCommandBuffers();
         static void SetupSyncStructures();
+        static void SetupDescriptors();
 
         static PipelineWrapper CreatePipeline(const vkb::Device& logicalDevice);
 

@@ -167,6 +167,8 @@ namespace Engine
 
         SetupSyncStructures();
 
+        SetupDescriptors();
+
         CreatePipeline(logicalDevice);
 
         Renderer::LoadModel("Suzanne.fbx");
@@ -548,6 +550,28 @@ namespace Engine
         }
     }
 
+    void VulkanRenderer::SetupDescriptors()
+    {
+        for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+        {
+            std::vector<DescriptorAllocator::PoolSizeRatio> frameSizes =
+            {
+                { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 3 },
+                { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 3 },
+                { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3 },
+                { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 4 },
+            };
+
+            _frameData[i].Descriptors = DescriptorAllocator{};
+            _frameData[i].Descriptors.Init(_device, 1000, frameSizes, _allocator);
+
+            _mainDeletionQueue.PushFunction([&, i]
+            {
+                _frameData[i].Descriptors.Destroy(_device, _allocator);
+            });
+        }
+    }
+
     PipelineWrapper VulkanRenderer::CreatePipeline(const vkb::Device& logicalDevice)
     {
         ComPtr<slang::IGlobalSession> slangGlobalSession;
@@ -719,7 +743,7 @@ namespace Engine
             }
         }
 
-        const VulkanFrame frame = GetFrame();
+        VulkanFrame frame = GetFrame();
         CheckVkResult(vkWaitForFences(_device, 1, &frame.Fence, true, 1000000000));
 
         uint32_t swapchainImageIndex;
@@ -729,6 +753,9 @@ namespace Engine
             _rebuildSwapchain = true;
             return;
         }
+
+        // TODO: Flush frame-scoped deletion queue.
+        frame.Descriptors.Clear(_device);
 
         CheckVkResult(vkResetFences(_device, 1, &frame.Fence));
 
