@@ -40,7 +40,7 @@ namespace Engine
         reactphysics3d::PhysicsWorld* _physicsWorld;
 
         float _accumulator = 0;
-        float _timeStep = 1/60.f;
+        float _timeStep = 1.f/60.f;
 
         std::map<std::string, Entity> _entityMap;
 

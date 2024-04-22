@@ -63,7 +63,7 @@ namespace Engine
 
     void CameraController::OnFixedUpdate(float timeStep)
     {
-        ANE_ELOG("TimeStep: {}", timeStep);
+
     }
 
     void CameraController::OnMoveX(InputValue inputValue)

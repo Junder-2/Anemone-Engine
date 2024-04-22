@@ -6,12 +6,14 @@
 #include "Components/RenderComponent.h"
 #include "Components/RigidBodyComponent.h"
 #include "Components/UUIDComponent.h"
+#include "glm/ext/scalar_common.hpp"
 
 
 namespace Engine
 {
-    Engine::Scene::Scene()
+    Scene::Scene()
     {
+        _physicsWorld = &GetPhysicsSystem().GetPhysicsWorld();
 
         //create an entity
         //entt::entity entity = Registry.create();
@@ -95,7 +97,6 @@ namespace Engine
 
     void Scene::OnUpdate(float timeStep)
     {
-
         {
             _registry.view<NativeScriptComponent>().each([&](auto entity, auto& scriptComponent)
             {
@@ -109,8 +110,6 @@ namespace Engine
             });
         }
 
-        SubmitDrawCommands();
-
         _accumulator += timeStep;
 
         // Fixed update
@@ -118,13 +117,15 @@ namespace Engine
         {
             OnFixedUpdate(_timeStep);
 
-            _accumulator -= _timeStep;
+            _accumulator = glm::max(_accumulator - _timeStep, 0.f);
         }
+        
+        SubmitDrawCommands();
     }
 
     void Scene::OnFixedUpdate(float timeStep)
     {
-        //_physicsWorld->update(timeStep);
+        _physicsWorld->update(timeStep);
 
         _registry.view<NativeScriptComponent>().each([&](auto entity, auto& scriptComponent)
         {
@@ -142,8 +143,8 @@ namespace Engine
         {
             auto[transform, body] = group.get<TransformComponent, RigidBodyComponent>(entt);
 
-            // transform.Transform.SetPosition(Vector3::Convert(body.Rigidbody->getTransform().getPosition()));
-            // transform.Transform.SetRotation(Quaternion::Convert(body.Rigidbody->getTransform().getOrientation()));
+            transform.Transform.SetPosition(Vector3::Convert(body.Rigidbody->getTransform().getPosition()));
+            transform.Transform.SetRotation(Quaternion::Convert(body.Rigidbody->getTransform().getOrientation()));
         }
     }
 
