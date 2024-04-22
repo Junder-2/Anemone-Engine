@@ -30,7 +30,7 @@ namespace Engine
             VkShaderStageFlags StageFlags;
             std::vector<VkDescriptorSetLayoutBinding> Bindings;
 
-            VkDescriptorSetLayoutCreateFlags CreateFlags;
+            VkDescriptorSetLayoutCreateFlags CreateFlags = 0;
 
             VkAllocationCallbacks* AllocationCallbacks = VK_NULL_HANDLE;
         } _info;
