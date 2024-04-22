@@ -52,8 +52,17 @@ namespace Engine
 
         void Destroy(VkDevice logicalDevice, const VkAllocationCallbacks* callbacks);
 
-        VkDescriptorSet Allocate(VkDevice logicalDevice, VkDescriptorSetLayout layout);
+        VkDescriptorSet Allocate(VkDevice logicalDevice, VkDescriptorSetLayout layout, const VkAllocationCallbacks* callbacks);
 
-        VkDescriptorPool Pool;
+    private:
+
+        VkDescriptorPool GetPool(VkDevice logicalDevice, const VkAllocationCallbacks* callbacks);
+
+        VkDescriptorPool CreatePool(VkDevice logicalDevice, uint32_t setCount, std::span<PoolSizeRatio> poolRatios, const VkAllocationCallbacks* callbacks);
+
+        std::vector<PoolSizeRatio> _ratios;
+        std::vector<VkDescriptorPool> _fullPools;
+        std::vector<VkDescriptorPool> _readyPools;
+        uint32_t _setsPerPool;
     };
 }
