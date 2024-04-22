@@ -72,7 +72,7 @@ namespace Engine
         * @param delegateMember method with void(float, float)
         */
         template <class TClass>
-        void BindMouseScroll(DelegateMember<TClass, void(float, float)> delegateMember);
+        void BindMouseScroll(DelegateMember<TClass, void(Vector2)> delegateMember);
 
         /**
         * Returns the trigger state of a key. If the requested key isn't registered returns only pressed or not pressed
@@ -118,7 +118,7 @@ namespace Engine
         std::unordered_map<int, MulticastDelegate<void(InputValue)>> _axisActionMappingDelegates {};
         MulticastDelegate<void(MouseMoveValue)> _mouseMoveDelegate {};
         MulticastDelegate<void(MouseButtonValues)> _mouseButtonValueDelegate {};
-        MulticastDelegate<void(float, float)> _mouseScrollDelegate {};
+        MulticastDelegate<void(Vector2)> _mouseScrollDelegate {};
     };
 
     template <class TClass>
@@ -159,7 +159,7 @@ namespace Engine
     }
 
     template <class TClass>
-    void InputSystem::BindMouseScroll(DelegateMember<TClass, void(float, float)> delegateMember)
+    void InputSystem::BindMouseScroll(DelegateMember<TClass, void(Vector2)> delegateMember)
     {
         _mouseScrollDelegate += delegateMember;
     }
