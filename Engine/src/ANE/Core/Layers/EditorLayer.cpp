@@ -44,7 +44,7 @@ namespace Engine
         // You would have a "Read from config files to find correct panel layout" method here
 
         CreateTestScene(50);
-        AttachUIPanel(new SceneHierarchyPanel(_scenes));
+        AttachUIPanel(new SceneHierarchyPanel(this));
         AttachUIPanel(new InspectorPanel(this));
         AttachUIPanel(new EditorLogPanel());
 
@@ -145,7 +145,7 @@ namespace Engine
         {
             TagComponent tag;
             ent.TryGetComponent(tag);
-            ANE_ELOG_WARN("We have a renderComponent with tag: {0} on entity: {1}", comp.ToString(), tag.Tag);
+            ANE_ELOG_WARN("We have a renderComponent with tag: {0} on entity: {1}", comp.ToString(), tag.Value);
         }
     }
 
