@@ -180,8 +180,9 @@ namespace Engine
         // VMA
         inline static VmaAllocator _vmaAllocator;
 
+        static constexpr int MAX_FRAMES_IN_FLIGHT = 3;
         inline static int _frameIndex = 0;
-        inline static VulkanFrame _frameData[3];
+        inline static VulkanFrame _frameData[MAX_FRAMES_IN_FLIGHT];
         inline static VulkanImmediateBuffer _immBuffer;
 
         inline static entt::dense_map<std::string, VmaMeshAsset> _loadedModelMap;

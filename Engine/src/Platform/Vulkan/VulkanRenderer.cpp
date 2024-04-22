@@ -876,7 +876,7 @@ namespace Engine
 
     VulkanFrame VulkanRenderer::GetFrame()
     {
-        return _frameData[_frameIndex % 3];
+        return _frameData[_frameIndex % MAX_FRAMES_IN_FLIGHT];
     }
 
     void VulkanRenderer::CreateVmaAllocator()
