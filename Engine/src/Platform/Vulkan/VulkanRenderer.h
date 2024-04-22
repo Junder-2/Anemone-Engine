@@ -33,6 +33,8 @@ namespace Engine
 
         VkImageView BackbufferView;
         VkFramebuffer Framebuffer;
+
+        DescriptorAllocator Descriptors;
     };
 
     struct VulkanImmediateBuffer
