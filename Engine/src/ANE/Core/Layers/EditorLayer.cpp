@@ -77,10 +77,6 @@ namespace Engine
         ImGuiIO& io = ImGui::GetIO();
 
 
-        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) || (ImGui::IsMouseClicked(ImGuiMouseButton_Right)))
-        {
-            
-        }
         for (UILayerPanel* panel : _UIpanels)
         {
             if(panel->_isVisible)
@@ -99,6 +95,8 @@ namespace Engine
     }
     void EditorLayer::Init()
     {
+
+
         //Every component type needs to be in here in order for it's text to be rendered
         //Ideally, Kyle will develop this into component type specific renderering methods
         //and we can then delete this map because it's kind of stupid, it's just quick and dirty

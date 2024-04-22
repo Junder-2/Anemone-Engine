@@ -37,6 +37,8 @@ namespace Engine
         _window = Window::Create(WindowProperties(_appSpec.Name));
         _window->BindOnEvent(MakeDelegate(this, &Application::OnEvent));
 
+        Renderer::Init(_window->GetWindowContext());
+
         _inputHandler = InputHandler::Create();
         _inputHandler->BindOnEvent(MakeDelegate(this, &Application::OnEvent));
 
@@ -44,7 +46,6 @@ namespace Engine
 
         _ImGuiLayer = ImGuiLayer::Create("ImGuiLayer");
         PushLayer(_ImGuiLayer);
-        Renderer::Init(_window->GetWindowContext());
     }
 
     void Application::Run()
