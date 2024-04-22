@@ -1,6 +1,5 @@
 #include "anepch.h"
 #include "Logging.h"
-
 #include "LogSink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 
@@ -114,6 +113,7 @@ namespace Engine
             break;
         }
 
+        _writer.WriteToFile(newLogMessage);
 
         _logMessages.push_front(newLogMessage);
     }
