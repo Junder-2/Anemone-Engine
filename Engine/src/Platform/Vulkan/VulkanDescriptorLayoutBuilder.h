@@ -1,13 +1,12 @@
 ﻿#pragma once
 #include <vulkan/vulkan_core.h>
-#include <VkBootstrap.h>
 
 namespace Engine
 {
     class DescriptorLayoutBuilder
     {
     public:
-        explicit DescriptorLayoutBuilder(vkb::Device const& logicalDevice);
+        explicit DescriptorLayoutBuilder(VkDevice const& logicalDevice);
 
         DescriptorLayoutBuilder& SetStageFlags(VkShaderStageFlags flags);
 

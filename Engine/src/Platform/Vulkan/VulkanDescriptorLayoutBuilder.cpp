@@ -3,7 +3,7 @@
 
 namespace Engine
 {
-    DescriptorLayoutBuilder::DescriptorLayoutBuilder(vkb::Device const& logicalDevice)
+    DescriptorLayoutBuilder::DescriptorLayoutBuilder(VkDevice const& logicalDevice)
     {
         _info.LogicalDevice = logicalDevice;
     }
