@@ -59,7 +59,7 @@ namespace Engine
     void ImGuiLayer::OnUIRender()
     {
         bool open = true;
-        //DockSpace(&open);
+        DockSpace(&open);
 
         // ImGui::ShowDemoWindow()
 
@@ -77,7 +77,6 @@ namespace Engine
         static bool opt_fullscreen = true;
         static bool opt_padding = false;
         ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
-
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDocking;
         if (opt_fullscreen)
         {

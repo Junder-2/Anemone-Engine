@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL_keycode.h>
+#include <functional> //This may be needed for compilatino of these types outside of Engine
 #include "ANE/Utilities/CommonUtilities.h"
 
 namespace Engine
