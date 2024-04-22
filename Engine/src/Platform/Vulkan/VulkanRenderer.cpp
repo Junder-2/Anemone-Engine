@@ -754,7 +754,7 @@ namespace Engine
             return;
         }
 
-        // TODO: Flush frame-scoped deletion queue.
+        frame.DeletionQueue.Flush();
         frame.Descriptors.Clear(_device);
 
         CheckVkResult(vkResetFences(_device, 1, &frame.Fence));

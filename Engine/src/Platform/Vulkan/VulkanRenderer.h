@@ -35,7 +35,7 @@ namespace Engine
         VkImageView BackbufferView;
         VkFramebuffer Framebuffer;
 
-        // TODO: Add deletion queue for frame-scoped objects.
+        VulkanDeletionQueue DeletionQueue;
         DescriptorAllocator Descriptors;
     };
 
