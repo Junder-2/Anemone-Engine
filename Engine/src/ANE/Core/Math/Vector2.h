@@ -2,6 +2,9 @@
 
 #include "MathCommon.h"
 
+#include <sstream>
+#include <string>
+#include <iostream>
 //Modified copy of reactphysics/include/reactphysics3d/mathematics/Vector2.h
 
 struct ImVec2;
