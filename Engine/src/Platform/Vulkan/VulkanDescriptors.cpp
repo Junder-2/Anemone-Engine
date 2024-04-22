@@ -66,4 +66,49 @@ namespace Engine
 
         return layout;
     }
+
+    void DescriptorAllocator::Init(const VkDevice logicalDevice, const uint32_t maxSets, const std::span<PoolSizeRatio> poolRatios, const VkAllocationCallbacks* callbacks = nullptr)
+    {
+        std::vector<VkDescriptorPoolSize> poolSizes;
+        for (const PoolSizeRatio ratio : poolRatios)
+        {
+            poolSizes.push_back(VkDescriptorPoolSize
+            {
+                .type = ratio.Type,
+                .descriptorCount = (uint32_t)(ratio.Ratio * (float)maxSets)
+            });
+        }
+
+        VkDescriptorPoolCreateInfo poolInfo = { .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO };
+        poolInfo.flags = 0;
+        poolInfo.maxSets = maxSets;
+        poolInfo.poolSizeCount = (uint32_t)poolSizes.size();
+        poolInfo.pPoolSizes = poolSizes.data();
+
+        vkCreateDescriptorPool(logicalDevice, &poolInfo, callbacks, &Pool);
+    }
+
+    void DescriptorAllocator::Clear(const VkDevice logicalDevice)
+    {
+        vkResetDescriptorPool(logicalDevice, Pool, 0);
+    }
+
+    void DescriptorAllocator::Destroy(const VkDevice logicalDevice, const VkAllocationCallbacks* callbacks = nullptr)
+    {
+        vkDestroyDescriptorPool(logicalDevice, Pool, callbacks);
+    }
+
+    VkDescriptorSet DescriptorAllocator::Allocate(const VkDevice logicalDevice, const VkDescriptorSetLayout layout)
+    {
+        VkDescriptorSetAllocateInfo allocInfo = { .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO, .pNext = nullptr };
+        allocInfo.descriptorPool = Pool;
+        allocInfo.descriptorSetCount = 1;
+        allocInfo.pSetLayouts = &layout;
+
+        VkDescriptorSet set;
+        const VkResult result = vkAllocateDescriptorSets(logicalDevice, &allocInfo, &set);
+        ANE_EASSERT(result == VK_SUCCESS, "Failed to allocate VkDescriptorSet.");
+
+        return set;
+    }
 }
