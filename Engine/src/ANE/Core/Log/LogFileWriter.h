@@ -1,17 +1,28 @@
 ﻿#pragma once
+#include <fstream>
+#include "LoggingTypes.h"
 
 namespace Engine
 {
+    class Logging;
+
     class LogFileWriter
     {
     public:
-        void InitLogWriter();
-        void WriteToFile(log_msg& msg);
+        int DirectoryCount() const;
+        void WriteToFile(LogMessage& msg);
 
     private:
-        std::string _sessionUUID;
-        std::string _currentLogUUID;
+        std::ofstream outputFile;
+        std::string fileName;
 
+        ~LogFileWriter();
+        LogFileWriter() = default;
 
+        const std::string path = "../Engine/Logs/";
+
+        const int MaxFileCount = 3;
+
+        friend Engine::Logging;
     };
 }

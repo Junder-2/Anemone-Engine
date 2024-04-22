@@ -8,6 +8,7 @@
 #pragma warning(push, 0)
 #include <spdlog/spdlog.h>
 
+#include "LogFileWriter.h"
 #include "LoggingTypes.h"
 #include "LogSink.h"
 #pragma warning(pop)
@@ -51,10 +52,9 @@ namespace Engine
         static void OnSink(const log_msg& logMsg);
 
     private:
-        inline static std::list<LogMessage> _logMessages {100};
+        inline static std::list<LogMessage> _logMessages{100};
+        inline static LogFileWriter _writer;
     };
-
-
 }
 
 #ifndef ANE_DIST
