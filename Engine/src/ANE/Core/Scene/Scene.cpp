@@ -115,11 +115,13 @@ namespace Engine
         // Fixed update
         while (_accumulator >= _timeStep)
         {
-            OnFixedUpdate(_timeStep);
-
             _accumulator = glm::max(_accumulator - _timeStep, 0.f);
+
+            OnFixedUpdate(_timeStep);
         }
-        
+
+        InterpolateRigidBodies();
+
         SubmitDrawCommands();
     }
 
@@ -137,14 +139,23 @@ namespace Engine
             }
             scriptComponent.OnFixedUpdateFunction(timeStep);
         });
+    }
+
+    void Scene::InterpolateRigidBodies()
+    {
+        const float factor = glm::clamp(_accumulator / _timeStep, 0.f, 1.f);
 
         auto group = _registry.view<TransformComponent, RigidBodyComponent>();
         for (auto entt : group)
         {
             auto[transform, body] = group.get<TransformComponent, RigidBodyComponent>(entt);
 
-            transform.Transform.SetPosition(Vector3::Convert(body.Rigidbody->getTransform().getPosition()));
-            transform.Transform.SetRotation(Quaternion::Convert(body.Rigidbody->getTransform().getOrientation()));
+            TransformMatrix& transformMatrix = transform.Transform;
+            auto prevTransform = rp3d::Transform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
+            auto newTransform = rp3d::Transform::interpolateTransforms(prevTransform, body.GetRigidBody()->getTransform(), factor);
+
+            transformMatrix.SetPosition(Vector3::Convert(newTransform.getPosition()));
+            transformMatrix.SetRotation(Quaternion::Convert(newTransform.getOrientation()));
         }
     }
 
@@ -163,6 +174,18 @@ namespace Engine
 
             Renderer::SubmitDrawCommand(draw);
         }
+        // Todo: add triangle or line rendering pipeline
+        // if(_physicsWorld)
+        // {
+        //     rp3d::DebugRenderer physicsDebugRenderer = _physicsWorld->getDebugRenderer();
+        //
+        //     DrawCommand draw = {};
+        //     draw.ModelMatrix = Matrix4x4::Identity();
+        //     draw.VertexCount = physicsDebugRenderer.getNbLines();
+        //     draw.MeshBuffers = renderer.Model.MeshBuffers;
+        //
+        //     Renderer::SubmitDrawCommand(draw);
+        // }
     }
 
     /**

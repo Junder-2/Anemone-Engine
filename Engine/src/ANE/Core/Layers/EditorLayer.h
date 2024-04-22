@@ -48,6 +48,7 @@ namespace Engine
 
     private:
         void CreateTestScene(int numEntitiesToTest);
+        void CreateFloor();
 
         void OnSwitchEditorFocus(InputValue inputValue);
 

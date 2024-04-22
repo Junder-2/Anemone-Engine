@@ -33,6 +33,7 @@ namespace Engine
 
     private:
         void OnFixedUpdate(float timeStep);
+        void InterpolateRigidBodies();
 
     private:
         friend class Entity;
@@ -40,7 +41,7 @@ namespace Engine
         reactphysics3d::PhysicsWorld* _physicsWorld;
 
         float _accumulator = 0;
-        float _timeStep = 1.f/60.f;
+        float _timeStep = 1.f/50.f;
 
         std::map<std::string, Entity> _entityMap;
 
