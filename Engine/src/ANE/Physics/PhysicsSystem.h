@@ -15,6 +15,7 @@ namespace Engine
     public:
         PhysicsSystem();
         ~PhysicsSystem() override;
+        void Free() override;
 
         reactphysics3d::PhysicsWorld& GetPhysicsWorld() const;
 

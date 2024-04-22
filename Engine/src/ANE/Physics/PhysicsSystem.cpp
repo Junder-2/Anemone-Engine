@@ -14,10 +14,11 @@ namespace Engine
         _world = _physicsCommon.createPhysicsWorld(reactphysics3d::PhysicsWorld::WorldSettings());
     }
 
-    PhysicsSystem::~PhysicsSystem()
+    PhysicsSystem::~PhysicsSystem() = default;
+
+    void PhysicsSystem::Free()
     {
-        _physicsCommon.destroyPhysicsWorld(_world);
-        delete _physicsLogger;
+        // Because reactphysics auto destructs itself we cant call out destructor
     }
 
     reactphysics3d::PhysicsWorld& PhysicsSystem::GetPhysicsWorld() const
