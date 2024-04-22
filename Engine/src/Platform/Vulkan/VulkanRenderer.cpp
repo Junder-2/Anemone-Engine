@@ -114,7 +114,7 @@ namespace Engine
 
         VmaMeshAsset vmaMeshAsset;
         vmaMeshAsset.Name = modelPath;
-        vmaMeshAsset.NumVertices = mesh.Indices.size();
+        vmaMeshAsset.NumVertices = (uint32_t)mesh.Indices.size();
         vmaMeshAsset.SubMeshes = meshAsset.SubMeshes;
         vmaMeshAsset.MeshBuffers = meshBuffers;
 
