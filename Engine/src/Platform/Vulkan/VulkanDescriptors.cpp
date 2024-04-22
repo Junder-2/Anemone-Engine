@@ -124,4 +124,59 @@ namespace Engine
 
         return newPool;
     }
+
+    void DescriptorWriter::WriteBuffer(const int binding, const VkBuffer buffer, const size_t size, const size_t offset, const VkDescriptorType type)
+    {
+        const VkDescriptorBufferInfo& info = BufferInfos.emplace_back(VkDescriptorBufferInfo
+        {
+            .buffer = buffer,
+            .offset = offset,
+            .range = size
+        });
+
+        VkWriteDescriptorSet write = { .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET, .pNext = nullptr };
+        write.dstSet = VK_NULL_HANDLE; // Empty for now.
+        write.dstBinding = binding;
+        write.descriptorCount = 1;
+        write.descriptorType = type;
+        write.pBufferInfo = &info;
+
+        Writes.push_back(write);
+    }
+
+    void DescriptorWriter::WriteImage(const int binding, const VkImageView image, const VkSampler sampler, const VkImageLayout layout, const VkDescriptorType type)
+    {
+        const VkDescriptorImageInfo& info = ImageInfos.emplace_back(VkDescriptorImageInfo
+        {
+            .sampler = sampler,
+            .imageView = image,
+            .imageLayout = layout
+        });
+
+        VkWriteDescriptorSet write = { .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET, .pNext = nullptr };
+        write.dstSet = VK_NULL_HANDLE; // Empty for now.
+        write.dstBinding = binding;
+        write.descriptorCount = 1;
+        write.descriptorType = type;
+        write.pImageInfo = &info;
+
+        Writes.push_back(write);
+    }
+
+    void DescriptorWriter::Clear()
+    {
+        ImageInfos.clear();
+        BufferInfos.clear();
+        Writes.clear();
+    }
+
+    void DescriptorWriter::UpdateSet(const VkDevice logicalDevice, const VkDescriptorSet set)
+    {
+        for (VkWriteDescriptorSet& write : Writes)
+        {
+            write.dstSet = set;
+        }
+
+        vkUpdateDescriptorSets(logicalDevice, (uint32_t)Writes.size(), Writes.data(), 0, nullptr);
+    }
 }
