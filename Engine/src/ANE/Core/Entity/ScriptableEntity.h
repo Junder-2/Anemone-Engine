@@ -24,7 +24,7 @@ namespace Engine
             if (!_entity.HasComponent<T>())
             {
                 if (TagComponent outComponent; _entity.TryGetComponent(outComponent))
-                    ANE_ELOG_WARN("No Component of type: {0} found on Entity: {1}", typeid(T).name(), outComponent.Tag);
+                    ANE_ELOG_WARN("No Component of type: {0} found on Entity: {1}", typeid(T).name(), outComponent.Value);
             }
 
             return _entity.GetComponent<T>();

@@ -12,21 +12,16 @@ namespace Engine
     class SceneHierarchyPanel : public UILayerPanel
     {
     public:
-        SceneHierarchyPanel(EditorLayer* _editorLayer);
-        ~SceneHierarchyPanel();
-        void DrawEntityNode(UUIDComponent UUID,TagComponent Tag,ImGuiTreeNodeFlags node_flags) const;
-        void DrawEntityNodeList();
+        ~SceneHierarchyPanel() = default;
+        void DrawEntityNode(const UUIDComponent& UUID, const TagComponent& Tag, ImGuiTreeNodeFlags node_flags) const;
+        void DrawEntityNodeList() const;
+        SceneHierarchyPanel(EditorLayer* ManagingLayer);
         void OnPanelRender() override;
-
-
-
-
 
 
         //std::unordered_map<const char*, std::shared_ptr<Scene>>* _managedScenes;
         EditorLayer* _editorLayer;
         std::shared_ptr<Scene> _activeScene;
-        Scene* _sceneContext;
         SelectionManager::selectionContext _SelectionContext = SelectionManager::selectionContext::UI;
     };
 }
