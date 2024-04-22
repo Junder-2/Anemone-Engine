@@ -13,6 +13,8 @@
 #include "LogSink.h"
 #pragma warning(pop)
 
+//todo: write a custom sink for logfilewriter so that you can get a full stacktrace
+
 namespace Engine
 {
     using log_msg = spdlog::details::log_msg;

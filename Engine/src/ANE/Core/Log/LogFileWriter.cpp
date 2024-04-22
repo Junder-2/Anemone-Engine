@@ -2,7 +2,7 @@
 #include "LogFileWriter.h"
 #include <iostream>
 #include <filesystem>
-#include "ANE/Core/Entity/UUIDGenerator.h"
+#include <string>
 #include "ANE/Utilities/LoggingUtilities.h"
 
 namespace Engine
@@ -11,46 +11,29 @@ namespace Engine
     {
         int fileCount = 0;
 
-        for (const auto& entry : std::filesystem::directory_iterator(path))
+        for (const auto& entry : std::filesystem::directory_iterator(_path))
             if (is_regular_file(entry.path())) ++fileCount;
 
         return fileCount;
     }
 
 
-    void Engine::LogFileWriter::WriteToFile(LogMessage& msg)
+    void LogFileWriter::GetOldestFile(std::filesystem::path& oldestFile) const
     {
-        //todo: this should probably prevent the call altogether
-        if (msg.LevelCategory == LogLevelCategory::LevelDebug || msg.LevelCategory == LogLevelCategory::LevelNone || msg.LevelCategory == LogLevelCategory::LevelInfo) return;
-
-        if (fileName.empty())
-        {
-            ANE_ELOG("We ARE NOT EMPTY");
-            const auto now = std::chrono::system_clock::now();
-            const auto time = std::chrono::system_clock::to_time_t(now);
-
-            std::tm tm;
-
-            #ifdef _WIN32
-            const auto err = localtime_s(&tm, &time); // couldn't get all info on the error codes from this, see if and when assert fails
-            //ANE_ASSERT(err == 0, "Unable to get local time");
-            #else
-        localtime_r(&time, &tm);
-            #endif
-
-            std::stringstream ss;
-            ss << std::put_time(&tm, "%Y-%m-%d_%H%M%S");
-
-            const std::string timeDate = ss.str();
-            fileName = path + "LOG_" + timeDate + ".txt";
-
-            outputFile.open(fileName, std::ios::app);
+        std::filesystem::file_time_type oldestTime = std::filesystem::file_time_type::max();
+        for (const auto& entry : std::filesystem::directory_iterator(_path)) {
+            if (is_regular_file(entry)) {
+                if (auto lastWriteTime = last_write_time(entry); lastWriteTime < oldestTime) {
+                    oldestTime = lastWriteTime;
+                    oldestFile = entry.path();
+                }
+            }
         }
+    }
 
-        // ANE_ASSERT(!outputFile.is_open(), "No open logfile");
-
+    std::string LogFileWriter::ConstructMessage(LogMessage& msg)
+    {
         std::string messageBuilder;
-
         const std::string levelName = LoggingUtilities::ToString(msg.LevelCategory);
 
         messageBuilder.append(std::format("[{0} {1}", msg.LoggerName, levelName));
@@ -61,11 +44,55 @@ namespace Engine
 
         messageBuilder.append(msg.Message);
 
-        outputFile << messageBuilder << '\n';
+        return messageBuilder;
     }
 
-    Engine::LogFileWriter::~LogFileWriter()
+    void LogFileWriter::WriteToFile(LogMessage& msg)
     {
-        outputFile.close();
+        if (msg.LevelCategory == LogLevelCategory::LevelDebug || msg.LevelCategory == LogLevelCategory::LevelNone || msg.LevelCategory == LogLevelCategory::LevelInfo) return;
+
+        if (!std::filesystem::is_directory(_path)) std::filesystem::create_directory(_path);
+
+        if (_fileName.empty())
+        {
+            if (DirectoryCount() >= MAX_FILE_COUNT)
+            {
+                std::filesystem::path oldestFile;
+
+                GetOldestFile(oldestFile);
+
+                if (!oldestFile.empty()) std::filesystem::remove(oldestFile);
+            }
+
+            const auto now = std::chrono::system_clock::now();
+            const auto time = std::chrono::system_clock::to_time_t(now);
+
+            std::tm tm;
+
+            #ifdef _WIN32
+            const auto err = localtime_s(&tm, &time); // couldn't get all info on the error codes from this, see if and when assert fails
+            ANE_ASSERT(err == 0, "Unable to get local time");
+            #else
+            localtime_r(&time, &tm);
+            #endif
+
+
+            std::stringstream ss;
+            ss << std::put_time(&tm, "%Y-%m-%d_%H%M%S");
+
+            const std::string timeDate = ss.str();
+            _fileName = _path + "LOG_" + timeDate + ".txt";
+
+            _outputFile.open(_fileName, std::ios::app);
+        }
+
+        ANE_ASSERT(_outputFile.is_open(), "No open logfile");
+
+        _outputFile << ConstructMessage(msg) << '\n';
+    }
+
+    LogFileWriter::~LogFileWriter()
+    {
+        _outputFile.close();
     }
 }

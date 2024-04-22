@@ -9,20 +9,22 @@ namespace Engine
     class LogFileWriter
     {
     public:
-        int DirectoryCount() const;
+        void GetOldestFile(std::filesystem::path& oldestFile) const;
         void WriteToFile(LogMessage& msg);
 
     private:
-        std::ofstream outputFile;
-        std::string fileName;
+        [[nodiscard("Return value not used.")]] int DirectoryCount() const;
+        [[nodiscard("Return value not used.")]] static std::string ConstructMessage(LogMessage& msg);
+
+        std::ofstream _outputFile;
+        std::string _fileName;
 
         ~LogFileWriter();
         LogFileWriter() = default;
 
-        const std::string path = "../Engine/Logs/";
+        const int MAX_FILE_COUNT = 4;
+        const std::string _path = "../Engine/Logs/";
 
-        const int MaxFileCount = 3;
-
-        friend Engine::Logging;
+        friend Logging;
     };
 }
