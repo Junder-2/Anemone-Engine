@@ -17,7 +17,9 @@ Engine::SceneHierarchyPanel::SceneHierarchyPanel(std::unordered_map<const char*,
 
 void Engine::SceneHierarchyPanel::OnPanelRender()
 {
-    ImGui::Begin("Scene Hierarchy");
+    ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
+    bool open = true;
+    ImGui::Begin("Scene Hierarchy",&open,dockspace_flags);
     std::vector<std::string>* selectedEntityUUIDS = SelectionManager::GetSelection(SelectionManager::UI);
 
      //ANE_LOG_INFO("Entering panel render phase");

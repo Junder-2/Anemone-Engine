@@ -75,23 +75,15 @@ namespace Engine
     void EditorLayer::OnUIRender()
     {
         ImGuiIO& io = ImGui::GetIO();
-        ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
 
-        ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(),dockspace_flags);
 
-        if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) || (ImGui::IsMouseClicked(ImGuiMouseButton_Right)))
-        {
-            ImGui::FocusWindow(GImGui->HoveredWindow);
-        }
         for (UILayerPanel* panel : _UIpanels)
         {
             if(panel->_isVisible)
             {
                 panel->OnPanelRender();
             }
-            /*There is a chance we will have situation where UI is not visible but still needs to do something
-          like maintaining a dockspace or something like that. This loop is for that situation.
-          If it remains empty for ages we can delete it but leaving it for now*/
+
 
             if(panel->_isEnabled)
             {
@@ -100,13 +92,11 @@ namespace Engine
         }
         ImGui::Begin("Editor");
         ImGui::End();
-
-
     }
-
-
     void EditorLayer::Init()
     {
+
+
         //Every component type needs to be in here in order for it's text to be rendered
         //Ideally, Kyle will develop this into component type specific renderering methods
         //and we can then delete this map because it's kind of stupid, it's just quick and dirty

@@ -25,6 +25,7 @@ group "Dependencies"
     include "Engine/vendor/imgui"
     include "Engine/vendor/VkBootstrap"
     include "Engine/vendor/Assimp"
+    include "Engine/vendor/reactphysics"
 group ""
 
 group "Core"
