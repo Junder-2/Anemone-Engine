@@ -14,7 +14,7 @@ namespace Engine
     public:
         SceneHierarchyPanel(EditorLayer* _editorLayer);
         ~SceneHierarchyPanel();
-        void DrawEntityNode(UUIDComponent UUID,TagComponent Tag,ImGuiTreeNodeFlags node_flags);
+        void DrawEntityNode(UUIDComponent UUID,TagComponent Tag,ImGuiTreeNodeFlags node_flags) const;
         void DrawEntityNodeList();
         void OnPanelRender() override;
 

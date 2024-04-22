@@ -1,8 +1,6 @@
 #include "anepch.h"
 #include "SceneHierarchyPanel.h"
-
 #include "imgui.h"
-#include "imgui_internal.h"
 #include "InspectorPanel.h"
 #include "ANE/Core/Editor/SelectionManager.h"
 #include "ANE/Core/Scene/Components/TagComponent.h"
@@ -12,6 +10,10 @@
 Engine::SceneHierarchyPanel::SceneHierarchyPanel(EditorLayer* ManagingLayer)
 {
     _editorLayer = ManagingLayer;
+}
+
+Engine::SceneHierarchyPanel::~SceneHierarchyPanel()
+{
 }
 
 
@@ -54,7 +56,7 @@ void Engine::SceneHierarchyPanel::DrawEntityNodeList()
 
 }
 
-void Engine::SceneHierarchyPanel::DrawEntityNode(UUIDComponent UUID, TagComponent Tag, ImGuiTreeNodeFlags node_flags)
+void Engine::SceneHierarchyPanel::DrawEntityNode(const UUIDComponent UUID, const TagComponent Tag, ImGuiTreeNodeFlags node_flags) const
 {
 
     bool node_open = ImGui::TreeNodeEx(UUID.UUID.c_str(), node_flags, Tag.Tag.c_str());
