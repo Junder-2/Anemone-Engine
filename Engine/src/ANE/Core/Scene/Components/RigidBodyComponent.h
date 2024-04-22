@@ -4,6 +4,7 @@
 #include "Component.h"
 #include "ANE/Core/Entity/Entity.h"
 #include "ANE/Physics/Physics.h"
+#include "ANE/Physics/PhysicsTypes.h"
 
 namespace Engine
 {
@@ -14,9 +15,22 @@ namespace Engine
 
         RigidBodyComponent(const Entity self) : Component(typeid(*this).name())
         {
-            Rigidbody = &GetPhysicsSystem().CreateRigidBody(self);
+            _rigidbody = GetPhysicsSystem().CreateRigidBody(self);
         }
 
-        reactphysics3d::RigidBody* Rigidbody;
+        RigidBodyComponent(const Entity self, const BodyMode bodyType) : Component(typeid(*this).name())
+        {
+            _rigidbody = GetPhysicsSystem().CreateRigidBody(self);
+            _rigidbody->setType(static_cast<reactphysics3d::BodyType>(bodyType));
+        }
+
+        rp3d::RigidBody* GetRigidBody() const
+        {
+            return _rigidbody;
+        }
+
+    private:
+
+        rp3d::RigidBody* _rigidbody;
     };
 }

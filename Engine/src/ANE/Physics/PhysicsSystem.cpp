@@ -4,6 +4,7 @@
 #include "PhysicsLogger.h"
 #include "ANE/Core/Entity/Entity.h"
 #include "ANE/Core/Math/Matrix/TransformMatrix.h"
+#include "ANE/Core/Scene/Components/RigidBodyComponent.h"
 
 namespace Engine
 {
@@ -11,7 +12,19 @@ namespace Engine
     {
         _physicsLogger = new PhysicsLogger();
         _physicsCommon.setLogger(_physicsLogger);
-        _world = _physicsCommon.createPhysicsWorld(reactphysics3d::PhysicsWorld::WorldSettings());
+
+        rp3d::PhysicsWorld::WorldSettings worldSettings;
+        worldSettings.worldName = "PhysicsWorld";
+
+        _world = _physicsCommon.createPhysicsWorld(worldSettings);
+        #ifdef ANE_DEBUG
+        _world->setIsDebugRenderingEnabled(true);
+        _debugRenderer = &_world->getDebugRenderer();
+
+        _debugRenderer->setIsDebugItemDisplayed(rp3d::DebugRenderer::DebugItem::COLLISION_SHAPE, true);
+        _debugRenderer->setIsDebugItemDisplayed(rp3d::DebugRenderer::DebugItem::COLLIDER_AABB, true);
+
+        #endif
     }
 
     PhysicsSystem::~PhysicsSystem() = default;
@@ -21,16 +34,82 @@ namespace Engine
         // Because reactphysics auto destructs itself we cant call out destructor
     }
 
-    reactphysics3d::PhysicsWorld& PhysicsSystem::GetPhysicsWorld() const
+    rp3d::PhysicsWorld& PhysicsSystem::GetPhysicsWorld() const
     {
         return *_world;
     }
 
-    reactphysics3d::RigidBody& PhysicsSystem::CreateRigidBody(Entity entity)
+    rp3d::RigidBody* PhysicsSystem::CreateRigidBody(Entity entity)
     {
         const TransformMatrix transform = entity.GetComponent<TransformComponent>().Transform;
-        const reactphysics3d::Transform reactTransform(transform.GetPosition(), transform.GetQuaternion());
+        const rp3d::Transform reactTransform(transform.GetPosition(), transform.GetQuaternion());
 
-        return *_world->createRigidBody(reactTransform);
+        const auto rigidBody = _world->createRigidBody(reactTransform);
+
+        #ifdef ANE_DEBUG
+        rigidBody->setIsDebugEnabled(true);
+        #endif
+
+        return rigidBody;
+    }
+
+    rp3d::Collider* PhysicsSystem::CreateSphereCollider(Entity entity, const float radius)
+    {
+        if(!entity.HasComponent<RigidBodyComponent>())
+        {
+            ANE_ELOG_WARN("Entity has no RigidBodyComponent, adding one");
+            entity.AddComponent<RigidBodyComponent>(entity);
+        }
+
+        const auto rigidBody = entity.GetComponent<RigidBodyComponent>();
+        const auto sphereCollider = rigidBody.GetRigidBody()->addCollider(CreateSphereShape(radius), rp3d::Transform::identity());
+
+        return sphereCollider;
+    }
+
+    rp3d::Collider* PhysicsSystem::CreateBoxCollider(Entity entity, const Vector3& halfExtents)
+    {
+        if(!entity.HasComponent<RigidBodyComponent>())
+        {
+            ANE_ELOG_WARN("Entity has no RigidBodyComponent, adding one");
+            entity.AddComponent<RigidBodyComponent>(entity);
+        }
+
+        const auto rigidBody = entity.GetComponent<RigidBodyComponent>();
+        const auto sphereCollider = rigidBody.GetRigidBody()->addCollider(CreateBoxShape(halfExtents), rp3d::Transform::identity());
+
+        return sphereCollider;
+    }
+
+    rp3d::Collider* PhysicsSystem::CreateCapsuleCollider(Entity entity, const float radius, const float height)
+    {
+        if(!entity.HasComponent<RigidBodyComponent>())
+        {
+            ANE_ELOG_WARN("Entity has no RigidBodyComponent, adding one");
+            entity.AddComponent<RigidBodyComponent>(entity);
+        }
+
+        const auto rigidBody = entity.GetComponent<RigidBodyComponent>();
+        const auto sphereCollider = rigidBody.GetRigidBody()->addCollider(CreateCapsuleShape(radius, height), rp3d::Transform::identity());
+
+        return sphereCollider;
+    }
+
+    rp3d::SphereShape* PhysicsSystem::CreateSphereShape(const float radius)
+    {
+        const auto sphereCollider = _physicsCommon.createSphereShape(radius);
+        return sphereCollider;
+    }
+
+    rp3d::BoxShape* PhysicsSystem::CreateBoxShape(const Vector3& halfExtents)
+    {
+        const auto boxCollider = _physicsCommon.createBoxShape(halfExtents);
+        return boxCollider;
+    }
+
+    rp3d::CapsuleShape* PhysicsSystem::CreateCapsuleShape(const float radius, const float height)
+    {
+        const auto capsuleCollider = _physicsCommon.createCapsuleShape(radius, height);
+        return capsuleCollider;
     }
 }
