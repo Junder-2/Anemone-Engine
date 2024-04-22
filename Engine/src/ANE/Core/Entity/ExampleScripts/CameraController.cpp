@@ -20,6 +20,7 @@ namespace Engine
         inputSystem.BindKeyboardAxisInput(KeyCodeS, KeyCodeW, MakeDelegate(this, &CameraController::OnMoveZ));
 
         inputSystem.BindMouseMove(MakeDelegate(this, &CameraController::OnLook));
+        inputSystem.BindMouseScroll(MakeDelegate(this, &CameraController::OnScroll));
 
         inputSystem.BindKeyboardInput(KeyCodeLShift, MakeDelegate(this, &CameraController::OnSpeedup));
 
@@ -42,7 +43,8 @@ namespace Engine
         if((_xInput != 0) || (_yInput != 0) || (_zInput != 0))
         {
 
-            const float moveSpeed = _isSpeedUp ? 0.05f : 0.01f;
+            //const float moveSpeed = _isSpeedUp ? 0.05f : 0.01f;
+            const float moveSpeed = _flySpeed * .05f;
 
             //const auto transformMat = _transformComponent->Transform.GetQuaternion();
             //const auto transformMat = (Matrix3x3)_transformComponent->Transform.GetLocalToWorld();
@@ -92,6 +94,11 @@ namespace Engine
         {
             Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
         }
+    }
+
+    void CameraController::OnScroll(Vector2 scrollDelta)
+    {
+        _flySpeed = glm::clamp(_flySpeed + scrollDelta.Y, 0.1f, 20.f);
     }
 
     void CameraController::OnSpeedup(InputValue inputValue)

@@ -68,7 +68,7 @@ namespace Engine
                 {
                     const MouseScrollEvent mouseScrollEvent = dynamic_cast<MouseScrollEvent&>(e);
 
-                    if(_mouseScrollDelegate) _mouseScrollDelegate(mouseScrollEvent.GetXDelta(), mouseScrollEvent.GetYDelta());
+                    if(_mouseScrollDelegate) _mouseScrollDelegate({mouseScrollEvent.GetXDelta(), mouseScrollEvent.GetYDelta()});
                 }
                 break;
                 case EventType::MouseButton:

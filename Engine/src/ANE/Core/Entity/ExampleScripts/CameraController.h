@@ -28,6 +28,8 @@ namespace Engine
 
         void OnLook(MouseMoveValue mouseValue);
 
+        void OnScroll(Vector2 scrollDelta);
+
         void OnSpeedup(InputValue inputValue);
 
         void OnKeyTest(InputValue inputValue)
@@ -45,5 +47,6 @@ namespace Engine
         float _xInput = 0, _yInput = 0, _zInput = 0;
         float _pitchRadians = 0, _yawRadians = 0;
         bool _isSpeedUp;
+        float _flySpeed = 1.f;
     };
 }
