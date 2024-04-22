@@ -11,10 +11,8 @@ namespace Engine
     class InspectorPanel : public UILayerPanel
     {
     public:
-
-        InspectorPanel();
         InspectorPanel(EditorLayer* editorLayer);
-        ~InspectorPanel();
+        ~InspectorPanel() = default;
 
 
 static void RegisterSelect(UUIDComponent selectedEntityID);
@@ -22,7 +20,7 @@ static void WipeSelect();
         SelectionManager::selectionContext _SelectionContext = SelectionManager::selectionContext::UI;
 
         inline static std::string selected = "";
-        EditorLayer* _EditorLayer;
+        EditorLayer* _editorLayer;
         void OnPanelRender() override;
     };
 }

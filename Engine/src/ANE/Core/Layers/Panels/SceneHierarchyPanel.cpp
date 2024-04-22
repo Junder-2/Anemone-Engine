@@ -7,73 +7,61 @@
 #include "ANE/Core/Scene/Components/UUIDComponent.h"
 
 
-Engine::SceneHierarchyPanel::SceneHierarchyPanel(EditorLayer* ManagingLayer)
+namespace Engine
 {
-    _editorLayer = ManagingLayer;
-}
-
-Engine::SceneHierarchyPanel::~SceneHierarchyPanel()
-{
-}
-
-
-void Engine::SceneHierarchyPanel::OnPanelRender()
-{
-    _activeScene = _editorLayer->GetActiveScene();
-    if(!_activeScene)
+    SceneHierarchyPanel::SceneHierarchyPanel(EditorLayer* ManagingLayer)
     {
-        return;
+        _editorLayer = ManagingLayer;
     }
-    bool open = true;
-
-    ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
-
-    ImGui::Begin("Scene Hierarchy",&open,dockspace_flags);
-
-    DrawEntityNodeList();
-
-    ImGui::End();
-}
 
 
-
-void Engine::SceneHierarchyPanel::DrawEntityNodeList()
-{
-    std::vector<std::string>* selectedEntityUUIDS = SelectionManager::GetSelection(SelectionManager::UI);
-    auto IDView = _activeScene->_registry.view<UUIDComponent,TagComponent>();
-    for(auto entity: IDView)
+    void SceneHierarchyPanel::OnPanelRender()
     {
-        auto &UUID = IDView.get<UUIDComponent>(entity);
-        auto &Tag = IDView.get<TagComponent>(entity);
-        ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
+        _activeScene = _editorLayer->GetActiveScene();
+        if (!_activeScene) return;
 
-        if(std::find(selectedEntityUUIDS->begin(), selectedEntityUUIDS->end(), UUID.UUID) != selectedEntityUUIDS->end()){
-            node_flags |= ImGuiTreeNodeFlags_Selected;
+        bool open = true;
+
+        ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
+
+        ImGui::Begin("Scene Hierarchy", &open, dockspace_flags);
+
+        DrawEntityNodeList();
+
+        ImGui::End();
+    }
+
+
+    void SceneHierarchyPanel::DrawEntityNodeList() const
+    {
+        std::vector<std::string>* selectedEntityUUIDS = SelectionManager::GetSelection(SelectionManager::UI);
+        for (const auto IDView = _activeScene->_registry.view<UUIDComponent, TagComponent>(); const auto entity : IDView)
+        {
+            auto& UUID = IDView.get<UUIDComponent>(entity);
+            auto& Tag = IDView.get<TagComponent>(entity);
+            ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
+
+            if (std::ranges::find(*selectedEntityUUIDS, UUID.UUID) != selectedEntityUUIDS->end())
+            {
+                node_flags |= ImGuiTreeNodeFlags_Selected;
+            }
+            DrawEntityNode(UUID, Tag, node_flags);
         }
-        DrawEntityNode(UUID,Tag,node_flags);
-
     }
 
-}
-
-void Engine::SceneHierarchyPanel::DrawEntityNode(const UUIDComponent UUID, const TagComponent Tag, ImGuiTreeNodeFlags node_flags) const
-{
-
-    bool node_open = ImGui::TreeNodeEx(UUID.UUID.c_str(), node_flags, Tag.Tag.c_str());
-
-    if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+    void SceneHierarchyPanel::DrawEntityNode(const UUIDComponent& UUID, const TagComponent& Tag, ImGuiTreeNodeFlags node_flags) const
     {
-        SelectionManager::DeSelect(_SelectionContext);
-        SelectionManager::RegisterSelect(_SelectionContext,UUID.UUID);
-    }
-    if(node_open)
-    {
-        //If heirarchy present, do recursive draw here
-        ImGui::TreePop();
+        const bool nodeOpen = ImGui::TreeNodeEx(UUID.UUID.c_str(), node_flags, Tag.Value.c_str());
+
+        if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+        {
+            SelectionManager::DeSelect(_SelectionContext);
+            SelectionManager::RegisterSelect(_SelectionContext, UUID.UUID);
+        }
+        if (nodeOpen)
+        {
+            //draw children, recursively
+            ImGui::TreePop();
+        }
     }
 }
-
-
-
-
-

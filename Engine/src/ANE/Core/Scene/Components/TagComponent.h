@@ -7,10 +7,10 @@ namespace Engine
     {
     public:
         //const char* Tag;
-        std::string Tag;
+        std::string Value;
         ANE_COMPONENT_INIT(TagComponent)
 
-        TagComponent(const char* tag) : Component(typeid(*this).name()) , Tag(tag) {}
+        TagComponent(const char* tag) : Component(typeid(*this).name()) , Value(tag) {}
 
         //operator const char*&() { return Tag; }
     };

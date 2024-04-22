@@ -88,6 +88,8 @@ namespace Engine
     template <typename T>
     std::enable_if_t<std::is_base_of_v<Component, T>> Entity::RemoveComponent()
     {
+        if (typeid(T) == typeid(TagComponent)) return;
+
         if (HasComponent<T>())
         {
             SceneHandle->_registry.remove<T>(EntityHandle);
