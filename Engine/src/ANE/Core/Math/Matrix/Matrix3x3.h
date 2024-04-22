@@ -182,16 +182,16 @@ namespace Engine
         _columns[2] = 0;
     }
 
-    inline Vector3 Matrix3x3::GetColumn(int i) const
+    inline Vector3 Matrix3x3::GetColumn(const int i) const
     {
-        assert(i>= 0 && i<3);
-        return Vector3(_columns[0][i], _columns[1][i], _columns[2][i]);
+        ANE_EASSERT(i>=0 && i<3, "Trying to return out of bounds column: {} ", i);
+        return _columns[i];
     }
 
-    inline Vector3 Matrix3x3::GetRow(int i) const
+    inline Vector3 Matrix3x3::GetRow(const int i) const
     {
-        assert(i>= 0 && i<3);
-        return _columns[i];
+        ANE_EASSERT(i>=0 && i<3, "Trying to return out of bounds row: {} ", i);
+        return { _columns[0][i], _columns[1][i], _columns[2][i] };
     }
 
     inline std::string Matrix3x3::ToString() const

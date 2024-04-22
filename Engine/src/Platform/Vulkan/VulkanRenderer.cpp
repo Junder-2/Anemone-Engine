@@ -155,7 +155,7 @@ namespace Engine
 
         vkb::Result<VkQueue> queueResult = logicalDevice.get_queue(vkb::QueueType::graphics);
 
-        ANE_EASSERT(queueResult.has_value(), "Queue has no graphics support")
+        ANE_EASSERT(queueResult.has_value(), "Queue has no graphics support.");
 
         _queue = queueResult.value();
 

@@ -7,9 +7,14 @@ namespace Engine
     {
         switch (level)
         {
-            case Level::Information: ANE_ELOG_INFO("Physics World ({0}, {1}): {2}", physicsWorldName, getCategoryName(category), message); break;
-            case Level::Error: ANE_ELOG_ERROR("Physics World ({0}, {1}): {2}", physicsWorldName, getCategoryName(category), message); break;
-            case Level::Warning: ANE_ELOG_WARN("Physics World ({0}, {1}): {2}", physicsWorldName, getCategoryName(category), message); break;
+            case Level::Information: ANE_PHYS_LOG_INFO("({0}, {1}): {2}", physicsWorldName, getCategoryName(category), message); break;
+            case Level::Warning: ANE_PHYS_LOG_WARN("({0}, {1}): {2}", physicsWorldName, getCategoryName(category), message); break;
+            case Level::Error: ANE_PHYS_LOG_ERROR("({0}, {1}): {2}", physicsWorldName, getCategoryName(category), message); break;
         }
+    }
+
+    spdlog::logger& PhysicsLogger::GetPhysicsLogger()
+    {
+        return Logging::GetLogger("Physics");
     }
 }

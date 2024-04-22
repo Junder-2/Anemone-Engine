@@ -4,6 +4,8 @@
 #include <reactphysics3d/mathematics/Quaternion.h>
 
 #include "Vector4.h"
+#include "glm/detail/type_quat.hpp"
+#include "glm/gtc/quaternion.hpp"
 
 namespace Engine
 {

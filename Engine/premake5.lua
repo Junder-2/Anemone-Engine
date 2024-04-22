@@ -34,7 +34,7 @@ project "Engine"
         "%{IncludeDir.VulkanSDK}",
         "%{IncludeDir.VkBootstrap}",
         "%{IncludeDir.VMA}",
-        "%{IncludeDir.reactphysics}",
+        "%{IncludeDir.reactphysics3d}",
         "%{IncludeDir.Assimp}",
         "%{IncludeDir.Slang}",
     }
@@ -54,6 +54,7 @@ project "Engine"
         "VkBootstrap",
         "Assimp",
         "slang",
+        "reactphysics3d",
     }
 
     filter "files:vendor/imgui/backends/**.cpp or files:vendor/imgui/backends/**.h"

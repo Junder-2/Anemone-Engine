@@ -200,16 +200,16 @@ namespace Engine
         _columns[3] = 0;
     }
 
-    inline Vector4 Matrix4x4::GetColumn(int i) const
+    inline Vector4 Matrix4x4::GetColumn(const int i) const
     {
-        assert(i>= 0 && i<3);
-        return Vector4(_columns[0][i], _columns[1][i], _columns[2][i]);
+        ANE_EASSERT(i>=0 && i<4, "Trying to return out of bounds column: {}", i);
+        return _columns[i];
     }
 
-    inline Vector4 Matrix4x4::GetRow(int i) const
+    inline Vector4 Matrix4x4::GetRow(const int i) const
     {
-        assert(i>= 0 && i<3);
-        return _columns[i];
+        ANE_EASSERT(i>=0 && i<4, "Trying to return out of bounds row: {}", i);
+        return { _columns[0][i], _columns[1][i], _columns[2][i], _columns[3][i] };
     }
 
     inline std::string Matrix4x4::ToString() const

@@ -13,7 +13,8 @@ namespace Engine
     struct Vector4
     {
         Vector4() : X(0), Y(0), Z(0), W(0) {}
-        Vector4(const float newX, const float newY = 0, const float newZ = 0, const float newW = 0) : X(newX), Y(newY), Z(newZ), W(newW) {}
+        Vector4(const float scalar) : X(scalar), Y(scalar), Z(scalar), W(scalar) {}
+        Vector4(const float newX, const float newY, const float newZ, const float newW) : X(newX), Y(newY), Z(newZ), W(newW) {}
         Vector4(Vector2 vector2, float newZ = 0, float newW = 0);
         Vector4(Vector3 vector3, float newW = 0);
 

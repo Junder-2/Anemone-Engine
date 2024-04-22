@@ -34,8 +34,6 @@ namespace Engine
     void Application::Init()
     {
         ANE_PROFILE_FUNCTION();
-        auto &MainLogger = Registry::GetLogger("Editor Console Log");
-        ASLOG_TO_LOGGER(MainLogger,debug, "starting...");
         _window = Window::Create(WindowProperties(_appSpec.Name));
         _window->BindOnEvent(MakeDelegate(this, &Application::OnEvent));
 
@@ -155,47 +153,46 @@ namespace Engine
 
     void Application::OnWindowResize(WindowResizeEvent& e)
     {
-        ANE_ELOG_INFO("new size ({0}, {1})", e.GetWidth(), e.GetHeight());
+        ANE_ELOG_DEBUG("new size ({0}, {1})", e.GetWidth(), e.GetHeight());
     }
 
     void Application::OnWindowMove(WindowMovedEvent& e)
     {
-        ANE_ELOG_INFO("new pos ({0}, {1}) : ({2}, {3})", e.GetX(), e.GetY(), e.GetXDelta(), e.GetYDelta());
+        ANE_ELOG_DEBUG("new pos ({0}, {1}) : ({2}, {3})", e.GetX(), e.GetY(), e.GetXDelta(), e.GetYDelta());
     }
 
     void Application::OnWindowStateChange(WindowStateChangeEvent& e)
     {
-        ANE_ELOG_INFO("window state change {0}", (int)e.GetState());
+        ANE_ELOG_DEBUG("window state change {0}", (int)e.GetState());
     }
 
     void Application::OnWindowFocusChange(WindowFocusChangeEvent& e)
     {
-        ANE_ELOG_INFO("window focus change {0}", e.IsFocused());
+        ANE_ELOG_DEBUG("window focus change {0}", e.IsFocused());
     }
 
     void Application::OnKeyTest(KeyboardKeyEvent& keyTriggerEvent)
     {
         const InputValue inputValue = keyTriggerEvent.GetInputValue();
-        ANE_ELOG_INFO("pressed {0}: {1}", inputValue.GetBindingId(), InputUtilities::ToString(inputValue.GetTriggerState()));
+        ANE_ELOG_DEBUG("pressed {0}: {1}", inputValue.GetBindingId(), InputUtilities::ToString(inputValue.GetTriggerState()));
     }
 
     void Application::OnMouseKeyTest(MouseButtonEvent& mouseButtonEvent)
     {
         const MouseButtonValues inputValue = mouseButtonEvent.GetInputValue();
-        ANE_ELOG_INFO("pressed mouse key {0}, with {1}, is doubleclick {2}", InputUtilities::ToString((MouseButton)inputValue.GetCurrentButtonIndex()),
+        ANE_ELOG_DEBUG("pressed mouse key {0}, with {1}, is doubleclick {2}", InputUtilities::ToString((MouseButton)inputValue.GetCurrentButtonIndex()),
             InputUtilities::ToString(inputValue.GetTriggerState()), inputValue.GetIsDoubleClick());
-        ANE_ELOG_INFO("raw mouse button state {0}", std::bitset<16>(inputValue.GetRawButtonStates()).to_string());
+        ANE_ELOG_DEBUG("raw mouse button state {0}", std::bitset<16>(inputValue.GetRawButtonStates()).to_string());
     }
 
     void Application::OnMouseScrollTest(MouseScrollEvent& mouseScrollEvent)
     {
-        ANE_ELOG_INFO("scrolled mouse ({0}, {1})", mouseScrollEvent.GetXDelta(), mouseScrollEvent.GetYDelta());
+        ANE_ELOG_DEBUG("scrolled mouse ({0}, {1})", mouseScrollEvent.GetXDelta(), mouseScrollEvent.GetYDelta());
     }
 
     void Application::OnMouseMoveTest(MouseMovementEvent& mouseMovementEvent)
     {
         const MouseMoveValue inputValue = mouseMovementEvent.GetInputValue();
-        // spdlog formatting not working use explicit glm::to_string
-        ANE_ELOG_INFO("moved mouse pos:({0}), delta:({1})", inputValue.GetMousePos().ToString(), inputValue.GetMouseDelta().ToString());
+        ANE_ELOG_DEBUG("moved mouse pos:({0}), delta:({1})", inputValue.GetMousePos().ToString(), inputValue.GetMouseDelta().ToString());
     }
 }

@@ -3,6 +3,9 @@
 #include <vulkan/vulkan.h>
 #include <vk_mem_alloc.h>
 
+#include "ANE/Core/Math/Vector3.h"
+#include "ANE/Core/Math/Vector4.h"
+
 namespace Engine
 {
     struct VmaImage
@@ -31,11 +34,11 @@ namespace Engine
     struct Vertex
     {
         // Optimal 16-byte alignment layout.
-        glm::vec3 Position;
+        Vector3 Position;
         float UvX;
-        glm::vec3 Normal;
+        Vector3 Normal;
         float UvY;
-        glm::vec4 Color;
+        Vector4 Color;
     };
 
 }

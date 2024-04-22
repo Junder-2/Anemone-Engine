@@ -67,6 +67,11 @@ namespace Engine
         return _logMessages;
     }
 
+    void Logging::ClearMessages()
+    {
+        _logMessages.clear();
+    }
+
     void Logging::OnSink(const log_msg& logMsg)
     {
         if(_logMessages.size() >= 100)
@@ -86,7 +91,29 @@ namespace Engine
         newLogMessage.Source.erase(newLogMessage.Source.length()-2);
 
         newLogMessage.Message = logMsg.payload;
-        newLogMessage.Level = logMsg.level;
+        switch (logMsg.level)
+        {
+            case spdlog::level::trace:
+                newLogMessage.LevelCategory = LogLevelCategory::LevelTrace;
+            break;
+            case spdlog::level::debug:
+                newLogMessage.LevelCategory = LogLevelCategory::LevelDebug;
+            break;
+            case spdlog::level::info:
+                newLogMessage.LevelCategory = LogLevelCategory::LevelInfo;
+            break;
+            case spdlog::level::warn:
+                newLogMessage.LevelCategory = LogLevelCategory::LevelWarn;
+            break;
+            case spdlog::level::err:
+            case spdlog::level::critical:
+                newLogMessage.LevelCategory = LogLevelCategory::LevelError;
+            break;
+            default:
+                newLogMessage.LevelCategory = LogLevelCategory::LevelNone;
+            break;
+        }
+
 
         _logMessages.push_front(newLogMessage);
     }

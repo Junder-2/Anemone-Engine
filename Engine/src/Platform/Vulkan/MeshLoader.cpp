@@ -70,19 +70,19 @@ namespace Engine
             const aiVector3D* uv = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][vertexIndex]) : nullptr;
 
             Vertex vertex = { };
-            vertex.Position = glm::vec3{ pos->x, pos->y, pos->z };
-            vertex.Normal = glm::vec3{ normal->x, normal->y, normal->z };
-            vertex.Color = glm::vec4{ vertex.Normal, 1 } * .5f + .5f;
+            vertex.Position = { pos->x, pos->y, pos->z };
+            vertex.Normal = { normal->x, normal->y, normal->z };
+            vertex.Color = Vector4{ vertex.Normal, 1 } * .5f + .5f;
             vertex.UvX = uv->x;
             vertex.UvY = uv->y;
 
-            bounds.Min.x = fmin(vertex.Position.x, bounds.Min.x);
-            bounds.Min.y = fmin(vertex.Position.y, bounds.Min.y);
-            bounds.Min.z = fmin(vertex.Position.z, bounds.Min.z);
+            bounds.Min.x = fmin(vertex.Position.X, bounds.Min.x);
+            bounds.Min.y = fmin(vertex.Position.Y, bounds.Min.y);
+            bounds.Min.z = fmin(vertex.Position.Z, bounds.Min.z);
 
-            bounds.Max.x = fmin(vertex.Position.x, bounds.Min.x);
-            bounds.Max.y = fmin(vertex.Position.y, bounds.Min.y);
-            bounds.Max.z = fmin(vertex.Position.z, bounds.Min.z);
+            bounds.Max.x = fmin(vertex.Position.X, bounds.Min.x);
+            bounds.Max.y = fmin(vertex.Position.Y, bounds.Min.y);
+            bounds.Max.z = fmin(vertex.Position.Z, bounds.Min.z);
 
             finalMesh.Vertices.push_back(vertex);
         }
