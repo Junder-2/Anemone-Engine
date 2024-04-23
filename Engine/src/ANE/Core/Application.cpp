@@ -157,7 +157,7 @@ namespace Engine
 
     void Application::OnWindowMove(WindowMovedEvent& e)
     {
-        ANE_ELOG_DEBUG("new pos ({0}, {1}) : ({2}, {3})", e.GetX(), e.GetY(), e.GetXDelta(), e.GetYDelta());
+        ANE_ELOG_DEBUG("new pos ({0}, {1})", e.GetX(), e.GetY());
     }
 
     void Application::OnWindowStateChange(WindowStateChangeEvent& e)

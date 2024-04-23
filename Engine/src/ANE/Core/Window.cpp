@@ -215,12 +215,10 @@ namespace Engine
                 uint32_t newY = (uint32_t)windowEvent.data2;
                 if(_windowData.XPos == newX && _windowData.YPos == newY) break;
 
-                const float xDelta = ((float)newX - (float)_windowData.XPos) * deltaTime;
-                const float yDelta = ((float)newY - (float)_windowData.YPos) * deltaTime;
                 _windowData.XPos = newX;
                 _windowData.YPos = newY;
 
-                WindowMovedEvent movedEvent(_windowData.XPos, _windowData.YPos, xDelta, yDelta);
+                WindowMovedEvent movedEvent(_windowData.XPos, _windowData.YPos);
                 DispatchEvent(movedEvent);
             }
             break;
