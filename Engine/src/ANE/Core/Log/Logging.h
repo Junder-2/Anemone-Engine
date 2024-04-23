@@ -73,6 +73,9 @@ namespace Engine
 #define ANE_INTERNAL_LOGGER_CALL(logger, level, ...) \
 (logger).log(spdlog::source_loc{__FILE__, __LINE__, SPDLOG_FUNCTION}, level, __VA_ARGS__)
 
+#define ANE_INTERNAL_LOGGER_CALL_SOURCE(logger, level, fileName, lineNumber, ...) \
+(logger).log(spdlog::source_loc{fileName, lineNumber, SPDLOG_FUNCTION}, level, __VA_ARGS__)
+
 // Engine log macros
 #define ANE_ELOG(...)               ANE_INTERNAL_LOGGER_CALL(ENGINE_LOGGER(), spdlog::level::trace, __VA_ARGS__)
 #define ANE_ELOG_DEBUG(...)         ANE_INTERNAL_LOGGER_CALL(ENGINE_LOGGER(), spdlog::level::debug, __VA_ARGS__)
