@@ -2,6 +2,7 @@
 #include "PhysicsSystem.h"
 
 #include "PhysicsLogger.h"
+#include "RigidBody.h"
 #include "ANE/Core/Entity/Entity.h"
 #include "ANE/Math/Types/TransformMatrix.h"
 #include "ANE/Core/Scene/Components/RigidBodyComponent.h"
@@ -39,7 +40,7 @@ namespace Engine
         return *_world;
     }
 
-    rp3d::RigidBody* PhysicsSystem::CreateRigidBody(Entity entity)
+    RigidBody* PhysicsSystem::CreateRigidBody(Entity entity)
     {
         const TransformMatrix transform = entity.GetComponent<TransformComponent>().Transform;
         const rp3d::Transform reactTransform(transform.GetPosition(), transform.GetQuaternion());
@@ -50,7 +51,7 @@ namespace Engine
         rigidBody->setIsDebugEnabled(true);
         #endif
 
-        return rigidBody;
+        return new RigidBody(rigidBody);
     }
 
     rp3d::Collider* PhysicsSystem::CreateSphereCollider(Entity entity, const float radius)
@@ -62,7 +63,7 @@ namespace Engine
         }
 
         const auto rigidBody = entity.GetComponent<RigidBodyComponent>();
-        const auto sphereCollider = rigidBody.GetRigidBody()->addCollider(CreateSphereShape(radius), rp3d::Transform::identity());
+        const auto sphereCollider = rigidBody.GetRigidBody()->GetReactRigidBody().addCollider(CreateSphereShape(radius), rp3d::Transform::identity());
 
         return sphereCollider;
     }
@@ -76,7 +77,7 @@ namespace Engine
         }
 
         const auto rigidBody = entity.GetComponent<RigidBodyComponent>();
-        const auto sphereCollider = rigidBody.GetRigidBody()->addCollider(CreateBoxShape(halfExtents), rp3d::Transform::identity());
+        const auto sphereCollider = rigidBody.GetRigidBody()->GetReactRigidBody().addCollider(CreateBoxShape(halfExtents), rp3d::Transform::identity());
 
         return sphereCollider;
     }
@@ -90,7 +91,7 @@ namespace Engine
         }
 
         const auto rigidBody = entity.GetComponent<RigidBodyComponent>();
-        const auto sphereCollider = rigidBody.GetRigidBody()->addCollider(CreateCapsuleShape(radius, height), rp3d::Transform::identity());
+        const auto sphereCollider = rigidBody.GetRigidBody()->GetReactRigidBody().addCollider(CreateCapsuleShape(radius, height), rp3d::Transform::identity());
 
         return sphereCollider;
     }

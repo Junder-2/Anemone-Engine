@@ -1,10 +1,10 @@
 ﻿#pragma once
-#include <reactphysics3d/body/RigidBody.h>
 
 #include "Component.h"
 #include "ANE/Core/Entity/Entity.h"
 #include "ANE/Physics/Physics.h"
 #include "ANE/Physics/PhysicsTypes.h"
+#include "ANE/Physics/RigidBody.h"
 
 namespace Engine
 {
@@ -18,19 +18,19 @@ namespace Engine
             _rigidbody = GetPhysicsSystem().CreateRigidBody(self);
         }
 
-        RigidBodyComponent(const Entity self, const BodyMode bodyType) : Component(typeid(*this).name())
+        RigidBodyComponent(const Entity self, const BodyType bodyType) : Component(typeid(*this).name())
         {
             _rigidbody = GetPhysicsSystem().CreateRigidBody(self);
-            _rigidbody->setType(static_cast<reactphysics3d::BodyType>(bodyType));
+            _rigidbody->SetBodyType(bodyType);
         }
 
-        rp3d::RigidBody* GetRigidBody() const
+        RigidBody* GetRigidBody() const
         {
             return _rigidbody;
         }
 
     private:
 
-        rp3d::RigidBody* _rigidbody;
+        RigidBody* _rigidbody;
     };
 }
