@@ -52,7 +52,7 @@ namespace Engine
 
     struct PushConstantBuffer
     {
-        glm::mat4 WorldMatrix;
+        Matrix4x4 WorldMatrix;
         VkDeviceAddress VertexBuffer;
     };
 
