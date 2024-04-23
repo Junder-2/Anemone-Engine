@@ -14,8 +14,6 @@ Engine::InspectorPanel::InspectorPanel(EditorLayer* editorLayer)
     _editorLayer = editorLayer;
 }
 
-
-
 void Engine::InspectorPanel::RegisterSelect(UUIDComponent selectedEntityID)
 {
     selected = selectedEntityID.UUID;
@@ -57,7 +55,8 @@ void Engine::InspectorPanel::OnPanelRender()
         if (ImGui::InputText("Tag", buffer, sizeof(buffer)))
             selectedEntity.GetComponent<TagComponent>().Value = std::string(buffer);
 
-        if(ImGui::Button("Add Component")){
+        if(ImGui::Button("Add Physics Suzanne")) // For physics testing
+        {
             selectedEntity.GetComponent<TransformComponent>().Transform.AddPosition(Random::InSphere(.2f));
             selectedEntity.AddComponent<RenderComponent>("Suzanne.fbx");
             selectedEntity.AddComponent<RigidBodyComponent>(selectedEntity);

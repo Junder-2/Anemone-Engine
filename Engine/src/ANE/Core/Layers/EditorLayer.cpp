@@ -107,6 +107,8 @@ namespace Engine
         ComponentTypeMap[entt::type_id<NativeScriptComponent>().hash()] = "NativeScriptComponent";
         ComponentTypeMap[entt::type_id<UUIDComponent>().hash()] = "UUIDComponent";
         ComponentTypeMap[entt::type_id<RenderComponent>().hash()] = "RenderComponent";
+        ComponentTypeMap[entt::type_id<RigidBodyComponent>().hash()] = "RigidBodyComponent";
+        ComponentTypeMap[entt::type_id<ColliderComponent>().hash()] = "ColliderComponent";
     }
 
     void EditorLayer::OnUpdate(float deltaTime)
