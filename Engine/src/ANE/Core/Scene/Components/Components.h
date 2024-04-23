@@ -7,3 +7,5 @@
 #include "RenderComponent.h"
 #include "TransformComponent.h"
 #include "CameraComponent.h"
+#include "RigidBodyComponent.h"
+#include "ColliderComponent.h"

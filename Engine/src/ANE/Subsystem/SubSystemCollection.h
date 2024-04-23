@@ -13,7 +13,7 @@ namespace Engine
         }
 
         SubSystemCollection() = default;
-        ~SubSystemCollection() = default;
+        ~SubSystemCollection();
 
         template<class T>
         T* GetSubSystem()
@@ -23,14 +23,14 @@ namespace Engine
 
             if(!_subsystems.contains(hashCode))
             {
-                _subsystems.insert_or_assign(hashCode, std::make_unique<T>());
+                _subsystems.insert_or_assign(hashCode, new T());
 
                 ANE_ELOG_INFO("Instancing new subsystem of {}", name);
             }
 
-            return dynamic_cast<T*>(_subsystems[hashCode].get());
+            return dynamic_cast<T*>(_subsystems[hashCode]);
         }
     private:
-        entt::dense_map<size_t, std::unique_ptr<SubSystem>> _subsystems {};
+        entt::dense_map<size_t, SubSystem*> _subsystems {};
     };
 }

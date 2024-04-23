@@ -57,6 +57,10 @@ namespace Engine
         {
         }
 
+        virtual void OnFixedUpdate(float timeStep)
+        {
+        }
+
     private:
         friend class Scene;
         Entity _entity;

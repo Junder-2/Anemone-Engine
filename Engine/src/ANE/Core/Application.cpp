@@ -11,11 +11,7 @@
 #include "ANE/Utilities/InputUtilities.h"
 #include "Layers/Layer.h"
 #include "Entity/Entity.h"
-#include "Entity/ExampleScripts/CameraController.h"
-#include "Layers/EditorLayer.h"
 #include "ANE/Renderer/Renderer.h"
-#include "Scene/Components/CameraComponent.h"
-#include "Scene/Components/NativeScriptComponent.h"
 #include "Scene/Components/RenderComponent.h"
 
 namespace Engine
@@ -50,6 +46,8 @@ namespace Engine
 
     void Application::Run()
     {
+        _lastTimeStamp = SDL_GetPerformanceCounter();
+
         while (_isRunning)
         {
             ANE_DEEP_PROFILE_SCOPE("Application::Run");

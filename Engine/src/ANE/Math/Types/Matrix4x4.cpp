@@ -79,7 +79,7 @@ namespace Engine
 
     Quaternion Matrix4x4::GetQuaternion() const
     {
-        return Quaternion::Convert(quat_cast(glm::mat4(*this)));
+        return Quaternion::Convert(normalize(quat_cast(glm::mat4(*this))));
     }
 
     Vector3 Matrix4x4::GetEulerAngles(bool isDegrees /*= false*/) const

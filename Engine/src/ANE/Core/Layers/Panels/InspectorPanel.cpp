@@ -3,15 +3,16 @@
 
 #include "imgui.h"
 #include "ANE/Core/Editor/SelectionManager.h"
+#include "ANE/Math/Random.h"
+#include "ANE/Core/Scene/Components/ColliderComponent.h"
 #include "ANE/Core/Scene/Components/RenderComponent.h"
+#include "ANE/Core/Scene/Components/RigidBodyComponent.h"
 
 
 Engine::InspectorPanel::InspectorPanel(EditorLayer* editorLayer)
 {
     _editorLayer = editorLayer;
 }
-
-
 
 void Engine::InspectorPanel::RegisterSelect(UUIDComponent selectedEntityID)
 {
@@ -54,6 +55,13 @@ void Engine::InspectorPanel::OnPanelRender()
         if (ImGui::InputText("Tag", buffer, sizeof(buffer)))
             selectedEntity.GetComponent<TagComponent>().Value = std::string(buffer);
 
+        if(ImGui::Button("Add Physics Suzanne")) // For physics testing
+        {
+            selectedEntity.GetComponent<TransformComponent>().Transform.AddPosition(Random::InSphere(.2f));
+            selectedEntity.AddComponent<RenderComponent>("Suzanne.fbx");
+            selectedEntity.AddComponent<RigidBodyComponent>(selectedEntity);
+            selectedEntity.AddComponent<ColliderComponent>(selectedEntity, 1.f);
+        }
     }
     else
     {

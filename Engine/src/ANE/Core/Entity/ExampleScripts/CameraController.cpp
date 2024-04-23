@@ -63,6 +63,11 @@ namespace Engine
         }
     }
 
+    void CameraController::OnFixedUpdate(float timeStep)
+    {
+
+    }
+
     void CameraController::OnMoveX(InputValue inputValue)
     {
         _xInput = inputValue.GetAxis();
