@@ -924,6 +924,11 @@ namespace Engine
         // Calls vkDestroyPipeline, vkDestroyRenderPass, vkDestroySwapchainKHR and vkDestroySurfaceKHR.
         ImGui_ImplVulkanH_DestroyWindow(_instance, _device, &_mainWindowData, _allocator);
 
+        for (VulkanFrame& frame : _frameData)
+        {
+            frame.DeletionQueue.Flush();
+        }
+
         _mainDeletionQueue.Flush();
 
         DestroyMainBuffers();
