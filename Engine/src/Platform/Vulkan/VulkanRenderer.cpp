@@ -761,7 +761,7 @@ namespace Engine
             }
         }
 
-        VulkanFrame frame = GetFrame();
+        VulkanFrame& frame = GetFrame();
         CheckVkResult(vkWaitForFences(_device, 1, &frame.Fence, true, 1000000000));
 
         uint32_t swapchainImageIndex;
@@ -837,7 +837,7 @@ namespace Engine
     {
         VmaBuffer sceneDataBuffer = CreateBuffer(sizeof(SceneData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
-        VulkanFrame frame = GetFrame();
+        VulkanFrame& frame = GetFrame();
         frame.DeletionQueue.PushFunction([=]
         {
             DestroyBuffer(sceneDataBuffer);
