@@ -3,6 +3,7 @@
 
 #include "Matrix3x3.h"
 #include "ANE/Math/Types/Quaternion.h"
+#include "ANE/Math/FMath.h"
 #include "glm/gtx/compatibility.hpp"
 
 namespace Engine
@@ -92,13 +93,13 @@ namespace Engine
 
         Vector3 euler;
 
-        euler.Yaw = glm::asin(-copy[0][2]);
-        if (glm::cos(euler.Yaw) != 0) {
-            euler.Pitch = glm::atan2(copy[1][2], copy[2][2]);
-            euler.Roll = glm::atan2(copy[0][1], copy[0][0]);
+        euler.Yaw = FMath::Asin(-copy[0][2]);
+        if (FMath::Cos(euler.Yaw) != 0) {
+            euler.Pitch = FMath::Atan2(copy[1][2], copy[2][2]);
+            euler.Roll = FMath::Atan2(copy[0][1], copy[0][0]);
         }
         else {
-            euler.Pitch = glm::atan2(-copy[2][0], copy[1][1]);
+            euler.Pitch = FMath::Atan2(-copy[2][0], copy[1][1]);
             euler.Roll = 0;
         }
 

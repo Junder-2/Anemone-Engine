@@ -1,11 +1,10 @@
 ﻿#include "anepch.h"
 #include "CameraController.h"
 
-#include <glm/gtx/quaternion.hpp>
-
 #include "ANE/Core/Application.h"
 #include "ANE/Core/Scene/Components/CameraComponent.h"
 #include "ANE/Events/EventHandler.h"
+#include "ANE/Math/FMath.h"
 #include "ANE/Renderer/Renderer.h"
 
 namespace Engine
@@ -91,7 +90,7 @@ namespace Engine
 
         constexpr float lookSpeed = (180.f * FMath::DEGREES_TO_RAD);
         const float newPitch = _pitchRadians + lookSpeed * delta.Y;
-        _pitchRadians = glm::clamp(newPitch, -FMath::Half_PI, FMath::Half_PI);
+        _pitchRadians = FMath::MirrorClamp(newPitch, FMath::Half_PI);
         _yawRadians += lookSpeed * delta.X;
         _transformComponent->Transform.SetRotation(Vector3{_pitchRadians, _yawRadians, 0});
 
@@ -103,7 +102,7 @@ namespace Engine
 
     void CameraController::OnScroll(Vector2 scrollDelta)
     {
-        _flySpeed = glm::clamp(_flySpeed + scrollDelta.Y, 0.1f, 20.f);
+        _flySpeed = FMath::Clamp(_flySpeed + scrollDelta.Y, 0.1f, 20.f);
     }
 
     void CameraController::OnSpeedup(InputValue inputValue)

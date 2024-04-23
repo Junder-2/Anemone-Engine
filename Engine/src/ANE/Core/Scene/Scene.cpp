@@ -2,6 +2,7 @@
 #include "Scene.h"
 
 #include "ANE/Core/Entity/Entity.h"
+#include "ANE/Math/FMath.h"
 #include "Components/NativeScriptComponent.h"
 #include "Components/RenderComponent.h"
 #include "Components/RigidBodyComponent.h"
@@ -115,7 +116,7 @@ namespace Engine
         // Fixed update
         while (_accumulator >= _timeStep)
         {
-            _accumulator = glm::max(_accumulator - _timeStep, 0.f);
+            _accumulator = FMath::Max0(_accumulator - _timeStep);
 
             OnFixedUpdate(_timeStep);
         }
@@ -143,7 +144,7 @@ namespace Engine
 
     void Scene::InterpolateRigidBodies()
     {
-        const float factor = glm::clamp(_accumulator / _timeStep, 0.f, 1.f);
+        const float factor = FMath::Saturate(_accumulator / _timeStep);
 
         auto group = _registry.view<TransformComponent, RigidBodyComponent>();
         for (auto entt : group)
