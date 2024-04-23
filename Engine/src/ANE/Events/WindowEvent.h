@@ -55,7 +55,8 @@ namespace Engine
     class WindowResizeEvent final : public Event
     {
     public:
-        WindowResizeEvent(const uint32_t width, const uint32_t height) : _width(width), _height(height) {}
+        WindowResizeEvent(const uint32_t width, const uint32_t height, const uint32_t windowIndex)
+            : _width(width), _height(height), _windowIndex(windowIndex) {}
 
         EventType GetEventType() const override { return EventType::WindowResize; }
         int GetEventCategories() const override { return (EventCategoryWindow); }
@@ -63,18 +64,23 @@ namespace Engine
         uint32_t GetWidth() const { return _width; }
         uint32_t GetHeight() const { return _height; }
 
+        uint32_t GetWindowIndex() const { return _windowIndex; }
+        bool IsMainWindow() const { return _windowIndex > 1; }
+
     private:
         uint32_t _width;
         uint32_t _height;
+        uint32_t _windowIndex;
     };
 
     /**
-    * Window event, stores the new (x,y) and deltas
+    * Window event, stores the new (x,y)
     */
     class WindowMovedEvent final : public Event
     {
     public:
-        WindowMovedEvent(const uint32_t x, const uint32_t y) : _xPos(x), _yPos(y) {}
+        WindowMovedEvent(const uint32_t x, const uint32_t y, const uint32_t windowIndex)
+            : _xPos(x), _yPos(y), _windowIndex(windowIndex) {}
 
         EventType GetEventType() const override { return EventType::WindowMoved; }
         int GetEventCategories() const override { return (EventCategoryWindow); }
@@ -82,8 +88,12 @@ namespace Engine
         uint32_t GetX() const { return _xPos; }
         uint32_t GetY() const { return _yPos; }
 
+        uint32_t GetWindowIndex() const { return _windowIndex; }
+        bool IsMainWindow() const { return _windowIndex > 1; }
+
     private:
         uint32_t _xPos;
         uint32_t _yPos;
+        uint32_t _windowIndex;
     };
 }

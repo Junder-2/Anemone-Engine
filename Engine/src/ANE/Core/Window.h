@@ -30,13 +30,13 @@ namespace Engine
         ViewportProperties() = default;
         ViewportProperties(const uint32_t id, const uint32_t width, const uint32_t height, const uint32_t xPos = 0, const uint32_t yPos = 0) : Id(id),  Width(width), Height(height), XPos(xPos), YPos(yPos) {}
 
-        uint32_t Id;
+        uint32_t Id = 0;
 
-        uint32_t Width;
-        uint32_t Height;
+        uint32_t Width = 0;
+        uint32_t Height = 0;
 
-        uint32_t XPos;
-        uint32_t YPos;
+        uint32_t XPos = 0;
+        uint32_t YPos = 0;
 
         Vector2 GetCenter() const { return {(float)Width * 0.5f + (float)XPos, (float)Height * 0.5f + (float)YPos}; }
 
@@ -93,6 +93,7 @@ namespace Engine
 
         void ProcessEvents(float deltaTime);
         void ProcessWindowEvent(const SDL_WindowEvent& windowEvent, float deltaTime);
+        void ProcessViewportEvents(const ViewportProperties& previousProps);
 
         Vector2 GetAbsoluteMousePos() const;
 
@@ -105,6 +106,7 @@ namespace Engine
         uint32_t _activeViewportId = 0;
         uint32_t _previousViewportId = 0;
         entt::dense_set<uint32_t> _viewports;
+        ViewportProperties _previousViewportProperties {};
 
         SinglecastDelegate<void(Event&)> _eventDelegate;
 

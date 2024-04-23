@@ -135,6 +135,13 @@ namespace Engine
             continue;
         }
 
+        if(!IsViewportMainWindow())
+        {
+            ProcessViewportEvents(_previousViewportProperties);
+        }
+
+        _previousViewportProperties = GetActiveViewportProperties();
+
         if(prevHasFocus && !HasFocus())
         {
             WindowFocusChangeEvent focusChangeEvent(false);
@@ -190,7 +197,7 @@ namespace Engine
                 _windowData.Width = newX;
                 _windowData.Height = newY;
 
-                WindowResizeEvent resizeEvent(_windowData.Width, _windowData.Height);
+                WindowResizeEvent resizeEvent(_windowData.Width, _windowData.Height, _windowData.Id);
                 DispatchEvent(resizeEvent);
             }
             break;
@@ -218,7 +225,7 @@ namespace Engine
                 _windowData.XPos = newX;
                 _windowData.YPos = newY;
 
-                WindowMovedEvent movedEvent(_windowData.XPos, _windowData.YPos);
+                WindowMovedEvent movedEvent(_windowData.XPos, _windowData.YPos, _windowData.Id);
                 DispatchEvent(movedEvent);
             }
             break;
@@ -231,6 +238,22 @@ namespace Engine
             case SDL_WINDOWEVENT_FOCUS_GAINED:
                 _windowHasFocus = true;
             break;
+        }
+    }
+
+    void Window::ProcessViewportEvents(const ViewportProperties& previousProps)
+    {
+        const ViewportProperties newViewportProps = GetActiveViewportProperties();
+        if(newViewportProps.Width != previousProps.Width || newViewportProps.Height != previousProps.Height)
+        {
+            WindowResizeEvent resizeEvent(newViewportProps.Width, newViewportProps.Height, newViewportProps.Id);
+            DispatchEvent(resizeEvent);
+        }
+
+        if(newViewportProps.XPos != previousProps.XPos || newViewportProps.YPos != previousProps.YPos)
+        {
+            WindowMovedEvent movedEvent(newViewportProps.XPos, newViewportProps.YPos, newViewportProps.Id);
+            DispatchEvent(movedEvent);
         }
     }
 
@@ -280,6 +303,8 @@ namespace Engine
         AddViewport(id);
         _previousViewportId = _activeViewportId;
         _activeViewportId = id;
+
+        ProcessViewportEvents(_previousViewportProperties);
     }
 
     void Window::AddViewport(uint32_t id)
