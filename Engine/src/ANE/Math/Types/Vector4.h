@@ -1,7 +1,9 @@
-﻿#pragma once
-#include "MathCommon.h"
+﻿//Modified copy of reactphysics/include/reactphysics3d/mathematics/Vector3.h
 
-//Modified copy of reactphysics/include/reactphysics3d/mathematics/Vector3.h
+#pragma once
+
+#include "ANE/Math/MathCommon.h"
+#include <string>
 
 struct ImVec4;
 
@@ -119,8 +121,7 @@ namespace Engine
 
         bool operator<(const Vector4& vector) const
         {
-            //TODO:
-            return (X == vector.X ? (Y == vector.Y ? Z < vector.Z : Y < vector.Y) : X < vector.X);
+            return (X == vector.X ? (Y == vector.Y ? (Z == vector.Z ? W < vector.W : Z < vector.Z) : Y < vector.Y) : X < vector.X);
         }
 
         friend Vector4 operator+(const Vector4& vector1, const Vector4& vector2)
@@ -155,16 +156,16 @@ namespace Engine
 
         friend Vector4 operator/(const Vector4& vector, const float scalar)
         {
-            assert(scalar > FMath::EPSILON);
+            ANE_EASSERT(scalar > FMath::EPSILON);
             return {vector.X / scalar, vector.Y / scalar, vector.Z / scalar, vector.W / scalar};
         }
 
         friend Vector4 operator/(const Vector4& vector1, const Vector4& vector2)
         {
-            assert(vector2.X > FMath::EPSILON);
-            assert(vector2.Y > FMath::EPSILON);
-            assert(vector2.Z > FMath::EPSILON);
-            assert(vector2.W > FMath::EPSILON);
+            ANE_EASSERT(vector2.X > FMath::EPSILON);
+            ANE_EASSERT(vector2.Y > FMath::EPSILON);
+            ANE_EASSERT(vector2.Z > FMath::EPSILON);
+            ANE_EASSERT(vector2.W > FMath::EPSILON);
             return {vector1.X / vector2.X, vector1.Y / vector2.Y, vector1.Z / vector2.Z, vector1.W / vector2.W};
         }
 

@@ -2,7 +2,7 @@
 #include "Matrix4x4.h"
 
 #include "Matrix3x3.h"
-#include "ANE/Core/Math/Quaternion.h"
+#include "ANE/Math/Types/Quaternion.h"
 #include "glm/gtx/compatibility.hpp"
 
 namespace Engine
@@ -155,17 +155,17 @@ namespace Engine
 
     Vector3 Matrix4x4::GetRight() const
     {
-        return _columns[0];
+        return Vector3(_columns[0]).GetNormalized();
     }
 
     Vector3 Matrix4x4::GetUp() const
     {
-        return _columns[1];
+        return Vector3(_columns[1]).GetNormalized();
     }
 
     Vector3 Matrix4x4::GetForward() const
     {
-        return _columns[2];
+        return Vector3(_columns[2]).GetNormalized();
     }
 
     Matrix4x4 Matrix4x4::Convert(const glm::mat4& mat4)

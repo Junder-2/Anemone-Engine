@@ -1,7 +1,7 @@
-﻿#pragma once
-#include "ANE/Core/Math/Vector3.h"
+﻿//Modified copy of reactphysics/include/reactphysics3d/mathematics/Matrix3x3.h
 
-//Modified copy of reactphysics/include/reactphysics3d/mathematics/Matrix3x3.h
+#pragma once
+#include "ANE/Math/Types/Vector3.h"
 
 namespace reactphysics3d
 {
@@ -68,9 +68,9 @@ namespace Engine
 
         static Matrix3x3 Identity()
         {
-            return {1.0, 0.0, 0.0,
-                    0.0, 1.0, 0.0,
-                    0.0, 0.0, 1.0};
+            return {1.f, 0.f, 0.f,
+                    0.f, 1.f, 0.f,
+                    0.f, 0.f, 1.f};
         }
 
         static Matrix3x3 Zero() { return {0}; }

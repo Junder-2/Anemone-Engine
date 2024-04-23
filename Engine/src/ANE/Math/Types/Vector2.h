@@ -1,11 +1,12 @@
-﻿#pragma once
+﻿//Modified copy of reactphysics/include/reactphysics3d/mathematics/Vector2.h
 
-#include "MathCommon.h"
+#pragma once
+
+#include "ANE/Math/MathCommon.h"
 
 #include <sstream>
 #include <string>
 #include <iostream>
-//Modified copy of reactphysics/include/reactphysics3d/mathematics/Vector2.h
 
 struct ImVec2;
 
@@ -90,7 +91,7 @@ namespace Engine
 
         Vector2& operator/=(const float& scalar)
         {
-            assert(scalar > FMath::EPSILON);
+            ANE_EASSERT(scalar > FMath::EPSILON);
             X /= scalar;
             Y /= scalar;
             return *this;
@@ -150,14 +151,14 @@ namespace Engine
 
         friend Vector2 operator/(const Vector2& vector, const float scalar)
         {
-            assert(scalar > FMath::EPSILON);
+            ANE_EASSERT(scalar > FMath::EPSILON);
             return  {vector.X / scalar, vector.Y / scalar};
         }
 
         friend Vector2 operator/(const Vector2& vector1, const Vector2& vector2)
         {
-            assert(vector2.X > FMath::EPSILON);
-            assert(vector2.Y > FMath::EPSILON);
+            ANE_EASSERT(vector2.X > FMath::EPSILON);
+            ANE_EASSERT(vector2.Y > FMath::EPSILON);
             return {vector1.X / vector2.X, vector1.Y / vector2.Y};
         }
 

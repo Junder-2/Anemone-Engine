@@ -1,7 +1,7 @@
 #pragma once
 #include "Matrix4x4.h"
-#include "ANE/Core/Math/Quaternion.h"
-#include "ANE/Core/Math/Vector3.h"
+#include "ANE/Math/Types/Quaternion.h"
+#include "ANE/Math/Types/Vector3.h"
 
 namespace Engine
 {

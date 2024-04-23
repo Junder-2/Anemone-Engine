@@ -3,8 +3,8 @@
 #include <vulkan/vulkan.h>
 #include <vk_mem_alloc.h>
 
-#include "ANE/Core/Math/Vector3.h"
-#include "ANE/Core/Math/Vector4.h"
+#include "ANE/Math/Types/Vector3.h"
+#include "ANE/Math/Types/Vector4.h"
 
 namespace Engine
 {
