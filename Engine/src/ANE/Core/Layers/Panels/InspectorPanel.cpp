@@ -3,7 +3,7 @@
 
 #include "imgui.h"
 #include "ANE/Core/Editor/SelectionManager.h"
-#include "ANE/Core/Math/Random.h"
+#include "ANE/Math/Random.h"
 #include "ANE/Core/Scene/Components/ColliderComponent.h"
 #include "ANE/Core/Scene/Components/RenderComponent.h"
 #include "ANE/Core/Scene/Components/RigidBodyComponent.h"

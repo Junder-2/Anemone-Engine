@@ -1,6 +1,6 @@
 #pragma once
-#include "Vector2.h"
-#include "Vector3.h"
+#include "Types/Vector2.h"
+#include "Types/Vector3.h"
 #include "glm/gtc/random.hpp"
 
 namespace Engine

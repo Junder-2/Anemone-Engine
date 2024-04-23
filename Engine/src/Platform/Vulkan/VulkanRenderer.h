@@ -7,7 +7,7 @@
 #include "VmaTypes.h"
 #include "VulkanDeletionQueue.h"
 #include "VulkanPipelineBuilder.h"
-#include "ANE/Core/Math/Matrix/Matrix4x4.h"
+#include "ANE/Math/Types/Matrix4x4.h"
 #include "ANE/Renderer/Draw.h"
 #include "ANE/Renderer/Mesh.h"
 

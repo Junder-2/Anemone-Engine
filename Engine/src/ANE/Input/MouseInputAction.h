@@ -1,6 +1,6 @@
 #pragma once
 #include "InputTypes.h"
-#include "ANE/Core/Math/Vector2.h"
+#include "ANE/Math/Types/Vector2.h"
 
 namespace Engine
 {

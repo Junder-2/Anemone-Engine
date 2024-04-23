@@ -3,7 +3,7 @@
 
 #include "PhysicsLogger.h"
 #include "ANE/Core/Entity/Entity.h"
-#include "ANE/Core/Math/Matrix/TransformMatrix.h"
+#include "ANE/Math/Types/TransformMatrix.h"
 #include "ANE/Core/Scene/Components/RigidBodyComponent.h"
 
 namespace Engine
