@@ -564,6 +564,11 @@ namespace Engine
 
                 .SetAllocationCallbacks(_allocator)
                 .Build();
+
+            _mainDeletionQueue.PushFunction([&]
+            {
+                vkDestroyDescriptorSetLayout(_device, _geometryDataLayout, _allocator);
+            });
         }
 
         for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
