@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "ANE/Core/Math/Vector4.h"
-#include "ANE/Core/Math/Matrix/Matrix4x4.h"
+#include "ANE/Math/Types/Vector4.h"
+#include "ANE/Math/Types/Matrix4x4.h"
 
 namespace Engine
 {
