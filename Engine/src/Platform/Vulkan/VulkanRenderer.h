@@ -39,6 +39,7 @@ namespace Engine
         VulkanDeletionQueue DeletionQueue;
 
         DescriptorAllocator Descriptors;
+        ApplicationData AppData;
         SceneData SceneData;
     };
 
@@ -178,6 +179,7 @@ namespace Engine
         inline static VmaImage _depthImage;
 
         inline static VkDescriptorSetLayout _geometryDataLayout;
+        inline static VkDescriptorSetLayout _appDataLayout;
 
         // Swapchain
         inline static VkSwapchainKHR _swapchain;

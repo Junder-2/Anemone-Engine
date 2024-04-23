@@ -18,13 +18,18 @@ cbuffer Constants
     ConstBufferPointer<Vertex> vertices;
 };
 
+struct AppData
+{
+    float Time;
+};
+
 struct SceneData
 {
     float4 AmbientColor;
 
     float4 SunlightDirection;
     float4 SunlightColor;
-}
+};
 
 // Per vertex data.
 /*struct Attributes
@@ -44,7 +49,8 @@ struct Varyings
     float2 uv;
 };
 
-uniform SceneData sceneData;
+ParameterBlock<AppData> appData;
+ParameterBlock<SceneData> sceneData;
 
 [shader("vertex")]
 Varyings vertexMain(uint vid : SV_VertexID)

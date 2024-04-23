@@ -555,18 +555,19 @@ namespace Engine
     void VulkanRenderer::SetupDescriptors()
     {
         {
-            DescriptorLayoutBuilder builder {_device};
-            _geometryDataLayout = builder
+            DescriptorLayoutBuilder builder { _device };
+            _appDataLayout = builder
                 .SetStageFlags(VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
                 .AddBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
-                //.AddBinding(1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
-                //.AddBinding(2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
 
                 .SetAllocationCallbacks(_allocator)
                 .Build();
 
+            _geometryDataLayout = builder.Build();
+
             _mainDeletionQueue.PushFunction([&]
             {
+                vkDestroyDescriptorSetLayout(_device, _appDataLayout, _allocator);
                 vkDestroyDescriptorSetLayout(_device, _geometryDataLayout, _allocator);
             });
         }
@@ -699,10 +700,10 @@ namespace Engine
         bufferRange.offset = 0;
         bufferRange.size = sizeof(PushConstantBuffer);
 
-        VkDescriptorSetLayout layouts[] = { _geometryDataLayout };
+        VkDescriptorSetLayout layouts[] = { _geometryDataLayout, _appDataLayout };
 
         VkPipelineLayoutCreateInfo pipelineLayoutInfo = VulkanInitializers::PipelineLayoutCreateInfo();
-        pipelineLayoutInfo.setLayoutCount = 1;
+        pipelineLayoutInfo.setLayoutCount = 2;
         pipelineLayoutInfo.pSetLayouts = layouts;
         pipelineLayoutInfo.pPushConstantRanges = &bufferRange;
         pipelineLayoutInfo.pushConstantRangeCount = 1;
@@ -840,15 +841,20 @@ namespace Engine
 
     void VulkanRenderer::DrawGeometry(VkCommandBuffer cmd, const DrawContext& drawCommands)
     {
+        VmaBuffer appDataBuffer = CreateBuffer(sizeof(ApplicationData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
         VmaBuffer sceneDataBuffer = CreateBuffer(sizeof(SceneData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
         VulkanFrame& frame = GetFrame();
         frame.DeletionQueue.PushFunction([=]
         {
+            DestroyBuffer(appDataBuffer);
             DestroyBuffer(sceneDataBuffer);
         });
 
         // Fixed data for now.
+        float time = SDL_GetPerformanceCounter() / static_cast<float>(SDL_GetPerformanceFrequency());
+        frame.AppData.Time = time;
+
         Vector3 ambientColor = Vector3(0.27f, 0.37f, 0.52f);
         Vector3 sunAngle = Vector3(50 * FMath::DEGREES_TO_RAD, -30 * FMath::DEGREES_TO_RAD, 0);
         Vector3 sunDirection = Quaternion::FromEulerAngles(sunAngle) * Vector3::ForwardVector();
@@ -858,14 +864,25 @@ namespace Engine
         frame.SceneData.SunlightDirection = Vector4(sunDirection, 0);
         frame.SceneData.SunlightColor = Vector4(sunColor, 0);
 
+        ApplicationData* appUniformData = (ApplicationData*)appDataBuffer.Allocation->GetMappedData();
+        *appUniformData = frame.AppData;
+
         SceneData* sceneUniformData = (SceneData*)sceneDataBuffer.Allocation->GetMappedData();
         *sceneUniformData = frame.SceneData;
 
-        VkDescriptorSet globalDescriptor = frame.Descriptors.Allocate(_device, _geometryDataLayout, _allocator);
+        VkDescriptorSet appDescriptor = frame.Descriptors.Allocate(_device, _appDataLayout, _allocator);
+        VkDescriptorSet sceneDescriptor = frame.Descriptors.Allocate(_device, _geometryDataLayout, _allocator);
 
-        DescriptorWriter writer;
-        writer.WriteBuffer(0, sceneDataBuffer.Buffer, sizeof(SceneData), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-        writer.UpdateSet(_device, globalDescriptor);
+        {
+            DescriptorWriter writer;
+            writer.WriteBuffer(0, appDataBuffer.Buffer, sizeof(ApplicationData), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+            writer.UpdateSet(_device, appDescriptor);
+        }
+        {
+            DescriptorWriter writer;
+            writer.WriteBuffer(0, sceneDataBuffer.Buffer, sizeof(SceneData), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+            writer.UpdateSet(_device, sceneDescriptor);
+        }
 
         _drawExtent.height = std::min(_swapchainExtent.height, _colorImage.ImageExtent.height);
         _drawExtent.width = std::min(_swapchainExtent.width, _colorImage.ImageExtent.width);
@@ -876,7 +893,8 @@ namespace Engine
         vkCmdBeginRendering(cmd, &renderInfo);
 
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _meshPipeline);
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 0, 1, &globalDescriptor, 0, nullptr);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 0, 1, &appDescriptor, 0, nullptr);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 1, 1, &sceneDescriptor, 0, nullptr);
 
         VkViewport viewport;
         viewport.x = 0;
