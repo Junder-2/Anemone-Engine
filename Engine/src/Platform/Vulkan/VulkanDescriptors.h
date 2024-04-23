@@ -20,7 +20,7 @@ namespace Engine
 
         void Destroy(VkDevice logicalDevice, const VkAllocationCallbacks* callbacks);
 
-        VkDescriptorSet Allocate(VkDevice logicalDevice, VkDescriptorSetLayout layout, const VkAllocationCallbacks* callbacks);
+        VkDescriptorSet Allocate(VkDevice logicalDevice, VkDescriptorSetLayout layout, const VkAllocationCallbacks* callbacks, void* pNext = nullptr);
 
     private:
 

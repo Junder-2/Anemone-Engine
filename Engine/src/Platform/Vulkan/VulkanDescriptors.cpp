@@ -51,11 +51,13 @@ namespace Engine
         _fullPools.clear();
     }
 
-    VkDescriptorSet DescriptorAllocator::Allocate(const VkDevice logicalDevice, const VkDescriptorSetLayout layout, const VkAllocationCallbacks* callbacks)
+    VkDescriptorSet DescriptorAllocator::Allocate(const VkDevice logicalDevice, const VkDescriptorSetLayout layout, const VkAllocationCallbacks* callbacks, void* pNext)
     {
         VkDescriptorPool pool = GetPool(logicalDevice, callbacks);
 
-        VkDescriptorSetAllocateInfo allocInfo = { .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO, .pNext = nullptr };
+        VkDescriptorSetAllocateInfo allocInfo = { .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO };
+        allocInfo.pNext = pNext;
+
         allocInfo.descriptorPool = pool;
         allocInfo.descriptorSetCount = 1;
         allocInfo.pSetLayouts = &layout;
