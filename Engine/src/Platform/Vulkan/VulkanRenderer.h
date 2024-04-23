@@ -9,6 +9,7 @@
 #include "VulkanDescriptors.h"
 #include "VulkanPipelineBuilder.h"
 #include "ANE/Core/Math/Matrix/Matrix4x4.h"
+#include "ANE/Renderer/CommonSets.h"
 #include "ANE/Renderer/Draw.h"
 #include "ANE/Renderer/Mesh.h"
 
@@ -36,7 +37,9 @@ namespace Engine
         VkFramebuffer Framebuffer;
 
         VulkanDeletionQueue DeletionQueue;
+
         DescriptorAllocator Descriptors;
+        SceneData SceneData;
     };
 
     struct VulkanImmediateBuffer
@@ -173,6 +176,8 @@ namespace Engine
 
         inline static VmaImage _colorImage;
         inline static VmaImage _depthImage;
+
+        inline static VkDescriptorSetLayout _geometryDataLayout;
 
         // Swapchain
         inline static VkSwapchainKHR _swapchain;
