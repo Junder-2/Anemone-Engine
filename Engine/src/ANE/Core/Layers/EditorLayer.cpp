@@ -12,8 +12,10 @@
 #include "ANE/Core/Application.h"
 #include "ANE/Core/Entity/ExampleScripts/CameraController.h"
 #include "ANE/Core/Scene/Components/CameraComponent.h"
+#include "ANE/Core/Scene/Components/ColliderComponent.h"
 #include "ANE/Core/Scene/Components/NativeScriptComponent.h"
 #include "ANE/Core/Scene/Components/RenderComponent.h"
+#include "ANE/Core/Scene/Components/RigidBodyComponent.h"
 #include "Panels/InspectorPanel.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "ANE/Input/EditorInputSystem.h"
@@ -44,7 +46,7 @@ namespace Engine
         // You would have a "Read from config files to find correct panel layout" method here
 
         CreateTestScene(50);
-        AttachUIPanel(new SceneHierarchyPanel(_scenes));
+        AttachUIPanel(new SceneHierarchyPanel(this));
         AttachUIPanel(new InspectorPanel(this));
         AttachUIPanel(new EditorLogPanel());
 
@@ -105,6 +107,8 @@ namespace Engine
         ComponentTypeMap[entt::type_id<NativeScriptComponent>().hash()] = "NativeScriptComponent";
         ComponentTypeMap[entt::type_id<UUIDComponent>().hash()] = "UUIDComponent";
         ComponentTypeMap[entt::type_id<RenderComponent>().hash()] = "RenderComponent";
+        ComponentTypeMap[entt::type_id<RigidBodyComponent>().hash()] = "RigidBodyComponent";
+        ComponentTypeMap[entt::type_id<ColliderComponent>().hash()] = "ColliderComponent";
     }
 
     void EditorLayer::OnUpdate(float deltaTime)
@@ -140,13 +144,28 @@ namespace Engine
         ent.AddComponent<CameraComponent>();
         ent.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
+        CreateFloor();
+
+
         //Get Component from entity
         if (RenderComponent comp; ent.TryGetComponent<RenderComponent>(comp))
         {
             TagComponent tag;
             ent.TryGetComponent(tag);
-            ANE_ELOG_WARN("We have a renderComponent with tag: {0} on entity: {1}", comp.ToString(), tag.Tag);
+            ANE_ELOG_WARN("We have a renderComponent with tag: {0} on entity: {1}", comp.ToString(), tag.Value);
         }
+    }
+
+    void EditorLayer::CreateFloor()
+    {
+        Entity floor = GetActiveScene()->Create("Floor");
+        TransformMatrix& transformMatrix = floor.GetComponent<TransformComponent>().Transform;
+        transformMatrix.SetPosition(Vector3(0, -5.f, 0));
+        transformMatrix.Scale(Vector3(10.f));
+
+        floor.AddComponent<RenderComponent>("Plane.obj");
+        floor.AddComponent<RigidBodyComponent>(floor, BodyMode::Static);
+        floor.AddComponent<ColliderComponent>(floor, Vector3(10.f, .1f, 10.f));
     }
 
     void EditorLayer::OnSwitchEditorFocus(InputValue inputValue)

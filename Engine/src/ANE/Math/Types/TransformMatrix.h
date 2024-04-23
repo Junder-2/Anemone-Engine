@@ -1,7 +1,7 @@
 #pragma once
 #include "Matrix4x4.h"
-#include "ANE/Core/Math/Quaternion.h"
-#include "ANE/Core/Math/Vector3.h"
+#include "ANE/Math/Types/Quaternion.h"
+#include "ANE/Math/Types/Vector3.h"
 
 namespace Engine
 {
@@ -18,6 +18,7 @@ namespace Engine
         void SetPosition(const Vector3 newPosition)
         {
             _localToWorld[3] = Vector4(newPosition, 1);
+            MarkDirty();
         }
 
         /**
@@ -27,6 +28,7 @@ namespace Engine
         void AddPosition(const Vector3 delta)
         {
             _localToWorld.AddPosition(delta);
+            MarkDirty();
         }
 
         /**
@@ -36,11 +38,13 @@ namespace Engine
         void AddLocalPosition(const Vector3 delta)
         {
             _localToWorld.Translate(delta);
+            MarkDirty();
         }
 
         void SetRotation(const Vector3 newRotation, const bool isDegrees = false)
         {
             _localToWorld.SetRotation(newRotation, isDegrees);
+            MarkDirty();
         }
 
         Vector3 GetPosition() const
@@ -51,17 +55,20 @@ namespace Engine
         void SetRotation(const Quaternion newRotation)
         {
             _localToWorld.SetRotation(newRotation);
+            MarkDirty();
         }
 
         //TODO: Add rotation are not properly working
         void AddRotation(const Vector3 delta, const bool isDegrees = false)
         {
             _localToWorld.SetRotation(delta, isDegrees);
+            MarkDirty();
         }
 
         void AddRotation(const Quaternion delta)
         {
             _localToWorld.Rotate(delta);
+            MarkDirty();
         }
 
         Vector3 GetEulerAngles(const bool isDegrees = false) const
@@ -109,7 +116,23 @@ namespace Engine
             return _localToWorld.GetForward();
         }
 
+        void MarkDirty()
+        {
+            _isDirty = true;
+        }
+
+        void ClearDirty()
+        {
+            _isDirty = false;
+        }
+
+        bool IsDirty() const
+        {
+            return _isDirty;
+        }
+
     private:
         Matrix4x4 _localToWorld;
+        bool _isDirty = false;
     };
 }

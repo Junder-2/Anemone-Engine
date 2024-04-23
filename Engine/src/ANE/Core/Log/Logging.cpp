@@ -37,6 +37,7 @@ namespace Engine
         newLogger->sinks().push_back(std::move(loggerSink));
 
         spdlog::details::registry::instance().initialize_logger(newLogger);
+        _registeredLoggers.push_back(loggerName);
 
         return newLogger;
     }
@@ -59,6 +60,11 @@ namespace Engine
             logger = CreateLogger(name);
         }
         return *logger;
+    }
+
+    const std::vector<std::string>& Logging::GetRegisteredLoggerNames()
+    {
+        return _registeredLoggers;
     }
 
     const std::list<LogMessage>& Logging::GetMessages()

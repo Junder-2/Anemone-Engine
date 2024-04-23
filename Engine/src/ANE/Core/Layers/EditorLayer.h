@@ -48,10 +48,11 @@ namespace Engine
 
     private:
         void CreateTestScene(int numEntitiesToTest);
+        void CreateFloor();
 
         void OnSwitchEditorFocus(InputValue inputValue);
 
-       // static void ShowEditorMenuBar();
+        // static void ShowEditorMenuBar();
 
 
     protected:

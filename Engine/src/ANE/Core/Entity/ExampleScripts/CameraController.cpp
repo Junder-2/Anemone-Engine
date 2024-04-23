@@ -1,11 +1,10 @@
 ﻿#include "anepch.h"
 #include "CameraController.h"
 
-#include <glm/gtx/quaternion.hpp>
-
 #include "ANE/Core/Application.h"
 #include "ANE/Core/Scene/Components/CameraComponent.h"
 #include "ANE/Events/EventHandler.h"
+#include "ANE/Math/FMath.h"
 #include "ANE/Renderer/Renderer.h"
 
 namespace Engine
@@ -20,6 +19,7 @@ namespace Engine
         inputSystem.BindKeyboardAxisInput(KeyCodeS, KeyCodeW, MakeDelegate(this, &CameraController::OnMoveZ));
 
         inputSystem.BindMouseMove(MakeDelegate(this, &CameraController::OnLook));
+        inputSystem.BindMouseScroll(MakeDelegate(this, &CameraController::OnScroll));
 
         inputSystem.BindKeyboardInput(KeyCodeLShift, MakeDelegate(this, &CameraController::OnSpeedup));
 
@@ -42,7 +42,8 @@ namespace Engine
         if((_xInput != 0) || (_yInput != 0) || (_zInput != 0))
         {
 
-            const float moveSpeed = _isSpeedUp ? 0.05f : 0.01f;
+            //const float moveSpeed = _isSpeedUp ? 0.05f : 0.01f;
+            const float moveSpeed = _flySpeed * .05f;
 
             //const auto transformMat = _transformComponent->Transform.GetQuaternion();
             //const auto transformMat = (Matrix3x3)_transformComponent->Transform.GetLocalToWorld();
@@ -59,6 +60,11 @@ namespace Engine
                 Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
             }
         }
+    }
+
+    void CameraController::OnFixedUpdate(float timeStep)
+    {
+
     }
 
     void CameraController::OnMoveX(InputValue inputValue)
@@ -84,7 +90,7 @@ namespace Engine
 
         constexpr float lookSpeed = (180.f * FMath::DEGREES_TO_RAD);
         const float newPitch = _pitchRadians + lookSpeed * delta.Y;
-        _pitchRadians = glm::clamp(newPitch, -FMath::Half_PI, FMath::Half_PI);
+        _pitchRadians = FMath::MirrorClamp(newPitch, FMath::Half_PI);
         _yawRadians += lookSpeed * delta.X;
         _transformComponent->Transform.SetRotation(Vector3{_pitchRadians, _yawRadians, 0});
 
@@ -92,6 +98,11 @@ namespace Engine
         {
             Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
         }
+    }
+
+    void CameraController::OnScroll(Vector2 scrollDelta)
+    {
+        _flySpeed = FMath::Clamp(_flySpeed + scrollDelta.Y, 0.1f, 20.f);
     }
 
     void CameraController::OnSpeedup(InputValue inputValue)

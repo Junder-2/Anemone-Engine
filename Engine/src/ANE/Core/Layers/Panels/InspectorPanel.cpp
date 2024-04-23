@@ -3,19 +3,15 @@
 
 #include "imgui.h"
 #include "ANE/Core/Editor/SelectionManager.h"
+#include "ANE/Math/Random.h"
+#include "ANE/Core/Scene/Components/ColliderComponent.h"
 #include "ANE/Core/Scene/Components/RenderComponent.h"
+#include "ANE/Core/Scene/Components/RigidBodyComponent.h"
 
-Engine::InspectorPanel::InspectorPanel()
-{
-}
 
 Engine::InspectorPanel::InspectorPanel(EditorLayer* editorLayer)
 {
-    _EditorLayer = editorLayer;
-}
-
-Engine::InspectorPanel::~InspectorPanel()
-{
+    _editorLayer = editorLayer;
 }
 
 void Engine::InspectorPanel::RegisterSelect(UUIDComponent selectedEntityID)
@@ -31,40 +27,47 @@ void Engine::InspectorPanel::WipeSelect()
 void Engine::InspectorPanel::OnPanelRender()
 {
     ImGui::Begin("Inspection");
-    std::vector<std::string>* selectedEntityUUIDS = SelectionManager::GetSelection(SelectionManager::UI);
-    if(selectedEntityUUIDS->size() > 0){
-        const char* name = "Untagged entity";
-        Entity selectedEntity = _EditorLayer->GetActiveScene()->GetEntityWithUUID(selectedEntityUUIDS->at(0));
-        TagComponent Tag;
-        if(selectedEntity.TryGetComponent<TagComponent>(Tag))
-        {
-            name = Tag.Tag.c_str();
-        }
-        ImGui::Text("%s\n", name);
 
-        for(auto&& curr : _EditorLayer->GetActiveScene()->_registry.storage())
+    std::vector<std::string>* selectedEntityUUIDS = SelectionManager::GetSelection(SelectionManager::UI);
+
+    if (!selectedEntityUUIDS->empty())
+    {
+        Entity selectedEntity = _editorLayer->GetActiveScene()->GetEntityWithUUID(selectedEntityUUIDS->at(0));
+
+        auto& tag = selectedEntity.GetComponent<TagComponent>().Value; // make sure we always have a tag, this can be dangerous
+
+
+        for (auto&& [fst, snd] : _editorLayer->GetActiveScene()->_registry.storage())
         {
-            if(auto& storage = curr.second; storage.contains(selectedEntity))
+            if (auto& storage = snd; storage.contains(selectedEntity))
             {
-                entt::id_type id = curr.first;
-                ImGui::Text(_EditorLayer->GetComponentNameFromEnttId(id).c_str());
+                const entt::id_type id = fst;
+                ImGui::Text("%s", _editorLayer->GetComponentNameFromEnttId(id).c_str());
             }
         }
 
-        if(ImGui::Button("Add Component")){
+        char buffer[256] = {};
+
+        const auto error = strcpy_s(buffer,sizeof(buffer),  tag.c_str());
+
+        ANE_ASSERT(error == 0, "can't copy string into buffer");
+
+        if (ImGui::InputText("Tag", buffer, sizeof(buffer)))
+            selectedEntity.GetComponent<TagComponent>().Value = std::string(buffer);
+
+        if(ImGui::Button("Add Physics Suzanne")) // For physics testing
+        {
+            selectedEntity.GetComponent<TransformComponent>().Transform.AddPosition(Random::InSphere(.2f));
             selectedEntity.AddComponent<RenderComponent>("Suzanne.fbx");
+            selectedEntity.AddComponent<RigidBodyComponent>(selectedEntity);
+            selectedEntity.AddComponent<ColliderComponent>(selectedEntity, 1.f);
         }
     }
     else
     {
         ImGui::Text("Nothing selected");
-
     }
     ImGui::End();
-
 }
 
-    //ANE_LOG_INFO("Entering panel render phase");
-
-
-
+//ANE_LOG_INFO("Entering panel render phase");

@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "Vector3.h"
-#include "Matrix/Matrix3x3.h"
+#include "Matrix3x3.h"
 
 //Modified copy of reactphysics/include/reactphysics3d/mathematics/Quaternion.h
 

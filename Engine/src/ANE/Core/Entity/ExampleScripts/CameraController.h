@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "../ScriptableEntity.h"
+#include "ANE/Core/Entity/ScriptableEntity.h"
 #include "ANE/Core/Scene/Components/CameraComponent.h"
 #include "ANE/Input/Input.h"
 #include "ANE/Utilities/InputUtilities.h"
@@ -20,6 +20,8 @@ namespace Engine
 
         void OnUpdate(float deltaTime) override;
 
+        void OnFixedUpdate(float timeStep) override;
+
         void OnMoveX(InputValue inputValue);
 
         void OnMoveY(InputValue inputValue);
@@ -27,6 +29,8 @@ namespace Engine
         void OnMoveZ(InputValue inputValue);
 
         void OnLook(MouseMoveValue mouseValue);
+
+        void OnScroll(Vector2 scrollDelta);
 
         void OnSpeedup(InputValue inputValue);
 
@@ -45,5 +49,6 @@ namespace Engine
         float _xInput = 0, _yInput = 0, _zInput = 0;
         float _pitchRadians = 0, _yawRadians = 0;
         bool _isSpeedUp;
+        float _flySpeed = 1.f;
     };
 }

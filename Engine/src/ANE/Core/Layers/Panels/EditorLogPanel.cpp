@@ -17,6 +17,14 @@ namespace Engine
     {
         _levelFilter = (int)LogLevelCategory::LevelError | (int)LogLevelCategory::LevelWarn | (int)LogLevelCategory::LevelInfo
                             | (int)LogLevelCategory::LevelDebug | (int)LogLevelCategory::LevelTrace;
+
+        for (const auto& loggerName : Logging::GetRegisteredLoggerNames())
+        {
+            if(!_loggerNameFilter.contains(loggerName))
+            {
+                _loggerNameFilter.insert_or_assign(loggerName, true);
+            }
+        }
     }
 
     EditorLogPanel::~EditorLogPanel()
@@ -39,6 +47,7 @@ namespace Engine
         for (const LogMessage& logMessage : logMessages | std::views::reverse)
         {
             if(logMessage.LevelCategory == LogLevelCategory::LevelNone) continue;
+            if(!_loggerNameFilter[logMessage.LoggerName]) continue;
             if(!((int)logMessage.LevelCategory & _levelFilter)) continue;
 
             DrawLogMessage(logMessage);
@@ -81,6 +90,21 @@ namespace Engine
         if(ImGui::Checkbox("Error", &filterError))
         {
             _levelFilter ^= (int)LogLevelCategory::LevelError;
+        }
+    }
+
+    void EditorLogPanel::ShowLoggerNamePopup()
+    {
+        ImGui::MenuItem("Loggers filter", nullptr, false, false);
+
+        for (const auto& loggerName : Logging::GetRegisteredLoggerNames())
+        {
+            if(!_loggerNameFilter.contains(loggerName))
+            {
+                _loggerNameFilter.insert_or_assign(loggerName, true);
+            }
+            bool* isActive = &_loggerNameFilter[loggerName];
+            ImGui::Checkbox(loggerName.c_str(), isActive);
         }
     }
 
@@ -173,6 +197,20 @@ namespace Engine
 
     void EditorLogPanel::DrawToolBar()
     {
+        if (ImGui::Button("Loggers"))
+        {
+            ImGui::OpenPopup("LoggerNamesPopup");
+        }
+        if (ImGui::IsItemHovered()) ImGui::SetTooltip("Filter out certain loggers");
+
+        if (ImGui::BeginPopup("LoggerNamesPopup"))
+        {
+            ShowLoggerNamePopup();
+            ImGui::EndPopup();
+        }
+
+        ImGui::SameLine();
+
         if (ImGui::Button("Levels"))
         {
             ImGui::OpenPopup("LogLevelsPopup");

@@ -2,15 +2,19 @@
 #include "Scene.h"
 
 #include "ANE/Core/Entity/Entity.h"
+#include "ANE/Math/FMath.h"
 #include "Components/NativeScriptComponent.h"
 #include "Components/RenderComponent.h"
+#include "Components/RigidBodyComponent.h"
 #include "Components/UUIDComponent.h"
+#include "glm/ext/scalar_common.hpp"
 
 
 namespace Engine
 {
-    Engine::Scene::Scene()
+    Scene::Scene()
     {
+        _physicsWorld = &GetPhysicsSystem().GetPhysicsWorld();
 
         //create an entity
         //entt::entity entity = Registry.create();
@@ -94,7 +98,6 @@ namespace Engine
 
     void Scene::OnUpdate(float timeStep)
     {
-
         {
             _registry.view<NativeScriptComponent>().each([&](auto entity, auto& scriptComponent)
             {
@@ -108,7 +111,73 @@ namespace Engine
             });
         }
 
+        _accumulator += timeStep;
+
+        // Fixed update
+        while (_accumulator >= _timeStep)
+        {
+            _accumulator = FMath::Max0(_accumulator - _timeStep);
+
+            OnFixedUpdate(_timeStep);
+        }
+
+        UpdateRigidBodies();
+
         SubmitDrawCommands();
+    }
+
+    void Scene::OnFixedUpdate(float timeStep)
+    {
+        const auto group = _registry.view<TransformComponent, RigidBodyComponent>();
+        for (const auto entity : group) //We need to apply changes in our transform to the internal rigidbody
+        {
+            auto[transform, body] = group.get<TransformComponent, RigidBodyComponent>(entity);
+
+            TransformMatrix& transformMatrix = transform.Transform;
+
+            if(!transformMatrix.IsDirty()) continue;
+
+            auto currentTransform = rp3d::Transform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
+
+            body.GetRigidBody()->setIsSleeping(false);
+            body.GetRigidBody()->setTransform(currentTransform);
+            transformMatrix.ClearDirty();
+        }
+
+        _physicsWorld->update(timeStep);
+
+        _registry.view<NativeScriptComponent>().each([&](auto entity, auto& scriptComponent)
+        {
+            if (!scriptComponent.Instance)
+            {
+                scriptComponent.Instantiate();
+                scriptComponent.Instance->_entity = { entity, this };
+                scriptComponent.OnCreateFunction();
+            }
+            scriptComponent.OnFixedUpdateFunction(timeStep);
+        });
+    }
+
+    void Scene::UpdateRigidBodies()
+    {
+        const float factor = FMath::Saturate(_accumulator / _timeStep);
+
+        const auto group = _registry.view<TransformComponent, RigidBodyComponent>();
+        for (const auto entity : group)
+        {
+            auto[transform, body] = group.get<TransformComponent, RigidBodyComponent>(entity);
+
+            TransformMatrix& transformMatrix = transform.Transform;
+
+            if(body.GetRigidBody()->isSleeping()) continue;
+
+            auto currentTransform = rp3d::Transform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
+            auto newTransform = rp3d::Transform::interpolateTransforms(currentTransform, body.GetRigidBody()->getTransform(), factor);
+
+            transformMatrix.SetPosition(Vector3::Convert(newTransform.getPosition()));
+            transformMatrix.SetRotation(Quaternion::Convert(newTransform.getOrientation()));
+            transformMatrix.ClearDirty();
+        }
     }
 
     void Scene::SubmitDrawCommands()
@@ -126,6 +195,18 @@ namespace Engine
 
             Renderer::SubmitDrawCommand(draw);
         }
+        // Todo: add triangle or line rendering pipeline
+        // if(_physicsWorld)
+        // {
+        //     rp3d::DebugRenderer physicsDebugRenderer = _physicsWorld->getDebugRenderer();
+        //
+        //     DrawCommand draw = {};
+        //     draw.ModelMatrix = Matrix4x4::Identity();
+        //     draw.VertexCount = physicsDebugRenderer.getNbLines();
+        //     draw.MeshBuffers = renderer.Model.MeshBuffers;
+        //
+        //     Renderer::SubmitDrawCommand(draw);
+        // }
     }
 
     /**

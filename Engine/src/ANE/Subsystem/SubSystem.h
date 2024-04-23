@@ -7,5 +7,6 @@ namespace Engine
     public:
         SubSystem() = default;
         virtual ~SubSystem() = default;
+        virtual void Free() { delete this; }
     };
 }

@@ -18,6 +18,7 @@ namespace Engine
 
         std::function<void()> OnCreateFunction;
         std::function<void(float)> OnUpdateFunction;
+        std::function<void(float)> OnFixedUpdateFunction;
         std::function<void()> OnDestroyFunction;
 
         template <typename T>
@@ -43,6 +44,11 @@ namespace Engine
             {
                 static_cast<T*>(Instance)->OnUpdate(deltaTime);
             };
+            OnFixedUpdateFunction = [&](float timeStep)
+            {
+                static_cast<T*>(Instance)->OnFixedUpdate(timeStep);
+            };
+
             OnDestroyFunction = [&]()
             {
                 static_cast<T*>(Instance)->OnDestroy();

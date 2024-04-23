@@ -3,7 +3,8 @@
 
 #include <reactphysics3d/mathematics/Matrix3x3.h>
 #include "Matrix4x4.h"
-#include "ANE/Core/Math/Quaternion.h"
+#include "ANE/Math/FMath.h"
+#include "ANE/Math/Types/Quaternion.h"
 #include "glm/gtx/euler_angles.hpp"
 #include "glm/gtx/matrix_decompose.hpp"
 
@@ -46,9 +47,9 @@ namespace Engine
 
     void Matrix3x3::Rotate(const Vector3 euler, const bool isDegrees /*= false*/)
     {
-        Rotate(euler.Yaw, Vector3::UpVector(), isDegrees);
-        Rotate(euler.Pitch, Vector3::RightVector(), isDegrees);
-        Rotate(euler.Roll, Vector3::ForwardVector(), isDegrees);
+        Rotate(FMath::WrapAngle(euler.Yaw), Vector3::UpVector(), isDegrees);
+        Rotate(FMath::WrapAngle(euler.Pitch), Vector3::RightVector(), isDegrees);
+        Rotate(FMath::WrapAngle(euler.Roll), Vector3::ForwardVector(), isDegrees);
     }
 
     void Matrix3x3::SetRotation(const Quaternion quat)
@@ -92,13 +93,13 @@ namespace Engine
 
         Vector3 euler;
 
-        euler.Yaw = glm::asin(-copy[0][2]);
-        if (glm::cos(euler.Yaw) != 0) {
-            euler.Pitch = glm::atan2(copy[1][2], copy[2][2]);
-            euler.Roll = glm::atan2(copy[0][1], copy[0][0]);
+        euler.Yaw = FMath::Asin(-copy[0][2]);
+        if (FMath::Cos(euler.Yaw) != 0) {
+            euler.Pitch = FMath::Atan2(copy[1][2], copy[2][2]);
+            euler.Roll = FMath::Atan2(copy[0][1], copy[0][0]);
         }
         else {
-            euler.Pitch = glm::atan2(-copy[2][0], copy[1][1]);
+            euler.Pitch = FMath::Atan2(-copy[2][0], copy[1][1]);
             euler.Roll = 0;
         }
 
@@ -132,17 +133,17 @@ namespace Engine
 
     Vector3 Matrix3x3::GetRight() const
     {
-        return _columns[0];
+        return _columns[0].GetNormalized();
     }
 
     Vector3 Matrix3x3::GetUp() const
     {
-        return _columns[1];
+        return _columns[1].GetNormalized();
     }
 
     Vector3 Matrix3x3::GetForward() const
     {
-        return _columns[2];
+        return _columns[2].GetNormalized();
     }
 
     Matrix3x3 Matrix3x3::Convert(const glm::mat3& mat3)

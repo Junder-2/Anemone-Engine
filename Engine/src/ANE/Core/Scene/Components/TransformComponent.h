@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "Component.h"
-#include "ANE/Core/Math/Matrix/TransformMatrix.h"
+#include "ANE/Math/Types/TransformMatrix.h"
 
 namespace Engine
 {
