@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "ANE/Core/Math/Vector4.h"
+#include "ANE/Core/Math/Matrix/Matrix4x4.h"
 
 namespace Engine
 {
@@ -20,5 +21,11 @@ namespace Engine
 
         Vector4 SunlightDirection;
         Vector4 SunlightColor;
+    };
+
+    struct TransformationData
+    {
+        Matrix4x4 LocalToWorld;
+        Matrix4x4 LocalToProjection;
     };
 }
