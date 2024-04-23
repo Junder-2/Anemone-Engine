@@ -1,5 +1,7 @@
 #pragma once
 
+#include <entt.hpp>
+
 #include "imgui.h"
 #include "UILayerPanel.h"
 
@@ -14,6 +16,7 @@ namespace Engine
         void OnPanelRender() override;
 
         void ShowLogLevelsPopup();
+        void ShowLoggerNamePopup();
         void DrawToolBar();
 
         void ShowLogFormatPopup();
@@ -30,6 +33,7 @@ namespace Engine
         static const ImVec4 colorError;
 
         int _levelFilter;
+        entt::dense_map<std::string, bool> _loggerNameFilter;
 
         bool _wrap = true;
         bool _autoScroll = false;

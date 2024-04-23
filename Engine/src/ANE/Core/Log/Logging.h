@@ -41,6 +41,11 @@ namespace Engine
         static spdlog::logger& GetLogger(std::string const& name);
 
         /**
+        * Returns a list of the names of registered loggers
+        */
+        static const std::vector<std::string>& GetRegisteredLoggerNames();
+
+        /**
         * Returns a list of unformatted logging messages
         */
         static const std::list<LogMessage>& GetMessages();
@@ -55,6 +60,7 @@ namespace Engine
 
     private:
         inline static std::list<LogMessage> _logMessages{100};
+        inline static std::vector<std::string> _registeredLoggers {};
         inline static LogFileWriter _writer;
     };
 }
