@@ -137,10 +137,7 @@ namespace Engine
 
             if(!transformMatrix.IsDirty()) continue;
 
-            auto currentTransform = rp3d::Transform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
-
-            body.GetRigidBody()->setIsSleeping(false);
-            body.GetRigidBody()->setTransform(currentTransform);
+            body.GetRigidBody()->SetTransform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
             transformMatrix.ClearDirty();
         }
 
@@ -169,10 +166,10 @@ namespace Engine
 
             TransformMatrix& transformMatrix = transform.Transform;
 
-            if(body.GetRigidBody()->isSleeping()) continue;
+            if(!body.GetRigidBody()->IsActive()) continue;
 
             auto currentTransform = rp3d::Transform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
-            auto newTransform = rp3d::Transform::interpolateTransforms(currentTransform, body.GetRigidBody()->getTransform(), factor);
+            auto newTransform = rp3d::Transform::interpolateTransforms(currentTransform, body.GetRigidBody()->GetReactRigidBody().getTransform(), factor);
 
             transformMatrix.SetPosition(Vector3::Convert(newTransform.getPosition()));
             transformMatrix.SetRotation(Quaternion::Convert(newTransform.getOrientation()));

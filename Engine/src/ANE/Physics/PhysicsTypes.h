@@ -9,7 +9,7 @@ namespace Engine
         Capsule
     };
 
-    enum class BodyMode
+    enum class BodyType
     {
         Static,
         Kinematic,

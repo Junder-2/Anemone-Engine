@@ -3,8 +3,10 @@
 #include "ANE/Subsystem/SubSystem.h"
 #include <reactphysics3d/reactphysics3d.h>
 
+
 namespace Engine
 {
+    class RigidBody;
     struct Vector3;
     class Entity;
     class PhysicsLogger;
@@ -18,7 +20,7 @@ namespace Engine
         void Free() override;
 
         rp3d::PhysicsWorld& GetPhysicsWorld() const;
-        rp3d::RigidBody* CreateRigidBody(Entity entity);
+        RigidBody* CreateRigidBody(Entity entity);
         rp3d::Collider* CreateSphereCollider(Entity entity, float radius = 1.f);
         rp3d::Collider* CreateBoxCollider(Entity entity, const Vector3& halfExtents);
         rp3d::Collider* CreateCapsuleCollider(Entity entity, float radius = 1.f, float height = 2.f);
