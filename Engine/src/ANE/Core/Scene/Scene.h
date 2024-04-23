@@ -33,7 +33,7 @@ namespace Engine
 
     private:
         void OnFixedUpdate(float timeStep);
-        void InterpolateRigidBodies();
+        void UpdateRigidBodies();
 
     private:
         friend class Entity;

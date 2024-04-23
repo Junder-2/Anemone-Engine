@@ -121,13 +121,29 @@ namespace Engine
             OnFixedUpdate(_timeStep);
         }
 
-        InterpolateRigidBodies();
+        UpdateRigidBodies();
 
         SubmitDrawCommands();
     }
 
     void Scene::OnFixedUpdate(float timeStep)
     {
+        const auto group = _registry.view<TransformComponent, RigidBodyComponent>();
+        for (const auto entity : group) //We need to apply changes in our transform to the internal rigidbody
+        {
+            auto[transform, body] = group.get<TransformComponent, RigidBodyComponent>(entity);
+
+            TransformMatrix& transformMatrix = transform.Transform;
+
+            if(!transformMatrix.IsDirty()) continue;
+
+            auto currentTransform = rp3d::Transform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
+
+            body.GetRigidBody()->setIsSleeping(false);
+            body.GetRigidBody()->setTransform(currentTransform);
+            transformMatrix.ClearDirty();
+        }
+
         _physicsWorld->update(timeStep);
 
         _registry.view<NativeScriptComponent>().each([&](auto entity, auto& scriptComponent)
@@ -142,21 +158,25 @@ namespace Engine
         });
     }
 
-    void Scene::InterpolateRigidBodies()
+    void Scene::UpdateRigidBodies()
     {
         const float factor = FMath::Saturate(_accumulator / _timeStep);
 
-        auto group = _registry.view<TransformComponent, RigidBodyComponent>();
-        for (auto entt : group)
+        const auto group = _registry.view<TransformComponent, RigidBodyComponent>();
+        for (const auto entity : group)
         {
-            auto[transform, body] = group.get<TransformComponent, RigidBodyComponent>(entt);
+            auto[transform, body] = group.get<TransformComponent, RigidBodyComponent>(entity);
 
             TransformMatrix& transformMatrix = transform.Transform;
-            auto prevTransform = rp3d::Transform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
-            auto newTransform = rp3d::Transform::interpolateTransforms(prevTransform, body.GetRigidBody()->getTransform(), factor);
+
+            if(body.GetRigidBody()->isSleeping()) continue;
+
+            auto currentTransform = rp3d::Transform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
+            auto newTransform = rp3d::Transform::interpolateTransforms(currentTransform, body.GetRigidBody()->getTransform(), factor);
 
             transformMatrix.SetPosition(Vector3::Convert(newTransform.getPosition()));
             transformMatrix.SetRotation(Quaternion::Convert(newTransform.getOrientation()));
+            transformMatrix.ClearDirty();
         }
     }
 
