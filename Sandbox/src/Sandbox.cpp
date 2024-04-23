@@ -1,5 +1,5 @@
 #include <cstdio>
-#include <..\..\Engine\src\ANE.h>
+#include <ANE.h>
 
 class Sandbox : public Engine::Application
 {
