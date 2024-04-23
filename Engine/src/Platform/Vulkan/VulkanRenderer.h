@@ -53,6 +53,7 @@ namespace Engine
     struct PushConstantBuffer
     {
         Matrix4x4 MVPMatrix;
+        Matrix4x4 ModelMatrix;
         VkDeviceAddress VertexBuffer;
     };
 

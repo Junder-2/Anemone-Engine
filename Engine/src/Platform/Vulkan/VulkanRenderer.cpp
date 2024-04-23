@@ -917,7 +917,8 @@ namespace Engine
         for (DrawCommand drawCommand : drawCommands.Commands)
         {
             PushConstantBuffer pushConstants;
-            pushConstants.WorldMatrix = ViewProjection * drawCommand.ModelMatrix; // VP * M
+            pushConstants.MVPMatrix = ViewProjection * drawCommand.ModelMatrix; // VP * M
+            pushConstants.ModelMatrix = drawCommand.ModelMatrix;
             pushConstants.VertexBuffer = drawCommand.MeshBuffers.VertexBufferAddress;
 
             vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstantBuffer), &pushConstants);

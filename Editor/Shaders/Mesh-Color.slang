@@ -12,6 +12,7 @@ struct Vertex
 cbuffer Constants
 {
     matrix<float, 4, 4> render_matrix;
+    matrix<float, 4, 4> model_matrix;
 
     // Similar to a GLSL buffer_reference.
     // Uses uint64 pointer manipulation to index, hence the GL_EXT_shader_explicit_arithmetic_types_int64 dependency.
@@ -59,7 +60,7 @@ Varyings vertexMain(uint vid : SV_VertexID)
 
     Vertex v = vertices[vid];
     output.sv_position = mul(render_matrix, float4(v.position, 1));
-    output.normal = v.normal;
+    output.normal = mul(float3x3(model_matrix), v.normal);
     output.color = 1;
     output.uv = float2(v.uv_x, v.uv_y);
 
