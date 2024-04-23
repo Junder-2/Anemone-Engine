@@ -15,9 +15,9 @@ namespace Engine
 
         switch (level)
         {
-            case Level::Information: ANE_PHYS_LOG_INFO(cleanedString); break;
-            case Level::Warning: ANE_PHYS_LOG_WARN(cleanedString); break;
-            case Level::Error: ANE_PHYS_LOG_ERROR(cleanedString); break;
+            case Level::Information: ANE_PHYS_LOG_INFO(filename, lineNumber, cleanedString); break;
+            case Level::Warning: ANE_PHYS_LOG_WARN(filename, lineNumber, cleanedString); break;
+            case Level::Error: ANE_PHYS_LOG_ERROR(filename, lineNumber, cleanedString); break;
         }
     }
 
