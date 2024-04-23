@@ -116,7 +116,7 @@ namespace Engine
         static void CleanupVulkan();
         static void CleanupImGui();
 
-        static VulkanFrame GetFrame();
+        static VulkanFrame& GetFrame();
 
         // VMA
         // TODO: Isolate VMA code to separate file/class.

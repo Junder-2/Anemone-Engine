@@ -952,7 +952,7 @@ namespace Engine
         ImGui::DestroyContext();
     }
 
-    VulkanFrame VulkanRenderer::GetFrame()
+    VulkanFrame& VulkanRenderer::GetFrame()
     {
         return _frameData[_frameIndex % MAX_FRAMES_IN_FLIGHT];
     }
