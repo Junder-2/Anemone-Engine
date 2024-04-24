@@ -757,6 +757,15 @@ namespace Engine
         for (uint32_t& pixel : pixels) { pixel = grey; }
         _greyImage = CreateImage((void*)&pixels, defaultImageExtent, defaultImageFormat, VK_IMAGE_USAGE_SAMPLED_BIT);
 
+        for (int x = 0; x < 16; x++)
+        {
+            for (int y = 0; y < 16; y++)
+            {
+                pixels[y * 16 + x] = (x % 2) ^ (y % 2) ? magenta : black;
+            }
+        }
+        _errorImage = CreateImage((void*)&pixels, defaultImageExtent, defaultImageFormat, VK_IMAGE_USAGE_SAMPLED_BIT);
+
         VkSamplerCreateInfo samplerInfo = { .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO, .pNext = nullptr };
 
         samplerInfo.magFilter = VK_FILTER_LINEAR;

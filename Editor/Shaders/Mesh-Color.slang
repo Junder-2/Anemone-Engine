@@ -50,8 +50,16 @@ struct Varyings
     float2 uv;
 };
 
+// Per-material data.
+struct Material
+{
+    Texture2D texture;
+    SamplerState sampler;
+};
+
 ParameterBlock<AppData> appData;
 ParameterBlock<SceneData> sceneData;
+ParameterBlock<Material> material;
 
 [shader("vertex")]
 Varyings vertexMain(uint vid : SV_VertexID)
@@ -70,11 +78,14 @@ Varyings vertexMain(uint vid : SV_VertexID)
 [shader("fragment")]
 float4 fragmentMain(Varyings input) : SV_TARGET
 {
-    input.normal = normalize(input.normal);
+    float3 normal = normalize(input.normal);
+    float2 uv = input.uv;
 
-    float nDotL = saturate(dot(input.normal, -sceneData.SunlightDirection.rgb));
-    input.color *= nDotL * sceneData.SunlightColor.rgb;
-    input.color += sceneData.AmbientColor.rgb;
+    float4 color = material.texture.Sample(material.sampler, uv) * float4(input.color, 1);
 
-    return float4(input.color, 1);
+    float nDotL = saturate(dot(normal, -sceneData.SunlightDirection.rgb));
+    color.rgb *= nDotL * sceneData.SunlightColor.rgb;
+    color.rgb += sceneData.AmbientColor.rgb;
+
+    return float4(color);
 }
