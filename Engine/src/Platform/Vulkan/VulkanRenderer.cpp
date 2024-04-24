@@ -107,7 +107,7 @@ namespace Engine
             return _loadedModelMap[modelPath];
         }
 
-        const std::filesystem::path absolutePath = std::filesystem::current_path().append("..\\Meshes\\").append(modelPath);
+        const std::filesystem::path absolutePath = std::filesystem::current_path().append("..\\Assets\\Meshes\\").append(modelPath);
 
         const MeshAsset meshAsset = MeshLoader::LoadMesh(absolutePath.string().c_str());
         Mesh mesh = meshAsset.SubMeshes[0]; // Use first submesh for now.
@@ -622,7 +622,7 @@ namespace Engine
         sessionDesc.targets = &targetDesc;
         sessionDesc.targetCount = 1;
         sessionDesc.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR;
-        const char* paths[] = { "Shaders/" };
+        const char* paths[] = { "../Assets/Shaders/" };
         sessionDesc.searchPaths = paths;
         sessionDesc.searchPathCount = 1;
 
