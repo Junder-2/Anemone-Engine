@@ -572,6 +572,22 @@ namespace Engine
             });
         }
 
+        {
+            DescriptorLayoutBuilder builder { _device };
+            _singleImageDataLayout = builder
+                .SetStageFlags(VK_SHADER_STAGE_FRAGMENT_BIT)
+                .AddBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER)
+                .AddBinding(1, VK_DESCRIPTOR_TYPE_SAMPLER)
+
+                .SetAllocationCallbacks(_allocator)
+                .Build();
+
+            _mainDeletionQueue.PushFunction([&]
+            {
+                vkDestroyDescriptorSetLayout(_device, _singleImageDataLayout, _allocator);
+            });
+        }
+
         for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
         {
             std::vector<DescriptorAllocator::PoolSizeRatio> frameSizes =
@@ -700,10 +716,10 @@ namespace Engine
         bufferRange.offset = 0;
         bufferRange.size = sizeof(PushConstantBuffer);
 
-        VkDescriptorSetLayout layouts[] = { _geometryDataLayout, _appDataLayout };
+        VkDescriptorSetLayout layouts[] = { _geometryDataLayout, _appDataLayout, _singleImageDataLayout };
 
         VkPipelineLayoutCreateInfo pipelineLayoutInfo = VulkanInitializers::PipelineLayoutCreateInfo();
-        pipelineLayoutInfo.setLayoutCount = 2;
+        pipelineLayoutInfo.setLayoutCount = (uint32_t)IM_ARRAYSIZE(layouts);
         pipelineLayoutInfo.pSetLayouts = layouts;
         pipelineLayoutInfo.pPushConstantRanges = &bufferRange;
         pipelineLayoutInfo.pushConstantRangeCount = 1;
@@ -925,6 +941,7 @@ namespace Engine
 
         VkDescriptorSet appDescriptor = frame.Descriptors.Allocate(_device, _appDataLayout, _allocator);
         VkDescriptorSet sceneDescriptor = frame.Descriptors.Allocate(_device, _geometryDataLayout, _allocator);
+        VkDescriptorSet imageDescriptor = frame.Descriptors.Allocate(_device, _singleImageDataLayout, _allocator);
 
         {
             DescriptorWriter writer;
@@ -936,6 +953,7 @@ namespace Engine
             writer.WriteBuffer(0, sceneDataBuffer.Buffer, sizeof(SceneData), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
             writer.UpdateSet(_device, sceneDescriptor);
         }
+        {
 
         _drawExtent.height = std::min(_swapchainExtent.height, _colorImage.ImageExtent.height);
         _drawExtent.width = std::min(_swapchainExtent.width, _colorImage.ImageExtent.width);

@@ -183,6 +183,7 @@ namespace Engine
 
         inline static VkDescriptorSetLayout _geometryDataLayout;
         inline static VkDescriptorSetLayout _appDataLayout;
+        inline static VkDescriptorSetLayout _singleImageDataLayout;
 
         // Swapchain
         inline static VkSwapchainKHR _swapchain;
