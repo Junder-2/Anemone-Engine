@@ -173,7 +173,7 @@ namespace Engine
 
         CreatePipeline(logicalDevice);
 
-        Renderer::LoadModel("Suzanne.fbx");
+        CreateDefaultResources();
     }
 
     void VulkanRenderer::SetupImGui(SDL_Window* window)
@@ -734,6 +734,48 @@ namespace Engine
         });
 
         return pipeline.value();
+    }
+
+    void VulkanRenderer::CreateDefaultResources()
+    {
+        Renderer::LoadModel("Suzanne.fbx");
+
+        constexpr VkExtent3D defaultImageExtent = VkExtent3D{ 16, 16, 1 };
+        constexpr VkFormat defaultImageFormat = VK_FORMAT_R8G8B8A8_UNORM;
+
+        constexpr uint32_t white = 0xFFFFFFFF;
+        constexpr uint32_t black = 0x000000FF;
+        constexpr uint32_t grey = 0xAAAAAAFF;
+        uint32_t pixels[16 * 16];
+
+        for (uint32_t& pixel : pixels) { pixel = white; }
+        _whiteImage = CreateImage((void*)&pixels, defaultImageExtent, defaultImageFormat, VK_IMAGE_USAGE_SAMPLED_BIT);
+
+        for (uint32_t& pixel : pixels) { pixel = black; }
+        _blackImage = CreateImage((void*)&pixels, defaultImageExtent, defaultImageFormat, VK_IMAGE_USAGE_SAMPLED_BIT);
+
+        for (uint32_t& pixel : pixels) { pixel = grey; }
+        _greyImage = CreateImage((void*)&pixels, defaultImageExtent, defaultImageFormat, VK_IMAGE_USAGE_SAMPLED_BIT);
+
+        VkSamplerCreateInfo samplerInfo = { .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO, .pNext = nullptr };
+
+        samplerInfo.magFilter = VK_FILTER_LINEAR;
+        samplerInfo.minFilter = VK_FILTER_LINEAR;
+        vkCreateSampler(_device, &samplerInfo, _allocator, &_samplerLinear);
+
+        samplerInfo.magFilter = VK_FILTER_NEAREST;
+        samplerInfo.minFilter = VK_FILTER_NEAREST;
+        vkCreateSampler(_device, &samplerInfo, _allocator, &_samplerNearest);
+
+        _mainDeletionQueue.PushFunction([=]
+        {
+            DestroyImage(_whiteImage);
+            DestroyImage(_blackImage);
+            DestroyImage(_greyImage);
+
+            vkDestroySampler(_device, _samplerLinear, _allocator);
+            vkDestroySampler(_device, _samplerNearest, _allocator);
+        });
     }
 
     void VulkanRenderer::CreateImGuiDescriptorPool()

@@ -109,6 +109,8 @@ namespace Engine
 
         static PipelineWrapper CreatePipeline(const vkb::Device& logicalDevice);
 
+        static void CreateDefaultResources();
+
         static void CreateImGuiDescriptorPool();
 
         inline static void Draw(const WindowProperties& props, const DrawContext& drawCommands);
@@ -199,6 +201,14 @@ namespace Engine
         inline static VulkanImmediateBuffer _immBuffer;
 
         inline static entt::dense_map<std::string, VmaMeshAsset> _loadedModelMap;
+
+        // Engine resources
+        inline static VmaImage _whiteImage;
+        inline static VmaImage _blackImage;
+        inline static VmaImage _greyImage;
+
+        inline static VkSampler _samplerLinear;
+        inline static VkSampler _samplerNearest;
 
         // ImGui
         inline static ImGui_ImplVulkanH_Window _mainWindowData;
