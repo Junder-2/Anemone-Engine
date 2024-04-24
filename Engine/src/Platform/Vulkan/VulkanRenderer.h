@@ -206,6 +206,7 @@ namespace Engine
         inline static VmaImage _whiteImage;
         inline static VmaImage _blackImage;
         inline static VmaImage _greyImage;
+        inline static VmaImage _errorImage;
 
         inline static VkSampler _samplerLinear;
         inline static VkSampler _samplerNearest;
