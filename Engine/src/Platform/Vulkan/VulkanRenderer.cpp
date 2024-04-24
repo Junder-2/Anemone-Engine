@@ -908,7 +908,7 @@ namespace Engine
         float time = SDL_GetPerformanceCounter() / static_cast<float>(SDL_GetPerformanceFrequency());
         frame.AppData.Time = time;
 
-        Vector3 ambientColor = Vector3(0.27f, 0.37f, 0.52f);
+        Vector3 ambientColor = Vector3(0.05f, 0.08f, 0.11f);
         Vector3 sunAngle = Vector3(50 * FMath::DEGREES_TO_RAD, -30 * FMath::DEGREES_TO_RAD, 0);
         Vector3 sunDirection = Quaternion::FromEulerAngles(sunAngle) * Vector3::ForwardVector();
         Vector3 sunColor = Vector3(1.0f, 0.9f, 0.67f);
