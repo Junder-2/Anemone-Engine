@@ -616,7 +616,7 @@ namespace Engine
         ComPtr<slang::IBlob> spirvVertProgram;
         ComPtr<slang::IBlob> spirvFragProgram;
         {
-            const char* moduleName = "Mesh_Color";
+            const char* moduleName = "Mesh_Diffuse";
             ComPtr<slang::IBlob> diagnosticBlob;
             slang::IModule* slangModule = session->loadModule(moduleName, diagnosticBlob.writeRef());
             //diagnoseIfNeeded(diagnosticBlob);
@@ -678,21 +678,21 @@ namespace Engine
         VkShaderModule meshVertShader;
         if (!VulkanUtils::LoadShaderModule(spirvVertProgram, _device, _allocator, &meshVertShader))
         {
-            ANE_ELOG_ERROR("Error when building vertex shader module: Mesh-Color.slang");
+            ANE_ELOG_ERROR("Error when building vertex shader module: Mesh-Diffuse.slang");
         }
         else
         {
-            ANE_ELOG_INFO("Built vertex shader module: Mesh-Color.slang");
+            ANE_ELOG_INFO("Built vertex shader module: Mesh-Diffuse.slang");
         }
 
         VkShaderModule meshFragShader;
         if (!VulkanUtils::LoadShaderModule(spirvFragProgram, _device, _allocator, &meshFragShader))
         {
-            ANE_ELOG_ERROR("Error when building fragment shader module: Mesh-Color.slang");
+            ANE_ELOG_ERROR("Error when building fragment shader module: Mesh-Diffuse.slang");
         }
         else
         {
-            ANE_ELOG_INFO("Built fragment shader module: Mesh-Color.slang");
+            ANE_ELOG_INFO("Built fragment shader module: Mesh-Diffuse.slang");
         }
 
         VkPushConstantRange bufferRange;
