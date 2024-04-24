@@ -130,6 +130,7 @@ namespace Engine
         Entity ent = GetActiveScene()->Create("Square Entity");
         std::stringstream oss;
 
+
         for(int i = 0; i < numEntitiesToTest;i++ )
         {
             //ANE_LOG_INFO(UUIDGenerator::get_uuid());

@@ -3,6 +3,7 @@
 
 #include "UUIDGenerator.h"
 #include "ANE/Core/Scene/Scene.h"
+#include "ANE/Core/Scene/Components/AttachmentsComponent.h"
 #include "ANE/Core/Scene/Components/Component.h"
 #include "ANE/Core/Scene/Components/TagComponent.h"
 #include "ANE/Core/Scene/Components/TransformComponent.h"
@@ -18,6 +19,7 @@ namespace Engine
             SceneHandle = scene;
 
             EntityHandle = SceneHandle->_registry.create();
+            this->AddComponent<AttachmentsComponent>();
             this->AddComponent<TransformComponent>();
             this->AddComponent<TagComponent>(name);
             this->AddComponent<UUIDComponent>(UUIDGenerator::get_uuid());
@@ -79,7 +81,13 @@ namespace Engine
             return static_cast<std::optional<std::reference_wrapper<T>>>(GetComponent<T>()).value();
         }
 
-        return SceneHandle->_registry.emplace<T>(EntityHandle, std::forward<Args>(args)...);
+        auto& componentHandle = SceneHandle->_registry.emplace<T>(EntityHandle, std::forward<Args>(args)...);
+        if(HasComponent<AttachmentsComponent>()){
+
+            AttachmentsComponent& componentList = GetComponent<AttachmentsComponent>();
+            componentList.AddComponent(componentHandle);
+        }
+        return componentHandle;
     }
 
     /**
@@ -123,7 +131,7 @@ namespace Engine
             return true;
         }
 
-        ANE_ELOG_WARN("Attempted to remove component of type {} that doesn't exist", typeid(T).name());
+        ANE_ELOG_WARN("Attempted to try get component of type {} that doesn't exist", typeid(T).name());
         return false;
     }
 

@@ -18,7 +18,7 @@ namespace Engine
 static void RegisterSelect(UUIDComponent selectedEntityID);
 static void WipeSelect();
         SelectionManager::selectionContext _SelectionContext = SelectionManager::selectionContext::UI;
-
+void DrawEntityComponentList(Entity& selectedEntity);
         inline static std::string selected = "";
         EditorLayer* _editorLayer;
         void OnPanelRender() override;
