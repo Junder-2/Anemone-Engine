@@ -8,7 +8,7 @@
 
 namespace Engine
 {
-    class RigidBodyComponent : Component
+    struct RigidBodyComponent : Component
     {
     public:
         ANE_COMPONENT_INIT(RigidBodyComponent)
