@@ -18,9 +18,7 @@ struct Vertex
     float4 color;
 };
 
-// Equivalent to GLSL push constants.
-[[vk::push_constant]]
-cbuffer Constants
+struct PushConstants
 {
     matrix<float, 4, 4> renderMatrix;
     matrix<float, 4, 4> modelMatrix;
@@ -39,6 +37,10 @@ struct Varyings
     float2 uv;
 };
 
+// Equivalent to GLSL push constants.
+[[vk::push_constant]]
+ConstantBuffer<PushConstants> pushConstants;
+
 ParameterBlock<AppData> appData;
 ParameterBlock<SceneData> sceneData;
 ParameterBlock<Material> material;
@@ -48,9 +50,9 @@ Varyings vertexMain(uint vid : SV_VertexID)
 {
     Varyings output;
 
-    Vertex v = vertices[vid];
-    output.position = mul(renderMatrix, float4(v.position, 1));
-    output.normal = mul(float3x3(modelMatrix), v.normal);
+    Vertex v = pushConstants.vertices[vid];
+    output.position = mul(pushConstants.renderMatrix, float4(v.position, 1));
+    output.normal = mul(float3x3(pushConstants.modelMatrix), v.normal);
     output.color = 1;
     output.uv = float2(v.uvX, v.uvY);
 

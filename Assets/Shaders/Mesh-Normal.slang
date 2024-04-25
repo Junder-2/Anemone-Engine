@@ -21,9 +21,7 @@ struct Vertex
     float4 color;
 };
 
-// Equivalent to GLSL push constants.
-[[vk::push_constant]]
-cbuffer Constants
+struct PushConstants
 {
     // Also known as the "Model, View, Projection" matrix,
     matrix<float, 4, 4> renderMatrix;
@@ -45,6 +43,10 @@ struct Varyings
     float3 normal;
 };
 
+// Equivalent to GLSL push constants.
+[[vk::push_constant]]
+ConstantBuffer<PushConstants> pushConstants;
+
 // Uniform buffers which are assigned from the CPU-side before drawing.
 ParameterBlock<AppData> appData;
 ParameterBlock<SceneData> sceneData;
@@ -58,14 +60,14 @@ Varyings vertexMain(uint vid : SV_VertexID)
     Varyings output;
 
     // Acces vertex data from the constant buffer.
-    Vertex v = vertices[vid];
+    Vertex v = pushConstants.vertices[vid];
 
     // Transforms the local space vertex position to projection space.
-    output.position = mul(renderMatrix, float4(v.position, 1));
+    output.position = mul(pushConstants.renderMatrix, float4(v.position, 1));
 
     // Transforms the local space vertex normal to world space.
     // We are ignoring the 4th row and column since we only need orientation.
-    output.normal = mul(float3x3(modelMatrix), v.normal);
+    output.normal = mul(float3x3(pushConstants.modelMatrix), v.normal);
 
     return output;
 }
