@@ -1,10 +1,10 @@
 #pragma once
-#include "Event.h"
 #include "ANE/Delegate/Delegate.h"
 
 namespace Engine
 {
     //TODO: might turn this into a subsystem and not a static class
+    class Event;
 
     /**
     * Global class to handle current event
@@ -41,35 +41,19 @@ namespace Engine
         /**
         * Consumes current event (certain events will be marked as flush and cannot be consumed)
         */
-        static void ConsumeEvent()
-        {
-            if(_currentEvent == nullptr)
-            {
-                ANE_ELOG_WARN("Cannot consume event outside of event handling");
-                return;
-            }
-            _currentEvent->Consume();
-        }
+        static void ConsumeEvent();
 
         /**
         * Subscribes to the OnEvent call at the editor stage
-        * @param delegateMember method with void(Event&)
+        * @param delegate method with void(Event&)
         */
-        template <class TClass>
-        static void BindEditorEvent(DelegateMember<TClass, void(Event&)> delegateMember)
-        {
-            _editorEventDelegate += delegateMember;
-        }
+        static void BindEditorEvent(const Delegate<void(Event&)>& delegate);
 
         /**
         * Subscribes to the OnEvent call at the app stage
-        * @param delegateMember method with void(Event&)
+        * @param delegate method with void(Event&)
         */
-        template <class TClass>
-        static void BindAppEvent(DelegateMember<TClass, void(Event&)> delegateMember)
-        {
-            _appEventDelegate += delegateMember;
-        }
+        static void BindAppEvent(const Delegate<void(Event&)>& delegate);
 
         /**
         * Blocks all events from passing into the app stage (certain events will be marked as flush and will still pass)

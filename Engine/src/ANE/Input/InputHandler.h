@@ -3,12 +3,18 @@
 #include <entt.hpp>
 #include <queue> // todo: we can probably precomile this
 
-#include "InputAction.h"
-#include "ANE/Events/Event.h"
+#include "InputTypes.h"
+#include "MouseInputAction.h"
 #include "ANE/Delegate/Delegate.h"
 
 namespace Engine
 {
+    struct InputValue;
+    struct Vector2;
+    class Event;
+    class InputAction;
+    class MouseInputAction;
+
     /**
     * Class that stores and processes inputs
     */
@@ -20,8 +26,7 @@ namespace Engine
         InputHandler();
         ~InputHandler();
 
-        template <class TClass>
-        void BindOnEvent(DelegateMember<TClass, void(Event&)> delegateMember);
+        void BindOnEvent(const Delegate<void(Event&)>& delegate);
         void OnUpdate();
 
         /**
@@ -30,7 +35,7 @@ namespace Engine
         */
         void RegisterKeyboardKey(int keyCode);
 
-        void PopulateKeyStates(const Uint8* newKeyStates);
+        void PopulateKeyStates(const uint8_t* newKeyStates);
         void ProcessKey(int keyCode, bool press);
         void ProcessMouseMovement(Vector2 pos, Vector2 delta);
         void ProcessAbsoluteMouseMovement(Vector2 pos);
@@ -54,7 +59,7 @@ namespace Engine
         /**
         * Returns current mouse input data
         */
-        MouseInputAction GetMouseInputData() const { return _mouseInputAction; }
+        MouseInputAction GetMouseInputData() const;
 
     private:
         void DispatchEvent(Event& e);
@@ -68,10 +73,4 @@ namespace Engine
         MouseInputAction _mouseInputAction {};
         bool _dirtyMouse = false;
     };
-
-    template <class TClass>
-    void InputHandler::BindOnEvent(DelegateMember<TClass, void(Event&)> delegateMember)
-    {
-        _eventDelegate = delegateMember;
-    }
 }

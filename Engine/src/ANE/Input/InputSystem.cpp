@@ -1,6 +1,7 @@
 #include "anepch.h"
 #include "InputSystem.h"
 
+#include "InputHandler.h"
 #include "ANE/Core/Application.h"
 #include "ANE/Events/EventHandler.h"
 #include "ANE/Utilities/InputUtilities.h"
@@ -12,6 +13,80 @@ namespace Engine
         _inputHandler = &Application::Get().GetInputHandler();
 
         EventHandler::BindAppEvent(MakeDelegate(this, &InputSystem::OnEvent));
+    }
+
+    void InputSystem::BindInput(const BindingPair bindingPair, const Delegate<void(InputValue)>& delegate)
+    {
+        switch(bindingPair.DeviceType)
+        {
+            case InputDeviceKeyboard:
+                _inputHandler->RegisterKeyboardKey(bindingPair.BindingId);
+            break;
+        }
+
+        _actionMappingDelegates[bindingPair] += delegate;
+    }
+
+    void InputSystem::BindKeyboardInput(const KeyCodes keyCode, const Delegate<void(InputValue)>& delegate)
+    {
+        BindInput(BindingPair(InputDeviceKeyboard, keyCode), delegate);
+    }
+
+    void InputSystem::BindMouseButton(const MouseButton buttonIndex, const Delegate<void(InputValue)>& delegate)
+    {
+        BindInput(BindingPair(InputDeviceMouse, buttonIndex), delegate);
+    }
+
+    void InputSystem::BindMouseMove(const Delegate<void(MouseMoveValue)>& delegate)
+    {
+        _mouseMoveDelegate += delegate;
+    }
+
+    void InputSystem::BindAnyMouseButton(const Delegate<void(MouseButtonValues)>& delegate)
+    {
+        _mouseButtonValueDelegate += delegate;
+    }
+
+    void InputSystem::BindMouseScroll(const Delegate<void(Vector2)>& delegate)
+    {
+        _mouseScrollDelegate += delegate;
+    }
+
+    void InputSystem::BindAxisInput(const BindingPair negativeBindingPair, const BindingPair positiveBindingPair, const Delegate<void(InputValue)>& delegate)
+    {
+        if (IsValidAxisBindings(negativeBindingPair, positiveBindingPair)) return;
+
+        switch(positiveBindingPair.DeviceType)
+        {
+            case InputDeviceKeyboard:
+                _inputHandler->RegisterKeyboardKey(positiveBindingPair.BindingId);
+            break;
+        }
+
+        switch(negativeBindingPair.DeviceType)
+        {
+            case InputDeviceKeyboard:
+                _inputHandler->RegisterKeyboardKey(negativeBindingPair.BindingId);
+            break;
+        }
+
+        int size = _bindingToAxisBinding.size();
+        if(size != 0 && size % 2 != 0)
+        {
+            ANE_ELOG_WARN("axis binding size is not multiple of 2: {}", size);
+            size++;
+        }
+        const int id = size / 2;
+
+        _bindingToAxisBinding.insert_or_assign(positiveBindingPair, AxisBinding(id, true));
+        _bindingToAxisBinding.insert_or_assign(negativeBindingPair, AxisBinding(id, false));
+
+        _axisActionMappingDelegates[id] += delegate;
+    }
+
+    void InputSystem::BindKeyboardAxisInput(const KeyCodes negativeKeyCode, const KeyCodes positiveKeyCode, const Delegate<void(InputValue)>& delegate)
+    {
+        BindAxisInput({InputDeviceKeyboard, negativeKeyCode}, {InputDeviceKeyboard, positiveKeyCode}, delegate);
     }
 
     void InputSystem::OnEvent(Event& e)
@@ -116,5 +191,45 @@ namespace Engine
             return true;
         }
         return false;
+    }
+
+    TriggerState InputSystem::GetKeyTriggerState(const int keyCode) const
+    {
+        return _inputHandler->GetKeyTriggerState(keyCode);
+    }
+
+    std::array<InputValue, 4> InputSystem::GetCurrentTriggeredKeys() const
+    {
+        return _inputHandler->GetCurrentTriggeredKeys();
+    }
+
+    Vector2 InputSystem::GetAbsoluteMousePos() const
+    {
+        return _inputHandler->GetMouseInputData().GetMoveValue().GetAbsoluteMousePos();
+    }
+
+    Vector2 InputSystem::GetMousePos() const
+    {
+        return _inputHandler->GetMouseInputData().GetMoveValue().GetMousePos();
+    }
+
+    Vector2 InputSystem::GetMouseDelta() const
+    {
+        return _inputHandler->GetMouseInputData().GetMoveValue().GetMouseDelta();
+    }
+
+    Vector2 InputSystem::GetMouseScroll() const
+    {
+        return _inputHandler->GetMouseInputData().GetScrollValue();
+    }
+
+    TriggerState InputSystem::GetMouseTriggerState(const int index) const
+    {
+        return _inputHandler-> GetMouseInputData().GetButtonValue().GetTriggerState(index);
+    }
+
+    MouseButtonValues InputSystem::GetMouseButtonValues() const
+    {
+        return _inputHandler->GetMouseInputData().GetButtonValue();
     }
 }

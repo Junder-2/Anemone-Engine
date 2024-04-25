@@ -2,6 +2,7 @@
 #include "Input.h"
 
 #include "ANE/Core/Application.h"
+#include "ANE/Core/Window.h"
 #include "ANE/Subsystem/SubSystemCollection.h"
 #include "ANE/Input/EditorInputSystem.h"
 

@@ -2,13 +2,24 @@
 
 #include "Core.h"
 #include "Layers/LayerStack.h"
-#include "Window.h"
-#include "ANE/Events/Event.h"
-#include "ANE/Core/Layers/ImGuiLayer.h"
-#include "ANE/Input/InputHandler.h"
+
 namespace Engine
 {
+    class MouseMovementEvent;
+    class MouseScrollEvent;
+    class MouseButtonEvent;
+    class KeyboardKeyEvent;
+    class WindowFocusChangeEvent;
+    class WindowStateChangeEvent;
+    class WindowMovedEvent;
+    class WindowResizeEvent;
+    class Event;
+    class ImGuiLayer;
+    class InputHandler;
+    class Window;
+    class Layer;
     class SubSystemCollection;
+
     struct ANE_API ApplicationSpecification
     {
         std::string Name = "Anemone Application";
@@ -59,7 +70,7 @@ namespace Engine
 
         static Application* _appInstance;
 
-        Uint64 _lastTimeStamp;
+        uint64_t _lastTimeStamp;
         LayerStack _layerStack;
         ImGuiLayer* _ImGuiLayer;
     };

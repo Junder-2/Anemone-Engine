@@ -2,6 +2,7 @@
 #include "CameraController.h"
 
 #include "ANE/Core/Application.h"
+#include "ANE/Core/Window.h"
 #include "ANE/Core/Scene/Components/CameraComponent.h"
 #include "ANE/Events/EventHandler.h"
 #include "ANE/Math/FMath.h"
