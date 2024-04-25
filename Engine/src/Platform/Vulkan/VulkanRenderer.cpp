@@ -759,10 +759,10 @@ namespace Engine
         constexpr VkExtent3D defaultImageExtent = VkExtent3D{ 16, 16, 1 };
         constexpr VkFormat defaultImageFormat = VK_FORMAT_R8G8B8A8_UNORM;
 
-        const uint32_t white = packUnorm4x8(glm::vec4(1, 1, 1, 1));
-        const uint32_t black = packUnorm4x8(glm::vec4(0, 0, 0, 1));
-        const uint32_t grey = packUnorm4x8(glm::vec4(0.66f, 0.66f, 0.66f, 1));
-        const uint32_t magenta = packUnorm4x8(glm::vec4(1, 0, 1, 1));
+        const uint32_t white = glm::packUnorm4x8(Vector4(1, 1, 1, 1));
+        const uint32_t black = glm::packUnorm4x8(Vector4(0, 0, 0, 1));
+        const uint32_t grey = glm::packUnorm4x8(Vector4(0.66f, 0.66f, 0.66f, 1));
+        const uint32_t magenta = glm::packUnorm4x8(Vector4(1, 0, 1, 1));
         uint32_t pixels[16 * 16];
 
         for (uint32_t& pixel : pixels) { pixel = white; }
