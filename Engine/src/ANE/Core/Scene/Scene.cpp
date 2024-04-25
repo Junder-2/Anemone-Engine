@@ -7,8 +7,6 @@
 #include "Components/RenderComponent.h"
 #include "Components/RigidBodyComponent.h"
 #include "Components/UUIDComponent.h"
-#include "glm/ext/scalar_common.hpp"
-
 
 namespace Engine
 {

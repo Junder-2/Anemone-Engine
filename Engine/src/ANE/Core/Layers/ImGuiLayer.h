@@ -4,6 +4,8 @@
 
 namespace Engine
 {
+    struct InputValue;
+
     class ImGuiLayer : public Layer
     {
     public:
@@ -35,7 +37,5 @@ namespace Engine
         void ToggleFlag(const char* key);
 
         entt::dense_map<std::string, bool> _menuFlags; // should be moved to its own class.
-
-
     };
 }

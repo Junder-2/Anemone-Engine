@@ -6,6 +6,7 @@
 #include <SDL_timer.h>
 
 #include "Window.h"
+#include "ANE/Events/Event.h"
 #include "ANE/Events/EventHandler.h"
 #include "ANE/Subsystem/SubSystemCollection.h"
 #include "ANE/Input/InputHandler.h"
@@ -42,8 +43,8 @@ namespace Engine
 
         _subsystemCollection = SubSystemCollection::Create();
 
-        _ImGuiLayer = ImGuiLayer::Create("ImGuiLayer");
-        PushLayer(_ImGuiLayer);
+        _imGuiLayer = ImGuiLayer::Create("ImGuiLayer");
+        PushLayer(_imGuiLayer);
     }
 
     void Application::Run()

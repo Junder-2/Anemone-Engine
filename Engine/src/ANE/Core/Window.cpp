@@ -7,6 +7,7 @@
 #include <VkBootstrap.h>
 
 #include "Application.h"
+#include "ANE/Events/WindowEvent.h"
 #include "ANE/Input/Input.h"
 #include "ANE/Input/InputHandler.h"
 #include "ANE/Utilities/InputUtilities.h"

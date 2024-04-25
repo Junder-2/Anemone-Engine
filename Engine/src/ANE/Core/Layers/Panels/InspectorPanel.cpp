@@ -3,6 +3,7 @@
 
 #include "imgui.h"
 #include "ANE/Core/Editor/SelectionManager.h"
+#include "ANE/Core/Layers/EditorLayer.h"
 #include "ANE/Math/Random.h"
 #include "ANE/Core/Scene/Components/Components.h"
 
@@ -15,14 +16,8 @@ namespace Engine
 
     void InspectorPanel::RegisterSelect(UUIDComponent selectedEntityID)
     {
-        selected = selectedEntityID.UUID;
+        _selected = selectedEntityID.UUID;
     }
-
-    void InspectorPanel::WipeSelect()
-    {
-        selected = "";
-    }
-
 
     void InspectorPanel::OnPanelRender()
     {
@@ -48,8 +43,6 @@ namespace Engine
         char buffer[256] = {};
         const auto error = strcpy_s(buffer, sizeof(buffer), tag.c_str());
         ANE_ASSERT(error == 0, "can't copy string into buffer");
-
-
 
         //GET type list of all types possible
         //Call a Get on each type with the selected entity
@@ -88,5 +81,3 @@ namespace Engine
         }
     */
 }
-
-//ANE_LOG_INFO("Entering panel render phase");

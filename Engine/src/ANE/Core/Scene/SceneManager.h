@@ -1,12 +1,15 @@
 ﻿#pragma once
 
-namespace Engine {
+namespace Engine
+{
     class Layer;
 
-    class SceneManager {
+    class SceneManager
+    {
     public:
         static void ChangeScene();
 
+    private:
         std::vector<Layer*> _layers;
     };
 }

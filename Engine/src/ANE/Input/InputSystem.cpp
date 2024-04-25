@@ -3,6 +3,7 @@
 
 #include "InputHandler.h"
 #include "ANE/Core/Application.h"
+#include "ANE/Events/Event.h"
 #include "ANE/Events/EventHandler.h"
 #include "ANE/Utilities/InputUtilities.h"
 
