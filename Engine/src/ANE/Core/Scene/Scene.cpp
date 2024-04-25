@@ -171,7 +171,8 @@ namespace Engine
 
             TransformMatrix& transformMatrix = transform.Transform;
 
-            if(!body.GetRigidBody()->IsActive()) continue;
+            if(transformMatrix.IsDirty() || body.GetRigidBody()->GetBodyType() == BodyType::Static) continue;
+            if(!body.GetRigidBody()->IsActive() || body.GetRigidBody()->IsSleeping()) continue;
 
             auto currentTransform = rp3d::Transform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
             auto newTransform = rp3d::Transform::interpolateTransforms(currentTransform, body.GetRigidBody()->GetReactRigidBody().getTransform(), factor);

@@ -42,7 +42,6 @@ namespace Engine
         void Inverse();
 
         Quaternion GetConjugate() const;
-
         Quaternion GetInverse() const;
 
         Matrix3x3 GetMatrix() const;
@@ -157,7 +156,7 @@ namespace Engine
         const float l = Length();
 
         // Check if the length is not equal to zero
-        assert (l > FMath::EPSILON);
+        ANE_EASSERT(l > FMath::EPSILON);
 
         X /= l;
         Y /= l;

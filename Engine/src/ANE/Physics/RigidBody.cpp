@@ -119,4 +119,14 @@ namespace Engine
     {
         return _reactRigidBody->isActive();
     }
+
+    void RigidBody::SetSleeping(const bool enable) const
+    {
+        _reactRigidBody->setIsSleeping(enable);
+    }
+
+    bool RigidBody::IsSleeping() const
+    {
+        return _reactRigidBody->isSleeping();
+    }
 }
