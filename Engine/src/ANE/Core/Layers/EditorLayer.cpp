@@ -166,7 +166,7 @@ namespace Engine
         transformMatrix.Scale(Vector3(10.f));
 
         floor.AddComponent<RenderComponent>("Plane.obj");
-        floor.AddComponent<RigidBodyComponent>(floor, BodyType::Static);
+        //floor.AddComponent<RigidBodyComponent>(floor, BodyType::Static);
         floor.AddComponent<ColliderComponent>(floor, Vector3(10.f, .1f, 10.f));
     }
 

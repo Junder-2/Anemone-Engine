@@ -25,6 +25,7 @@ namespace Engine
          * Adds a positional offset to the Transform
          * @param delta World space offset
          */
+
         void AddPosition(const Vector3 delta)
         {
             _localToWorld.AddPosition(delta);
@@ -44,6 +45,7 @@ namespace Engine
         void SetRotation(const Vector3 newRotation, const bool isDegrees = false)
         {
             _localToWorld.SetRotation(newRotation, isDegrees);
+            ANE_ELOG_INFO("Inside transform matrix is rotation {}", newRotation.ToString());
             MarkDirty();
         }
 

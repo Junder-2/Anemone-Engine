@@ -40,7 +40,11 @@ namespace Engine
         static void RegisterComponentMetaData()
         {
             entt::meta<TransformComponent>()
-                .data<&TransformComponent::Transform>("Transform"_hs).prop("display_name"_hs, "Transform");
+                .data<&TransformComponent::Transform>("Transform"_hs).prop("display_name"_hs, "Transform")
+                .prop("Position"_hs, "Position")
+                .prop("Rotation"_hs, "Rotation")
+                .prop("Scale"_hs, "Scale");
+
         }
 
 

@@ -37,7 +37,15 @@ namespace Engine
         {
             Entity selectedEntity = _editorLayer->GetActiveScene()->GetEntityWithUUID(selectedEntityUUIDS->at(0));
             DrawEntityComponentList(selectedEntity);
+            if(ImGui::Button("Add Physics Suzanne")) // For physics testing
+                {
+                selectedEntity.GetComponent<TransformComponent>().Transform.AddPosition(Random::InSphere(.2f));
+                selectedEntity.AddComponent<RenderComponent>("Suzanne.fbx");
+                selectedEntity.AddComponent<RigidBodyComponent>(selectedEntity);
+                selectedEntity.AddComponent<ColliderComponent>(selectedEntity, 1.f);
+                }
         }
+
         ImGui::End();
     }
     std::string InspectorPanel::TypePrefixRemoval(std::string fullComponentName)
@@ -52,6 +60,7 @@ namespace Engine
     void InspectorPanel::DrawEntityComponentList(Entity& selectedEntity)
     {
         {
+
             for (auto&& [fst, snd] : _editorLayer->GetActiveScene()->_registry.storage())
             {
                 if (snd.contains(selectedEntity))
@@ -65,20 +74,21 @@ namespace Engine
                         std::string full_string = TypePrefixRemoval(component_type);
                         ImGui::Text(full_string.c_str(), ImGuiTreeNodeFlags_DefaultOpen);
 
-                            for (auto&& data : type.data())
-                            {
-                                auto& field = data.second;
+                        for (auto&& data : type.data())
+                        {
+                            auto& field = data.second;
 
-                                auto itr = g_data_inspectors.find(field.type().info().hash());
-                                if (itr != g_data_inspectors.end())
-                                {
-                                    itr->second(field, component_data);
-                                }
-                                else
-                                {
-                                    ImGui::Text("%s", "nada");
-                                }
+                            auto itr = g_data_inspectors.find(field.type().info().hash());
+                            if (itr != g_data_inspectors.end())
+                            {
+                                itr->second(field, component_data);
                             }
+                            else
+                            {
+                                ImGui::Text("%s", std::to_string(field.type().info().hash()));
+                            }
+                        }
+
 
                     }
                 }
@@ -164,13 +174,7 @@ g_data_inspectors.find()
 
 
     /*
-    if(ImGui::Button("Add Physics Suzanne")) // For physics testing
-        {
-        selectedEntity.GetComponent<TransformComponent>().Transform.AddPosition(Random::InSphere(.2f));
-        selectedEntity.AddComponent<RenderComponent>("Suzanne.fbx");
-        selectedEntity.AddComponent<RigidBodyComponent>(selectedEntity);
-        selectedEntity.AddComponent<ColliderComponent>(selectedEntity, 1.f);
-        }
+
 
 }
 */
