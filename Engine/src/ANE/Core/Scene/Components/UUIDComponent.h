@@ -7,6 +7,7 @@ namespace Engine
     {
         std::string UUID{};
         UUIDComponent(std::string uuid) : Component(typeid(*this).name()) , UUID(uuid) {}
-
     };
+
+
 }

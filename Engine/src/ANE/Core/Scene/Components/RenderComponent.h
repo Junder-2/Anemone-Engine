@@ -19,10 +19,11 @@ namespace Engine
             Model = Renderer::LoadModel(_modelPath);
         }
 
-    public:
+
         VmaMeshAsset Model = {};
 
     private:
         std::string _modelPath;
     };
+
 }

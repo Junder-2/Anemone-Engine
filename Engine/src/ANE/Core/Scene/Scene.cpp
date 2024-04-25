@@ -8,6 +8,7 @@
 #include "Components/RigidBodyComponent.h"
 #include "Components/UUIDComponent.h"
 #include "glm/ext/scalar_common.hpp"
+#include "glm/gtx/type_trait.hpp"
 
 
 namespace Engine

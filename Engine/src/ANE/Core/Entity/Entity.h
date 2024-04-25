@@ -19,7 +19,7 @@ namespace Engine
             SceneHandle = scene;
 
             EntityHandle = SceneHandle->_registry.create();
-            this->AddComponent<AttachmentsComponent>();
+            //this->AddComponent<AttachmentsComponent>();
             this->AddComponent<TransformComponent>();
             this->AddComponent<TagComponent>(name);
             this->AddComponent<UUIDComponent>(UUIDGenerator::get_uuid());
@@ -81,13 +81,7 @@ namespace Engine
             return static_cast<std::optional<std::reference_wrapper<T>>>(GetComponent<T>()).value();
         }
 
-        auto& componentHandle = SceneHandle->_registry.emplace<T>(EntityHandle, std::forward<Args>(args)...);
-        if(HasComponent<AttachmentsComponent>()){
-
-            AttachmentsComponent& componentList = GetComponent<AttachmentsComponent>();
-            componentList.AddComponent(componentHandle);
-        }
-        return componentHandle;
+        return SceneHandle->_registry.emplace<T>(EntityHandle, std::forward<Args>(args)...);;
     }
 
     /**
@@ -134,12 +128,30 @@ namespace Engine
         ANE_ELOG_WARN("Attempted to try get component of type {} that doesn't exist", typeid(T).name());
         return false;
     }
+    template<typename Type>
+    Type & get(entt::registry &registry, entt::entity entity) {
+        return registry.get_or_emplace<Type>(entity);
+    }
+
+    template<typename Type>
+    Type & set(entt::registry &registry, entt::entity entity, const Type &instance) {
+        return registry.emplace_or_replace<Type>(entity, instance);
+    }
+
+    template<typename Type>
+    void extend_meta_type() {
+        entt::meta<Type>()
+            .template func<&get<Type>, entt::as_ref_t>("get")
+            .template func<&set<Type>>("set");
+    }
+
 
     template <typename T>
     std::enable_if_t<std::is_base_of_v<Component, T>, T&> Entity::GetComponent()
     {
         return SceneHandle->_registry.get<T>(EntityHandle);
     }
+
 }
 
 
