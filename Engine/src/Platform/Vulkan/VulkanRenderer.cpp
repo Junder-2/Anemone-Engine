@@ -954,6 +954,11 @@ namespace Engine
             writer.UpdateSet(_device, sceneDescriptor);
         }
         {
+            DescriptorWriter writer;
+            writer.WriteImage(0, _errorImage.ImageView, _samplerNearest, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+            writer.WriteImage(1, _errorImage.ImageView, _samplerNearest, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_SAMPLER);
+            writer.UpdateSet(_device, imageDescriptor);
+        }
 
         _drawExtent.height = std::min(_swapchainExtent.height, _colorImage.ImageExtent.height);
         _drawExtent.width = std::min(_swapchainExtent.width, _colorImage.ImageExtent.width);
