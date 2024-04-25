@@ -42,11 +42,13 @@ namespace Engine
 
     void ImGuiLayer::OnUpdate(float deltaTime)
     {
+        Layer::OnUpdate(deltaTime);
         // AddDebugMessage();
     }
 
     void ImGuiLayer::OnEvent(Event& e)
     {
+        Layer::OnEvent(e);
     }
 
 
@@ -59,6 +61,8 @@ namespace Engine
 
     void ImGuiLayer::OnUIRender()
     {
+        Layer::OnUIRender();
+
         bool open = true;
         DockSpace(&open);
 

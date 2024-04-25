@@ -253,6 +253,8 @@ namespace Engine
 
     void Window::ProcessViewportEvents(const ViewportProperties& previousProps)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         const ViewportProperties newViewportProps = GetActiveViewportProperties();
         if(newViewportProps.Width != previousProps.Width || newViewportProps.Height != previousProps.Height)
         {

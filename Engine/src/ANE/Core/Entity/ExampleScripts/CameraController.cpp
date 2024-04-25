@@ -42,6 +42,8 @@ namespace Engine
 
     void CameraController::OnUpdate(float deltaTime)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         if((_xInput != 0) || (_yInput != 0) || (_zInput != 0))
         {
             //const float moveSpeed = _isSpeedUp ? 0.05f : 0.01f;

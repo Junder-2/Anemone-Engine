@@ -33,6 +33,7 @@ namespace Engine
     void Application::Init()
     {
         ANE_PROFILE_FUNCTION();
+
         _window = Window::Create(WindowProperties(_appSpec.Name));
         _window->BindOnEvent(MakeDelegate(this, &Application::OnEvent));
 
@@ -86,6 +87,8 @@ namespace Engine
 
     void Application::OnEvent(Event& e)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         EventHandler::PushEvent(&e);
 
         if(e.HasCategory(EventCategoryWindow))

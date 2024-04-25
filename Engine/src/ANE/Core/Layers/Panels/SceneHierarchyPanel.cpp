@@ -34,6 +34,8 @@ namespace Engine
 
     void SceneHierarchyPanel::DrawEntityNodeList() const
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         std::vector<std::string>* selectedEntityUUIDS = SelectionManager::GetSelection(SelectionManager::UI);
         for (const auto IDView = _activeScene->_registry.view<UUIDComponent, TagComponent>(); const auto entity : IDView)
         {
@@ -51,6 +53,8 @@ namespace Engine
 
     void SceneHierarchyPanel::DrawEntityNode(const UUIDComponent& uuid, const TagComponent& tag, const ImGuiTreeNodeFlags nodeFlags) const
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         const bool nodeOpen = ImGui::TreeNodeEx(uuid.UUID.c_str(), nodeFlags, tag.Value.c_str());
 
         if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())

@@ -71,6 +71,8 @@ namespace Engine
 
     void EditorLayer::OnEvent(Event& e)
     {
+        Layer::OnEvent(e);
+
         EventHandler::DispatchEditorEvents();
         EventHandler::DispatchAppEvents();
     }
@@ -111,6 +113,8 @@ namespace Engine
 
     void EditorLayer::OnUpdate(float deltaTime)
     {
+        Layer::OnUpdate(deltaTime);
+
         if (_activeScene) _activeScene->OnUpdate(deltaTime);
     }
 
@@ -121,6 +125,8 @@ namespace Engine
 
     void EditorLayer::CreateTestScene(int numEntitiesToTest)
     {
+        ANE_PROFILE_FUNCTION();
+
         //Add scene to layer
         AddScene<Scene>("Game");
 

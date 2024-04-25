@@ -92,10 +92,13 @@ namespace Engine
 
     void Scene::OnEvent(Event& e)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
     }
 
     void Scene::OnUpdate(float timeStep)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         {
             _registry.view<NativeScriptComponent>().each([&](auto entity, auto& scriptComponent)
             {
@@ -126,6 +129,8 @@ namespace Engine
 
     void Scene::OnFixedUpdate(float timeStep)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         const auto group = _registry.view<TransformComponent, RigidBodyComponent>();
         for (const auto entity : group) //We need to apply changes in our transform to the internal rigidbody
         {
@@ -155,6 +160,8 @@ namespace Engine
 
     void Scene::UpdateRigidBodies()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         const float factor = FMath::Saturate(_accumulator / _timeStep);
 
         const auto group = _registry.view<TransformComponent, RigidBodyComponent>();
@@ -177,6 +184,8 @@ namespace Engine
 
     void Scene::SubmitDrawCommands()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         // TODO: Sort based on pivot or bounds.
         const auto view = _registry.view<TransformComponent, RenderComponent>();
         for (entt::entity entity : view)

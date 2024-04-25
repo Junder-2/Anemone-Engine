@@ -52,6 +52,8 @@ namespace Engine
 
     void VulkanRenderer::Render(const WindowProperties& props, const DrawContext& drawCommands)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         if (!_initialized)
         {
             ANE_ELOG_WARN("Unable to end VulkanRenderer frame as it was never fully initialized.");
@@ -827,6 +829,8 @@ namespace Engine
 
     void VulkanRenderer::Draw(const WindowProperties& props, const DrawContext& drawCommands)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         if (_rebuildSwapchain)
         {
             if (props.Width > 0 && props.Height > 0)
@@ -888,21 +892,25 @@ namespace Engine
 
         CheckVkResult(vkQueueSubmit2(_queue, 1, &submitInfo, frame.Fence));
 
-        VkPresentInfoKHR presentInfo = VulkanInitializers::PresentInfo();
-
-        presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = &frame.RenderSemaphore;
-
-        presentInfo.swapchainCount = 1;
-        presentInfo.pSwapchains = &_swapchain;
-
-        presentInfo.pImageIndices = &swapchainImageIndex;
-
-        result = vkQueuePresentKHR(_queue, &presentInfo);
-        if (result == VK_ERROR_OUT_OF_DATE_KHR)
         {
-            _rebuildSwapchain = true;
-            return;
+            ANE_DEEP_PROFILE_SCOPE("vkQueuePresentKHR");
+
+            VkPresentInfoKHR presentInfo = VulkanInitializers::PresentInfo();
+
+            presentInfo.waitSemaphoreCount = 1;
+            presentInfo.pWaitSemaphores = &frame.RenderSemaphore;
+
+            presentInfo.swapchainCount = 1;
+            presentInfo.pSwapchains = &_swapchain;
+
+            presentInfo.pImageIndices = &swapchainImageIndex;
+
+            result = vkQueuePresentKHR(_queue, &presentInfo);
+            if (result == VK_ERROR_OUT_OF_DATE_KHR)
+            {
+                _rebuildSwapchain = true;
+                return;
+            }
         }
 
         _frameIndex++;
@@ -910,6 +918,8 @@ namespace Engine
 
     void VulkanRenderer::DrawGeometry(VkCommandBuffer cmd, const DrawContext& drawCommands)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         VmaBuffer appDataBuffer = CreateBuffer(sizeof(ApplicationData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
         VmaBuffer sceneDataBuffer = CreateBuffer(sizeof(SceneData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
@@ -1010,6 +1020,8 @@ namespace Engine
     // TODO: Fully integrate ImGui into rendering loop.
     void VulkanRenderer::DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         VkRenderingAttachmentInfo colorAttachment = VulkanInitializers::AttachmentInfo(targetImageView, nullptr, VK_IMAGE_LAYOUT_GENERAL);
         VkRenderingInfo renderInfo = VulkanInitializers::RenderingInfo(_windowExtent, &colorAttachment, nullptr);
 

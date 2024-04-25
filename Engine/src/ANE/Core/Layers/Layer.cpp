@@ -3,6 +3,21 @@
 
 namespace Engine
 {
+    void Layer::OnUpdate(float deltaTime)
+    {
+        ANE_DEEP_PROFILE_FUNCTION();
+    }
+
+    void Layer::OnEvent(Event& e)
+    {
+        ANE_DEEP_PROFILE_FUNCTION();
+    }
+
+    void Layer::OnUIRender()
+    {
+        ANE_DEEP_PROFILE_FUNCTION();
+    }
+
     void Layer::AttachUIPanel(UILayerPanel* newPanel)
     {
         _UIpanels.emplace(_UIpanels.begin(),newPanel);

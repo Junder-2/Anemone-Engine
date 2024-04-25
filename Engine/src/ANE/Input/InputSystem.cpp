@@ -92,6 +92,8 @@ namespace Engine
 
     void InputSystem::OnEvent(Event& e)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         if(!e.HasCategory(EventCategoryInput)) return;
 
         if(e.HasCategory(EventCategoryKeyboard))

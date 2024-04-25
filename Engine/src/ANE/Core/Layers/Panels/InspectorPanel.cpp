@@ -21,6 +21,8 @@ namespace Engine
 
     void InspectorPanel::OnPanelRender()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         ImGui::Begin("Inspection");
         std::vector<std::string>* selectedEntityUUIDS = SelectionManager::GetSelection(SelectionManager::UI);
 
@@ -38,6 +40,8 @@ namespace Engine
 
     void InspectorPanel::DrawEntityComponentList(Entity& selectedEntity)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         //Name below!!!
         auto& tag = selectedEntity.GetComponent<TagComponent>().Value; // make sure we always have a tag, this can be dangerous
         char buffer[256] = {};

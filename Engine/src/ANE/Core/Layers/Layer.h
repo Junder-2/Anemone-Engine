@@ -13,9 +13,9 @@ namespace Engine
 
         virtual void OnAttach() {}
         virtual void OnDetach() {}
-        virtual void OnUpdate(float deltaTime) {}
-        virtual void OnEvent(Event& e) {}
-        virtual void OnUIRender() {}
+        virtual void OnUpdate(float deltaTime);
+        virtual void OnEvent(Event& e);
+        virtual void OnUIRender();
 
         void AttachUIPanel(UILayerPanel* newPanel);
         void DetachUIPanel(const UILayerPanel* panelToRemove);
