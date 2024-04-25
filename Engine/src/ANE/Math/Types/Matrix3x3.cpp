@@ -113,16 +113,14 @@ namespace Engine
         _columns[1].Normalize();
         _columns[2].Normalize();
 
-        _columns[0] *= scale.X;
-        _columns[1] *= scale.Y;
-        _columns[2] *= scale.Z;
+        Scale(scale);
     }
 
     void Matrix3x3::Scale(const Vector3 scale)
     {
-        _columns[0] *= scale.X;
-        _columns[1] *= scale.Y;
-        _columns[2] *= scale.Z;
+        _columns[0] *= FMath::Max(scale.X, 0.01f);
+        _columns[1] *= FMath::Max(scale.Y, 0.01f);
+        _columns[2] *= FMath::Max(scale.Z, 0.01f);
     }
 
     Vector3 Matrix3x3::GetScale() const

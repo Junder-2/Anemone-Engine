@@ -130,22 +130,20 @@ namespace Engine
         return {_columns[3]};
     }
 
-    void Matrix4x4::Scale(const Vector3 scale)
-    {
-        _columns[0] *= scale.X;
-        _columns[1] *= scale.Y;
-        _columns[2] *= scale.Z;
-    }
-
     void Matrix4x4::SetScale(const Vector3 scale)
     {
         _columns[0].Normalize();
         _columns[1].Normalize();
         _columns[2].Normalize();
 
-        _columns[0] *= scale.X;
-        _columns[1] *= scale.Y;
-        _columns[2] *= scale.Z;
+        Scale(scale);
+    }
+
+    void Matrix4x4::Scale(const Vector3 scale)
+    {
+        _columns[0] *= FMath::Max(scale.X, 0.01f);
+        _columns[1] *= FMath::Max(scale.Y, 0.01f);
+        _columns[2] *= FMath::Max(scale.Z, 0.01f);
     }
 
     Vector3 Matrix4x4::GetScale() const

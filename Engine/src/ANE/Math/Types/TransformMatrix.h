@@ -41,15 +41,15 @@ namespace Engine
             MarkDirty();
         }
 
+        Vector3 GetPosition() const
+        {
+            return _localToWorld.GetPosition();
+        }
+
         void SetRotation(const Vector3 newRotation, const bool isDegrees = false)
         {
             _localToWorld.SetRotation(newRotation, isDegrees);
             MarkDirty();
-        }
-
-        Vector3 GetPosition() const
-        {
-            return _localToWorld.GetPosition();
         }
 
         void SetRotation(const Quaternion newRotation)
@@ -81,9 +81,16 @@ namespace Engine
             return _localToWorld.GetQuaternion();
         }
 
+        void SetScale(const Vector3 scale)
+        {
+            _localToWorld.SetScale(scale);
+            MarkDirty();
+        }
+
         void Scale(const Vector3 scale)
         {
             _localToWorld.Scale(scale);
+            MarkDirty();
         }
 
         Vector3 GetScale() const
