@@ -1,3 +1,14 @@
+#include "Mesh-Input.include"
+
+// Per vertex data.
+/*struct Attributes
+{
+    float3 position : POSITION;
+    float3 normal : NORMAL;
+    float2 uv : UV;
+    float4 color : COLOR;
+};*/
+
 struct Vertex
 {
     float3 position;
@@ -19,28 +30,6 @@ cbuffer Constants
     ConstBufferPointer<Vertex> vertices;
 };
 
-struct AppData
-{
-    float Time;
-};
-
-struct SceneData
-{
-    float4 AmbientColor;
-
-    float4 SunlightDirection;
-    float4 SunlightColor;
-};
-
-// Per vertex data.
-/*struct Attributes
-{
-    float3 position : POSITION;
-    float3 normal : NORMAL;
-    float2 uv : UV;
-    float4 color : COLOR;
-};*/
-
 // Data passed from vertex to the next stage.
 struct Varyings
 {
@@ -48,13 +37,6 @@ struct Varyings
     float3 normal;
     float3 color;
     float2 uv;
-};
-
-// Per-material data.
-struct Material
-{
-    Texture2D texture;
-    SamplerState sampler;
 };
 
 ParameterBlock<AppData> appData;
