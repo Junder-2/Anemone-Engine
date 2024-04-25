@@ -12,9 +12,9 @@
 struct Vertex
 {
     float3 position;
-    float uv_x;
+    float uvX;
     float3 normal;
-    float uv_y;
+    float uvY;
     float4 color;
 };
 
@@ -22,8 +22,8 @@ struct Vertex
 [[vk::push_constant]]
 cbuffer Constants
 {
-    matrix<float, 4, 4> render_matrix;
-    matrix<float, 4, 4> model_matrix;
+    matrix<float, 4, 4> renderMatrix;
+    matrix<float, 4, 4> modelMatrix;
 
     // Similar to a GLSL buffer_reference.
     // Uses uint64 pointer manipulation to index, hence the GL_EXT_shader_explicit_arithmetic_types_int64 dependency.
@@ -49,10 +49,10 @@ Varyings vertexMain(uint vid : SV_VertexID)
     Varyings output;
 
     Vertex v = vertices[vid];
-    output.position = mul(render_matrix, float4(v.position, 1));
-    output.normal = mul(float3x3(model_matrix), v.normal);
+    output.position = mul(renderMatrix, float4(v.position, 1));
+    output.normal = mul(float3x3(modelMatrix), v.normal);
     output.color = 1;
-    output.uv = float2(v.uv_x, v.uv_y);
+    output.uv = float2(v.uvX, v.uvY);
 
     return output;
 }

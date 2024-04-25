@@ -15,9 +15,9 @@
 struct Vertex
 {
     float3 position;
-    float uv_x;
+    float uvX;
     float3 normal;
-    float uv_y;
+    float uvY;
     float4 color;
 };
 
@@ -26,10 +26,10 @@ struct Vertex
 cbuffer Constants
 {
     // Also known as the "Model, View, Projection" matrix,
-    matrix<float, 4, 4> render_matrix;
+    matrix<float, 4, 4> renderMatrix;
 
     // Also known as the "Local to World" or "Object" matrix.
-    matrix<float, 4, 4> model_matrix;
+    matrix<float, 4, 4> modelMatrix;
 
     // Similar to a GLSL buffer_reference.
     // Uses uint64 pointer manipulation to index, hence the GL_EXT_shader_explicit_arithmetic_types_int64 dependency.
@@ -61,11 +61,11 @@ Varyings vertexMain(uint vid : SV_VertexID)
     Vertex v = vertices[vid];
 
     // Transforms the local space vertex position to projection space.
-    output.position = mul(render_matrix, float4(v.position, 1));
+    output.position = mul(renderMatrix, float4(v.position, 1));
 
     // Transforms the local space vertex normal to world space.
     // We are ignoring the 4th row and column since we only need orientation.
-    output.normal = mul(float3x3(model_matrix), v.normal);
+    output.normal = mul(float3x3(modelMatrix), v.normal);
 
     return output;
 }
