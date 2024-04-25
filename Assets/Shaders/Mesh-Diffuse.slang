@@ -33,7 +33,7 @@ cbuffer Constants
 // Data passed from vertex to the next stage.
 struct Varyings
 {
-    float4 sv_position : SV_Position;
+    float4 position : SV_Position;
     float3 normal;
     float3 color;
     float2 uv;
@@ -49,7 +49,7 @@ Varyings vertexMain(uint vid : SV_VertexID)
     Varyings output;
 
     Vertex v = vertices[vid];
-    output.sv_position = mul(render_matrix, float4(v.position, 1));
+    output.position = mul(render_matrix, float4(v.position, 1));
     output.normal = mul(float3x3(model_matrix), v.normal);
     output.color = 1;
     output.uv = float2(v.uv_x, v.uv_y);

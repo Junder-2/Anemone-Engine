@@ -41,7 +41,7 @@ cbuffer Constants
 // https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-semantics
 struct Varyings
 {
-    float4 sv_position : SV_Position;
+    float4 position : SV_Position;
     float3 normal;
 };
 
@@ -61,7 +61,7 @@ Varyings vertexMain(uint vid : SV_VertexID)
     Vertex v = vertices[vid];
 
     // Transforms the local space vertex position to projection space.
-    output.sv_position = mul(render_matrix, float4(v.position, 1));
+    output.position = mul(render_matrix, float4(v.position, 1));
 
     // Transforms the local space vertex normal to world space.
     // We are ignoring the 4th row and column since we only need orientation.
