@@ -144,9 +144,9 @@ namespace Engine
         }
     }
 
-    void InputHandler::ProcessAbsoluteMouseMovement(Vector2 pos)
+    void InputHandler::ProcessAbsoluteMouseMovement(const Vector2 pos)
     {
-
+        _mouseInputAction.PopulateAbsoluteMove(pos);
     }
 
     void InputHandler::ProcessMouseMovement(const Vector2 pos, const Vector2 delta)
