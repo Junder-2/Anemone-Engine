@@ -3,6 +3,7 @@
 
 #include <reactphysics3d/mathematics/Quaternion.h>
 
+#include "Matrix3x3.h"
 #include "Vector4.h"
 #include "glm/detail/type_quat.hpp"
 #include "glm/gtc/quaternion.hpp"

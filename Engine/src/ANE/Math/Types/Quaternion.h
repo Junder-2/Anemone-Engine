@@ -1,8 +1,8 @@
-﻿#pragma once
-#include "Vector3.h"
-#include "Matrix3x3.h"
+﻿//Modified copy of reactphysics/include/reactphysics3d/mathematics/Quaternion.h
 
-//Modified copy of reactphysics/include/reactphysics3d/mathematics/Quaternion.h
+#pragma once
+
+#include "Vector3.h"
 
 namespace reactphysics3d
 {
@@ -11,6 +11,8 @@ namespace reactphysics3d
 
 namespace Engine
 {
+    struct Matrix3x3;
+
     struct Quaternion
     {
         Quaternion() : X(0), Y(0), Z(0), W(0) {}

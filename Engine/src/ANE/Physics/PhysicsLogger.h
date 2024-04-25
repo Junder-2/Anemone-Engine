@@ -23,6 +23,5 @@ namespace Engine
     #define ANE_PHYS_LOG_INFO(fileName, lineNumber, ...)
     #define ANE_PHYS_LOG_WARN(fileName, lineNumber, ...)
     #define ANE_PHYS_LOG_ERROR(fileName, lineNumber, ...)
-
     #endif
 }
