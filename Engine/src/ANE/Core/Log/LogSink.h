@@ -13,7 +13,7 @@ namespace Engine
     class LogSink final : public spdlog::sinks::base_sink<std::mutex>
     {
     public:
-        void BindSink(DelegateFree<void(const log_msg&)> delegateMember);
+        void BindSink(const Delegate<void(const log_msg&)>& delegate);
 
     private:
         void sink_it_(const log_msg &msg) override;
