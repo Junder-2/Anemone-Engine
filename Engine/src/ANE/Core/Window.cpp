@@ -8,6 +8,7 @@
 
 #include "Application.h"
 #include "ANE/Input/Input.h"
+#include "ANE/Input/InputHandler.h"
 #include "ANE/Utilities/InputUtilities.h"
 #include "Platform/Vulkan/VulkanRenderer.h"
 
@@ -22,6 +23,11 @@ namespace Engine
     Window::~Window()
     {
         Shutdown();
+    }
+
+    void Window::BindOnEvent(const Delegate<void(Event&)>& delegate)
+    {
+        _eventDelegate = delegate;
     }
 
     void Window::Init(const WindowProperties& props)

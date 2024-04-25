@@ -3,11 +3,12 @@
 #include <SDL_events.h>
 #include <SDL_video.h>
 
-#include "ANE/Delegate/Delegate.h"
-#include "ANE/Events/Event.h"
+#include "ANE/Math/Types/Vector2.h"
 
 namespace Engine
 {
+    class Event;
+
     struct ANE_API WindowProperties
     {
         std::string Title;
@@ -59,8 +60,7 @@ namespace Engine
         Window(const WindowProperties& props);
         ~Window();
 
-        template <class TClass>
-        void BindOnEvent(DelegateMember<TClass, void(Event&)> delegateMember);
+        void BindOnEvent(const Delegate<void(Event&)>& delegate);
 
         void OnUpdate(float deltaTime);
         void SetVSync(bool enabled);
@@ -113,10 +113,4 @@ namespace Engine
         bool _imGuiHasFocus = false;
         bool _windowHasFocus = false;
     };
-
-    template <class TClass>
-    void Window::BindOnEvent(DelegateMember<TClass, void(Event&)> delegateMember)
-    {
-        _eventDelegate = delegateMember;
-    }
 }

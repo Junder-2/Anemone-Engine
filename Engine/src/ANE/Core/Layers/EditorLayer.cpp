@@ -10,6 +10,7 @@
 //kind of thing
 #include "imgui_internal.h"
 #include "ANE/Core/Application.h"
+#include "ANE/Core/Window.h"
 #include "ANE/Core/Entity/ExampleScripts/CameraController.h"
 #include "ANE/Core/Scene/Components/CameraComponent.h"
 #include "ANE/Core/Scene/Components/ColliderComponent.h"

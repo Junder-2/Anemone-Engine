@@ -6,6 +6,7 @@
 
 #include "InputAction.h"
 #include "InputTypes.h"
+#include "ANE/Events/Event.h"
 
 namespace Engine
 {
@@ -38,6 +39,11 @@ namespace Engine
         }
 
         _keyboardInputActions.clear();
+    }
+
+    void InputHandler::BindOnEvent(const Delegate<void(Event&)>& delegate)
+    {
+        _eventDelegate = delegate;
     }
 
     void InputHandler::DispatchEvent(Event& e)
@@ -186,6 +192,11 @@ namespace Engine
         }
 
         return newArray;
+    }
+
+    MouseInputAction InputHandler::GetMouseInputData() const
+    {
+        return _mouseInputAction;
     }
 
     TriggerState InputHandler::GetKeyTriggerState(const int keyCode)
