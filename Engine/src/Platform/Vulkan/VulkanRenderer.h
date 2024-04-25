@@ -6,8 +6,10 @@
 
 #include "VmaTypes.h"
 #include "VulkanDeletionQueue.h"
+#include "VulkanDescriptors.h"
 #include "VulkanPipelineBuilder.h"
 #include "ANE/Math/Types/Matrix4x4.h"
+#include "ANE/Renderer/CommonSets.h"
 #include "ANE/Renderer/Draw.h"
 #include "ANE/Renderer/Mesh.h"
 
@@ -33,6 +35,12 @@ namespace Engine
 
         VkImageView BackbufferView;
         VkFramebuffer Framebuffer;
+
+        VulkanDeletionQueue DeletionQueue;
+
+        DescriptorAllocator Descriptors;
+        ApplicationData AppData;
+        SceneData SceneData;
     };
 
     struct VulkanImmediateBuffer
@@ -44,7 +52,8 @@ namespace Engine
 
     struct PushConstantBuffer
     {
-        glm::mat4 WorldMatrix;
+        Matrix4x4 MVPMatrix;
+        Matrix4x4 ModelMatrix;
         VkDeviceAddress VertexBuffer;
     };
 
@@ -96,8 +105,11 @@ namespace Engine
 
         static void SetupCommandBuffers();
         static void SetupSyncStructures();
+        static void SetupDescriptors();
 
         static PipelineWrapper CreatePipeline(const vkb::Device& logicalDevice);
+
+        static void CreateDefaultResources();
 
         static void CreateImGuiDescriptorPool();
 
@@ -108,7 +120,7 @@ namespace Engine
         static void CleanupVulkan();
         static void CleanupImGui();
 
-        static VulkanFrame GetFrame();
+        static VulkanFrame& GetFrame();
 
         // VMA
         // TODO: Isolate VMA code to separate file/class.
@@ -169,6 +181,10 @@ namespace Engine
         inline static VmaImage _colorImage;
         inline static VmaImage _depthImage;
 
+        inline static VkDescriptorSetLayout _geometryDataLayout;
+        inline static VkDescriptorSetLayout _appDataLayout;
+        inline static VkDescriptorSetLayout _singleImageDataLayout;
+
         // Swapchain
         inline static VkSwapchainKHR _swapchain;
         inline static VkFormat _swapchainImageFormat;
@@ -180,11 +196,21 @@ namespace Engine
         // VMA
         inline static VmaAllocator _vmaAllocator;
 
+        static constexpr int MAX_FRAMES_IN_FLIGHT = 3;
         inline static int _frameIndex = 0;
-        inline static VulkanFrame _frameData[3];
+        inline static VulkanFrame _frameData[MAX_FRAMES_IN_FLIGHT];
         inline static VulkanImmediateBuffer _immBuffer;
 
         inline static entt::dense_map<std::string, VmaMeshAsset> _loadedModelMap;
+
+        // Engine resources
+        inline static VmaImage _whiteImage;
+        inline static VmaImage _blackImage;
+        inline static VmaImage _greyImage;
+        inline static VmaImage _errorImage;
+
+        inline static VkSampler _samplerLinear;
+        inline static VkSampler _samplerNearest;
 
         // ImGui
         inline static ImGui_ImplVulkanH_Window _mainWindowData;

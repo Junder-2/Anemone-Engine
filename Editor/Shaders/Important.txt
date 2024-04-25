@@ -1,5 +1,0 @@
-Syntax highlighting for Visual Code:
-https://marketplace.visualstudio.com/items?itemName=shader-slang.slang-language-extension
-
-Underscores can't be used in .slang file names.
-Our current language format is HLSL.

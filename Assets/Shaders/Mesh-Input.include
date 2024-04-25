@@ -1,0 +1,21 @@
+// Uniform data across every shader drawn during a frame.
+struct AppData
+{
+    float Time;
+};
+
+// Per-scene data.
+struct SceneData
+{
+    float4 AmbientColor;
+
+    float4 SunlightDirection;
+    float4 SunlightColor;
+};
+
+// Per-material data.
+struct Material
+{
+    Texture2D texture;
+    SamplerState sampler;
+};
