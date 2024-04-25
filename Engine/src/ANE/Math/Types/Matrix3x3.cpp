@@ -25,10 +25,41 @@ namespace Engine
         return Convert(inverse(glm::mat3(*this)));
     }
 
-    void Matrix3x3::Rotate(const Quaternion quat)
+    void Matrix3x3::SetRotation(const Quaternion& quat)
+    {
+        const Vector3 scale = GetScale();
+
+        _columns[0] = Vector4(1, 0, 0, 0) * scale.X;
+        _columns[1] = Vector4(0, 1, 0, 0) * scale.Y;
+        _columns[2] = Vector4(0, 0, 1, 0) * scale.Z;
+        Rotate(quat);
+    }
+
+    void Matrix3x3::Rotate(const Quaternion& quat)
     {
         const Matrix3x3 rotMatrix = (quat).GetMatrix();
         *this *= rotMatrix;
+    }
+
+    Quaternion Matrix3x3::GetQuaternion() const
+    {
+        return Quaternion::Convert(quat_cast(glm::mat3(*this)));
+    }
+
+    void Matrix3x3::SetRotation(Vector3 euler, const bool isDegrees /*= false*/)
+    {
+        const Vector3 scale = GetScale();
+
+        _columns[0] = Vector4(1, 0, 0, 0) * scale.X;
+        _columns[1] = Vector4(0, 1, 0, 0) * scale.Y;
+        _columns[2] = Vector4(0, 0, 1, 0) * scale.Z;
+
+        if(isDegrees)
+        {
+            euler *= FMath::DEGREES_TO_RAD;
+        }
+
+        Rotate(Quaternion(euler));
     }
 
     void Matrix3x3::Rotate(float angle, const Vector3 axis, const bool isDegrees /*= false*/)
@@ -50,37 +81,6 @@ namespace Engine
         Rotate(FMath::WrapAngle(euler.Yaw), Vector3::UpVector(), isDegrees);
         Rotate(FMath::WrapAngle(euler.Pitch), Vector3::RightVector(), isDegrees);
         Rotate(FMath::WrapAngle(euler.Roll), Vector3::ForwardVector(), isDegrees);
-    }
-
-    void Matrix3x3::SetRotation(const Quaternion quat)
-    {
-        const Vector3 scale = GetScale();
-
-        _columns[0] = Vector4(1, 0, 0, 0) * scale.X;
-        _columns[1] = Vector4(0, 1, 0, 0) * scale.Y;
-        _columns[2] = Vector4(0, 0, 1, 0) * scale.Z;
-        Rotate(quat);
-    }
-
-    void Matrix3x3::SetRotation(Vector3 euler, const bool isDegrees /*= false*/)
-    {
-        const Vector3 scale = GetScale();
-
-        _columns[0] = Vector4(1, 0, 0, 0) * scale.X;
-        _columns[1] = Vector4(0, 1, 0, 0) * scale.Y;
-        _columns[2] = Vector4(0, 0, 1, 0) * scale.Z;
-
-        if(isDegrees)
-        {
-            euler *= FMath::DEGREES_TO_RAD;
-        }
-
-        Rotate(Quaternion(euler));
-    }
-
-    Quaternion Matrix3x3::GetQuaternion() const
-    {
-        return Quaternion::Convert(quat_cast(glm::mat3(*this)));
     }
 
     Vector3 Matrix3x3::GetEulerAngles(const bool isDegrees /*= false*/) const
