@@ -1,4 +1,5 @@
 #pragma once
+#include "ANE/Delegate/Delegate.h"
 
 namespace Engine
 {

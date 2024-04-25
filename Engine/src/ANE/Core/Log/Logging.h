@@ -7,16 +7,14 @@
 //solves warnings
 #pragma warning(push, 0)
 #include <spdlog/spdlog.h>
-
-#include "LogFileWriter.h"
 #include "LoggingTypes.h"
-#include "LogSink.h"
 #pragma warning(pop)
 
 //todo: write a custom sink for logfilewriter so that you can get a full stacktrace
 
 namespace Engine
 {
+    class LogFileWriter;
     using log_msg = spdlog::details::log_msg;
 
     class ANE_API Logging
@@ -61,7 +59,7 @@ namespace Engine
     private:
         inline static std::list<LogMessage> _logMessages{100};
         inline static std::vector<std::string> _registeredLoggers {};
-        inline static LogFileWriter _writer;
+        static LogFileWriter _writer;
     };
 }
 

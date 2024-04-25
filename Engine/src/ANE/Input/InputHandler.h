@@ -5,6 +5,7 @@
 
 #include "InputTypes.h"
 #include "MouseInputAction.h"
+#include "ANE/Delegate/Delegate.h"
 
 namespace Engine
 {

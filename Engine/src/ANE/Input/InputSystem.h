@@ -1,5 +1,6 @@
 #pragma once
 #include "InputTypes.h"
+#include "ANE/Delegate/Delegate.h"
 #include "ANE/Subsystem/SubSystem.h"
 
 namespace Engine

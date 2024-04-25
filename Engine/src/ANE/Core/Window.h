@@ -4,6 +4,7 @@
 #include <SDL_video.h>
 
 #include "ANE/Math/Types/Vector2.h"
+#include "ANE/Delegate/Delegate.h"
 
 namespace Engine
 {
