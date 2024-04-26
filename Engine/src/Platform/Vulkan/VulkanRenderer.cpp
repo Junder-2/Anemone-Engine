@@ -47,6 +47,14 @@ namespace Engine
 
         SetupVulkan(_window);
         SetupImGui(_window);
+
+        // TODO: Make less functions static so we can move this to a more appropriate location.
+        _filamentMaterial.BuildPipelines(this);
+        _mainDeletionQueue.PushFunction([&]
+        {
+            _filamentMaterial.ClearResources(this);
+        });
+
         _initialized = true;
     }
 
