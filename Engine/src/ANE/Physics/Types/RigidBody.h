@@ -26,9 +26,19 @@ namespace Engine
         void SetPosition(Vector3 position) const;
 
         /**
+         * Returns the position of the rigidbody
+         */
+        Vector3 GetPosition() const;
+
+        /**
          * Sets the rotation of the rigidbody
          */
         void SetRotation(const Quaternion& rotation) const;
+
+        /**
+         * Returns the rotation of the rigidbody
+         */
+        Quaternion GetRotation() const;
 
         /**
          * Sets the linear velocity of the rigidbody
