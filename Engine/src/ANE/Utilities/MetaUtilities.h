@@ -50,7 +50,7 @@ namespace Engine
     inline void inspect_collider_shape_type(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<CollisionShapeType>();
-        ImGui::Text("%d",(CollisionShapeType)v);
+        ImGui::Text("%f",(CollisionShapeType)v);
 
         //ImGui::Text("%d",v);
     }
@@ -58,7 +58,7 @@ namespace Engine
     {
         auto v = field.get(component_data).cast<float>();
         ImGui::DragFloat(field.prop("display_name"_hs).value().cast<char const*>(),&v,0.1f);
-
+        field.set(component_data,v);
         //ImGui::Text("%d",v);
     }
     inline void inspect_mesh_asset(entt::meta_data& field, entt::meta_any& component_data)
