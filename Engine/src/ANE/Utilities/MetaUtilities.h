@@ -38,7 +38,7 @@ namespace Engine
         }
         if (ImGui::DragFloat3(field.prop("Scale"_hs).value().cast<char const*>(), &scale.X, 0.1f))
         {
-            // v.SetScale(scale);
+            v.SetScale(scale);
         }
         field.set(component_data,v);
     }

@@ -42,11 +42,9 @@ namespace Engine
         static void RegisterComponentMetaData()
         {
             entt::meta<CameraComponent>()
-            .data<&CameraComponent::_zNear>("float"_hs).prop("display_name"_hs, "Z-Near");
-
-
-                /*.data<&CameraComponent::_fieldOfView>("FieldOfView"_hs).prop("display_name"_hs, "Field Of View")
-            .data<&CameraComponent::Transform>("Transform"_hs).prop("display_name"_hs, "Transform");
+            .data<&CameraComponent::_zNear>("float"_hs).prop("display_name"_hs, "Z-Near"),
+            .data<&CameraComponent::_fieldOfView>("FieldOfView"_hs).prop("display_name"_hs, "Field Of View")
+            .data<&CameraComponent::Transform>("Transform Matrix"_hs).prop("display_name"_hs, "Transform");
                 .data<&CameraComponent::ViewPos>("ViewPos"_hs).prop("display_name"_hs, "View Position");
 */
         }
