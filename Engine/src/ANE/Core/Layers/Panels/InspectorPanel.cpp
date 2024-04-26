@@ -74,6 +74,7 @@ namespace Engine
                     if (type)
                     {
                         auto componentData = type.from_void(snd.value(selectedEntity));
+
                         const std::string componentType{type.info().name()};
                         std::string fullString = TypePrefixRemoval(componentType);
                         ImGui::Text(fullString.c_str(), ImGuiTreeNodeFlags_DefaultOpen);
@@ -85,7 +86,11 @@ namespace Engine
                             auto itr = g_data_inspectors.find(field.type().info().hash());
                             if (itr != g_data_inspectors.end())
                             {
-                                itr->second(field, componentData);
+                                if(itr->second(field, componentData))
+
+                                {
+                                    ANE_ELOG("OnValidate should occur here");
+                                }
                             }
                             else
                             {

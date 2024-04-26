@@ -3,23 +3,29 @@
 #include "imgui.h"
 #include "ANE/Core/Scene/Components/Components.h"
 #include "ANE/Math/Types/TransformMatrix.h"
+#include "ANE/Math/Types/Vector2.h"
 
 #include "ANE/Math/Types/Vector3.h"
+#include "ANE/Math/Types/Vector4.h"
 
 
 namespace Engine
 {
     using namespace entt::literals;
 
-    inline void inspect_string_field(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool inspect_string_field(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<std::string>();
         char buffer[256] = {};
         const auto error = strcpy_s(buffer, sizeof(buffer), v.c_str());
-        ImGui::InputText(field.prop("display_name"_hs).value().cast<const char*>(),buffer,sizeof(buffer));
-        field.set(component_data,std::string(buffer));
+        if(ImGui::InputText(field.prop("display_name"_hs).value().cast<const char*>(),buffer,sizeof(buffer)))
+        {
+            return field.set(component_data,std::string(buffer));
+
+        }
+        return false;
     }
-    inline void inspect_transform_matrix(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool inspect_transform_matrix(entt::meta_data& field, entt::meta_any& component_data)
     {
 
         TransformMatrix newMatrix;
@@ -31,58 +37,85 @@ namespace Engine
         if (ImGui::DragFloat3(field.prop("Position"_hs).value().cast<char const*>(), &position.X, 0.1f))
         {
             v.SetPosition(position);
+            return field.set(component_data,v);
+
         }
         if (ImGui::DragFloat3(field.prop("Rotation"_hs).value().cast<char const*>(), &rotation.X, 0.1f))
         {
             v.SetRotation(rotation,true);
+            return field.set(component_data,v);
+
         }
         if (ImGui::DragFloat3(field.prop("Scale"_hs).value().cast<char const*>(), &scale.X, 0.1f))
         {
             v.SetScale(scale);
+            return field.set(component_data,v);
+
         }
-        field.set(component_data,v);
+        return false;
     }
-    inline void inspect_collider(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool inspect_collider(entt::meta_data& field, entt::meta_any& component_data)
     {
         //auto v = field.get(component_data).cast<rp3d::Collider>();
         ImGui::Text("%s","Collider");
+        return false;
+
     }
-    inline void inspect_collider_shape_type(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool inspect_collider_shape_type(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<CollisionShapeType>();
         ImGui::Text("%f",(CollisionShapeType)v);
-
+        return false;
         //ImGui::Text("%d",v);
     }
-    inline void inspect_float(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool inspect_float(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<float>();
-        ImGui::DragFloat(field.prop("display_name"_hs).value().cast<char const*>(),&v,0.1f);
-        field.set(component_data,v);
+        if(ImGui::DragFloat(field.prop("display_name"_hs).value().cast<char const*>(),&v,0.1f))
+        {
+            return field.set(component_data,v); //insufficient for dirty flag!!!
+
+        }
+        return false;
         //ImGui::Text("%d",v);
     }
-    inline void inspect_mesh_asset(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool inspect_mesh_asset(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<VmaMeshAsset>();
         ImGui::Text("%s", v.Name.c_str());
+        return false;
     }
-    inline void inspect_vector3_field(entt::meta_data& field, entt::meta_any& component_data)
+
+    inline bool inspect_vector2_field(entt::meta_data& field, entt::meta_any& component_data)
     {
-        auto v = field.get(component_data).cast<std::string>();
-        char buffer[256] = {};
-        const auto error = strcpy_s(buffer, sizeof(buffer), v.c_str());
-        ImGui::InputText(field.prop("display_name"_hs).value().cast<const char*>(),buffer,sizeof(buffer));
-        field.set(component_data,std::string(buffer));
+        auto v = field.get(component_data).cast<Vector2>();
+        if (ImGui::DragFloat2(field.prop("display_name"_hs).value().cast<char const*>(), &v.X, 0.1f))
+        {
+            return field.set(component_data, v);
+        }
+        return false;
     }
-    inline void inspect_vector2_field(entt::meta_data& field, entt::meta_any& component_data)
+
+    inline bool inspect_vector3_field(entt::meta_data& field, entt::meta_any& component_data)
     {
-        auto v = field.get(component_data).cast<std::string>();
-        char buffer[256] = {};
-        const auto error = strcpy_s(buffer, sizeof(buffer), v.c_str());
-        ImGui::InputText(field.prop("display_name"_hs).value().cast<const char*>(),buffer,sizeof(buffer));
-        field.set(component_data,std::string(buffer));
+        auto v = field.get(component_data).cast<Vector3>();
+        if (ImGui::DragFloat3(field.prop("display_name"_hs).value().cast<char const*>(), &v.X, 0.1f))
+        {
+            return field.set(component_data, v);
+        }
+        return false;
     }
-    using FieldInspectorFn = void (*)(entt::meta_data& field, entt::meta_any& component_data);
+    inline bool inspect_vector4_field(entt::meta_data& field, entt::meta_any& component_data)
+    {
+        auto v = field.get(component_data).cast<Vector4>();
+        if (ImGui::DragFloat4(field.prop("display_name"_hs).value().cast<char const*>(), &v.X, 0.1f))
+        {
+            return field.set(component_data, v);
+        }
+        return false;
+    }
+
+    using FieldInspectorFn = bool (*)(entt::meta_data& field, entt::meta_any& component_data);
 
     inline static std::unordered_map<entt::id_type, FieldInspectorFn> g_data_inspectors
     {
@@ -91,7 +124,10 @@ namespace Engine
           {entt::type_id<rp3d::Collider>().hash(), inspect_collider},
         {entt::type_id<CollisionShapeType>().hash(), inspect_collider_shape_type},
         {entt::type_id<VmaMeshAsset>().hash(), inspect_mesh_asset},
-        {entt::type_id<float>().hash(), inspect_float}
+        {entt::type_id<float>().hash(), inspect_float},
+        {entt::type_id<Vector2>().hash(), inspect_vector2_field},
+        {entt::type_id<Vector3>().hash(), inspect_vector3_field},
+        {entt::type_id<Vector4>().hash(), inspect_vector4_field}
     };
 
 
