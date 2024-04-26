@@ -6,6 +6,38 @@
 namespace Engine::FMath
 {
     /**
+     * Rounds value to closest integer
+     */
+    inline float Round(const float x)
+    {
+        return glm::round(x);
+    }
+
+    /**
+     * Rounds value to closest low integer
+     */
+    inline float Floor(const float x)
+    {
+        return glm::floor(x);
+    }
+
+    /**
+     * Rounds value to closest high integer
+     */
+    inline float Ceil(const float x)
+    {
+        return glm::ceil(x);
+    }
+
+    /**
+     * Snaps value
+     */
+    inline float Snap(const float x, const float scale)
+    {
+        return Floor(x * scale) / scale;
+    }
+
+    /**
      * Wraps an angle in radians from 0 to 2pi
      */
     inline float WrapAngle(const float radians)
