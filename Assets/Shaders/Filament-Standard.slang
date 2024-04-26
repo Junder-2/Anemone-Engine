@@ -71,8 +71,12 @@ float4 fragmentMain(Varyings input) : SV_TARGET
     float3 normal = normalize(input.normal);
     float2 uv = input.uv;
 
-    float4 color = props.ColorMap.T.Sample(props.ColorMap.S, uv) * float4(input.color, 1);
+    float4 colorMap = texture(props.ColorMap, uv);
+    float3 normalMap = texture(props.NormalMap, uv).rgb;
+    float3 ormMap = texture(props.ORMMap, uv).rgb;
 
+    float4 color = colorMap * float4(input.color, 1);
+    
     float nDotL = saturate(dot(normal, -sceneData.SunlightDirection.rgb));
     color.rgb *= nDotL * sceneData.SunlightColor.rgb;
     color.rgb += sceneData.AmbientColor.rgb;
