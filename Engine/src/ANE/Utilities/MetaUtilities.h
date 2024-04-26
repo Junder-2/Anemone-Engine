@@ -34,25 +34,29 @@ namespace Engine
         Vector3 scale = v.GetScale();
         Vector3 rotation = v.GetEulerAngles(true);
         ImGui::Text("%s",field.prop("display_name"_hs).value().cast<const char*>());
+        bool propertyWritten = false;
         if (ImGui::DragFloat3(field.prop("Position"_hs).value().cast<char const*>(), &position.X, 0.1f))
         {
             v.SetPosition(position);
-            return field.set(component_data,v);
+            propertyWritten = true;
+            field.set(component_data,v);
 
         }
         if (ImGui::DragFloat3(field.prop("Rotation"_hs).value().cast<char const*>(), &rotation.X, 0.1f))
         {
             v.SetRotation(rotation,true);
-            return field.set(component_data,v);
+            propertyWritten = true;
+            field.set(component_data,v);
 
         }
         if (ImGui::DragFloat3(field.prop("Scale"_hs).value().cast<char const*>(), &scale.X, 0.1f))
         {
             v.SetScale(scale);
-            return field.set(component_data,v);
+            propertyWritten = true;
+            field.set(component_data,v);
 
         }
-        return false;
+        return propertyWritten;
     }
     inline bool inspect_collider(entt::meta_data& field, entt::meta_any& component_data)
     {
