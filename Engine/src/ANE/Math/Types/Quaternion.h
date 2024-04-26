@@ -41,6 +41,7 @@ namespace Engine
 
         void Inverse();
 
+        Quaternion GetNormalized() const;
         Quaternion GetConjugate() const;
         Quaternion GetInverse() const;
 
@@ -162,6 +163,16 @@ namespace Engine
         Y /= l;
         Z /= l;
         W /= l;
+    }
+
+    inline Quaternion Quaternion::GetNormalized() const
+    {
+        const float l = Length();
+
+        // Check if the length is not equal to zero
+        ANE_EASSERT(l > FMath::EPSILON);
+
+        return {X/l, Y/l, Z/l, W/l};
     }
 
     inline void Quaternion::Inverse()
