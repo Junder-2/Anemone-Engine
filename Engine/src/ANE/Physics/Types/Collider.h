@@ -37,6 +37,16 @@ namespace Engine
         Quaternion GetRotation() const;
 
         /**
+         * Sets the local space rotation of the collider
+         */
+        void SetRotation(const Vector3& rotation, bool inDegrees = false) const;
+
+        /**
+         * Returns the local space rotation of the collider
+         */
+        Vector3 GetEulerAngles(bool inDegrees = false) const;
+
+        /**
          * Sets the mask of what this collider should be able to collide with
          */
         void SetCollisionMask(uint16_t collisionMask) const;
@@ -82,6 +92,9 @@ namespace Engine
         {
             return *_reactCollider;
         }
+
+    protected:
+        void WakeBody() const;
 
     protected:
         rp3d::Collider* _reactCollider;

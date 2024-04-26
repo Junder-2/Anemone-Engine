@@ -8,12 +8,13 @@ namespace Engine
 {
     void Collider::SetTransform(const Vector3 position, const Quaternion& rotation) const
     {
+        WakeBody();
         _reactCollider->setLocalToBodyTransform(rp3d::Transform(position, rotation));
     }
 
     void Collider::SetPosition(const Vector3 position) const
     {
-        _reactCollider->setLocalToBodyTransform(rp3d::Transform(position, _reactCollider->getLocalToBodyTransform().getOrientation()));
+        SetTransform(position, Quaternion::Convert(_reactCollider->getLocalToBodyTransform().getOrientation()));
     }
 
     Vector3 Collider::GetPosition() const
@@ -23,12 +24,22 @@ namespace Engine
 
     void Collider::SetRotation(const Quaternion& rotation) const
     {
-        _reactCollider->setLocalToBodyTransform(rp3d::Transform(_reactCollider->getLocalToBodyTransform().getPosition(), rotation));
+        SetTransform(Vector3::Convert(_reactCollider->getLocalToBodyTransform().getPosition()), rotation);
     }
 
     Quaternion Collider::GetRotation() const
     {
         return Quaternion::Convert(_reactCollider->getLocalToBodyTransform().getOrientation());
+    }
+
+    void Collider::SetRotation(const Vector3& rotation, const bool inDegrees /*= false*/) const
+    {
+        SetTransform(Vector3::Convert(_reactCollider->getLocalToBodyTransform().getPosition()), Quaternion::FromEulerAngles(rotation, inDegrees));
+    }
+
+    Vector3 Collider::GetEulerAngles(const bool inDegrees /*= false*/) const
+    {
+        return Quaternion::Convert(_reactCollider->getLocalToBodyTransform().getOrientation()).GetEulerAngles(inDegrees);
     }
 
     void Collider::SetCollisionMask(const uint16_t collisionMask) const
@@ -74,6 +85,14 @@ namespace Engine
     CollisionShapeType Collider::GetShapeType() const
     {
         return _shapeType;
+    }
+
+    void Collider::WakeBody() const
+    {
+        if(const auto rigidbody = dynamic_cast<rp3d::RigidBody*>(_reactCollider->getBody()))
+        {
+            rigidbody->setIsSleeping(false);
+        }
     }
 }
 

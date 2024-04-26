@@ -9,6 +9,7 @@ namespace Engine
 
     void SphereCollider::SetRadius(const float radius) const
     {
+        WakeBody();
         dynamic_cast<reactphysics3d::SphereShape*>(_reactCollider->getCollisionShape())->setRadius(radius);
     }
 
