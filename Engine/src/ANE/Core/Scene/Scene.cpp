@@ -213,30 +213,4 @@ namespace Engine
         //     Renderer::SubmitDrawCommand(draw);
         // }
     }
-
-    /**
-     * \brief Creates a Entity in the scene, adds a Transform and Tag
-     * \param name Name of Entity, if no name is given it will be tagged with: "Untagged"
-     * \return reference of the newly created Entity.
-     */
-    [[nodiscard("Entity never used")]] Entity Scene::Create(const char* name)
-    {
-        Entity ent{this, name};
-        //_entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent;// here
-        return ent;
-    }
-    [[nodiscard("Entity never used")]] Entity Scene::Create(std::string stringName)
-    {
-
-        Entity ent{this, stringName.c_str()};
-        //_entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent;
-        return ent;
-    }
-
-    Entity Scene::GetEntityWithUUID(std::string UUID)
-    {
-        //return _entityMap[UUID];
-        return {};
-    }
-
 }

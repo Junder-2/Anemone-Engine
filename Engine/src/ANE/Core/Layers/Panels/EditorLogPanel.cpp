@@ -3,8 +3,8 @@
 
 #include <ranges>
 #include "imgui.h"
-#include "ANE/Core/Layers/EditorLayer.h"
 #include "ANE/Utilities/LoggingUtilities.h"
+#include "ANE/Core/Layers/EditorLayer.h"
 
 namespace Engine
 {
@@ -13,7 +13,7 @@ namespace Engine
     const ImVec4 EditorLogPanel::colorWarn {0.8f, 0.8f, 0.f, 1.f};
     const ImVec4 EditorLogPanel::colorError {1.0f, 0.1f, 0.1f, 1.f};
 
-    EditorLogPanel::EditorLogPanel(EditorLayer* layer) : _editorLayer(layer)
+    EditorLogPanel::EditorLogPanel(EditorLayer* layer)
     {
         _levelFilter = (int)LogLevelCategory::LevelError | (int)LogLevelCategory::LevelWarn | (int)LogLevelCategory::LevelInfo
                             | (int)LogLevelCategory::LevelDebug | (int)LogLevelCategory::LevelTrace;
@@ -60,7 +60,7 @@ namespace Engine
         }
         ImGui::EndChild();
 
-        //if (!open) _editorLayer->DetachUIPanel(this);
+        if (!open) _editorLayer->DetachUIPanel(this);
 
         ImGui::End();
     }

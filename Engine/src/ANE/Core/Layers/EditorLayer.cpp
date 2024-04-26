@@ -133,7 +133,7 @@ namespace Engine
         AddScene<Scene>("Game");
 
         //Create a Entity
-        Entity ent = GetActiveScene()->Create("Square Entity");
+        Entity ent = Create("Square Entity");
         std::stringstream oss;
 
         for(int i = 0; i < numEntitiesToTest;i++ )
@@ -143,7 +143,7 @@ namespace Engine
             std::string string = "Entity";
             string.append(std::to_string(i));
             string.append("\n");
-            GetActiveScene()->Create(string);
+            Create(string);
         }
         //Add component to entity
         //ent.AddComponent<RenderComponent>();
@@ -163,7 +163,7 @@ namespace Engine
 
     void EditorLayer::CreateFloor()
     {
-        Entity floor = GetActiveScene()->Create("Floor");
+        Entity floor = Create("Floor");
         TransformMatrix& transformMatrix = floor.GetComponent<TransformComponent>().Transform;
         transformMatrix.SetPosition(Vector3(0, -5.f, 0));
         transformMatrix.Scale(Vector3(10.f));
@@ -238,5 +238,30 @@ namespace Engine
     std::enable_if_t<std::is_base_of_v<UILayerPanel, TValue>> EditorLayer::AddPanel(Args&&... args)
     {
         Layer::AttachUIPanel(new TValue(std::forward<Args>(args)...));
+    }
+
+    /**
+    * \brief Creates a Entity in the scene, adds a Transform and Tag
+    * \param name Name of Entity, if no name is given it will be tagged with: "Untagged"
+    * \return reference of the newly created Entity.
+    */
+    [[nodiscard("Entity never used")]] Entity EditorLayer::Create(const char* name)
+    {
+        Entity ent{GetActiveScene().get(), name};
+        _entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent;// here
+        return ent;
+    }
+    [[nodiscard("Entity never used")]] Entity EditorLayer::Create(std::string stringName)
+    {
+
+        Entity ent{GetActiveScene().get(), stringName.c_str()};
+        _entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent;
+        return ent;
+    }
+
+    Entity EditorLayer::GetEntityWithUUID(std::string UUID)
+    {
+        return _entityMap[UUID];
+        return {};
     }
 }

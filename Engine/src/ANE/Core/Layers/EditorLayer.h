@@ -1,7 +1,8 @@
 ﻿#pragma once
 #include "Layer.h"
 #include "entt.hpp"
-#include "../Scene/Scene.h"
+#include "ANE/Core/Entity/Entity.h"
+#include "ANE/Core/Scene/Scene.h"
 
 namespace Engine
 {
@@ -50,7 +51,13 @@ namespace Engine
 
         std::shared_ptr<Scene> GetActiveScene() { return _activeScene; }
 
+        Entity Create(const char* name = "Untagged");
+        Entity Create(std::string = "Untagged");
+        Entity GetEntityWithUUID(std::string UUID);
+
     private:
+        std::map<std::string, Entity> _entityMap;
+
         void CreateTestScene(int numEntitiesToTest);
         void CreateFloor();
 

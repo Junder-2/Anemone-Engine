@@ -7,7 +7,6 @@
 
 namespace Engine
 {
-
     class EditorLayer;
 
     class EditorLogPanel : public UILayerPanel
