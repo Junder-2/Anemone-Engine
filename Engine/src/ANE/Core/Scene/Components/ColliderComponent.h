@@ -39,7 +39,14 @@ namespace Engine
         {
             return _collider;
         }
+        static void RegisterComponentMetaData()
+        {
+            entt::meta<ColliderComponent>()
+                .data<&ColliderComponent::_collider>("Collider"_hs).prop("display_name"_hs, "Collider")
+                .data<&ColliderComponent::_shapeType>("ColliderShapeType"_hs).prop("display_name"_hs, "Collider Shape Type");
 
+
+        }
     private:
         CollisionShapeType _shapeType;
         rp3d::Collider* _collider;

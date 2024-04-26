@@ -45,7 +45,9 @@ namespace Engine
     void EditorLayer::OnAttach()
     {
         // You would have a "Read from config files to find correct panel layout" method here
-
+        TagComponent::RegisterComponentMetaData();
+        TransformComponent::RegisterComponentMetaData();
+        ColliderComponent::RegisterComponentMetaData();
         CreateTestScene(50);
         AttachUIPanel(new SceneHierarchyPanel(this));
         AttachUIPanel(new InspectorPanel(this));

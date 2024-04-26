@@ -28,6 +28,7 @@ namespace Engine
          * Adds a positional offset to the Transform
          * @param delta World space offset
          */
+
         void AddPosition(const Vector3 delta)
         {
             _localToWorld.AddPosition(delta);
