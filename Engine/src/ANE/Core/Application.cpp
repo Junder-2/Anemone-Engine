@@ -6,6 +6,7 @@
 #include <SDL_timer.h>
 
 #include "Window.h"
+#include "ANE/Events/Event.h"
 #include "ANE/Events/EventHandler.h"
 #include "ANE/Subsystem/SubSystemCollection.h"
 #include "ANE/Input/InputHandler.h"
@@ -32,6 +33,7 @@ namespace Engine
     void Application::Init()
     {
         ANE_PROFILE_FUNCTION();
+
         _window = Window::Create(WindowProperties(_appSpec.Name));
         _window->BindOnEvent(MakeDelegate(this, &Application::OnEvent));
 
@@ -42,8 +44,8 @@ namespace Engine
 
         _subsystemCollection = SubSystemCollection::Create();
 
-        _ImGuiLayer = ImGuiLayer::Create("ImGuiLayer");
-        PushLayer(_ImGuiLayer);
+        _imGuiLayer = ImGuiLayer::Create("ImGuiLayer");
+        PushLayer(_imGuiLayer);
     }
 
     void Application::Run()
@@ -85,6 +87,8 @@ namespace Engine
 
     void Application::OnEvent(Event& e)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         EventHandler::PushEvent(&e);
 
         if(e.HasCategory(EventCategoryWindow))

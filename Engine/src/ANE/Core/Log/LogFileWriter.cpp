@@ -17,17 +17,17 @@ namespace Engine
         return fileCount;
     }
 
-
     void LogFileWriter::GetOldestFile(std::filesystem::path& oldestFile) const
     {
         std::filesystem::file_time_type oldestTime = std::filesystem::file_time_type::max();
-        for (const auto& entry : std::filesystem::directory_iterator(_path)) {
-            if (is_regular_file(entry)) {
-                if (auto lastWriteTime = last_write_time(entry); lastWriteTime < oldestTime) {
-                    oldestTime = lastWriteTime;
-                    oldestFile = entry.path();
-                }
-            }
+        for (const auto& entry : std::filesystem::directory_iterator(_path))
+        {
+            if (!is_regular_file(entry)) continue;
+            auto lastWriteTime = last_write_time(entry);
+            if ( lastWriteTime >= oldestTime) continue;
+
+            oldestTime = lastWriteTime;
+            oldestFile = entry.path();
         }
     }
 

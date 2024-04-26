@@ -26,9 +26,19 @@ namespace Engine
         void SetPosition(Vector3 position) const;
 
         /**
+         * Returns the position of the rigidbody
+         */
+        Vector3 GetPosition() const;
+
+        /**
          * Sets the rotation of the rigidbody
          */
         void SetRotation(const Quaternion& rotation) const;
+
+        /**
+         * Returns the rotation of the rigidbody
+         */
+        Quaternion GetRotation() const;
 
         /**
          * Sets the linear velocity of the rigidbody
@@ -116,9 +126,19 @@ namespace Engine
         void SetActive(bool enable) const;
 
         /**
-         * returns the active state of the rigidbody
+         * Returns the active state of the rigidbody
          */
         bool IsActive() const;
+
+        /**
+         * Sets the sleeping state of the rigidbody
+         */
+        void SetSleeping(bool enable) const;
+
+        /**
+         * Returns the sleeping state of the rigidbody
+         */
+        bool IsSleeping() const;
 
         /**
          * Destroys the rigidbody and any connected joints

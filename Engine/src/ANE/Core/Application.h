@@ -40,7 +40,7 @@ namespace Engine
 
         Window& GetWindow() const { return *_window; }
         InputHandler& GetInputHandler() const { return *_inputHandler; }
-        ImGuiLayer& GetImGuiLayer() const { return *_ImGuiLayer; }
+        ImGuiLayer& GetImGuiLayer() const { return *_imGuiLayer; }
         SubSystemCollection& GetSubsystemCollection() const { return *_subsystemCollection; }
 
         static Application& Get() { return *_appInstance; }
@@ -72,7 +72,7 @@ namespace Engine
 
         uint64_t _lastTimeStamp;
         LayerStack _layerStack;
-        ImGuiLayer* _ImGuiLayer;
+        ImGuiLayer* _imGuiLayer;
     };
 
     Application* CreateApplication();

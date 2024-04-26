@@ -1,11 +1,12 @@
 ﻿#pragma once
 #include "ANE/Core/Entity/ScriptableEntity.h"
-#include "ANE/Core/Scene/Components/CameraComponent.h"
-#include "ANE/Input/Input.h"
-#include "ANE/Utilities/InputUtilities.h"
 
 namespace Engine
 {
+    struct MouseMoveValue;
+    struct InputValue;
+    struct CameraComponent;
+
     class CameraController : public ScriptableEntity
     {
     public:
@@ -34,14 +35,9 @@ namespace Engine
 
         void OnSpeedup(InputValue inputValue);
 
-        void OnKeyTest(InputValue inputValue)
-        {
-            ANE_LOG_INFO("Testing Button device({0}) id({1}): {2}", InputUtilities::ToString(inputValue.GetDeviceType()), inputValue.GetBindingId(), InputUtilities::ToString(inputValue.GetTriggerState()));
-        }
-
         void OnEditorEvent(Event& event);
 
-        Matrix4x4 ComputeViewProjMatrix(CameraComponent camera);
+        Matrix4x4 ComputeViewProjMatrix(const CameraComponent& camera);
 
     private:
         TransformComponent* _transformComponent {};

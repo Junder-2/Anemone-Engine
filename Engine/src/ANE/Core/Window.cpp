@@ -7,6 +7,7 @@
 #include <VkBootstrap.h>
 
 #include "Application.h"
+#include "ANE/Events/WindowEvent.h"
 #include "ANE/Input/Input.h"
 #include "ANE/Input/InputHandler.h"
 #include "ANE/Utilities/InputUtilities.h"
@@ -252,6 +253,8 @@ namespace Engine
 
     void Window::ProcessViewportEvents(const ViewportProperties& previousProps)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         const ViewportProperties newViewportProps = GetActiveViewportProperties();
         if(newViewportProps.Width != previousProps.Width || newViewportProps.Height != previousProps.Height)
         {

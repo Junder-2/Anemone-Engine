@@ -23,6 +23,47 @@ namespace Engine
         return Convert(inverse(glm::mat4(*this)));
     }
 
+    void Matrix4x4::SetRotation(const Quaternion& quat)
+    {
+        const Vector3 scale = GetScale();
+
+        _columns[0] = Vector4(1, 0, 0, 0);
+        _columns[1] = Vector4(0, 1, 0, 0);
+        _columns[2] = Vector4(0, 0, 1, 0);
+        Rotate(quat);
+        Scale(scale);
+    }
+
+    void Matrix4x4::Rotate(const Quaternion& quat)
+    {
+        Matrix4x4 rotMatrix = (quat).GetMatrix();
+        rotMatrix[3][3] = 1;
+
+        *this *= rotMatrix;
+    }
+
+    Quaternion Matrix4x4::GetQuaternion() const
+    {
+        return Quaternion::Convert(quat_cast(glm::mat4(*this)));
+    }
+
+    void Matrix4x4::SetRotation(Vector3 euler, const bool isDegrees /*= false*/)
+    {
+        const Vector3 scale = GetScale();
+
+        _columns[0] = Vector4(1, 0, 0, 0);
+        _columns[1] = Vector4(0, 1, 0, 0);
+        _columns[2] = Vector4(0, 0, 1, 0);
+
+        if(isDegrees)
+        {
+            euler *= FMath::DEGREES_TO_RAD;
+        }
+
+        Rotate(euler, false);
+        Scale(scale);
+    }
+
     void Matrix4x4::Rotate(float angle, const Vector3 axis, const bool isDegrees /*= false*/)
     {
         if(isDegrees)
@@ -37,53 +78,14 @@ namespace Engine
         _columns[2] = Vector4::Convert(newMatrix[2]);
     }
 
-    void Matrix4x4::Rotate(const Quaternion quat)
-    {
-        Matrix4x4 rotMatrix = (quat).GetMatrix();
-        rotMatrix[3][3] = 1;
-
-        *this *= rotMatrix;
-    }
-
     void Matrix4x4::Rotate(const Vector3 euler, const bool isDegrees /*= false*/)
     {
-        Rotate(FMath::WrapAngle(euler.Yaw), Vector3::UpVector(), isDegrees);
-        Rotate(FMath::WrapAngle(euler.Pitch), Vector3::RightVector(), isDegrees);
-        Rotate(FMath::WrapAngle(euler.Roll), Vector3::ForwardVector(), isDegrees);
+        Rotate(euler.Yaw, Vector3::UpVector(), isDegrees);
+        Rotate(euler.Pitch, Vector3::RightVector(), isDegrees);
+        Rotate(euler.Roll, Vector3::ForwardVector(), isDegrees);
     }
 
-    void Matrix4x4::SetRotation(const Quaternion quat)
-    {
-        const Vector3 scale = GetScale();
-
-        _columns[0] = Vector4(1, 0, 0, 0) * scale.X;
-        _columns[1] = Vector4(0, 1, 0, 0) * scale.Y;
-        _columns[2] = Vector4(0, 0, 1, 0) * scale.Z;
-        Rotate(quat);
-    }
-
-    void Matrix4x4::SetRotation(Vector3 euler, const bool isDegrees /*= false*/)
-    {
-        const Vector3 scale = GetScale();
-
-        _columns[0] = Vector4(1, 0, 0, 0) * scale.X;
-        _columns[1] = Vector4(0, 1, 0, 0) * scale.Y;
-        _columns[2] = Vector4(0, 0, 1, 0) * scale.Z;
-
-        if(isDegrees)
-        {
-            euler *= FMath::DEGREES_TO_RAD;
-        }
-
-        Rotate(euler, false);
-    }
-
-    Quaternion Matrix4x4::GetQuaternion() const
-    {
-        return Quaternion::Convert(normalize(quat_cast(glm::mat4(*this))));
-    }
-
-    Vector3 Matrix4x4::GetEulerAngles(bool isDegrees /*= false*/) const
+    Vector3 Matrix4x4::GetEulerAngles(const bool isDegrees /*= false*/) const
     {
         Matrix3x3 copy = *this;
 
@@ -130,22 +132,20 @@ namespace Engine
         return {_columns[3]};
     }
 
-    void Matrix4x4::Scale(const Vector3 scale)
-    {
-        _columns[0] *= scale.X;
-        _columns[1] *= scale.Y;
-        _columns[2] *= scale.Z;
-    }
-
     void Matrix4x4::SetScale(const Vector3 scale)
     {
         _columns[0].Normalize();
         _columns[1].Normalize();
         _columns[2].Normalize();
 
-        _columns[0] *= scale.X;
-        _columns[1] *= scale.Y;
-        _columns[2] *= scale.Z;
+        Scale(scale);
+    }
+
+    void Matrix4x4::Scale(const Vector3 scale)
+    {
+        _columns[0] *= FMath::Max(scale.X, 0.01f);
+        _columns[1] *= FMath::Max(scale.Y, 0.01f);
+        _columns[2] *= FMath::Max(scale.Z, 0.01f);
     }
 
     Vector3 Matrix4x4::GetScale() const

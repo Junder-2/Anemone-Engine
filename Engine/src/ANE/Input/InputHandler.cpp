@@ -62,6 +62,8 @@ namespace Engine
 
     void InputHandler::OnUpdate()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         bool needProcessing = false;
 
         if(_dirtyMouse)
@@ -107,6 +109,8 @@ namespace Engine
 
     void InputHandler::FlushInputs()
     {
+        ANE_PROFILE_FUNCTION();
+
         for (const auto val : _keyboardInputActions | std::views::values)
         {
             if(val->FlushAction())
@@ -210,8 +214,6 @@ namespace Engine
         {
             return TriggerHolding;
         }
-
-        //ANE_ELOG_WARN("No registered of key {0}", keyCode);
 
         return TriggerNone;
     }

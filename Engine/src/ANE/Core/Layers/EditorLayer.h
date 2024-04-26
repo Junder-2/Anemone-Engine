@@ -1,10 +1,12 @@
 ﻿#pragma once
 #include "Layer.h"
 #include "entt.hpp"
-#include "ANE/Core/Scene/Scene.h"
 
 namespace Engine
 {
+    struct InputValue;
+    class Scene;
+
     class EditorLayer : public Layer
     {
     public:
@@ -52,13 +54,8 @@ namespace Engine
 
         void OnSwitchEditorFocus(InputValue inputValue);
 
-        // static void ShowEditorMenuBar();
-
-
     protected:
         std::string _debugName;
-
-
 
     private:
         std::unordered_map<const char*, std::shared_ptr<Scene>> _scenes;
@@ -73,8 +70,6 @@ namespace Engine
         std::unique_ptr<TValue> tempScene = std::make_unique<TValue>(entities);
         _scenes.emplace(std::make_pair(key, std::move(tempScene)));
     }
-
-
 
     template <class TValue>
     std::enable_if_t<std::is_base_of_v<Scene, TValue>> EditorLayer::AddScene(const char* key)

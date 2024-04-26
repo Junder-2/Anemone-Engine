@@ -7,8 +7,6 @@
 #include "Components/RenderComponent.h"
 #include "Components/RigidBodyComponent.h"
 #include "Components/UUIDComponent.h"
-#include "glm/ext/scalar_common.hpp"
-
 
 namespace Engine
 {
@@ -94,10 +92,13 @@ namespace Engine
 
     void Scene::OnEvent(Event& e)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
     }
 
     void Scene::OnUpdate(float timeStep)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         {
             _registry.view<NativeScriptComponent>().each([&](auto entity, auto& scriptComponent)
             {
@@ -112,6 +113,19 @@ namespace Engine
         }
 
         _accumulator += timeStep;
+
+        const auto group = _registry.view<TransformComponent, RigidBodyComponent>();
+        for (const auto entity : group) //We need to apply changes in our transform to the internal rigidbody
+        {
+            auto[transform, body] = group.get<TransformComponent, RigidBodyComponent>(entity);
+
+            TransformMatrix& transformMatrix = transform.Transform;
+
+            if(!transformMatrix.IsDirty()) continue;
+
+            body.GetRigidBody()->SetTransform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
+            transformMatrix.ClearDirty();
+        }
 
         // Fixed update
         while (_accumulator >= _timeStep)
@@ -128,18 +142,7 @@ namespace Engine
 
     void Scene::OnFixedUpdate(float timeStep)
     {
-        const auto group = _registry.view<TransformComponent, RigidBodyComponent>();
-        for (const auto entity : group) //We need to apply changes in our transform to the internal rigidbody
-        {
-            auto[transform, body] = group.get<TransformComponent, RigidBodyComponent>(entity);
-
-            TransformMatrix& transformMatrix = transform.Transform;
-
-            if(!transformMatrix.IsDirty()) continue;
-
-            body.GetRigidBody()->SetTransform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
-            transformMatrix.ClearDirty();
-        }
+        ANE_DEEP_PROFILE_FUNCTION();
 
         _physicsWorld->update(timeStep);
 
@@ -157,6 +160,8 @@ namespace Engine
 
     void Scene::UpdateRigidBodies()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         const float factor = FMath::Saturate(_accumulator / _timeStep);
 
         const auto group = _registry.view<TransformComponent, RigidBodyComponent>();
@@ -166,19 +171,22 @@ namespace Engine
 
             TransformMatrix& transformMatrix = transform.Transform;
 
-            if(!body.GetRigidBody()->IsActive()) continue;
+            if(transformMatrix.IsDirty() || body.GetRigidBody()->GetBodyType() == BodyType::Static) continue;
+            if(!body.GetRigidBody()->IsActive() || body.GetRigidBody()->IsSleeping()) continue;
 
             auto currentTransform = rp3d::Transform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
             auto newTransform = rp3d::Transform::interpolateTransforms(currentTransform, body.GetRigidBody()->GetReactRigidBody().getTransform(), factor);
 
             transformMatrix.SetPosition(Vector3::Convert(newTransform.getPosition()));
-            transformMatrix.SetRotation(Quaternion::Convert(newTransform.getOrientation()));
+            transformMatrix.SetRotation(Quaternion::Convert(newTransform.getOrientation())); //TODO: Issues with scale and rotation
             transformMatrix.ClearDirty();
         }
     }
 
     void Scene::SubmitDrawCommands()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         // TODO: Sort based on pivot or bounds.
         const auto view = _registry.view<TransformComponent, RenderComponent>();
         for (entt::entity entity : view)

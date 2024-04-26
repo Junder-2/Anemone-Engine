@@ -10,7 +10,7 @@
 
 namespace Engine {
 
-    auto GetPathFor(Location id) -> std::filesystem::path {
+    auto GetPathFor(const Location id) -> std::filesystem::path {
         switch (id) {
             case Location::D_USER_CONFIG: {
                 auto p = std::filesystem::current_path();

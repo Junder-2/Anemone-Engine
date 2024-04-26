@@ -83,6 +83,8 @@ namespace Engine
 
     void Logging::OnSink(const log_msg& logMsg)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         if(_logMessages.size() >= 100)
         {
             _logMessages.pop_back();

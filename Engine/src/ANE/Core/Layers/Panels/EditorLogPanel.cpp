@@ -34,6 +34,8 @@ namespace Engine
 
     void EditorLogPanel::OnPanelRender()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         ImGui::Begin("Log Window");
 
         DrawToolBar();
@@ -65,6 +67,8 @@ namespace Engine
 
     void EditorLogPanel::ShowLogLevelsPopup()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         ImGui::MenuItem("Filter Levels", nullptr, false, false);
         bool filterTrace = _levelFilter & (int)LogLevelCategory::LevelTrace;
         if(ImGui::Checkbox("Trace", &filterTrace))
@@ -95,6 +99,8 @@ namespace Engine
 
     void EditorLogPanel::ShowLoggerNamePopup()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         ImGui::MenuItem("Loggers filter", nullptr, false, false);
 
         for (const auto& loggerName : Logging::GetRegisteredLoggerNames())
@@ -119,6 +125,8 @@ namespace Engine
 
     void EditorLogPanel::DrawLogMessage(const LogMessage& logMessage)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         ImGui::BeginGroup();
 
         if(_wrap)
@@ -197,6 +205,8 @@ namespace Engine
 
     void EditorLogPanel::DrawToolBar()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         if (ImGui::Button("Loggers"))
         {
             ImGui::OpenPopup("LoggerNamesPopup");

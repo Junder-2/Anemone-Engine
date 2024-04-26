@@ -50,16 +50,17 @@ namespace Engine
         float GetDeterminant() const;
         Matrix3x3 GetInverse() const;
 
-        void Rotate(float angle, Vector3 axis, bool isDegrees = false);
-        void Rotate(Quaternion quat);
-        void Rotate(Vector3 euler, bool isDegrees = false);
-        void SetRotation(Vector3 euler, bool isDegrees = false);
-        void SetRotation(Quaternion quat);
+        void SetRotation(const Quaternion& quat);
+        void Rotate(const Quaternion& quat);
         Quaternion GetQuaternion() const;
+
+        void SetRotation(Vector3 euler, bool isDegrees = false);
+        void Rotate(float angle, Vector3 axis, bool isDegrees = false);
+        void Rotate(Vector3 euler, bool isDegrees = false);
         Vector3 GetEulerAngles(bool isDegrees = false) const;
 
-        void Scale(Vector3 scale);
         void SetScale(Vector3 scale);
+        void Scale(Vector3 scale);
         Vector3 GetScale() const;
 
         Vector3 GetRight() const;

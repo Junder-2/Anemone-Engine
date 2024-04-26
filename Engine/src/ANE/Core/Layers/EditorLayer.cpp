@@ -20,11 +20,12 @@
 #include "Panels/InspectorPanel.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "ANE/Input/EditorInputSystem.h"
+#include "ANE/Input/Input.h"
+#include "ANE/Input/InputAction.h"
 #include "Panels/EditorLogPanel.h"
 
 namespace Engine
 {
-
     #ifndef MM_IEEE_ASSERT
     #define MM_IEEE_ASSERT(x) assert(x)
     #endif
@@ -43,7 +44,6 @@ namespace Engine
 
     void EditorLayer::OnAttach()
     {
-
         // You would have a "Read from config files to find correct panel layout" method here
 
         CreateTestScene(50);
@@ -71,6 +71,8 @@ namespace Engine
 
     void EditorLayer::OnEvent(Event& e)
     {
+        Layer::OnEvent(e);
+
         EventHandler::DispatchEditorEvents();
         EventHandler::DispatchAppEvents();
     }
@@ -79,16 +81,14 @@ namespace Engine
     {
         ImGuiIO& io = ImGui::GetIO();
 
-
         for (UILayerPanel* panel : _UIpanels)
         {
-            if(panel->_isVisible)
+            if(panel->IsVisible())
             {
                 panel->OnPanelRender();
             }
 
-
-            if(panel->_isEnabled)
+            if(panel->IsEnabled())
             {
                 //panel->doWindowMaintenance
             }
@@ -96,34 +96,33 @@ namespace Engine
         ImGui::Begin("Editor");
         ImGui::End();
     }
+
     void EditorLayer::Init()
     {
-
-
-        //Every component type needs to be in here in order for it's text to be rendered
-        //Ideally, Kyle will develop this into component type specific renderering methods
-        //and we can then delete this map because it's kind of stupid, it's just quick and dirty
-        ComponentTypeMap[entt::type_id<TagComponent>().hash()] = "TagComponent";
-        ComponentTypeMap[entt::type_id<TransformComponent>().hash()] = "TransformComponent";
-        ComponentTypeMap[entt::type_id<NativeScriptComponent>().hash()] = "NativeScriptComponent";
-        ComponentTypeMap[entt::type_id<UUIDComponent>().hash()] = "UUIDComponent";
-        ComponentTypeMap[entt::type_id<RenderComponent>().hash()] = "RenderComponent";
-        ComponentTypeMap[entt::type_id<RigidBodyComponent>().hash()] = "RigidBodyComponent";
-        ComponentTypeMap[entt::type_id<ColliderComponent>().hash()] = "ColliderComponent";
+        TagComponent::RegisterComponentMetaData();
+        TransformComponent::RegisterComponentMetaData();
+        ColliderComponent::RegisterComponentMetaData();
+        RenderComponent::RegisterComponentMetaData();
+        UUIDComponent::RegisterComponentMetaData();
+        CameraComponent::RegisterComponentMetaData();
     }
 
     void EditorLayer::OnUpdate(float deltaTime)
     {
+        Layer::OnUpdate(deltaTime);
+
         if (_activeScene) _activeScene->OnUpdate(deltaTime);
     }
 
-    std::string EditorLayer::GetComponentNameFromEnttId(entt::id_type id)
+    std::string EditorLayer::GetComponentNameFromEnttId(const entt::id_type id)
     {
         return ComponentTypeMap[id];
     }
 
     void EditorLayer::CreateTestScene(int numEntitiesToTest)
     {
+        ANE_PROFILE_FUNCTION();
+
         //Add scene to layer
         AddScene<Scene>("Game");
 
@@ -131,10 +130,9 @@ namespace Engine
         Entity ent = GetActiveScene()->Create("Square Entity");
         std::stringstream oss;
 
-
         for(int i = 0; i < numEntitiesToTest;i++ )
         {
-            //ANE_LOG_INFO(UUIDGenerator::get_uuid());
+            //ANE_LOG_INFO(UUIDGenerator::GetUUID());
 
             std::string string = "Entity";
             string.append(std::to_string(i));
@@ -147,7 +145,6 @@ namespace Engine
         ent.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
         CreateFloor();
-
 
         //Get Component from entity
         if (RenderComponent comp; ent.TryGetComponent<RenderComponent>(comp))
@@ -201,8 +198,6 @@ namespace Engine
         EventHandler::ConsumeEvent();
     }
 
-
-
     template <class EntityType>
     void EditorLayer::EntityWidget(EntityType& e, entt::basic_registry<EntityType>& reg, bool dropTarget)
     {
@@ -232,5 +227,4 @@ namespace Engine
 
         ImGui::PopID();
     }
-
 }

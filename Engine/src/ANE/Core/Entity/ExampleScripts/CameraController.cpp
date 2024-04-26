@@ -4,7 +4,10 @@
 #include "ANE/Core/Application.h"
 #include "ANE/Core/Window.h"
 #include "ANE/Core/Scene/Components/CameraComponent.h"
+#include "ANE/Events/Event.h"
 #include "ANE/Events/EventHandler.h"
+#include "ANE/Input/Input.h"
+#include "ANE/Input/InputAction.h"
 #include "ANE/Math/FMath.h"
 #include "ANE/Renderer/Renderer.h"
 
@@ -13,8 +16,7 @@ namespace Engine
     void CameraController::OnCreate()
     {
         InputSystem& inputSystem = GetInputSystem();
-        // inputSystem.BindInput(BindingPair(InputDeviceKeyboard, KeyCodeW), MakeDelegate(this, &CameraController::OnKeyTest));
-        // inputSystem.BindMouseButton(MouseButtonLeft, MakeDelegate(this, &CameraController::OnKeyTest));
+
         inputSystem.BindKeyboardAxisInput(KeyCodeA, KeyCodeD, MakeDelegate(this, &CameraController::OnMoveX));
         inputSystem.BindKeyboardAxisInput(KeyCodeQ, KeyCodeE, MakeDelegate(this, &CameraController::OnMoveY));
         inputSystem.BindKeyboardAxisInput(KeyCodeS, KeyCodeW, MakeDelegate(this, &CameraController::OnMoveZ));
@@ -40,15 +42,16 @@ namespace Engine
 
     void CameraController::OnUpdate(float deltaTime)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         if((_xInput != 0) || (_yInput != 0) || (_zInput != 0))
         {
-
             //const float moveSpeed = _isSpeedUp ? 0.05f : 0.01f;
             const float moveSpeed = _flySpeed * .05f;
 
             //const auto transformMat = _transformComponent->Transform.GetQuaternion();
             //const auto transformMat = (Matrix3x3)_transformComponent->Transform.GetLocalToWorld();
-            auto transform = _transformComponent->Transform;
+            const auto transform = _transformComponent->Transform;
 
             const Vector3 right = transform.GetRight() * _xInput;
             const Vector3 up = transform.GetUp() * _yInput;
@@ -118,11 +121,11 @@ namespace Engine
         const WindowResizeEvent& resizeEvent = dynamic_cast<WindowResizeEvent&>(event);
         const float w = (float)resizeEvent.GetWidth(), h = (float)resizeEvent.GetHeight();
 
-        _cameraComponent->UpdateAspectRatio(w / h);
+        _cameraComponent->SetAspectRatio(w / h);
         Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
     }
 
-    Matrix4x4 CameraController::ComputeViewProjMatrix(CameraComponent camera)
+    Matrix4x4 CameraController::ComputeViewProjMatrix(const CameraComponent& camera)
     {
         Matrix4x4 transformMatrix = _transformComponent->Transform.GetWorldToLocal();
         Matrix4x4 viewMatrix = transformMatrix;
