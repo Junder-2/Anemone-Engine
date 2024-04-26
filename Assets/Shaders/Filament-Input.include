@@ -13,13 +13,6 @@ struct SceneData
     float4 SunlightColor;
 };
 
-
-struct TextureSamplerPair
-{
-    Texture2D T;
-    SamplerState S;
-};
-
 // Per-material data.
 struct MaterialProperties
 {
@@ -32,7 +25,7 @@ struct MaterialProperties
     float Height;
     float Occlusion;
 
-    TextureSamplerPair ColorMap;
-    TextureSamplerPair NormalMap;
-    TextureSamplerPair ORMMap;
+    Sampler2D ColorMap;
+    Sampler2D NormalMap;
+    Sampler2D ORMMap;
 };

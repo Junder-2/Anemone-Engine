@@ -71,9 +71,9 @@ float4 fragmentMain(Varyings input) : SV_TARGET
     float3 normal = normalize(input.normal);
     float2 uv = input.uv;
 
-    float4 colorMap = texture(props.ColorMap, uv);
-    float3 normalMap = texture(props.NormalMap, uv).rgb;
-    float3 ormMap = texture(props.ORMMap, uv).rgb;
+    float4 colorMap = props.ColorMap.Sample(uv);
+    float3 normalMap = props.NormalMap.Sample(uv).rgb;
+    float3 ormMap = props.ORMMap.Sample(uv).rgb;
 
     float4 color = colorMap * float4(input.color, 1);
     
