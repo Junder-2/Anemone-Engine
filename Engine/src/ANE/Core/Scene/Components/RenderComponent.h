@@ -22,6 +22,15 @@ namespace Engine
 
         VmaMeshAsset Model = {};
 
+
+        static void RegisterComponentMetaData()
+        {
+            entt::meta<RenderComponent>()
+             .data<&RenderComponent::_modelPath>("Model File Location"_hs).prop("display_name"_hs, "Model File Location")
+             .data<&RenderComponent::Model>("Mesh Asset"_hs).prop("display_name"_hs, "Mesh Asset");
+
+        }
+
     private:
         std::string _modelPath;
     };

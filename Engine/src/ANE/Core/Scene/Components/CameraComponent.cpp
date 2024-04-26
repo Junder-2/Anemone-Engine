@@ -5,6 +5,8 @@
 
 namespace Engine
 {
+
+
     void CameraComponent::SetPosition(const Vector3 newPosition)
     {
         Transform.SetPosition(newPosition);
