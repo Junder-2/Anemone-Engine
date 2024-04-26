@@ -60,11 +60,6 @@ Varyings vertexMain(uint vid : SV_VertexID)
     return output;
 }
 
-float4 texture(TextureSamplerPair pair, float2 uv)
-{
-    return pair.T.Sample(pair.S, uv);
-}
-
 [shader("fragment")]
 float4 fragmentMain(Varyings input) : SV_TARGET
 {
