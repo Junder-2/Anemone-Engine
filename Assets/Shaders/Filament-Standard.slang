@@ -45,7 +45,6 @@ ConstantBuffer<PushConstants> pushConstants;
 ParameterBlock<AppData> appData;
 ParameterBlock<SceneData> sceneData;
 ParameterBlock<MaterialProperties> props;
-ParameterBlock<MaterialTextures> images;
 
 [shader("vertex")]
 Varyings vertexMain(uint vid : SV_VertexID)
@@ -67,7 +66,7 @@ float4 fragmentMain(Varyings input) : SV_TARGET
     float3 normal = normalize(input.normal);
     float2 uv = input.uv;
 
-    float4 color = images.Color.T.Sample(images.Color.S, uv) * float4(input.color, 1);
+    float4 color = props.ColorMap.T.Sample(props.ColorMap.S, uv) * float4(input.color, 1);
 
     float nDotL = saturate(dot(normal, -sceneData.SunlightDirection.rgb));
     color.rgb *= nDotL * sceneData.SunlightColor.rgb;
