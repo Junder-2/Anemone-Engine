@@ -182,6 +182,7 @@ namespace Engine
         matrixRange.offset = 0;
         matrixRange.size = sizeof(PushConstantBuffer);
 
+        // TODO: Figure out how to handle buffer and texture sharing binding 0.
         DescriptorLayoutBuilder layoutBuilder{ device };
         MaterialLayout = layoutBuilder
             .SetStageFlags(VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
