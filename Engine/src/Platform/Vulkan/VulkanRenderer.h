@@ -80,6 +80,13 @@ namespace Engine
         float GetFramerate();
         static ImGuiIO* GetImGuiIO() { return _io; }
 
+        // Vulkan
+        static VkDevice GetDevice() { return _device; }
+        static VkAllocationCallbacks* GetAllocator() { return _allocator; }
+        static std::vector<VkDescriptorSetLayout> GetSceneLayouts() { return { _appDataLayout, _geometryDataLayout}; }
+        static VmaImage GetColorBuffer() { return _colorImage; };
+        static VmaImage GetDepthBuffer() { return _depthImage; };
+
     private:
         // Vulkan
         static void CheckVkResult(VkResult err);
