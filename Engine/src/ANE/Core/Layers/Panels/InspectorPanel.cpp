@@ -45,7 +45,7 @@ namespace Engine
                 selectedEntity.AddComponent<ColliderComponent>(selectedEntity, 1.f);
                 }
         }
-
+        ImGui::ShowDemoWindow();
         ImGui::End();
     }
     std::string InspectorPanel::TypePrefixRemoval(std::string fullComponentName)

@@ -45,7 +45,6 @@ namespace Engine
         void SetRotation(const Vector3 newRotation, const bool isDegrees = false)
         {
             _localToWorld.SetRotation(newRotation, isDegrees);
-            ANE_ELOG_INFO("Inside transform matrix is rotation {}", newRotation.ToString());
             MarkDirty();
         }
 

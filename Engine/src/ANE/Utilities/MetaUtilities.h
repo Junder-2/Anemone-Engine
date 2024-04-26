@@ -35,7 +35,6 @@ namespace Engine
         }
         if (ImGui::DragFloat3(field.prop("Rotation"_hs).value().cast<char const*>(), &rotation.X, 0.1f))
         {
-            ANE_ELOG_INFO("Inside imgui loop is rotation {}", rotation.ToString());
             v.SetRotation(rotation,true);
         }
         if (ImGui::DragFloat3(field.prop("Scale"_hs).value().cast<char const*>(), &scale.X, 0.1f))
