@@ -89,6 +89,7 @@ namespace Engine
                                 if(itr->second(field, componentData))
 
                                 {
+                                    //selectedEntity.OnValidate();
                                     ANE_ELOG("OnValidate should occur here");
                                 }
                             }
