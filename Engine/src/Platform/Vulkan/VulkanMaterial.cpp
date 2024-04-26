@@ -188,11 +188,8 @@ namespace Engine
             .SetStageFlags(VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
             .AddBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
             .AddBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) // Color
-            .AddBinding(2, VK_DESCRIPTOR_TYPE_SAMPLER)
-            .AddBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) // Normal
-            .AddBinding(4, VK_DESCRIPTOR_TYPE_SAMPLER)
-            .AddBinding(5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) // Occlusion, Roughness, Metallic
-            .AddBinding(6, VK_DESCRIPTOR_TYPE_SAMPLER)
+            .AddBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) // Normal
+            .AddBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) // Occlusion, Roughness, Metallic
 
             .Build();
 
