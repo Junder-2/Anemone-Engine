@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "ANE/Events/Event.h"
-//#include "../Entity/Entity.h"
 #include "entt.hpp"
 
 namespace reactphysics3d
@@ -10,11 +8,11 @@ namespace reactphysics3d
 
 namespace Engine
 {
+    class Event;
     class Entity;
 
     class Scene : std::enable_shared_from_this<Scene>
     {
-
     public:
         Scene();
         Scene(const Scene&) = default;
@@ -44,6 +42,5 @@ namespace Engine
         float _timeStep = 1.f/50.f;
 
         std::map<std::string, Entity> _entityMap;
-
     };
 }

@@ -9,7 +9,6 @@ namespace Engine
     */
     struct MouseMoveValue
     {
-    public:
         void SetAbsoluteMousePos(const Vector2 pos)
         {
             _mouseAbsolutePosition.X = pos.X;

@@ -2,27 +2,28 @@
 #include "imgui.h"
 #include "UILayerPanel.h"
 #include "ANE/Core/Editor/SelectionManager.h"
-#include "ANE/Core/Layers/EditorLayer.h"
-#include "ANE/Core/Scene/Scene.h"
-#include "ANE/Core/Scene/Components/TagComponent.h"
-#include "ANE/Core/Scene/Components/UUIDComponent.h"
 
 namespace Engine
 {
+    class Scene;
+    class EditorLayer;
+    struct TagComponent;
+    struct UUIDComponent;
+
     class SceneHierarchyPanel : public UILayerPanel
     {
     public:
         ~SceneHierarchyPanel() = default;
-        void DrawEntityNode(const UUIDComponent& UUID, const TagComponent& Tag, ImGuiTreeNodeFlags node_flags) const;
+        void DrawEntityNode(const UUIDComponent& uuid, const TagComponent& tag, ImGuiTreeNodeFlags nodeFlags) const;
         void DrawEntityNodeList() const;
-        SceneHierarchyPanel(EditorLayer* ManagingLayer);
+        SceneHierarchyPanel(EditorLayer* managingLayer);
         void OnPanelRender() override;
 
-
+    private:
         //std::unordered_map<const char*, std::shared_ptr<Scene>>* _managedScenes;
         EditorLayer* _editorLayer;
         std::shared_ptr<Scene> _activeScene;
-        SelectionManager::selectionContext _SelectionContext = SelectionManager::selectionContext::UI;
+        SelectionManager::SelectionContext _selectionContext = SelectionManager::SelectionContext::UI;
     };
 }
 

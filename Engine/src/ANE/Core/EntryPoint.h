@@ -5,7 +5,8 @@ extern Engine::Application* Engine::CreateApplication();
 
 int main(int argc, char* argv[])
 {
-    Engine::Logging::Init(Engine::GetApplicationName());
+    const auto appName = Engine::GetApplicationName();
+    Engine::Logging::Init(appName);
 	ANE_ELOG_INFO("Logging initialized");
 
     ANE_PROFILE_BEGIN_SESSION("Startup", appName + "-Profile-Startup.json");

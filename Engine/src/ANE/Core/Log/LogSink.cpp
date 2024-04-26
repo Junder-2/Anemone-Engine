@@ -3,9 +3,9 @@
 
 namespace Engine
 {
-    void LogSink::BindSink(DelegateFree<void(const spdlog::details::log_msg&)> delegateMember)
+    void LogSink::BindSink(const Delegate<void(const log_msg&)>& delegate)
     {
-        _sinkDelegate = delegateMember;
+        _sinkDelegate = delegate;
     }
 
     void LogSink::sink_it_(const spdlog::details::log_msg& msg)

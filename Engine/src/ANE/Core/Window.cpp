@@ -7,7 +7,9 @@
 #include <VkBootstrap.h>
 
 #include "Application.h"
+#include "ANE/Events/WindowEvent.h"
 #include "ANE/Input/Input.h"
+#include "ANE/Input/InputHandler.h"
 #include "ANE/Utilities/InputUtilities.h"
 #include "Platform/Vulkan/VulkanRenderer.h"
 
@@ -22,6 +24,11 @@ namespace Engine
     Window::~Window()
     {
         Shutdown();
+    }
+
+    void Window::BindOnEvent(const Delegate<void(Event&)>& delegate)
+    {
+        _eventDelegate = delegate;
     }
 
     void Window::Init(const WindowProperties& props)
@@ -93,16 +100,19 @@ namespace Engine
                 case SDL_KEYDOWN:
                 case SDL_KEYUP:
                 {
-                    if(event.key.repeat != 0) continue;
-                    inputHandler->ProcessKey(event.key.keysym.sym, event.type == SDL_KEYDOWN);
+                    const SDL_KeyboardEvent keyEvent = event.key;
+                    if(keyEvent.repeat != 0) continue;
+                    inputHandler->ProcessKey(keyEvent.keysym.sym, keyEvent.state == SDL_PRESSED);
                 }
                 continue;
                 case SDL_MOUSEBUTTONDOWN:
                 case SDL_MOUSEBUTTONUP:
                 {
-                    const int keyIndex = MOUSE_BUTTON_TO_SDL_MOUSE_BUTTON(event.button.button);
+                    const SDL_MouseButtonEvent buttonEvent = event.button;
 
-                    inputHandler->ProcessMouseButton(keyIndex, event.type == SDL_MOUSEBUTTONDOWN, event.button.clicks >= 2);
+                    const int keyIndex = MOUSE_BUTTON_TO_SDL_MOUSE_BUTTON(buttonEvent.button);
+
+                    inputHandler->ProcessMouseButton(keyIndex, buttonEvent.state == SDL_PRESSED, buttonEvent.clicks >= 2);
                 }
                 continue;
                 case SDL_MOUSEWHEEL:
@@ -243,6 +253,8 @@ namespace Engine
 
     void Window::ProcessViewportEvents(const ViewportProperties& previousProps)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         const ViewportProperties newViewportProps = GetActiveViewportProperties();
         if(newViewportProps.Width != previousProps.Width || newViewportProps.Height != previousProps.Height)
         {

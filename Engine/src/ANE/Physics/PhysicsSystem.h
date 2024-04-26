@@ -3,7 +3,6 @@
 #include "ANE/Subsystem/SubSystem.h"
 #include <reactphysics3d/reactphysics3d.h>
 
-
 namespace Engine
 {
     class RigidBody;

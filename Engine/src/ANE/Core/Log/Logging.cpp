@@ -1,5 +1,7 @@
 #include "anepch.h"
 #include "Logging.h"
+
+#include "LogFileWriter.h"
 #include "LogSink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 
@@ -16,6 +18,8 @@ namespace Engine
     static spdlog::pattern_formatter LoggerNameFormatter(LOGGER_NAME_PATTERN);
     static spdlog::pattern_formatter SourceFormatter(SOURCE_PATTERN);
     static spdlog::pattern_formatter TimeFormatter(TIME_PATTERN);
+
+    LogFileWriter Logging::_writer {};
 
     void Logging::Init(const std::string& appName)
     {
@@ -79,6 +83,8 @@ namespace Engine
 
     void Logging::OnSink(const log_msg& logMsg)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         if(_logMessages.size() >= 100)
         {
             _logMessages.pop_back();

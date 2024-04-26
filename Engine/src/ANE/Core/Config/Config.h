@@ -23,5 +23,4 @@ namespace Engine {
     auto GetPathFor(Location id) -> std::filesystem::path;
 
     void CreateDirectories();
-
 } // namespace asap::config

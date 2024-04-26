@@ -6,6 +6,7 @@
 
 #include "InputAction.h"
 #include "InputTypes.h"
+#include "ANE/Events/Event.h"
 
 namespace Engine
 {
@@ -40,6 +41,11 @@ namespace Engine
         _keyboardInputActions.clear();
     }
 
+    void InputHandler::BindOnEvent(const Delegate<void(Event&)>& delegate)
+    {
+        _eventDelegate = delegate;
+    }
+
     void InputHandler::DispatchEvent(Event& e)
     {
         if(_eventDelegate) _eventDelegate(e);
@@ -56,6 +62,8 @@ namespace Engine
 
     void InputHandler::OnUpdate()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         bool needProcessing = false;
 
         if(_dirtyMouse)
@@ -101,6 +109,8 @@ namespace Engine
 
     void InputHandler::FlushInputs()
     {
+        ANE_PROFILE_FUNCTION();
+
         for (const auto val : _keyboardInputActions | std::views::values)
         {
             if(val->FlushAction())
@@ -138,9 +148,9 @@ namespace Engine
         }
     }
 
-    void InputHandler::ProcessAbsoluteMouseMovement(Vector2 pos)
+    void InputHandler::ProcessAbsoluteMouseMovement(const Vector2 pos)
     {
-
+        _mouseInputAction.PopulateAbsoluteMove(pos);
     }
 
     void InputHandler::ProcessMouseMovement(const Vector2 pos, const Vector2 delta)
@@ -188,6 +198,11 @@ namespace Engine
         return newArray;
     }
 
+    MouseInputAction InputHandler::GetMouseInputData() const
+    {
+        return _mouseInputAction;
+    }
+
     TriggerState InputHandler::GetKeyTriggerState(const int keyCode)
     {
         if (_keyboardInputActions.contains(keyCode))
@@ -199,8 +214,6 @@ namespace Engine
         {
             return TriggerHolding;
         }
-
-        //ANE_ELOG_WARN("No registered of key {0}", keyCode);
 
         return TriggerNone;
     }

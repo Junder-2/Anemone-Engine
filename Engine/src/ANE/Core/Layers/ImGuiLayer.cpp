@@ -4,6 +4,7 @@
 #include "imgui_internal.h"
 #include "ANE/Input/EditorInputsystem.h"
 #include "ANE/Input/Input.h"
+#include "ANE/Input/InputAction.h"
 
 namespace Engine
 {
@@ -41,11 +42,13 @@ namespace Engine
 
     void ImGuiLayer::OnUpdate(float deltaTime)
     {
+        Layer::OnUpdate(deltaTime);
         // AddDebugMessage();
     }
 
     void ImGuiLayer::OnEvent(Event& e)
     {
+        Layer::OnEvent(e);
     }
 
 
@@ -58,6 +61,8 @@ namespace Engine
 
     void ImGuiLayer::OnUIRender()
     {
+        Layer::OnUIRender();
+
         bool open = true;
         DockSpace(&open);
 

@@ -3,17 +3,18 @@
 #include "imgui.h"
 #include "InspectorPanel.h"
 #include "ANE/Core/Editor/SelectionManager.h"
+#include "ANE/Core/Entity/Entity.h"
+#include "ANE/Core/Layers/EditorLayer.h"
+#include "ANE/Core/Scene/Scene.h"
 #include "ANE/Core/Scene/Components/TagComponent.h"
 #include "ANE/Core/Scene/Components/UUIDComponent.h"
 
-
 namespace Engine
 {
-    SceneHierarchyPanel::SceneHierarchyPanel(EditorLayer* ManagingLayer)
+    SceneHierarchyPanel::SceneHierarchyPanel(EditorLayer* managingLayer)
     {
-        _editorLayer = ManagingLayer;
+        _editorLayer = managingLayer;
     }
-
 
     void SceneHierarchyPanel::OnPanelRender()
     {
@@ -22,18 +23,19 @@ namespace Engine
 
         bool open = true;
 
-        ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_PassthruCentralNode;
+        const ImGuiDockNodeFlags dockSpaceFlags = ImGuiDockNodeFlags_PassthruCentralNode;
 
-        ImGui::Begin("Scene Hierarchy", &open, dockspace_flags);
+        ImGui::Begin("Scene Hierarchy", &open, dockSpaceFlags);
 
         DrawEntityNodeList();
 
         ImGui::End();
     }
 
-
     void SceneHierarchyPanel::DrawEntityNodeList() const
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         std::vector<std::string>* selectedEntityUUIDS = SelectionManager::GetSelection(SelectionManager::UI);
         for (const auto IDView = _activeScene->_registry.view<UUIDComponent, TagComponent>(); const auto entity : IDView)
         {
@@ -49,14 +51,16 @@ namespace Engine
         }
     }
 
-    void SceneHierarchyPanel::DrawEntityNode(const UUIDComponent& UUID, const TagComponent& Tag, ImGuiTreeNodeFlags node_flags) const
+    void SceneHierarchyPanel::DrawEntityNode(const UUIDComponent& uuid, const TagComponent& tag, const ImGuiTreeNodeFlags nodeFlags) const
     {
-        const bool nodeOpen = ImGui::TreeNodeEx(UUID.UUID.c_str(), node_flags, Tag.Value.c_str());
+        ANE_DEEP_PROFILE_FUNCTION();
+
+        const bool nodeOpen = ImGui::TreeNodeEx(uuid.UUID.c_str(), nodeFlags, tag.Value.c_str());
 
         if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
         {
-            SelectionManager::DeSelect(_SelectionContext);
-            SelectionManager::RegisterSelect(_SelectionContext, UUID.UUID);
+            SelectionManager::DeSelect(_selectionContext);
+            SelectionManager::RegisterSelect(_selectionContext, uuid.UUID);
         }
         if (nodeOpen)
         {

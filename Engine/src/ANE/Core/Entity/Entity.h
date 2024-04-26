@@ -22,7 +22,7 @@ namespace Engine
             //this->AddComponent<AttachmentsComponent>();
             this->AddComponent<TransformComponent>();
             this->AddComponent<TagComponent>(name);
-            this->AddComponent<UUIDComponent>(UUIDGenerator::get_uuid());
+            this->AddComponent<UUIDComponent>(UUIDGenerator::GetUUID());
         }
 
         Entity(entt::entity handle, Scene* scene) : EntityHandle(handle), SceneHandle(scene) {}
@@ -153,5 +153,3 @@ namespace Engine
     }
 
 }
-
-

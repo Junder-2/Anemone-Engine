@@ -116,9 +116,19 @@ namespace Engine
         void SetActive(bool enable) const;
 
         /**
-         * returns the active state of the rigidbody
+         * Returns the active state of the rigidbody
          */
         bool IsActive() const;
+
+        /**
+         * Sets the sleeping state of the rigidbody
+         */
+        void SetSleeping(bool enable) const;
+
+        /**
+         * Returns the sleeping state of the rigidbody
+         */
+        bool IsSleeping() const;
 
         /**
          * Destroys the rigidbody and any connected joints

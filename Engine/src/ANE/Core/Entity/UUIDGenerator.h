@@ -6,7 +6,7 @@ namespace Engine
     class UUIDGenerator
     {
     public:
-        static std::string get_uuid() {
+        static std::string GetUUID() {
             static std::random_device dev;
             static std::mt19937 rng(dev());
 

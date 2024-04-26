@@ -7,9 +7,6 @@
 #include "Components/RenderComponent.h"
 #include "Components/RigidBodyComponent.h"
 #include "Components/UUIDComponent.h"
-#include "glm/ext/scalar_common.hpp"
-#include "glm/gtx/type_trait.hpp"
-
 
 namespace Engine
 {
@@ -95,10 +92,13 @@ namespace Engine
 
     void Scene::OnEvent(Event& e)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
     }
 
     void Scene::OnUpdate(float timeStep)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         {
             _registry.view<NativeScriptComponent>().each([&](auto entity, auto& scriptComponent)
             {
@@ -129,6 +129,8 @@ namespace Engine
 
     void Scene::OnFixedUpdate(float timeStep)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         const auto group = _registry.view<TransformComponent, RigidBodyComponent>();
         for (const auto entity : group) //We need to apply changes in our transform to the internal rigidbody
         {
@@ -158,6 +160,8 @@ namespace Engine
 
     void Scene::UpdateRigidBodies()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         const float factor = FMath::Saturate(_accumulator / _timeStep);
 
         const auto group = _registry.view<TransformComponent, RigidBodyComponent>();
@@ -167,7 +171,8 @@ namespace Engine
 
             TransformMatrix& transformMatrix = transform.Transform;
 
-            if(!body.GetRigidBody()->IsActive()) continue;
+            if(transformMatrix.IsDirty() || body.GetRigidBody()->GetBodyType() == BodyType::Static) continue;
+            if(!body.GetRigidBody()->IsActive() || body.GetRigidBody()->IsSleeping()) continue;
 
             auto currentTransform = rp3d::Transform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
             auto newTransform = rp3d::Transform::interpolateTransforms(currentTransform, body.GetRigidBody()->GetReactRigidBody().getTransform(), factor);
@@ -180,6 +185,8 @@ namespace Engine
 
     void Scene::SubmitDrawCommands()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         // TODO: Sort based on pivot or bounds.
         const auto view = _registry.view<TransformComponent, RenderComponent>();
         for (entt::entity entity : view)

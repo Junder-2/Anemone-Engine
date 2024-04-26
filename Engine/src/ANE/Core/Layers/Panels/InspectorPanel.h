@@ -4,11 +4,13 @@
 #include "ANE/Utilities/MetaUtilities.h"
 #include "UILayerPanel.h"
 #include "ANE/Core/Editor/SelectionManager.h"
-#include "ANE/Core/Entity/Entity.h"
-#include "ANE/Core/Layers/EditorLayer.h"
 
 namespace Engine
 {
+
+    struct UUIDComponent;
+    class Entity;
+    class EditorLayer;
 
     class InspectorPanel : public UILayerPanel
     {
@@ -21,12 +23,14 @@ namespace Engine
 
         static void RegisterSelect(UUIDComponent selectedEntityID);
         static void WipeSelect();
-        SelectionManager::selectionContext _SelectionContext = SelectionManager::selectionContext::UI;
         void DrawEntityComponentList(Entity& selectedEntity);
         inline static std::string selected = "";
         EditorLayer* _editorLayer;
+
         void OnPanelRender() override;
 
-
+    private:
+        SelectionManager::SelectionContext _selectionContext = SelectionManager::SelectionContext::UI;
+        inline static std::string _selected = "";
     };
 }

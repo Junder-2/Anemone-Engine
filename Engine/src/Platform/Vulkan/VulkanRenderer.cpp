@@ -22,10 +22,12 @@ using Slang::ComPtr;
 #include "VulkanUtils.h"
 #include "ANE/Core/Window.h"
 #include "ANE/Math/Types/Matrix4x4.h"
-#include "ANE/Renderer/Mesh.h"
-#include "ANE/Utilities/ImGuiUtilities.h"
-#include "ANE/Renderer/Renderer.h"
+#include "ANE/Math/Types/Quaternion.h"
 #include "ANE/Renderer/Draw.h"
+#include "ANE/Renderer/Mesh.h"
+#include "ANE/Renderer/Renderer.h"
+#include "ANE/Utilities/ImGuiUtilities.h"
+#include "VulkanDescriptorLayoutBuilder.h"
 
 namespace Engine
 {
@@ -50,6 +52,8 @@ namespace Engine
 
     void VulkanRenderer::Render(const WindowProperties& props, const DrawContext& drawCommands)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         if (!_initialized)
         {
             ANE_ELOG_WARN("Unable to end VulkanRenderer frame as it was never fully initialized.");
@@ -105,7 +109,7 @@ namespace Engine
             return _loadedModelMap[modelPath];
         }
 
-        const std::filesystem::path absolutePath = std::filesystem::current_path().append("..\\Meshes\\").append(modelPath);
+        const std::filesystem::path absolutePath = std::filesystem::current_path().append("..\\Assets\\Meshes\\").append(modelPath);
 
         const MeshAsset meshAsset = MeshLoader::LoadMesh(absolutePath.string().c_str());
         Mesh mesh = meshAsset.SubMeshes[0]; // Use first submesh for now.
@@ -114,7 +118,7 @@ namespace Engine
 
         VmaMeshAsset vmaMeshAsset;
         vmaMeshAsset.Name = modelPath;
-        vmaMeshAsset.NumVertices = mesh.Indices.size();
+        vmaMeshAsset.NumVertices = (uint32_t)mesh.Indices.size();
         vmaMeshAsset.SubMeshes = meshAsset.SubMeshes;
         vmaMeshAsset.MeshBuffers = meshBuffers;
 
@@ -167,9 +171,11 @@ namespace Engine
 
         SetupSyncStructures();
 
+        SetupDescriptors();
+
         CreatePipeline(logicalDevice);
 
-        Renderer::LoadModel("Suzanne.fbx");
+        CreateDefaultResources();
     }
 
     void VulkanRenderer::SetupImGui(SDL_Window* window)
@@ -548,6 +554,62 @@ namespace Engine
         }
     }
 
+    void VulkanRenderer::SetupDescriptors()
+    {
+        {
+            DescriptorLayoutBuilder builder { _device };
+            _appDataLayout = builder
+                .SetStageFlags(VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
+                .AddBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER)
+
+                .SetAllocationCallbacks(_allocator)
+                .Build();
+
+            _geometryDataLayout = builder.Build();
+
+            _mainDeletionQueue.PushFunction([&]
+            {
+                vkDestroyDescriptorSetLayout(_device, _appDataLayout, _allocator);
+                vkDestroyDescriptorSetLayout(_device, _geometryDataLayout, _allocator);
+            });
+        }
+
+        {
+            DescriptorLayoutBuilder builder { _device };
+            _singleImageDataLayout = builder
+                .SetStageFlags(VK_SHADER_STAGE_FRAGMENT_BIT)
+                .AddBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER)
+                .AddBinding(1, VK_DESCRIPTOR_TYPE_SAMPLER)
+
+                .SetAllocationCallbacks(_allocator)
+                .Build();
+
+            _mainDeletionQueue.PushFunction([&]
+            {
+                vkDestroyDescriptorSetLayout(_device, _singleImageDataLayout, _allocator);
+            });
+        }
+
+        for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+        {
+            std::vector<DescriptorAllocator::PoolSizeRatio> frameSizes =
+            {
+                { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 3 },
+                { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 3 },
+                { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 3 },
+                { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 4 },
+            };
+
+            _frameData[i].Descriptors = DescriptorAllocator{};
+            _frameData[i].Descriptors.Init(_device, 1000, frameSizes, _allocator);
+
+            _mainDeletionQueue.PushFunction([&, i]
+            {
+                _frameData[i].Descriptors.Destroy(_device, _allocator);
+            });
+        }
+    }
+
     PipelineWrapper VulkanRenderer::CreatePipeline(const vkb::Device& logicalDevice)
     {
         ComPtr<slang::IGlobalSession> slangGlobalSession;
@@ -562,7 +624,7 @@ namespace Engine
         sessionDesc.targets = &targetDesc;
         sessionDesc.targetCount = 1;
         sessionDesc.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR;
-        const char* paths[] = { "Shaders/" };
+        const char* paths[] = { "../Assets/Shaders/" };
         sessionDesc.searchPaths = paths;
         sessionDesc.searchPathCount = 1;
 
@@ -572,7 +634,7 @@ namespace Engine
         ComPtr<slang::IBlob> spirvVertProgram;
         ComPtr<slang::IBlob> spirvFragProgram;
         {
-            const char* moduleName = "Mesh_Color";
+            const char* moduleName = "Mesh_Diffuse";
             ComPtr<slang::IBlob> diagnosticBlob;
             slang::IModule* slangModule = session->loadModule(moduleName, diagnosticBlob.writeRef());
             //diagnoseIfNeeded(diagnosticBlob);
@@ -634,21 +696,21 @@ namespace Engine
         VkShaderModule meshVertShader;
         if (!VulkanUtils::LoadShaderModule(spirvVertProgram, _device, _allocator, &meshVertShader))
         {
-            ANE_ELOG_ERROR("Error when building vertex shader module: Mesh-Color.slang");
+            ANE_ELOG_ERROR("Error when building vertex shader module: Mesh-Diffuse.slang");
         }
         else
         {
-            ANE_ELOG_INFO("Built vertex shader module: Mesh-Color.slang");
+            ANE_ELOG_INFO("Built vertex shader module: Mesh-Diffuse.slang");
         }
 
         VkShaderModule meshFragShader;
         if (!VulkanUtils::LoadShaderModule(spirvFragProgram, _device, _allocator, &meshFragShader))
         {
-            ANE_ELOG_ERROR("Error when building fragment shader module: Mesh-Color.slang");
+            ANE_ELOG_ERROR("Error when building fragment shader module: Mesh-Diffuse.slang");
         }
         else
         {
-            ANE_ELOG_INFO("Built fragment shader module: Mesh-Color.slang");
+            ANE_ELOG_INFO("Built fragment shader module: Mesh-Diffuse.slang");
         }
 
         VkPushConstantRange bufferRange;
@@ -656,7 +718,11 @@ namespace Engine
         bufferRange.offset = 0;
         bufferRange.size = sizeof(PushConstantBuffer);
 
+        VkDescriptorSetLayout layouts[] = { _geometryDataLayout, _appDataLayout, _singleImageDataLayout };
+
         VkPipelineLayoutCreateInfo pipelineLayoutInfo = VulkanInitializers::PipelineLayoutCreateInfo();
+        pipelineLayoutInfo.setLayoutCount = (uint32_t)IM_ARRAYSIZE(layouts);
+        pipelineLayoutInfo.pSetLayouts = layouts;
         pipelineLayoutInfo.pPushConstantRanges = &bufferRange;
         pipelineLayoutInfo.pushConstantRangeCount = 1;
 
@@ -688,6 +754,59 @@ namespace Engine
         return pipeline.value();
     }
 
+    void VulkanRenderer::CreateDefaultResources()
+    {
+        Renderer::LoadModel("Suzanne.fbx");
+
+        constexpr VkExtent3D defaultImageExtent = VkExtent3D{ 16, 16, 1 };
+        constexpr VkFormat defaultImageFormat = VK_FORMAT_R8G8B8A8_UNORM;
+
+        const uint32_t white = packUnorm4x8(glm::vec4(1, 1, 1, 1));
+        const uint32_t black = packUnorm4x8(glm::vec4(0, 0, 0, 1));
+        const uint32_t grey = packUnorm4x8(glm::vec4(0.66f, 0.66f, 0.66f, 1));
+        const uint32_t magenta = packUnorm4x8(glm::vec4(1, 0, 1, 1));
+        uint32_t pixels[16 * 16];
+
+        for (uint32_t& pixel : pixels) { pixel = white; }
+        _whiteImage = CreateImage((void*)&pixels, defaultImageExtent, defaultImageFormat, VK_IMAGE_USAGE_SAMPLED_BIT);
+
+        for (uint32_t& pixel : pixels) { pixel = black; }
+        _blackImage = CreateImage((void*)&pixels, defaultImageExtent, defaultImageFormat, VK_IMAGE_USAGE_SAMPLED_BIT);
+
+        for (uint32_t& pixel : pixels) { pixel = grey; }
+        _greyImage = CreateImage((void*)&pixels, defaultImageExtent, defaultImageFormat, VK_IMAGE_USAGE_SAMPLED_BIT);
+
+        for (int x = 0; x < 16; x++)
+        {
+            for (int y = 0; y < 16; y++)
+            {
+                pixels[y * 16 + x] = (x % 2) ^ (y % 2) ? magenta : black;
+            }
+        }
+        _errorImage = CreateImage((void*)&pixels, defaultImageExtent, defaultImageFormat, VK_IMAGE_USAGE_SAMPLED_BIT);
+
+        VkSamplerCreateInfo samplerInfo = { .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO, .pNext = nullptr };
+
+        samplerInfo.magFilter = VK_FILTER_LINEAR;
+        samplerInfo.minFilter = VK_FILTER_LINEAR;
+        vkCreateSampler(_device, &samplerInfo, _allocator, &_samplerLinear);
+
+        samplerInfo.magFilter = VK_FILTER_NEAREST;
+        samplerInfo.minFilter = VK_FILTER_NEAREST;
+        vkCreateSampler(_device, &samplerInfo, _allocator, &_samplerNearest);
+
+        _mainDeletionQueue.PushFunction([=]
+        {
+            DestroyImage(_whiteImage);
+            DestroyImage(_blackImage);
+            DestroyImage(_greyImage);
+            DestroyImage(_errorImage);
+
+            vkDestroySampler(_device, _samplerLinear, _allocator);
+            vkDestroySampler(_device, _samplerNearest, _allocator);
+        });
+    }
+
     void VulkanRenderer::CreateImGuiDescriptorPool()
     {
         VkDescriptorPoolSize poolSizes[] =
@@ -710,6 +829,8 @@ namespace Engine
 
     void VulkanRenderer::Draw(const WindowProperties& props, const DrawContext& drawCommands)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         if (_rebuildSwapchain)
         {
             if (props.Width > 0 && props.Height > 0)
@@ -719,7 +840,7 @@ namespace Engine
             }
         }
 
-        const VulkanFrame frame = GetFrame();
+        VulkanFrame& frame = GetFrame();
         CheckVkResult(vkWaitForFences(_device, 1, &frame.Fence, true, 1000000000));
 
         uint32_t swapchainImageIndex;
@@ -729,6 +850,9 @@ namespace Engine
             _rebuildSwapchain = true;
             return;
         }
+
+        frame.DeletionQueue.Flush();
+        frame.Descriptors.Clear(_device);
 
         CheckVkResult(vkResetFences(_device, 1, &frame.Fence));
 
@@ -768,21 +892,25 @@ namespace Engine
 
         CheckVkResult(vkQueueSubmit2(_queue, 1, &submitInfo, frame.Fence));
 
-        VkPresentInfoKHR presentInfo = VulkanInitializers::PresentInfo();
-
-        presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = &frame.RenderSemaphore;
-
-        presentInfo.swapchainCount = 1;
-        presentInfo.pSwapchains = &_swapchain;
-
-        presentInfo.pImageIndices = &swapchainImageIndex;
-
-        result = vkQueuePresentKHR(_queue, &presentInfo);
-        if (result == VK_ERROR_OUT_OF_DATE_KHR)
         {
-            _rebuildSwapchain = true;
-            return;
+            ANE_DEEP_PROFILE_SCOPE("vkQueuePresentKHR");
+
+            VkPresentInfoKHR presentInfo = VulkanInitializers::PresentInfo();
+
+            presentInfo.waitSemaphoreCount = 1;
+            presentInfo.pWaitSemaphores = &frame.RenderSemaphore;
+
+            presentInfo.swapchainCount = 1;
+            presentInfo.pSwapchains = &_swapchain;
+
+            presentInfo.pImageIndices = &swapchainImageIndex;
+
+            result = vkQueuePresentKHR(_queue, &presentInfo);
+            if (result == VK_ERROR_OUT_OF_DATE_KHR)
+            {
+                _rebuildSwapchain = true;
+                return;
+            }
         }
 
         _frameIndex++;
@@ -790,6 +918,58 @@ namespace Engine
 
     void VulkanRenderer::DrawGeometry(VkCommandBuffer cmd, const DrawContext& drawCommands)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
+        VmaBuffer appDataBuffer = CreateBuffer(sizeof(ApplicationData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+        VmaBuffer sceneDataBuffer = CreateBuffer(sizeof(SceneData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+
+        VulkanFrame& frame = GetFrame();
+        frame.DeletionQueue.PushFunction([=]
+        {
+            DestroyBuffer(appDataBuffer);
+            DestroyBuffer(sceneDataBuffer);
+        });
+
+        // Fixed data for now.
+        float time = SDL_GetPerformanceCounter() / static_cast<float>(SDL_GetPerformanceFrequency());
+        frame.AppData.Time = time;
+
+        Vector3 ambientColor = Vector3(0.05f, 0.08f, 0.11f);
+        Vector3 sunAngle = Vector3(50 * FMath::DEGREES_TO_RAD, -30 * FMath::DEGREES_TO_RAD, 0);
+        Vector3 sunDirection = Quaternion::FromEulerAngles(sunAngle) * Vector3::ForwardVector();
+        Vector3 sunColor = Vector3(1.0f, 0.9f, 0.67f);
+
+        frame.SceneData.AmbientColor = Vector4(ambientColor, 0);
+        frame.SceneData.SunlightDirection = Vector4(sunDirection, 0);
+        frame.SceneData.SunlightColor = Vector4(sunColor, 0);
+
+        ApplicationData* appUniformData = (ApplicationData*)appDataBuffer.Allocation->GetMappedData();
+        *appUniformData = frame.AppData;
+
+        SceneData* sceneUniformData = (SceneData*)sceneDataBuffer.Allocation->GetMappedData();
+        *sceneUniformData = frame.SceneData;
+
+        VkDescriptorSet appDescriptor = frame.Descriptors.Allocate(_device, _appDataLayout, _allocator);
+        VkDescriptorSet sceneDescriptor = frame.Descriptors.Allocate(_device, _geometryDataLayout, _allocator);
+        VkDescriptorSet imageDescriptor = frame.Descriptors.Allocate(_device, _singleImageDataLayout, _allocator);
+
+        {
+            DescriptorWriter writer;
+            writer.WriteBuffer(0, appDataBuffer.Buffer, sizeof(ApplicationData), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+            writer.UpdateSet(_device, appDescriptor);
+        }
+        {
+            DescriptorWriter writer;
+            writer.WriteBuffer(0, sceneDataBuffer.Buffer, sizeof(SceneData), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+            writer.UpdateSet(_device, sceneDescriptor);
+        }
+        {
+            DescriptorWriter writer;
+            writer.WriteImage(0, _errorImage.ImageView, _samplerNearest, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+            writer.WriteImage(1, _errorImage.ImageView, _samplerNearest, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_SAMPLER);
+            writer.UpdateSet(_device, imageDescriptor);
+        }
+
         _drawExtent.height = std::min(_swapchainExtent.height, _colorImage.ImageExtent.height);
         _drawExtent.width = std::min(_swapchainExtent.width, _colorImage.ImageExtent.width);
 
@@ -799,6 +979,9 @@ namespace Engine
         vkCmdBeginRendering(cmd, &renderInfo);
 
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _meshPipeline);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 0, 1, &appDescriptor, 0, nullptr);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 1, 1, &sceneDescriptor, 0, nullptr);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 2, 1, &imageDescriptor, 0, nullptr);
 
         VkViewport viewport;
         viewport.x = 0;
@@ -821,7 +1004,8 @@ namespace Engine
         for (DrawCommand drawCommand : drawCommands.Commands)
         {
             PushConstantBuffer pushConstants;
-            pushConstants.WorldMatrix = ViewProjection * drawCommand.ModelMatrix; // VP * M
+            pushConstants.MVPMatrix = ViewProjection * drawCommand.ModelMatrix; // VP * M
+            pushConstants.ModelMatrix = drawCommand.ModelMatrix;
             pushConstants.VertexBuffer = drawCommand.MeshBuffers.VertexBufferAddress;
 
             vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstantBuffer), &pushConstants);
@@ -836,6 +1020,8 @@ namespace Engine
     // TODO: Fully integrate ImGui into rendering loop.
     void VulkanRenderer::DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         VkRenderingAttachmentInfo colorAttachment = VulkanInitializers::AttachmentInfo(targetImageView, nullptr, VK_IMAGE_LAYOUT_GENERAL);
         VkRenderingInfo renderInfo = VulkanInitializers::RenderingInfo(_windowExtent, &colorAttachment, nullptr);
 
@@ -850,6 +1036,11 @@ namespace Engine
     {
         // Calls vkDestroyPipeline, vkDestroyRenderPass, vkDestroySwapchainKHR and vkDestroySurfaceKHR.
         ImGui_ImplVulkanH_DestroyWindow(_instance, _device, &_mainWindowData, _allocator);
+
+        for (VulkanFrame& frame : _frameData)
+        {
+            frame.DeletionQueue.Flush();
+        }
 
         _mainDeletionQueue.Flush();
 
@@ -874,9 +1065,9 @@ namespace Engine
         ImGui::DestroyContext();
     }
 
-    VulkanFrame VulkanRenderer::GetFrame()
+    VulkanFrame& VulkanRenderer::GetFrame()
     {
-        return _frameData[_frameIndex % 3];
+        return _frameData[_frameIndex % MAX_FRAMES_IN_FLIGHT];
     }
 
     void VulkanRenderer::CreateVmaAllocator()

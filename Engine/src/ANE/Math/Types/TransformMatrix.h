@@ -8,11 +8,14 @@ namespace Engine
     struct TransformMatrix
     {
     public:
-        TransformMatrix(const Matrix4x4& transform = Matrix4x4::Identity()) : _localToWorld(transform) {}
+        TransformMatrix(const Matrix4x4& transform = Matrix4x4::Identity()) : _localToWorld(transform)
+        {
+            SyncEulerAngles();
+        }
         TransformMatrix(const TransformMatrix&) = default;
 
         /**
-         * Sets the position
+         * Sets the world position of the Transform
          * @param newPosition World space position
          */
         void SetPosition(const Vector3 newPosition)
@@ -42,76 +45,140 @@ namespace Engine
             MarkDirty();
         }
 
-        void SetRotation(const Vector3 newRotation, const bool isDegrees = false)
-        {
-            _localToWorld.SetRotation(newRotation, isDegrees);
-            MarkDirty();
-        }
-
+        /**
+         * Returns the world position of the Transform
+         */
         Vector3 GetPosition() const
         {
             return _localToWorld.GetPosition();
         }
 
-        void SetRotation(const Quaternion newRotation)
+        /**
+         * Sets the rotation of the Transform in Quaternion
+         * @param newRotation World space rotation
+         */
+        void SetRotation(const Quaternion& newRotation)
         {
             _localToWorld.SetRotation(newRotation);
+            SyncEulerAngles();
             MarkDirty();
         }
 
-        //TODO: Add rotation are not properly working
-        void AddRotation(const Vector3 delta, const bool isDegrees = false)
-        {
-            _localToWorld.SetRotation(delta, isDegrees);
-            MarkDirty();
-        }
-
-        void AddRotation(const Quaternion delta)
+        /**
+         * Adds to the rotation of the Transform in Quaternion
+         * @param delta World space offset
+         */
+        void AddRotation(const Quaternion& delta)
         {
             _localToWorld.Rotate(delta);
+            SyncEulerAngles();
             MarkDirty();
         }
 
-        Vector3 GetEulerAngles(const bool isDegrees = false) const
-        {
-            return _localToWorld.GetEulerAngles(isDegrees);
-        }
-
+        /**
+         * Returns the rotation of the Transform in Quaternion
+         */
         Quaternion GetQuaternion() const
         {
             return _localToWorld.GetQuaternion();
         }
 
+        /**
+         * Sets the rotation of the Transform using EulerAngles
+         * @param newRotation World space rotation
+         * @param isDegrees Input is in degrees
+         */
+        void SetRotation(const Vector3 newRotation, const bool isDegrees = false)
+        {
+            _eulerAngles = newRotation * (isDegrees ? FMath::DEGREES_TO_RAD : 1.f);
+            _localToWorld.SetRotation(_eulerAngles, false);
+            MarkDirty();
+        }
+
+        /**
+         * Add to the rotation of the Transform in EulerAngles
+         * @param delta World space offset
+         * @param isDegrees input is in degrees
+         */
+        void AddRotation(const Vector3 delta, const bool isDegrees = false)
+        {
+            _eulerAngles += delta * (isDegrees ? FMath::DEGREES_TO_RAD : 1.f);
+            _localToWorld.SetRotation(_eulerAngles, false);
+            MarkDirty();
+        }
+
+        /**
+         * Returns the rotation of the Transform in EulerAngles
+         * @param inDegrees Output in degrees
+         */
+        Vector3 GetEulerAngles(const bool inDegrees = false) const
+        {
+            return _eulerAngles * (inDegrees ? FMath::RAD_TO_DEGREES : 1.f);
+        }
+
+        /**
+         * Sets the scale of the Transform
+         * @param scale World space scale
+         */
+        void SetScale(const Vector3 scale)
+        {
+            _localToWorld.SetScale(scale);
+            MarkDirty();
+        }
+
+        /**
+         * Scales the Transform
+         * @param scale World space scale
+         */
         void Scale(const Vector3 scale)
         {
             _localToWorld.Scale(scale);
+            MarkDirty();
         }
 
+        /**
+         * Returns the scale of the Transform
+         */
         Vector3 GetScale() const
         {
             return _localToWorld.GetScale();
         }
 
+        /**
+         * Returns the World to Local Matrix
+         */
         Matrix4x4 GetWorldToLocal() const
         {
             return _localToWorld.GetInverse();
         }
 
+        /**
+         * Returns the Local to World Matrix
+         */
         Matrix4x4 GetLocalToWorld() const
         {
             return _localToWorld;
         }
 
+        /**
+         * Returns the Transforms local X
+         */
         Vector3 GetRight() const
         {
             return _localToWorld.GetRight();
         }
 
+        /**
+         * Returns the Transforms local Y
+         */
         Vector3 GetUp() const
         {
             return _localToWorld.GetUp();
         }
 
+        /**
+         * Returns the Transforms local Z
+         */
         Vector3 GetForward() const
         {
             return _localToWorld.GetForward();
@@ -133,7 +200,13 @@ namespace Engine
         }
 
     private:
+        void SyncEulerAngles()
+        {
+            _eulerAngles = _localToWorld.GetEulerAngles();
+        }
+
         Matrix4x4 _localToWorld;
+        Vector3 _eulerAngles = 0;
         bool _isDirty = false;
     };
 }

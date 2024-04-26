@@ -1,8 +1,8 @@
-﻿#pragma once
-#include "Vector3.h"
-#include "Matrix3x3.h"
+﻿//Modified copy of reactphysics/include/reactphysics3d/mathematics/Quaternion.h
 
-//Modified copy of reactphysics/include/reactphysics3d/mathematics/Quaternion.h
+#pragma once
+
+#include "Vector3.h"
 
 namespace reactphysics3d
 {
@@ -11,6 +11,8 @@ namespace reactphysics3d
 
 namespace Engine
 {
+    struct Matrix3x3;
+
     struct Quaternion
     {
         Quaternion() : X(0), Y(0), Z(0), W(0) {}
@@ -40,7 +42,6 @@ namespace Engine
         void Inverse();
 
         Quaternion GetConjugate() const;
-
         Quaternion GetInverse() const;
 
         Matrix3x3 GetMatrix() const;
@@ -155,7 +156,7 @@ namespace Engine
         const float l = Length();
 
         // Check if the length is not equal to zero
-        assert (l > FMath::EPSILON);
+        ANE_EASSERT(l > FMath::EPSILON);
 
         X /= l;
         Y /= l;
