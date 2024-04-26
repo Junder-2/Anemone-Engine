@@ -7,6 +7,7 @@
 #include "VmaTypes.h"
 #include "VulkanDeletionQueue.h"
 #include "VulkanDescriptors.h"
+#include "VulkanMaterial.h"
 #include "VulkanPipelineBuilder.h"
 #include "ANE/Math/Types/Matrix4x4.h"
 #include "ANE/Renderer/CommonSets.h"
@@ -218,6 +219,9 @@ namespace Engine
 
         inline static VkSampler _samplerLinear;
         inline static VkSampler _samplerNearest;
+
+        inline static MaterialInstance _fallbackMaterial;
+        inline static FilamentMetallicRoughness _filamentMaterial;
 
         // ImGui
         inline static ImGui_ImplVulkanH_Window _mainWindowData;
