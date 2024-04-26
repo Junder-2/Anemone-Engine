@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include <entt.hpp>
+//#include <entt.hpp>
 
 #include "UUIDGenerator.h"
 #include "ANE/Core/Scene/Scene.h"

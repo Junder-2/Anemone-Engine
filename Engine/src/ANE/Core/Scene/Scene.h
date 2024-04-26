@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "entt.hpp"
+//#include "../Entity/Entity.h"
 
 namespace reactphysics3d
 {
@@ -41,6 +42,6 @@ namespace Engine
         float _accumulator = 0;
         float _timeStep = 1.f/50.f;
 
-        std::map<std::string, Entity> _entityMap;
+        std::map<std::string, Engine::Entity> _entityMap;
     };
 }

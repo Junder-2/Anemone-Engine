@@ -1,22 +1,22 @@
 ﻿#pragma once
 #include "Layer.h"
 #include "entt.hpp"
+#include "../Scene/Scene.h"
 
 namespace Engine
 {
     struct InputValue;
-    class Scene;
+    class UILayerPanel;
 
     class EditorLayer : public Layer
     {
     public:
-
         EditorLayer(const std::string& name = "EditorLayer");
 
         ~EditorLayer() override;
 
         void OnUIRender() override;
-        void DockSpace();
+        //void DockSpace();
 
         void Init();
 
@@ -33,6 +33,8 @@ namespace Engine
 
         std::string GetComponentNameFromEnttId(entt::id_type id);
 
+        template <class TValue, typename... Args>
+        std::enable_if_t<std::is_base_of_v<UILayerPanel, TValue>> AddPanel(Args&&... args);
         template <class TValue>
         std::enable_if_t<std::is_base_of_v<Scene, TValue>> AddScene(const char* key);
 
@@ -61,7 +63,6 @@ namespace Engine
         std::unordered_map<const char*, std::shared_ptr<Scene>> _scenes;
         std::shared_ptr<Scene> _activeScene;
         std::map<entt::id_type, std::string> ComponentTypeMap;
-
     };
 
     template <class TValue>
@@ -79,4 +80,6 @@ namespace Engine
         if (_scenes.size() == 1)
             SetActiveScene(key);
     }
+
+
 }

@@ -7,11 +7,15 @@
 
 namespace Engine
 {
+
+    class EditorLayer;
+
     class EditorLogPanel : public UILayerPanel
     {
+
     public:
-        EditorLogPanel();
-        ~EditorLogPanel();
+        EditorLogPanel(EditorLayer* layer);
+        ~EditorLogPanel() = default;
 
         void OnPanelRender() override;
 
@@ -26,6 +30,8 @@ namespace Engine
 
         void LoadSettings();
         void SaveSettings();
+
+        EditorLayer* _editorLayer;
 
     private:
         static const ImVec4 colorInfo;

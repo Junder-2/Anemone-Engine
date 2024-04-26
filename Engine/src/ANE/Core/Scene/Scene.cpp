@@ -222,20 +222,21 @@ namespace Engine
     [[nodiscard("Entity never used")]] Entity Scene::Create(const char* name)
     {
         Entity ent{this, name};
-        _entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent;// here
+        //_entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent;// here
         return ent;
     }
     [[nodiscard("Entity never used")]] Entity Scene::Create(std::string stringName)
     {
 
         Entity ent{this, stringName.c_str()};
-        _entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent;
+        //_entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent;
         return ent;
     }
 
     Entity Scene::GetEntityWithUUID(std::string UUID)
     {
-        return _entityMap[UUID];
+        //return _entityMap[UUID];
+        return {};
     }
 
 }

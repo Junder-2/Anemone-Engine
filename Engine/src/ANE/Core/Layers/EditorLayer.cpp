@@ -51,7 +51,7 @@ namespace Engine
         CreateTestScene(50);
         AttachUIPanel(new SceneHierarchyPanel(this));
         AttachUIPanel(new InspectorPanel(this));
-        AttachUIPanel(new EditorLogPanel());
+        AttachUIPanel(new EditorLogPanel(this));
 
         // Then you would call load methods to load the most recent project
 
@@ -232,5 +232,11 @@ namespace Engine
         }
 
         ImGui::PopID();
+    }
+
+    template <class TValue, typename... Args>
+    std::enable_if_t<std::is_base_of_v<UILayerPanel, TValue>> EditorLayer::AddPanel(Args&&... args)
+    {
+        Layer::AttachUIPanel(new TValue(std::forward<Args>(args)...));
     }
 }

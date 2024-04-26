@@ -2,8 +2,8 @@
 #include "EditorLogPanel.h"
 
 #include <ranges>
-
 #include "imgui.h"
+#include "ANE/Core/Layers/EditorLayer.h"
 #include "ANE/Utilities/LoggingUtilities.h"
 
 namespace Engine
@@ -13,7 +13,7 @@ namespace Engine
     const ImVec4 EditorLogPanel::colorWarn {0.8f, 0.8f, 0.f, 1.f};
     const ImVec4 EditorLogPanel::colorError {1.0f, 0.1f, 0.1f, 1.f};
 
-    EditorLogPanel::EditorLogPanel()
+    EditorLogPanel::EditorLogPanel(EditorLayer* layer) : _editorLayer(layer)
     {
         _levelFilter = (int)LogLevelCategory::LevelError | (int)LogLevelCategory::LevelWarn | (int)LogLevelCategory::LevelInfo
                             | (int)LogLevelCategory::LevelDebug | (int)LogLevelCategory::LevelTrace;
@@ -25,10 +25,6 @@ namespace Engine
                 _loggerNameFilter.insert_or_assign(loggerName, true);
             }
         }
-    }
-
-    EditorLogPanel::~EditorLogPanel()
-    {
 
     }
 
@@ -36,7 +32,9 @@ namespace Engine
     {
         ANE_DEEP_PROFILE_FUNCTION();
 
-        ImGui::Begin("Log Window");
+        bool open;
+
+        ImGui::Begin("Log Window", &open);
 
         DrawToolBar();
 
@@ -61,6 +59,8 @@ namespace Engine
             ImGui::SetScrollHereY(1.f);
         }
         ImGui::EndChild();
+
+        //if (!open) _editorLayer->DetachUIPanel(this);
 
         ImGui::End();
     }
