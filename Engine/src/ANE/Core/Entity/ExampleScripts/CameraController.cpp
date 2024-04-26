@@ -121,7 +121,7 @@ namespace Engine
         const WindowResizeEvent& resizeEvent = dynamic_cast<WindowResizeEvent&>(event);
         const float w = (float)resizeEvent.GetWidth(), h = (float)resizeEvent.GetHeight();
 
-        _cameraComponent->UpdateAspectRatio(w / h);
+        _cameraComponent->SetAspectRatio(w / h);
         Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
     }
 
