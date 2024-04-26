@@ -43,6 +43,12 @@ namespace Engine
         }
         field.set(component_data,v);
     }
+    inline void inspect_collider_shape_type(entt::meta_data& field, entt::meta_any& component_data)
+    {
+        auto v = field.get(component_data).cast<CollisionShapeType>();
+        ImGui::Text("%d",v);
+
+    }
 
     inline void inspect_vector3_field(entt::meta_data& field, entt::meta_any& component_data)
     {
@@ -65,7 +71,8 @@ namespace Engine
     inline static std::unordered_map<entt::id_type, FieldInspectorFn> g_data_inspectors
     {
         {entt::type_id<std::string>().hash(), inspect_string_field},
-        {entt::type_id<TransformMatrix>().hash(), inspect_transform_component}
+        {entt::type_id<TransformMatrix>().hash(), inspect_transform_component},
+        //{entt::type_id<ColliderComponent>().hash(), inspect_collider_shape_type}
     };
 
 

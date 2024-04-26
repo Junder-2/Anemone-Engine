@@ -1,6 +1,10 @@
 #include "anepch.h"
 #include "InspectorPanel.h"
-
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <utility>
+#include <cstring>
 #include "imgui.h"
 #include "ANE/Core/Editor/SelectionManager.h"
 #include "ANE/Core/Layers/EditorLayer.h"
@@ -34,17 +38,18 @@ namespace Engine
         {
             Entity selectedEntity = _editorLayer->GetActiveScene()->GetEntityWithUUID(selectedEntityUUIDS->at(0));
             DrawEntityComponentList(selectedEntity);
-            if(ImGui::Button("Add Physics Suzanne")) // For physics testing
-                {
+            if (ImGui::Button("Add Physics Suzanne")) // For physics testing
+            {
                 selectedEntity.GetComponent<TransformComponent>().Transform.AddPosition(Random::InSphere(.2f));
                 selectedEntity.AddComponent<RenderComponent>("Suzanne.fbx");
                 selectedEntity.AddComponent<RigidBodyComponent>(selectedEntity);
                 selectedEntity.AddComponent<ColliderComponent>(selectedEntity, 1.f);
-                }
+            }
         }
         ImGui::ShowDemoWindow();
         ImGui::End();
     }
+
     std::string InspectorPanel::TypePrefixRemoval(std::string fullComponentName)
     {
         std::string prefix = "struct Engine::";
@@ -57,19 +62,18 @@ namespace Engine
     void InspectorPanel::DrawEntityComponentList(Entity& selectedEntity)
     {
         {
-
             for (auto&& [fst, snd] : _editorLayer->GetActiveScene()->_registry.storage())
             {
                 if (snd.contains(selectedEntity))
                 {
-                    entt::id_type component_type_id = fst;
-                    auto type = entt::resolve(component_type_id);
+                    entt::id_type componentTypeID = fst;
+                    auto type = entt::resolve(componentTypeID);
                     if (type)
                     {
-                        auto component_data = type.from_void(snd.value(selectedEntity));
-                        std::string component_type{type.info().name()};
-                        std::string full_string = TypePrefixRemoval(component_type);
-                        ImGui::Text(full_string.c_str(), ImGuiTreeNodeFlags_DefaultOpen);
+                        auto componentData = type.from_void(snd.value(selectedEntity));
+                        const std::string componentType{type.info().name()};
+                        std::string fullString = TypePrefixRemoval(componentType);
+                        ImGui::Text(fullString.c_str(), ImGuiTreeNodeFlags_DefaultOpen);
 
                         for (auto&& data : type.data())
                         {
@@ -78,11 +82,14 @@ namespace Engine
                             auto itr = g_data_inspectors.find(field.type().info().hash());
                             if (itr != g_data_inspectors.end())
                             {
-                                itr->second(field, component_data);
+                                itr->second(field, componentData);
                             }
                             else
                             {
-                                ImGui::Text("%s", std::to_string(field.type().info().hash()));
+                                std::string string;
+                                string.append("No draw function found for data of type hash");
+                                string.append(field.type().info().name());
+                                ImGui::Text("%s", string);
                             }
                         }
                     }
@@ -91,4 +98,3 @@ namespace Engine
         }
     }
 }
-

@@ -22,15 +22,15 @@ namespace Engine
         std::string TypePrefixRemoval(std::string fullComponentName);
 
         static void RegisterSelect(UUIDComponent selectedEntityID);
-        static void WipeSelect();
+        //static void WipeSelect();
         void DrawEntityComponentList(Entity& selectedEntity);
-        inline static std::string selected = "";
-        EditorLayer* _editorLayer;
 
         void OnPanelRender() override;
 
     private:
         SelectionManager::SelectionContext _selectionContext = SelectionManager::SelectionContext::UI;
         inline static std::string _selected = "";
+        EditorLayer* _editorLayer;
+
     };
 }
