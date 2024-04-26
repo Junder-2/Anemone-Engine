@@ -45,9 +45,7 @@ namespace Engine
     void EditorLayer::OnAttach()
     {
         // You would have a "Read from config files to find correct panel layout" method here
-        TagComponent::RegisterComponentMetaData();
-        TransformComponent::RegisterComponentMetaData();
-        ColliderComponent::RegisterComponentMetaData();
+
         CreateTestScene(50);
         AttachUIPanel(new SceneHierarchyPanel(this));
         AttachUIPanel(new InspectorPanel(this));
@@ -101,16 +99,12 @@ namespace Engine
 
     void EditorLayer::Init()
     {
-        //Every component type needs to be in here in order for it's text to be rendered
-        //Ideally, Kyle will develop this into component type specific renderering methods
-        //and we can then delete this map because it's kind of stupid, it's just quick and dirty
-        ComponentTypeMap[entt::type_id<TagComponent>().hash()] = "TagComponent";
-        ComponentTypeMap[entt::type_id<TransformComponent>().hash()] = "TransformComponent";
-        ComponentTypeMap[entt::type_id<NativeScriptComponent>().hash()] = "NativeScriptComponent";
-        ComponentTypeMap[entt::type_id<UUIDComponent>().hash()] = "UUIDComponent";
-        ComponentTypeMap[entt::type_id<RenderComponent>().hash()] = "RenderComponent";
-        ComponentTypeMap[entt::type_id<RigidBodyComponent>().hash()] = "RigidBodyComponent";
-        ComponentTypeMap[entt::type_id<ColliderComponent>().hash()] = "ColliderComponent";
+        TagComponent::RegisterComponentMetaData();
+        TransformComponent::RegisterComponentMetaData();
+        ColliderComponent::RegisterComponentMetaData();
+        RenderComponent::RegisterComponentMetaData();
+        UUIDComponent::RegisterComponentMetaData();
+        CameraComponent::RegisterComponentMetaData();
     }
 
     void EditorLayer::OnUpdate(float deltaTime)
