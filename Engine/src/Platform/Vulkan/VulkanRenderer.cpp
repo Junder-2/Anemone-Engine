@@ -62,7 +62,7 @@ namespace Engine
         }
 
         //ImGui::Render();
-        ImDrawData* drawData = ImGui::GetDrawData();
+        const ImDrawData* drawData = ImGui::GetDrawData();
         const bool isMinimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
         if (!isMinimized)
         {
@@ -142,7 +142,7 @@ namespace Engine
     void VulkanRenderer::SetupVulkan(SDL_Window* window)
     {
         const std::vector<const char*> extensions = GetAvailableExtensions(window);
-        vkb::Instance vkbInstance = CreateVkbInstance(extensions);
+        const vkb::Instance vkbInstance = CreateVkbInstance(extensions);
         _instance = vkbInstance.instance;
         _debugMessenger = vkbInstance.debug_messenger;
 
@@ -207,7 +207,7 @@ namespace Engine
 
         // Setup Platform/Renderer backends
         ImGui_ImplSDL2_InitForVulkan(window);
-        ImGui_ImplVulkanH_Window* wd = &_mainWindowData;
+        const ImGui_ImplVulkanH_Window* wd = &_mainWindowData;
 
         ImGui_ImplVulkan_InitInfo initInfo = {};
         initInfo.Instance = _instance;
@@ -253,11 +253,11 @@ namespace Engine
 
     vkb::Instance VulkanRenderer::CreateVkbInstance(const std::vector<const char*>& extensions)
     {
-        VkDebugUtilsMessageSeverityFlagBitsEXT debugMessageSeverityFlags = (VkDebugUtilsMessageSeverityFlagBitsEXT)(
+        constexpr VkDebugUtilsMessageSeverityFlagBitsEXT debugMessageSeverityFlags = (VkDebugUtilsMessageSeverityFlagBitsEXT)(
             VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
             VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
             VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT);
-        VkDebugUtilsMessageTypeFlagBitsEXT debugMessageTypeFlags = (VkDebugUtilsMessageTypeFlagBitsEXT)(
+        constexpr VkDebugUtilsMessageTypeFlagBitsEXT debugMessageTypeFlags = (VkDebugUtilsMessageTypeFlagBitsEXT)(
             VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
             VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
             VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT);
@@ -332,7 +332,7 @@ namespace Engine
         for (uint32_t i = 0; i < static_cast<uint32_t>(queueFamilies.size ()); i++) {
             if (!(queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)) continue;
 
-            queueDescriptions.push_back(vkb::CustomQueueDescription (i, std::vector<float> (queueFamilies[i].queueCount, 1.0f)));
+            queueDescriptions.emplace_back(i, std::vector(queueFamilies[i].queueCount, 1.0f));
             indices.GraphicsFamily = i;
             break;
         }
@@ -432,7 +432,7 @@ namespace Engine
 
         VmaAllocationCreateInfo cImgAllocInfo = { };
         cImgAllocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
-        cImgAllocInfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        cImgAllocInfo.requiredFlags = (VkMemoryPropertyFlags)VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
 
         CHECK_RESULT(vmaCreateImage(_vmaAllocator, &cImgInfo, &cImgAllocInfo, &_colorImage.Image, &_colorImage.Allocation, nullptr));
 
@@ -823,7 +823,7 @@ namespace Engine
 
         VmaBuffer materialConstants = CreateBuffer(sizeof(FilamentMetallicRoughness::MaterialConstants), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
-        FilamentMetallicRoughness::MaterialConstants* sceneUniformData = (FilamentMetallicRoughness::MaterialConstants*)materialConstants.Allocation->GetMappedData();
+        auto* sceneUniformData = (FilamentMetallicRoughness::MaterialConstants*)materialConstants.Allocation->GetMappedData();
         sceneUniformData->Color = Vector3::OneVector();
         sceneUniformData->Normal = 1.0f;
         sceneUniformData->Emission = Vector3::ZeroVector();
@@ -846,7 +846,7 @@ namespace Engine
 
     void VulkanRenderer::CreateImGuiDescriptorPool()
     {
-        VkDescriptorPoolSize poolSizes[] =
+        constexpr VkDescriptorPoolSize poolSizes[] =
         {
             { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1 },
         };
@@ -979,10 +979,10 @@ namespace Engine
         frame.SceneData.SunlightDirection = Vector4(sunDirection, 0);
         frame.SceneData.SunlightColor = Vector4(sunColor, 0);
 
-        ApplicationData* appUniformData = (ApplicationData*)appDataBuffer.Allocation->GetMappedData();
+        auto* appUniformData = (ApplicationData*)appDataBuffer.Allocation->GetMappedData();
         *appUniformData = frame.AppData;
 
-        SceneData* sceneUniformData = (SceneData*)sceneDataBuffer.Allocation->GetMappedData();
+        auto* sceneUniformData = (SceneData*)sceneDataBuffer.Allocation->GetMappedData();
         *sceneUniformData = frame.SceneData;
 
         VkDescriptorSet appDescriptor = frame.Descriptors.Allocate(_device, _appDataLayout, _allocator);
@@ -1053,12 +1053,12 @@ namespace Engine
     }
 
     // TODO: Fully integrate ImGui into rendering loop.
-    void VulkanRenderer::DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView)
+    void VulkanRenderer::DrawImGui(const VkCommandBuffer cmd, const VkImageView targetImageView)
     {
         ANE_DEEP_PROFILE_FUNCTION();
 
-        VkRenderingAttachmentInfo colorAttachment = VulkanInitializers::AttachmentInfo(targetImageView, nullptr, VK_IMAGE_LAYOUT_GENERAL);
-        VkRenderingInfo renderInfo = VulkanInitializers::RenderingInfo(_windowExtent, &colorAttachment, nullptr);
+        const VkRenderingAttachmentInfo colorAttachment = VulkanInitializers::AttachmentInfo(targetImageView, nullptr, VK_IMAGE_LAYOUT_GENERAL);
+        const VkRenderingInfo renderInfo = VulkanInitializers::RenderingInfo(_windowExtent, &colorAttachment, nullptr);
 
         vkCmdBeginRendering(cmd, &renderInfo);
 
@@ -1153,7 +1153,7 @@ namespace Engine
         // Always allocate images on dedicated GPU memory.
         VmaAllocationCreateInfo allocInfo = { };
         allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
-        allocInfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        allocInfo.requiredFlags = (VkMemoryPropertyFlags)VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
 
         CHECK_RESULT(vmaCreateImage(_vmaAllocator, &imgInfo, &allocInfo, &newImage.Image, &newImage.Allocation, nullptr));
 

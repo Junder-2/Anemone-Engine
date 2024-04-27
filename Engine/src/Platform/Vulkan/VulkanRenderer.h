@@ -91,7 +91,7 @@ namespace Engine
 
     private:
         // Function passed for error checking in ImGui.
-        static void CheckVkResult(VkResult err) { CHECK_RESULT(err); }
+        static void CheckVkResult(const VkResult err) { CHECK_RESULT(err); }
 
         static std::vector<const char*> GetAvailableExtensions(SDL_Window* window);
 
