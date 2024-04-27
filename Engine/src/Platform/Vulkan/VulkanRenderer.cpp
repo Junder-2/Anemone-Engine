@@ -18,7 +18,6 @@
 using Slang::ComPtr;
 
 #include "MeshLoader.h"
-#include "VulkanCommon.h"
 #include "VulkanInitializers.h"
 #include "VulkanUtils.h"
 #include "ANE/Core/Window.h"
@@ -242,15 +241,6 @@ namespace Engine
         initInfo.CheckVkResultFn = CheckVkResult;
 
         ImGui_ImplVulkan_Init(&initInfo);
-    }
-
-    void VulkanRenderer::CheckVkResult(VkResult err)
-    {
-        if (err == VK_SUCCESS)
-            return;
-        ANE_ELOG_ERROR("Vulkan Error: VkResult = {0}", (int)err);
-        if (err < 0)
-            abort();
     }
 
     std::vector<const char*> VulkanRenderer::GetAvailableExtensions(SDL_Window* window)

@@ -5,6 +5,7 @@
 #include <span>
 
 #include "VmaTypes.h"
+#include "VulkanCommon.h"
 #include "VulkanDeletionQueue.h"
 #include "VulkanDescriptors.h"
 #include "VulkanMaterial.h"
@@ -89,8 +90,8 @@ namespace Engine
         static VmaImage GetDepthBuffer() { return _depthImage; };
 
     private:
-        // Vulkan
-        static void CheckVkResult(VkResult err);
+        // Function passed for error checking in ImGui.
+        static void CheckVkResult(VkResult err) { CHECK_RESULT(err); };
 
         static std::vector<const char*> GetAvailableExtensions(SDL_Window* window);
 
