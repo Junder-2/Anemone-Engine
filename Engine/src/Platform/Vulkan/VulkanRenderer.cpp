@@ -18,6 +18,7 @@
 using Slang::ComPtr;
 
 #include "MeshLoader.h"
+#include "VulkanCommon.h"
 #include "VulkanInitializers.h"
 #include "VulkanUtils.h"
 #include "ANE/Core/Window.h"
@@ -102,8 +103,7 @@ namespace Engine
             return;
         }
 
-        const VkResult err = vkDeviceWaitIdle(_device);
-        CheckVkResult(err);
+        CHECK_RESULT(vkDeviceWaitIdle(_device));
 
         CleanupImGui();
         CleanupVulkan();
@@ -451,11 +451,11 @@ namespace Engine
         cImgAllocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
         cImgAllocInfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-        CheckVkResult(vmaCreateImage(_vmaAllocator, &cImgInfo, &cImgAllocInfo, &_colorImage.Image, &_colorImage.Allocation, nullptr));
+        CHECK_RESULT(vmaCreateImage(_vmaAllocator, &cImgInfo, &cImgAllocInfo, &_colorImage.Image, &_colorImage.Allocation, nullptr));
 
         const VkImageViewCreateInfo cViewInfo = VulkanInitializers::ImageViewCreateInfo(_colorImage.ImageFormat, _colorImage.Image, VK_IMAGE_ASPECT_COLOR_BIT);
 
-        CheckVkResult(vkCreateImageView(_device, &cViewInfo, _allocator, &_colorImage.ImageView));
+        CHECK_RESULT(vkCreateImageView(_device, &cViewInfo, _allocator, &_colorImage.ImageView));
 
         // Setup depth buffer.
         _depthImage.ImageFormat = VK_FORMAT_D32_SFLOAT;
@@ -466,11 +466,11 @@ namespace Engine
 
         const VkImageCreateInfo dImgInfo = VulkanInitializers::ImageCreateInfo(_depthImage.ImageFormat, depthImageUsages, imageExtent);
 
-        CheckVkResult(vmaCreateImage(_vmaAllocator, &dImgInfo, &cImgAllocInfo, &_depthImage.Image, &_depthImage.Allocation, nullptr));
+        CHECK_RESULT(vmaCreateImage(_vmaAllocator, &dImgInfo, &cImgAllocInfo, &_depthImage.Image, &_depthImage.Allocation, nullptr));
 
         const VkImageViewCreateInfo dViewInfo = VulkanInitializers::ImageViewCreateInfo(_depthImage.ImageFormat, _depthImage.Image, VK_IMAGE_ASPECT_DEPTH_BIT);
 
-        CheckVkResult(vkCreateImageView(_device, &dViewInfo, _allocator, &_depthImage.ImageView));
+        CHECK_RESULT(vkCreateImageView(_device, &dViewInfo, _allocator, &_depthImage.ImageView));
     }
 
     void VulkanRenderer::DestroyMainBuffers()
@@ -509,11 +509,11 @@ namespace Engine
         // Frame buffers.
         for (VulkanFrame& frame : _frameData)
         {
-            CheckVkResult(vkCreateCommandPool(_device, &commandPoolInfo, _allocator, &frame.CommandPool));
+            CHECK_RESULT(vkCreateCommandPool(_device, &commandPoolInfo, _allocator, &frame.CommandPool));
 
             VkCommandBufferAllocateInfo cmdAllocInfo = VulkanInitializers::CommandBufferAllocateInfo(frame.CommandPool, 1);
 
-            CheckVkResult(vkAllocateCommandBuffers(_device, &cmdAllocInfo, &frame.CommandBuffer));
+            CHECK_RESULT(vkAllocateCommandBuffers(_device, &cmdAllocInfo, &frame.CommandBuffer));
 
             _mainDeletionQueue.PushFunction([=]
             {
@@ -522,11 +522,11 @@ namespace Engine
         }
 
         // Immediate buffer.
-        CheckVkResult(vkCreateCommandPool(_device, &commandPoolInfo, _allocator, &_immBuffer.CommandPool));
+        CHECK_RESULT(vkCreateCommandPool(_device, &commandPoolInfo, _allocator, &_immBuffer.CommandPool));
 
         const VkCommandBufferAllocateInfo cmdAllocInfo = VulkanInitializers::CommandBufferAllocateInfo(_immBuffer.CommandPool, 1);
 
-        CheckVkResult(vkAllocateCommandBuffers(_device, &cmdAllocInfo, &_immBuffer.CommandBuffer));
+        CHECK_RESULT(vkAllocateCommandBuffers(_device, &cmdAllocInfo, &_immBuffer.CommandBuffer));
 
         _mainDeletionQueue.PushFunction([=]
         {
@@ -537,7 +537,7 @@ namespace Engine
     void VulkanRenderer::SetupSyncStructures()
     {
         const VkFenceCreateInfo fenceCreateInfo = VulkanInitializers::FenceCreateInfo(VK_FENCE_CREATE_SIGNALED_BIT);
-        CheckVkResult(vkCreateFence(_device, &fenceCreateInfo, _allocator, &_immBuffer.Fence));
+        CHECK_RESULT(vkCreateFence(_device, &fenceCreateInfo, _allocator, &_immBuffer.Fence));
 
         _mainDeletionQueue.PushFunction([=]
         {
@@ -546,12 +546,12 @@ namespace Engine
 
         for (VulkanFrame& frame : _frameData)
         {
-            CheckVkResult(vkCreateFence(_device, &fenceCreateInfo, _allocator, &frame.Fence));
+            CHECK_RESULT(vkCreateFence(_device, &fenceCreateInfo, _allocator, &frame.Fence));
 
             VkSemaphoreCreateInfo semaphoreCreateInfo = VulkanInitializers::SemaphoreCreateInfo();
 
-            CheckVkResult(vkCreateSemaphore(_device, &semaphoreCreateInfo, _allocator, &frame.SwapchainSemaphore));
-            CheckVkResult(vkCreateSemaphore(_device, &semaphoreCreateInfo, _allocator, &frame.RenderSemaphore));
+            CHECK_RESULT(vkCreateSemaphore(_device, &semaphoreCreateInfo, _allocator, &frame.SwapchainSemaphore));
+            CHECK_RESULT(vkCreateSemaphore(_device, &semaphoreCreateInfo, _allocator, &frame.RenderSemaphore));
 
             _mainDeletionQueue.PushFunction([=]
             {
@@ -726,7 +726,7 @@ namespace Engine
         pipelineLayoutInfo.pPushConstantRanges = &bufferRange;
         pipelineLayoutInfo.pushConstantRangeCount = 1;
 
-        CheckVkResult(vkCreatePipelineLayout(_device, &pipelineLayoutInfo, _allocator, &_pipelineLayout));
+        CHECK_RESULT(vkCreatePipelineLayout(_device, &pipelineLayoutInfo, _allocator, &_pipelineLayout));
 
         VulkanPipelineBuilder builder{ logicalDevice, _pipelineLayout };
         vkb::Result<PipelineWrapper> pipeline = builder
@@ -821,8 +821,7 @@ namespace Engine
         poolInfo.poolSizeCount = (uint32_t)IM_ARRAYSIZE(poolSizes);
         poolInfo.pPoolSizes = poolSizes;
 
-        VkResult err = vkCreateDescriptorPool(_device, &poolInfo, _allocator, &_imGuiDescriptorPool);
-        CheckVkResult(err);
+        CHECK_RESULT(vkCreateDescriptorPool(_device, &poolInfo, _allocator, &_imGuiDescriptorPool));
 
         _mainDeletionQueue.PushFunction([&]{ vkDestroyDescriptorPool(_device, _imGuiDescriptorPool, _allocator); });
     }
@@ -841,7 +840,7 @@ namespace Engine
         }
 
         VulkanFrame& frame = GetFrame();
-        CheckVkResult(vkWaitForFences(_device, 1, &frame.Fence, true, 1000000000));
+        CHECK_RESULT(vkWaitForFences(_device, 1, &frame.Fence, true, 1000000000));
 
         uint32_t swapchainImageIndex;
         VkResult result = vkAcquireNextImageKHR(_device, _swapchain, 1000000000, frame.SwapchainSemaphore, nullptr, &swapchainImageIndex);
@@ -854,13 +853,13 @@ namespace Engine
         frame.DeletionQueue.Flush();
         frame.Descriptors.Clear(_device);
 
-        CheckVkResult(vkResetFences(_device, 1, &frame.Fence));
+        CHECK_RESULT(vkResetFences(_device, 1, &frame.Fence));
 
         const VkCommandBuffer cmd = frame.CommandBuffer;
 
-        CheckVkResult(vkResetCommandBuffer(cmd, 0));
+        CHECK_RESULT(vkResetCommandBuffer(cmd, 0));
         const VkCommandBufferBeginInfo cmdBeginInfo = VulkanInitializers::CommandBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-        CheckVkResult(vkBeginCommandBuffer(cmd, &cmdBeginInfo));
+        CHECK_RESULT(vkBeginCommandBuffer(cmd, &cmdBeginInfo));
 
         VulkanUtils::TransitionImage(cmd, _colorImage.Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
         VulkanUtils::TransitionImage(cmd, _depthImage.Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
@@ -882,7 +881,7 @@ namespace Engine
         // Prepare and present active swapchain buffer.
         VulkanUtils::TransitionImage(cmd, swapchainImage, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
-        CheckVkResult(vkEndCommandBuffer(cmd));
+        CHECK_RESULT(vkEndCommandBuffer(cmd));
 
         const VkCommandBufferSubmitInfo cmdInfo = VulkanInitializers::CommandBufferSubmitInfo(cmd);
         const VkSemaphoreSubmitInfo waitInfo = VulkanInitializers::SemaphoreSubmitInfo(VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR, frame.SwapchainSemaphore);
@@ -890,7 +889,7 @@ namespace Engine
 
         const VkSubmitInfo2 submitInfo = VulkanInitializers::SubmitInfo(&cmdInfo, &signalInfo, &waitInfo);
 
-        CheckVkResult(vkQueueSubmit2(_queue, 1, &submitInfo, frame.Fence));
+        CHECK_RESULT(vkQueueSubmit2(_queue, 1, &submitInfo, frame.Fence));
 
         {
             ANE_DEEP_PROFILE_SCOPE("vkQueuePresentKHR");
@@ -1078,7 +1077,7 @@ namespace Engine
         allocatorInfo.instance = _instance;
         allocatorInfo.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
 
-        CheckVkResult(vmaCreateAllocator(&allocatorInfo, &_vmaAllocator));
+        CHECK_RESULT(vmaCreateAllocator(&allocatorInfo, &_vmaAllocator));
     }
 
     VmaBuffer VulkanRenderer::CreateBuffer(const size_t allocSize, const VkBufferUsageFlags usage, const VmaMemoryUsage memoryUsage)
@@ -1093,7 +1092,7 @@ namespace Engine
         vmaAllocInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT;
 
         VmaBuffer newBuffer;
-        CheckVkResult(vmaCreateBuffer(_vmaAllocator, &bufferInfo, &vmaAllocInfo, &newBuffer.Buffer, &newBuffer.Allocation, &newBuffer.Info));
+        CHECK_RESULT(vmaCreateBuffer(_vmaAllocator, &bufferInfo, &vmaAllocInfo, &newBuffer.Buffer, &newBuffer.Allocation, &newBuffer.Info));
 
         return newBuffer;
     }
@@ -1120,7 +1119,7 @@ namespace Engine
         allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
         allocInfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-        CheckVkResult(vmaCreateImage(_vmaAllocator, &imgInfo, &allocInfo, &newImage.Image, &newImage.Allocation, nullptr));
+        CHECK_RESULT(vmaCreateImage(_vmaAllocator, &imgInfo, &allocInfo, &newImage.Image, &newImage.Allocation, nullptr));
 
         // Depth formats need to use the correct aspect flag.
         VkImageAspectFlags aspectFlag = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -1133,7 +1132,7 @@ namespace Engine
         VkImageViewCreateInfo viewInfo = VulkanInitializers::ImageViewCreateInfo(format, newImage.Image, aspectFlag);
         viewInfo.subresourceRange.levelCount = imgInfo.mipLevels;
 
-        CheckVkResult(vkCreateImageView(_device, &viewInfo, _allocator, &newImage.ImageView));
+        CHECK_RESULT(vkCreateImageView(_device, &viewInfo, _allocator, &newImage.ImageView));
 
         return newImage;
     }
@@ -1181,26 +1180,26 @@ namespace Engine
 
     void VulkanRenderer::ImmediateSubmit(std::function<void(VkCommandBuffer cmd)>&& function)
     {
-        CheckVkResult(vkResetFences(_device, 1, &_immBuffer.Fence));
-        CheckVkResult(vkResetCommandBuffer(_immBuffer.CommandBuffer, 0));
+        CHECK_RESULT(vkResetFences(_device, 1, &_immBuffer.Fence));
+        CHECK_RESULT(vkResetCommandBuffer(_immBuffer.CommandBuffer, 0));
 
         const VkCommandBuffer cmd = _immBuffer.CommandBuffer;
         // The command buffer is used exactly once, so we let Vulkan know that.
         const VkCommandBufferBeginInfo cmdBeginInfo = VulkanInitializers::CommandBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-        CheckVkResult(vkBeginCommandBuffer(cmd, &cmdBeginInfo));
+        CHECK_RESULT(vkBeginCommandBuffer(cmd, &cmdBeginInfo));
 
         function(cmd);
 
-        CheckVkResult(vkEndCommandBuffer(cmd));
+        CHECK_RESULT(vkEndCommandBuffer(cmd));
 
         const VkCommandBufferSubmitInfo cmdInfo = VulkanInitializers::CommandBufferSubmitInfo(cmd);
         const VkSubmitInfo2 submit = VulkanInitializers::SubmitInfo(&cmdInfo, nullptr, nullptr);
 
-        CheckVkResult(vkQueueSubmit2(_queue, 1, &submit, _immBuffer.Fence));
+        CHECK_RESULT(vkQueueSubmit2(_queue, 1, &submit, _immBuffer.Fence));
 
         // Thread will be blocked until the graphic commands finish execution.
-        CheckVkResult(vkWaitForFences(_device, 1, &_immBuffer.Fence, true, 9999999999));
+        CHECK_RESULT(vkWaitForFences(_device, 1, &_immBuffer.Fence, true, 9999999999));
     }
 
     VmaMeshBuffers VulkanRenderer::UploadMesh(const std::span<uint32_t> indices, const std::span<Vertex> vertices)
