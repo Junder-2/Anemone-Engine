@@ -86,12 +86,12 @@ namespace Engine
         static VkDevice GetDevice() { return _device; }
         static VkAllocationCallbacks* GetAllocator() { return _allocator; }
         static std::vector<VkDescriptorSetLayout> GetSceneLayouts() { return { _appDataLayout, _geometryDataLayout}; }
-        static VmaImage GetColorBuffer() { return _colorImage; };
-        static VmaImage GetDepthBuffer() { return _depthImage; };
+        static VmaImage GetColorBuffer() { return _colorImage; }
+        static VmaImage GetDepthBuffer() { return _depthImage; }
 
     private:
         // Function passed for error checking in ImGui.
-        static void CheckVkResult(VkResult err) { CHECK_RESULT(err); };
+        static void CheckVkResult(VkResult err) { CHECK_RESULT(err); }
 
         static std::vector<const char*> GetAvailableExtensions(SDL_Window* window);
 
