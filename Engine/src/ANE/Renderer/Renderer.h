@@ -21,6 +21,8 @@ namespace Engine
 
         static VmaMeshAsset LoadModel(const std::string& modelPath);
 
+        static VmaImage LoadTexture(const std::string& texturePath);
+
         static void SubmitDrawCommand(const DrawCommand& command);
 
         //These methods are sandwiched around the UI Layer render loops

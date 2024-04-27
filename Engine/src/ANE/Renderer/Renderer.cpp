@@ -36,6 +36,11 @@ namespace Engine
         return _vulkanRenderer->LoadModel(modelPath);
     }
 
+    VmaImage Renderer::LoadTexture(const std::string& texturePath)
+    {
+        return _vulkanRenderer->LoadTexture(texturePath);
+    }
+
     void Renderer::SubmitDrawCommand(const DrawCommand& command)
     {
         _drawCommands.Commands.push_back(command);
