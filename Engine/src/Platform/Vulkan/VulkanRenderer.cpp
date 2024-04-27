@@ -706,19 +706,11 @@ namespace Engine
         {
             ANE_ELOG_ERROR("Error when building vertex shader module: Mesh-Diffuse.slang");
         }
-        else
-        {
-            ANE_ELOG_INFO("Built vertex shader module: Mesh-Diffuse.slang");
-        }
 
         VkShaderModule meshFragShader;
         if (!VulkanUtils::LoadShaderModule(spirvFragProgram, _device, _allocator, &meshFragShader))
         {
             ANE_ELOG_ERROR("Error when building fragment shader module: Mesh-Diffuse.slang");
-        }
-        else
-        {
-            ANE_ELOG_INFO("Built fragment shader module: Mesh-Diffuse.slang");
         }
 
         VkPushConstantRange bufferRange;
