@@ -174,6 +174,7 @@ namespace Engine
 
         // Deletion queue with the scope of the renderer.
         inline static VulkanDeletionQueue _mainDeletionQueue;
+        inline static DescriptorAllocator _mainDescriptors;
 
         inline static VkAllocationCallbacks* _allocator = nullptr;
         inline static VkInstance _instance = VK_NULL_HANDLE;
@@ -222,7 +223,7 @@ namespace Engine
         inline static VkSampler _samplerLinear;
         inline static VkSampler _samplerNearest;
 
-        inline static MaterialInstance _fallbackMaterial;
+        inline static MaterialInstance _filamentInstance;
         inline static FilamentMetallicRoughness _filamentMaterial;
 
         // ImGui

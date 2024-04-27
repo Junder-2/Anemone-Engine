@@ -55,6 +55,36 @@ namespace Engine
             _filamentMaterial.ClearResources(this);
         });
 
+        FilamentMetallicRoughness::MaterialResources materialResources;
+        materialResources.ColorImage = _whiteImage;
+        materialResources.ColorSampler = _samplerLinear;
+        materialResources.NormalImage = _normalImage;
+        materialResources.NormalSampler = _samplerLinear;
+        materialResources.ORMImage = _blackImage;
+        materialResources.ORMSampler = _samplerLinear;
+
+        VmaBuffer materialConstants = CreateBuffer(sizeof(FilamentMetallicRoughness::MaterialConstants), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+
+        FilamentMetallicRoughness::MaterialConstants* sceneUniformData = (FilamentMetallicRoughness::MaterialConstants*)materialConstants.Allocation->GetMappedData();
+        sceneUniformData->Color = Vector3::OneVector();
+        sceneUniformData->Normal = 1.0f;
+        sceneUniformData->Emission = Vector3::ZeroVector();
+        sceneUniformData->Metallic = 0.0f;
+        sceneUniformData->Roughness = 1.0f;
+        sceneUniformData->Reflectance = 0.0f;
+        sceneUniformData->Height = 0.0f;
+        sceneUniformData->Occlusion = 0.0f;
+
+        materialResources.DataBuffer = materialConstants.Buffer;
+        materialResources.DataBufferOffset = 0;
+
+        _fallbackMaterial = _filamentMaterial.WriteMaterial(this, MaterialPass::Opaque, materialResources, _mainDescriptors);
+
+        _mainDeletionQueue.PushFunction([=]
+        {
+            DestroyBuffer(materialConstants);
+        });
+
         _initialized = true;
     }
 
@@ -554,6 +584,19 @@ namespace Engine
 
     void VulkanRenderer::SetupDescriptors()
     {
+        std::vector<DescriptorAllocator::PoolSizeRatio> sizes =
+        {
+            { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 3 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 3 },
+            { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 3 },
+        };
+
+        _mainDescriptors.Init(_device, 10, sizes, _allocator);
+        _mainDeletionQueue.PushFunction([&]
+        {
+            _mainDescriptors.Destroy(_device, _allocator);
+        });
+
         {
             DescriptorLayoutBuilder builder { _device };
             _appDataLayout = builder
