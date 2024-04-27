@@ -78,6 +78,7 @@ namespace Engine
         void Cleanup();
 
         VmaMeshAsset LoadModel(const std::string& modelPath);
+        VmaImage LoadTexture(const std::string& texturePath);
 
         float GetFramerate();
         static ImGuiIO* GetImGuiIO() { return _io; }
@@ -212,6 +213,7 @@ namespace Engine
         inline static VulkanImmediateBuffer _immBuffer;
 
         inline static entt::dense_map<std::string, VmaMeshAsset> _loadedModelMap;
+        inline static entt::dense_map<std::string, VmaImage> _loadedTextureMap;
 
         // Engine resources
         inline static VmaImage _whiteImage;

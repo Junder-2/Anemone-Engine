@@ -11,6 +11,8 @@
 #include <assimp/postprocess.h>
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 #include <filesystem>
 #include <slang.h>
 #include <slang-com-ptr.h>
@@ -132,6 +134,34 @@ namespace Engine
         _loadedModelMap[modelPath] = vmaMeshAsset;
 
         return vmaMeshAsset;
+    }
+
+    VmaImage VulkanRenderer::LoadTexture(const std::string& texturePath)
+    {
+        if (_loadedTextureMap.contains(texturePath))
+        {
+            return _loadedTextureMap[texturePath];
+        }
+
+        int width, height, channels;
+        const stbi_uc* pixels = stbi_load(texturePath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
+        if (!pixels)
+        {
+            ANE_ELOG_ERROR("Unable to load texture at path: {}", texturePath);
+            return _errorImage;
+        }
+
+        const VkExtent3D imageExtent = VkExtent3D{ (uint32_t)width, (uint32_t)height, 1 };
+        const VmaImage imageBuffers = CreateImage(pixels, imageExtent, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_SAMPLED_BIT);
+
+        _mainDeletionQueue.PushFunction([=]
+        {
+            DestroyImage(imageBuffers);
+        });
+
+        _loadedTextureMap[texturePath] = imageBuffers;
+
+        return imageBuffers;
     }
 
     float VulkanRenderer::GetFramerate()
