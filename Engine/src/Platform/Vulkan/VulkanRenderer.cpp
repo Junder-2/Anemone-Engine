@@ -577,7 +577,6 @@ namespace Engine
             _singleImageDataLayout = builder
                 .SetStageFlags(VK_SHADER_STAGE_FRAGMENT_BIT)
                 .AddBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER)
-                .AddBinding(1, VK_DESCRIPTOR_TYPE_SAMPLER)
 
                 .SetAllocationCallbacks(_allocator)
                 .Build();
@@ -960,7 +959,6 @@ namespace Engine
         {
             DescriptorWriter writer;
             writer.WriteImage(0, _errorImage.ImageView, _samplerNearest, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-            writer.WriteImage(1, _errorImage.ImageView, _samplerNearest, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_SAMPLER);
             writer.UpdateSet(_device, imageDescriptor);
         }
 
