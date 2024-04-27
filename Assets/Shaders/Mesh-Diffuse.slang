@@ -65,7 +65,7 @@ float4 fragmentMain(Varyings input) : SV_TARGET
     float3 normal = normalize(input.normal);
     float2 uv = input.uv;
 
-    float4 color = material.texture.Sample(material.sampler, uv) * float4(input.color, 1);
+    float4 color = material.texture.Sample(uv) * float4(input.color, 1);
 
     float nDotL = saturate(dot(normal, -sceneData.SunlightDirection.rgb));
     color.rgb *= nDotL * sceneData.SunlightColor.rgb;

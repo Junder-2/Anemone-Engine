@@ -16,6 +16,5 @@ struct SceneData
 // Per-material data.
 struct Material
 {
-    Texture2D texture;
-    SamplerState sampler;
+    Sampler2D texture;
 };
