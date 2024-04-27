@@ -95,7 +95,7 @@ namespace Engine
 
         static std::vector<const char*> GetAvailableExtensions(SDL_Window* window);
 
-        static void SetupVulkan(SDL_Window* window);
+        void SetupVulkan(SDL_Window* window);
         static void SetupImGui(SDL_Window* window);
 
         static vkb::Instance CreateVkbInstance(const std::vector<const char*>& extensions);
@@ -118,7 +118,7 @@ namespace Engine
 
         static PipelineWrapper CreatePipeline(const vkb::Device& logicalDevice);
 
-        static void CreateDefaultResources();
+        void CreateDefaultResources();
 
         static void CreateImGuiDescriptorPool();
 
