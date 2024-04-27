@@ -755,6 +755,7 @@ namespace Engine
         const uint32_t black = glm::packUnorm4x8(Vector4(0, 0, 0, 1));
         const uint32_t grey = glm::packUnorm4x8(Vector4(0.66f, 0.66f, 0.66f, 1));
         const uint32_t magenta = glm::packUnorm4x8(Vector4(1, 0, 1, 1));
+        const uint32_t normal = glm::packUnorm4x8(Vector4(0.5f, 0.5f, 1, 1));
         uint32_t pixels[16 * 16];
 
         for (uint32_t& pixel : pixels) { pixel = white; }
@@ -765,6 +766,9 @@ namespace Engine
 
         for (uint32_t& pixel : pixels) { pixel = grey; }
         _greyImage = CreateImage((void*)&pixels, defaultImageExtent, defaultImageFormat, VK_IMAGE_USAGE_SAMPLED_BIT);
+
+        for (uint32_t& pixel : pixels) { pixel = normal; }
+        _normalImage = CreateImage((void*)&pixels, defaultImageExtent, defaultImageFormat, VK_IMAGE_USAGE_SAMPLED_BIT);
 
         for (int x = 0; x < 16; x++)
         {
@@ -790,6 +794,7 @@ namespace Engine
             DestroyImage(_whiteImage);
             DestroyImage(_blackImage);
             DestroyImage(_greyImage);
+            DestroyImage(_normalImage);
             DestroyImage(_errorImage);
 
             vkDestroySampler(_device, _samplerLinear, _allocator);
