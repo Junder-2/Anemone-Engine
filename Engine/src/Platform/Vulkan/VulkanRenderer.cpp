@@ -143,11 +143,13 @@ namespace Engine
             return _loadedTextureMap[texturePath];
         }
 
+        const std::string assetPath = std::string("../Assets/Textures/").append(texturePath);
+
         int width, height, channels;
-        const stbi_uc* pixels = stbi_load(texturePath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
+        const stbi_uc* pixels = stbi_load(assetPath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
         if (!pixels)
         {
-            ANE_ELOG_ERROR("Unable to load texture at path: {}", texturePath);
+            ANE_ELOG_ERROR("Unable to load texture at path: {}", assetPath);
             return _errorImage;
         }
 
