@@ -53,6 +53,7 @@ float4 fragmentMain(Varyings input) : SV_TARGET
     float4 colorMap = props.ColorMap.Sample(uv);
     float3 normalMap = props.NormalMap.Sample(uv).rgb;
     float3 ormMap = props.ORMMap.Sample(uv).rgb;
+    normal = TangentDirToWorld(normal, tangent, GetTangentSpaceNormal(uv));
 
     float4 color = colorMap * float4(input.color, 1);
     
