@@ -50,9 +50,6 @@ float4 fragmentMain(Varyings input) : SV_TARGET
     float3 tangent = normalize(input.tangent);
     float2 uv = input.uv;
 
-    float4 colorMap = props.ColorMap.Sample(uv);
-    float3 normalMap = props.NormalMap.Sample(uv).rgb;
-    float3 ormMap = props.ORMMap.Sample(uv).rgb;
     normal = TangentDirToWorld(normal, tangent, GetTangentSpaceNormal(uv));
 
     float4 color = GetColor(uv);
@@ -61,5 +58,20 @@ float4 fragmentMain(Varyings input) : SV_TARGET
     color.rgb *= nDotL * sceneData.SunlightColor.rgb;
     color.rgb += sceneData.AmbientColor.rgb;
 
-    return float4(color);
+    // Used for debugging.
+    float4 colorMap = props.ColorMap.Sample(uv);
+    float3 normalMap = props.NormalMap.Sample(uv).rgb;
+    float3 ormMap = props.ORMMap.Sample(uv).rgb;
+
+    float3 outputs[6];
+    outputs[0] = colorMap.rgb;
+    outputs[1] = normalMap;
+    outputs[2] = ormMap;
+    outputs[3] = color.rgb;
+    outputs[4] = color.rgb;
+    outputs[5] = color.rgb;
+
+    int outputIndex = int(uv.x * 6 + uv.y + appData.Time * .1);
+    //int outputIndex = 2;
+    return float4(outputs[outputIndex % 6], 1);
 }
