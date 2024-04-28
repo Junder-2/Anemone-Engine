@@ -60,3 +60,27 @@ ConstantBuffer<PushConstants> pushConstants;
 ParameterBlock<AppData> appData;
 ParameterBlock<SceneData> sceneData;
 ParameterBlock<MaterialProperties> props;
+
+// Getters.
+float4 GetColor(float2 uv)
+{
+    float4 colorMap = props.ColorMap.Sample(uv);
+    return colorMap;
+}
+
+float3 GetTangentSpaceNormal(float2 uv)
+{
+    float3 normalMap = props.NormalMap.Sample(uv).rgb;
+    return UnpackNormalMap(normalMap, .5);
+}
+
+float3 GetORM(float2 uv)
+{
+    float3 ormMap = props.ORMMap.Sample(uv).rgb;
+    float3 orm;
+    orm.x = lerp(1, ormMap.x, props.Occlusion);
+    orm.y = lerp(ormMap.y, 1, props.Roughness);
+    orm.z = ormMap.z * props.Metallic;
+
+    return orm;
+}
