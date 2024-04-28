@@ -56,7 +56,7 @@ float4 fragmentMain(Varyings input) : SV_TARGET
 
     float4 color = colorMap * float4(input.color, 1);
     
-    float nDotL = saturate(dot(normal, -sceneData.SunlightDirection.rgb));
+    float nDotL = saturate(dot(normal, -sceneData.SunlightDirection.xyz));
     color.rgb *= nDotL * sceneData.SunlightColor.rgb;
     color.rgb += sceneData.AmbientColor.rgb;
 
