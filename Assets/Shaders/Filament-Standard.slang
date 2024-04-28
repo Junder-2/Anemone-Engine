@@ -55,7 +55,7 @@ float4 fragmentMain(Varyings input) : SV_TARGET
     float3 ormMap = props.ORMMap.Sample(uv).rgb;
     normal = TangentDirToWorld(normal, tangent, GetTangentSpaceNormal(uv));
 
-    float4 color = colorMap * float4(input.color, 1);
+    float4 color = GetColor(uv);
     
     float nDotL = saturate(dot(normal, -sceneData.SunlightDirection.xyz));
     color.rgb *= nDotL * sceneData.SunlightColor.rgb;
