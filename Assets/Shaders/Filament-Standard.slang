@@ -9,7 +9,6 @@
     float4 color : COLOR;
 };*/
 
-// TODO: Tangents
 struct Vertex
 {
     float3 position;
@@ -17,6 +16,7 @@ struct Vertex
     float3 normal;
     float uvY;
     float4 color;
+    float4 tangent;
 };
 
 struct PushConstants
