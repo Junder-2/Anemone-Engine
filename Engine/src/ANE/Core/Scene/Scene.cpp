@@ -114,6 +114,19 @@ namespace Engine
 
         _accumulator += timeStep;
 
+        const auto group = _registry.view<TransformComponent, RigidBodyComponent>();
+        for (const auto entity : group) //We need to apply changes in our transform to the internal rigidbody
+        {
+            auto[transform, body] = group.get<TransformComponent, RigidBodyComponent>(entity);
+
+            TransformMatrix& transformMatrix = transform.Transform;
+
+            if(!transformMatrix.IsDirty()) continue;
+
+            body.GetRigidBody()->SetTransform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
+            transformMatrix.ClearDirty();
+        }
+
         // Fixed update
         while (_accumulator >= _timeStep)
         {
@@ -130,19 +143,6 @@ namespace Engine
     void Scene::OnFixedUpdate(float timeStep)
     {
         ANE_DEEP_PROFILE_FUNCTION();
-
-        const auto group = _registry.view<TransformComponent, RigidBodyComponent>();
-        for (const auto entity : group) //We need to apply changes in our transform to the internal rigidbody
-        {
-            auto[transform, body] = group.get<TransformComponent, RigidBodyComponent>(entity);
-
-            TransformMatrix& transformMatrix = transform.Transform;
-
-            if(!transformMatrix.IsDirty()) continue;
-
-            body.GetRigidBody()->SetTransform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
-            transformMatrix.ClearDirty();
-        }
 
         _physicsWorld->update(timeStep);
 
@@ -178,7 +178,7 @@ namespace Engine
             auto newTransform = rp3d::Transform::interpolateTransforms(currentTransform, body.GetRigidBody()->GetReactRigidBody().getTransform(), factor);
 
             transformMatrix.SetPosition(Vector3::Convert(newTransform.getPosition()));
-            transformMatrix.SetRotation(Quaternion::Convert(newTransform.getOrientation()));
+            transformMatrix.SetRotation(Quaternion::Convert(newTransform.getOrientation())); //TODO: Issues with scale and rotation
             transformMatrix.ClearDirty();
         }
     }

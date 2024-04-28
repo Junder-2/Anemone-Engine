@@ -80,7 +80,7 @@ namespace Engine
          */
         Quaternion GetQuaternion() const
         {
-            return _localToWorld.GetQuaternion();
+            return _localToWorld.GetQuaternion().GetNormalized();
         }
 
         /**

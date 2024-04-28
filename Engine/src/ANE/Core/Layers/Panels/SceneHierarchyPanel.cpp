@@ -21,7 +21,7 @@ namespace Engine
         _activeScene = _editorLayer->GetActiveScene();
         if (!_activeScene) return;
 
-        bool open = true;
+         bool open = true;
 
         const ImGuiDockNodeFlags dockSpaceFlags = ImGuiDockNodeFlags_PassthruCentralNode;
 

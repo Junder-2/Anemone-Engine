@@ -19,9 +19,10 @@ namespace Engine
 
             EntityHandle = SceneHandle->_registry.create();
             //this->AddComponent<AttachmentsComponent>();
-            this->AddComponent<TransformComponent>();
-            this->AddComponent<TagComponent>(name);
             this->AddComponent<UUIDComponent>(UUIDGenerator::GetUUID());
+            this->AddComponent<TagComponent>(name);
+            this->AddComponent<TransformComponent>();
+
         }
 
         Entity(entt::entity handle, Scene* scene) : EntityHandle(handle), SceneHandle(scene) {}

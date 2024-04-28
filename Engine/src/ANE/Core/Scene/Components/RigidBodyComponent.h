@@ -4,7 +4,7 @@
 #include "ANE/Core/Entity/Entity.h"
 #include "ANE/Physics/Physics.h"
 #include "ANE/Physics/PhysicsTypes.h"
-#include "ANE/Physics/RigidBody.h"
+#include "ANE/Physics/Types/RigidBody.h"
 
 namespace Engine
 {
@@ -28,8 +28,6 @@ namespace Engine
         {
             return _rigidbody;
         }
-
-
 
     private:
 
