@@ -1,3 +1,25 @@
+#include "Common.include"
+
+struct Vertex
+{
+    float3 position;
+    float uvX;
+    float3 normal;
+    float uvY;
+    float4 color;
+    float4 tangent;
+};
+
+struct PushConstants
+{
+    matrix<float, 4, 4> renderMatrix;
+    matrix<float, 4, 4> modelMatrix;
+
+    // Similar to a GLSL buffer_reference.
+    // Uses uint64 pointer manipulation to index, hence the GL_EXT_shader_explicit_arithmetic_types_int64 dependency.
+    ConstBufferPointer<Vertex> vertices;
+};
+
 // Uniform data across every shader drawn during a frame.
 struct AppData
 {
@@ -29,3 +51,12 @@ struct MaterialProperties
     Sampler2D NormalMap;
     Sampler2D ORMMap;
 };
+
+// Equivalent to GLSL push constants.
+[[vk::push_constant]]
+ConstantBuffer<PushConstants> pushConstants;
+
+// Sets.
+ParameterBlock<AppData> appData;
+ParameterBlock<SceneData> sceneData;
+ParameterBlock<MaterialProperties> props;

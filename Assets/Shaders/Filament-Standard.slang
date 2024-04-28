@@ -9,26 +9,6 @@
     float4 color : COLOR;
 };*/
 
-struct Vertex
-{
-    float3 position;
-    float uvX;
-    float3 normal;
-    float uvY;
-    float4 color;
-    float4 tangent;
-};
-
-struct PushConstants
-{
-    matrix<float, 4, 4> renderMatrix;
-    matrix<float, 4, 4> modelMatrix;
-
-    // Similar to a GLSL buffer_reference.
-    // Uses uint64 pointer manipulation to index, hence the GL_EXT_shader_explicit_arithmetic_types_int64 dependency.
-    ConstBufferPointer<Vertex> vertices;
-};
-
 // Data passed from vertex to the next stage.
 struct Varyings
 {
@@ -38,14 +18,6 @@ struct Varyings
     float3 color;
     float2 uv;
 };
-
-// Equivalent to GLSL push constants.
-[[vk::push_constant]]
-ConstantBuffer<PushConstants> pushConstants;
-
-ParameterBlock<AppData> appData;
-ParameterBlock<SceneData> sceneData;
-ParameterBlock<MaterialProperties> props;
 
 [shader("vertex")]
 Varyings vertexMain(uint vid : SV_VertexID)
