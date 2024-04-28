@@ -62,6 +62,15 @@ Varyings vertexMain(uint vid : SV_VertexID)
     return output;
 }
 
+float3 TangentDirToWorld(float3 normal, float3 tangent, float3 dir)
+{
+    float3 binormal = cross(normal, tangent);
+    return normalize(
+        dir.x * tangent +
+        dir.y * binormal +
+        dir.z * normal);
+}
+
 [shader("fragment")]
 float4 fragmentMain(Varyings input) : SV_TARGET
 {
