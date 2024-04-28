@@ -34,6 +34,7 @@ struct Varyings
 {
     float4 position : SV_Position;
     float3 normal;
+    float3 tangent;
     float3 color;
     float2 uv;
 };
@@ -54,6 +55,7 @@ Varyings vertexMain(uint vid : SV_VertexID)
     Vertex v = pushConstants.vertices[vid];
     output.position = mul(pushConstants.renderMatrix, float4(v.position, 1));
     output.normal = mul(float3x3(pushConstants.modelMatrix), v.normal);
+    output.tangent = mul(float3x3(pushConstants.modelMatrix), v.tangent.xyz);
     output.color = 1;
     output.uv = float2(v.uvX, v.uvY);
 
@@ -64,6 +66,7 @@ Varyings vertexMain(uint vid : SV_VertexID)
 float4 fragmentMain(Varyings input) : SV_TARGET
 {
     float3 normal = normalize(input.normal);
+    float3 tangent = normalize(input.tangent);
     float2 uv = input.uv;
 
     float4 colorMap = props.ColorMap.Sample(uv);
