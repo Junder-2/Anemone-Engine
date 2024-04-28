@@ -1,0 +1,8 @@
+float3 UnpackNormalMap(float3 packedNormal, float scale)
+{
+    float3 normal;
+    normal.xy = (packedNormal.xy * 2 - 1) * scale;
+    normal.z = sqrt(1.0 - saturate(dot(normal.xy, normal.xy)));
+
+    return normal;
+}
