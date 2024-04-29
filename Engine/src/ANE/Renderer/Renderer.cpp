@@ -69,6 +69,11 @@ namespace Engine
         _vulkanRenderer->ViewProjection = matrix;
     }
 
+    void Renderer::SetCameraPosition(const Vector3 pos)
+    {
+        _vulkanRenderer->CameraPosition = pos;
+    }
+
     void Renderer::FlushDrawCommands()
     {
         _drawCommands.Commands.clear();

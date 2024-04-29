@@ -157,6 +157,7 @@ namespace Engine
     public:
         inline static ImVec4 ClearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+        inline static Vector3 CameraPosition;
         inline static Matrix4x4 ViewProjection;
 
     private:

@@ -33,6 +33,8 @@ namespace Engine
 
         static void SetViewProjection(const Matrix4x4& matrix);
 
+        static void SetCameraPosition(Vector3 pos);
+
     private:
         static void FlushDrawCommands();
 

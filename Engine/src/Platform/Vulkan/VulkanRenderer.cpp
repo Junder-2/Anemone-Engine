@@ -1007,6 +1007,7 @@ namespace Engine
         Vector3 sunDirection = Quaternion::FromEulerAngles(sunAngle) * Vector3::ForwardVector();
         Vector3 sunColor = Vector3(1.0f, 0.9f, 0.67f);
 
+        frame.SceneData.CameraPosition = Vector4(CameraPosition);
         frame.SceneData.AmbientColor = Vector4(ambientColor, 0);
         frame.SceneData.SunlightDirection = Vector4(sunDirection, 0);
         frame.SceneData.SunlightColor = Vector4(sunColor, 0);
