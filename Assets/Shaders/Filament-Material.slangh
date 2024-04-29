@@ -1,0 +1,29 @@
+#pragma once
+
+struct Material
+{
+    float3 diffuseColor;
+    float roughness;
+    float occlusion;
+    float3 f0;
+};
+
+float3 ComputeDiffuseColor(float4 baseColor, float metallic)
+{
+    return baseColor.rgb * (1 - metallic);
+}
+
+float ComputeRoughness(float perceptualRoughness)
+{
+    return perceptualRoughness * perceptualRoughness;
+}
+
+float3 ComputeF0(float4 baseColor, float metallic, float reflectance)
+{
+    return baseColor.rgb * metallic + (reflectance * (1 - metallic));
+}
+
+float ComputeDielectricF0(float reflectance)
+{
+    return 0.16 * reflectance * reflectance;
+}
