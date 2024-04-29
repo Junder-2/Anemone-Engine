@@ -76,6 +76,7 @@ namespace Engine
 
         static Matrix3x3 Zero() { return {0}; }
 
+        static Matrix3x3 Convert(const reactphysics3d::Matrix3x3& mat3);
         static Matrix3x3 Convert(const glm::mat3& mat3);
 
         // Conversion to other vector2 types

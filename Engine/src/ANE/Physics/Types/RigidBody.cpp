@@ -12,16 +12,24 @@ namespace Engine
         _reactRigidBody = nullptr;
     }
 
-    void RigidBody::SetTransform(const Vector3 position, const Quaternion& rotation) const
+    void RigidBody::SetTransform(const Vector3 position, const Quaternion& rotation, const bool teleport /*= false*/) const
     {
-        _reactRigidBody->setIsSleeping(false);
         _reactRigidBody->setTransform(rp3d::Transform(position, rotation));
+        if(teleport)
+        {
+            SetVelocity(0);
+            SetAngularVelocity(0);
+        }
     }
 
-    void RigidBody::SetPosition(const Vector3 position) const
+    void RigidBody::SetPosition(const Vector3 position, const bool teleport /*= false*/) const
     {
-        _reactRigidBody->setIsSleeping(false);
         _reactRigidBody->setTransform(rp3d::Transform(position, _reactRigidBody->getTransform().getOrientation()));
+        if(teleport)
+        {
+            SetVelocity(0);
+            SetAngularVelocity(0);
+        }
     }
 
     Vector3 RigidBody::GetPosition() const
@@ -29,10 +37,14 @@ namespace Engine
         return Vector3::Convert(_reactRigidBody->getTransform().getPosition());
     }
 
-    void RigidBody::SetRotation(const Quaternion& rotation) const
+    void RigidBody::SetRotation(const Quaternion& rotation, const bool teleport /*= false*/) const
     {
-        _reactRigidBody->setIsSleeping(false);
         _reactRigidBody->setTransform(rp3d::Transform(_reactRigidBody->getTransform().getPosition(), rotation));
+        if(teleport)
+        {
+            SetVelocity(0);
+            SetAngularVelocity(0);
+        }
     }
 
     Quaternion RigidBody::GetRotation() const

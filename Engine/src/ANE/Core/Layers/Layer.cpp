@@ -1,6 +1,8 @@
 #include "anepch.h"
 #include "Layer.h"
 
+#include "Panels/UILayerPanel.h"
+
 namespace Engine
 {
     void Layer::OnUpdate(float deltaTime)
@@ -20,12 +22,18 @@ namespace Engine
 
     void Layer::AttachUIPanel(UILayerPanel* newPanel)
     {
-        _UIpanels.emplace(_UIpanels.begin(),newPanel);
-    }
-    void Layer::DetachUIPanel(const UILayerPanel* panelToRemove)
-    {
-        const auto it = std::find(_UIpanels.begin(), _UIpanels.end(), panelToRemove);
+        auto it = std::ranges::find_if(_UIpanels, [newPanel](const UILayerPanel* panel)
+        {
+            return typeid(*panel) == typeid(*newPanel);
+        });
 
-        _UIpanels.erase(it);
+        if (it == _UIpanels.end()) _UIpanels.emplace(_UIpanels.begin(), newPanel);
+    }
+
+    void Layer::DetachUIPanel(UILayerPanel* panelToRemove)
+    {
+        auto it = std::ranges::find(_UIpanels, panelToRemove);
+        if (it != _UIpanels.end()) _UIpanels.erase(it);
+
     }
 }
