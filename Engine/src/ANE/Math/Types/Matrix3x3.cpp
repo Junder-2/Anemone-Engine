@@ -147,6 +147,11 @@ namespace Engine
         return _columns[2].GetNormalized();
     }
 
+    Matrix3x3 Matrix3x3::Convert(const reactphysics3d::Matrix3x3& mat3)
+    {
+        return {Vector3::Convert(mat3[0]), Vector3::Convert(mat3[1]), Vector3::Convert(mat3[2])};
+    }
+
     Matrix3x3 Matrix3x3::Convert(const glm::mat3& mat3)
     {
         return {Vector3::Convert(mat3[0]), Vector3::Convert(mat3[1]), Vector3::Convert(mat3[2])};
