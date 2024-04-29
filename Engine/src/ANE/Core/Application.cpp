@@ -12,7 +12,8 @@
 #include "ANE/Input/InputHandler.h"
 #include "ANE/Utilities/InputUtilities.h"
 #include "Layers/Layer.h"
-#include "Entity/Entity.h"
+#include "Entity/Entity.h" // this holds something that Rendercomponent needs?
+#include "ANE/Utilities/API.h"
 #include "ANE/Renderer/Renderer.h"
 #include "Layers/ImGuiLayer.h"
 #include "Scene/Components/RenderComponent.h"
@@ -46,6 +47,8 @@ namespace Engine
 
         _imGuiLayer = ImGuiLayer::Create("ImGuiLayer");
         PushLayer(_imGuiLayer);
+
+        API::WINDOW_SIZE = Vector2(_window->GetWidth(), _window->GetHeight());
     }
 
     void Application::Run()
@@ -158,6 +161,7 @@ namespace Engine
 
     void Application::OnWindowResize(WindowResizeEvent& e)
     {
+        API::WINDOW_SIZE = Vector2(e.GetWidth(), e.GetHeight());
         ANE_ELOG_DEBUG("new size ({0}, {1})", e.GetWidth(), e.GetHeight());
     }
 
