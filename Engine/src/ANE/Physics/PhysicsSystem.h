@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "ANE/Subsystem/SubSystem.h"
-#include <reactphysics3d/reactphysics3d.h>
 
 namespace Engine
 {
@@ -37,8 +36,7 @@ namespace Engine
     private:
         rp3d::PhysicsCommon _physicsCommon {};
         rp3d::PhysicsWorld* _world;
-        rp3d::DebugRenderer* _debugRenderer;
-
         PhysicsLogger* _physicsLogger;
+        rp3d::DebugRenderer* _debugRenderer;
     };
 }

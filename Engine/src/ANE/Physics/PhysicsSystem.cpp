@@ -19,7 +19,7 @@ namespace Engine
 
         rp3d::PhysicsWorld::WorldSettings worldSettings;
         worldSettings.worldName = "PhysicsWorld";
-        worldSettings.isSleepingEnabled = false; // Because of a bug this is currently necessary
+        //worldSettings.isSleepingEnabled = false; // Because of a bug this is currently necessary
 
         _world = _physicsCommon.createPhysicsWorld(worldSettings);
         #ifdef ANE_DEBUG

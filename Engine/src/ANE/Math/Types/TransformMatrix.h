@@ -123,6 +123,7 @@ namespace Engine
         void SetScale(const Vector3 scale)
         {
             _localToWorld.SetScale(scale);
+            _localToWorld.SetRotation(_eulerAngles);
             MarkDirty();
         }
 
@@ -133,6 +134,7 @@ namespace Engine
         void Scale(const Vector3 scale)
         {
             _localToWorld.Scale(scale);
+            _localToWorld.SetRotation(_eulerAngles);
             MarkDirty();
         }
 

@@ -14,7 +14,6 @@ namespace Engine
 
     void RigidBody::SetTransform(const Vector3 position, const Quaternion& rotation, const bool teleport /*= false*/) const
     {
-        _reactRigidBody->setIsSleeping(false);
         _reactRigidBody->setTransform(rp3d::Transform(position, rotation));
         if(teleport)
         {
@@ -25,7 +24,6 @@ namespace Engine
 
     void RigidBody::SetPosition(const Vector3 position, const bool teleport /*= false*/) const
     {
-        _reactRigidBody->setIsSleeping(false);
         _reactRigidBody->setTransform(rp3d::Transform(position, _reactRigidBody->getTransform().getOrientation()));
         if(teleport)
         {
@@ -41,7 +39,6 @@ namespace Engine
 
     void RigidBody::SetRotation(const Quaternion& rotation, const bool teleport /*= false*/) const
     {
-        _reactRigidBody->setIsSleeping(false);
         _reactRigidBody->setTransform(rp3d::Transform(_reactRigidBody->getTransform().getPosition(), rotation));
         if(teleport)
         {
