@@ -1,6 +1,10 @@
 #include "anepch.h"
 #include "UILayerPanel.h"
 
-void Engine::UILayerPanel::OnPanelRender()
+namespace Engine
 {
+    UIUpdateWrapper Engine::UILayerPanel::OnPanelRender()
+    {
+        return UIUpdateWrapper{};
+    }
 }

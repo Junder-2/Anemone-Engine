@@ -18,7 +18,7 @@ namespace Engine
         virtual void OnUIRender();
 
         void AttachUIPanel(UILayerPanel* newPanel);
-        void DetachUIPanel(const UILayerPanel* panelToRemove);
+        void DetachUIPanel(UILayerPanel* panelToRemove);
 
     protected:
         std::vector<UILayerPanel*> _UIpanels; // todo: make into smartpointer

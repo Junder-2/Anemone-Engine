@@ -3,6 +3,7 @@
 #include <entt.hpp>
 
 #include "imgui.h"
+#include "UIUpdateWrapper.h"
 #include "UILayerPanel.h"
 
 namespace Engine
@@ -16,7 +17,7 @@ namespace Engine
         EditorLogPanel(EditorLayer* layer);
         ~EditorLogPanel() = default;
 
-        void OnPanelRender() override;
+        UIUpdateWrapper OnPanelRender() override;
 
         void ShowLogLevelsPopup();
         void ShowLoggerNamePopup();
@@ -47,5 +48,6 @@ namespace Engine
         bool _displaySource = true;
         bool _displayLevel = true;
         bool _displayLoggerName = true;
+
     };
 }

@@ -25,16 +25,19 @@ namespace Engine
                 _loggerNameFilter.insert_or_assign(loggerName, true);
             }
         }
-
+        _editorLayer = layer;
     }
 
-    void EditorLogPanel::OnPanelRender()
+    UIUpdateWrapper EditorLogPanel::OnPanelRender()
     {
         ANE_DEEP_PROFILE_FUNCTION();
 
         bool open;
 
+        UIUpdateWrapper UIUpdate;
+
         ImGui::Begin("Log Window", &open);
+
 
         DrawToolBar();
 
@@ -60,9 +63,9 @@ namespace Engine
         }
         ImGui::EndChild();
 
-        if (!open) _editorLayer->DetachUIPanel(this);
-
         ImGui::End();
+        if (!open) UIUpdate.RemoveSelf = this;
+        return UIUpdate;
     }
 
     void EditorLogPanel::ShowLogLevelsPopup()

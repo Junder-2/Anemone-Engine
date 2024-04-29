@@ -3,6 +3,7 @@
 #include "entt.hpp"
 #include "ANE/Core/Entity/Entity.h"
 #include "ANE/Core/Scene/Scene.h"
+#include "Panels/UIUpdateWrapper.h"
 
 namespace Engine
 {
@@ -34,8 +35,8 @@ namespace Engine
 
         std::string GetComponentNameFromEnttId(entt::id_type id);
 
-        template <class TValue, typename... Args>
-        std::enable_if_t<std::is_base_of_v<UILayerPanel, TValue>> AddPanel(Args&&... args);
+        template <class TValue>
+        std::enable_if_t<std::is_base_of_v<UILayerPanel, TValue>> AddPanel(TValue* panel);
         template <class TValue>
         std::enable_if_t<std::is_base_of_v<Scene, TValue>> AddScene(const char* key);
 
@@ -57,14 +58,12 @@ namespace Engine
 
     private:
         std::map<std::string, Entity> _entityMap;
-
+        std::vector<UIUpdateWrapper> UIUpdates;
         void CreateTestScene(int numEntitiesToTest);
         void CreateFloor();
 
         void OnSwitchEditorFocus(InputValue inputValue);
 
-    protected:
-        std::string _debugName;
 
     private:
         std::unordered_map<const char*, std::shared_ptr<Scene>> _scenes;
@@ -88,5 +87,9 @@ namespace Engine
             SetActiveScene(key);
     }
 
-
+    template <class TValue>
+    std::enable_if_t<std::is_base_of_v<UILayerPanel, TValue>> EditorLayer::AddPanel(TValue* panel)
+    {
+        Layer::AttachUIPanel(panel);
+    }
 }

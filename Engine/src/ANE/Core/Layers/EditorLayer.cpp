@@ -23,6 +23,9 @@
 #include "ANE/Input/Input.h"
 #include "ANE/Input/InputAction.h"
 #include "Panels/EditorLogPanel.h"
+#include "Panels/MainMenuPanel.h"
+#include "Panels/CreateScenePanel.h"
+#include "Panels/UIUpdateWrapper.h"
 
 namespace Engine
 {
@@ -50,6 +53,7 @@ namespace Engine
         AttachUIPanel(new SceneHierarchyPanel(this));
         AttachUIPanel(new InspectorPanel(this));
         AttachUIPanel(new EditorLogPanel(this));
+        AttachUIPanel(new MainMenuPanel(this));
 
         // Then you would call load methods to load the most recent project
 
@@ -66,7 +70,6 @@ namespace Engine
 
     void EditorLayer::OnDetach()
     {
-
     }
 
     void EditorLayer::OnEvent(Event& e)
@@ -83,16 +86,33 @@ namespace Engine
 
         for (UILayerPanel* panel : _UIpanels)
         {
-            if(panel->IsVisible())
+            if (panel == nullptr) continue;
+
+            if (panel->IsVisible())
             {
-                panel->OnPanelRender();
+                auto update = panel->OnPanelRender();
+
+                UIUpdates.emplace(UIUpdates.begin(), update);
             }
 
-            if(panel->IsEnabled())
-            {
-                //panel->doWindowMaintenance
-            }
+            // if(panel->IsEnabled())
+            // {
+            //     //panel->doWindowMaintenance
+            // }
         }
+
+
+        for (auto UIUpdate : UIUpdates)
+        {
+            if (UIUpdate.RemoveSelf != nullptr) DetachUIPanel(UIUpdate.RemoveSelf);
+
+            for (auto panel : UIUpdate.PanelsToAdd) AddPanel(panel);
+
+            UIUpdate.Clean();
+        }
+
+        UIUpdates.clear();
+
         ImGui::Begin("Editor");
         ImGui::End();
     }
@@ -130,7 +150,7 @@ namespace Engine
         Entity ent = Create("Square Entity");
         std::stringstream oss;
 
-        for(int i = 0; i < numEntitiesToTest;i++ )
+        for (int i = 0; i < numEntitiesToTest; i++)
         {
             //ANE_LOG_INFO(UUIDGenerator::GetUUID());
 
@@ -171,24 +191,24 @@ namespace Engine
     {
         bool blockingAppInputs = IsMouseVisible();
 
-        if(inputValue.GetDeviceType() == InputDeviceKeyboard)
+        if (inputValue.GetDeviceType() == InputDeviceKeyboard)
         {
-            if(inputValue.GetTriggerState() != TriggerStarted || blockingAppInputs) return;
+            if (inputValue.GetTriggerState() != TriggerStarted || blockingAppInputs) return;
             switch (inputValue.GetBindingId())
             {
                 case KeyCodeEscape:
                     ShowMouse();
                     blockingAppInputs = true;
-                break;
+                    break;
                 default: return;
             }
         }
-        else if(inputValue.GetDeviceType() == InputDeviceMouse) //Any mouse click should return focus
+        else if (inputValue.GetDeviceType() == InputDeviceMouse) //Any mouse click should return focus
         {
             //Reject any refocus it is not a doubleclick or if the mouse is not over viewport
-            if(inputValue.GetTriggerState() != TriggerStarted || !blockingAppInputs) return;
-            if(!GetInputSystem().GetMouseButtonValues().GetIsDoubleClick()) return;
-            if(!Application::Get().GetWindow().IsOverViewport()) return;
+            if (inputValue.GetTriggerState() != TriggerStarted || !blockingAppInputs) return;
+            if (!GetInputSystem().GetMouseButtonValues().GetIsDoubleClick()) return;
+            if (!Application::Get().GetWindow().IsOverViewport()) return;
 
             HideMouse();
             blockingAppInputs = false;
@@ -203,22 +223,29 @@ namespace Engine
     {
         ImGui::PushID(static_cast<int>(entt::to_integral(e)));
 
-        if (reg.valid(e)) {
+        if (reg.valid(e))
+        {
             ImGui::Text("ID: %d", entt::to_integral(e));
-        } else {
+        }
+        else
+        {
             ImGui::Text("Invalid Entity");
         }
 
-        if (reg.valid(e)) {
-            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+        if (reg.valid(e))
+        {
+            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+            {
                 ImGui::SetDragDropPayload(MM_IEEE_IMGUI_PAYLOAD_TYPE_ENTITY, &e, sizeof(e));
                 ImGui::Text("ID: %d", entt::to_integral(e));
                 ImGui::EndDragDropSource();
             }
         }
 
-        if (dropTarget && ImGui::BeginDragDropTarget()) {
-            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(MM_IEEE_IMGUI_PAYLOAD_TYPE_ENTITY)) {
+        if (dropTarget && ImGui::BeginDragDropTarget())
+        {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(MM_IEEE_IMGUI_PAYLOAD_TYPE_ENTITY))
+            {
                 e = *(EntityType*)payload->Data;
             }
 
@@ -228,11 +255,6 @@ namespace Engine
         ImGui::PopID();
     }
 
-    template <class TValue, typename... Args>
-    std::enable_if_t<std::is_base_of_v<UILayerPanel, TValue>> EditorLayer::AddPanel(Args&&... args)
-    {
-        Layer::AttachUIPanel(new TValue(std::forward<Args>(args)...));
-    }
 
     /**
     * \brief Creates a Entity in the scene, adds a Transform and Tag
@@ -242,12 +264,12 @@ namespace Engine
     [[nodiscard("Entity never used")]] Entity EditorLayer::Create(const char* name)
     {
         Entity ent{GetActiveScene().get(), name};
-        _entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent;// here
+        _entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent; // here
         return ent;
     }
+
     [[nodiscard("Entity never used")]] Entity EditorLayer::Create(std::string stringName)
     {
-
         Entity ent{GetActiveScene().get(), stringName.c_str()};
         _entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent;
         return ent;
