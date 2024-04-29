@@ -1,6 +1,7 @@
 #include "anepch.h"
 #include "SphereCollider.h"
 
+#include "ANE/Math/FMath.h"
 #include "ANE/Physics/PhysicsTypes.h"
 
 namespace Engine
@@ -10,7 +11,7 @@ namespace Engine
     void SphereCollider::SetRadius(const float radius) const
     {
         WakeBody();
-        reinterpret_cast<reactphysics3d::SphereShape*>(_reactCollider->getCollisionShape())->setRadius(radius);
+        reinterpret_cast<reactphysics3d::SphereShape*>(_reactCollider->getCollisionShape())->setRadius(FMath::Max(radius, MIN_SCALE));
     }
 
     float SphereCollider::GetRadius() const

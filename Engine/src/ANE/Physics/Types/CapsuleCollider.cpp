@@ -1,6 +1,7 @@
 #include "anepch.h"
 #include "CapsuleCollider.h"
 
+#include "ANE/Math/FMath.h"
 #include "ANE/Physics/PhysicsTypes.h"
 
 namespace Engine
@@ -16,13 +17,13 @@ namespace Engine
     void CapsuleCollider::SetRadius(const float radius) const
     {
         WakeBody();
-        reinterpret_cast<reactphysics3d::CapsuleShape*>(_reactCollider->getCollisionShape())->setRadius(radius);
+        reinterpret_cast<reactphysics3d::CapsuleShape*>(_reactCollider->getCollisionShape())->setRadius(FMath::Max(radius, MIN_SCALE));
     }
 
     void CapsuleCollider::SetHeight(const float height) const
     {
         WakeBody();
-        reinterpret_cast<reactphysics3d::CapsuleShape*>(_reactCollider->getCollisionShape())->setHeight(height);
+        reinterpret_cast<reactphysics3d::CapsuleShape*>(_reactCollider->getCollisionShape())->setHeight(FMath::Max(height, MIN_SCALE));
     }
 
     float CapsuleCollider::GetRadius() const

@@ -1,6 +1,7 @@
 #include "anepch.h"
 #include "BoxCollider.h"
 
+#include "ANE/Math/VMath.h"
 #include "ANE/Math/Types/Vector3.h"
 #include "ANE/Physics/PhysicsTypes.h"
 
@@ -11,7 +12,7 @@ namespace Engine
     void BoxCollider::SetHalfSize(const Vector3 halfSize) const
     {
         WakeBody();
-        reinterpret_cast<reactphysics3d::BoxShape*>(_reactCollider->getCollisionShape())->setHalfExtents(halfSize);
+        reinterpret_cast<reactphysics3d::BoxShape*>(_reactCollider->getCollisionShape())->setHalfExtents(Math::Max(halfSize, Vector3::OneVector()*MIN_SCALE));
     }
 
     Vector3 BoxCollider::GetHalfSize() const

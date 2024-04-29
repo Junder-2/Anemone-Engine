@@ -2,6 +2,8 @@
 
 namespace Engine
 {
+    const float MIN_SCALE = 0.01f;
+
     enum class CollisionShapeType
     {
         Sphere,
