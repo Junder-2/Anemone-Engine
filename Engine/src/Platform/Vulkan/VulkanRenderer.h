@@ -43,6 +43,7 @@ namespace Engine
         DescriptorAllocator Descriptors;
         ApplicationData AppData;
         SceneData SceneData;
+        FilamentMetallicRoughness::MaterialConstants FilamentData;
     };
 
     struct VulkanImmediateBuffer
