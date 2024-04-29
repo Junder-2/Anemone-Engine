@@ -31,6 +31,8 @@ struct AppData
 // Per-scene data.
 struct SceneData
 {
+    float4 CameraPos;
+
     float4 AmbientColor;
 
     float4 SunlightDirection;
