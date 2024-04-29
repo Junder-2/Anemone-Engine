@@ -2,14 +2,16 @@
 // Specular BRDF implementations.
 // ----------------------------------------------------------------
 
-float D_GGX(float NoH, float roughness)
+float D_GGX(float roughness, float NoH, float3 halfDir)
 {
-    float a2 = roughness * roughness;
-    float f = (NoH * a2 - NoH) * NoH + 1.0;
-    return a2 / (PI * f * f);
+    float oneMinusNoHSquared = 1.0 - NoH * NoH;
+    float a = NoH * roughness;
+    float k = roughness / (oneMinusNoHSquared + a * a);
+    float d = k * k * (1.0 / PI);
+    return d;
 }
 
-float V_SmithGGXCorrelated(float NoV, float NoL, float roughness)
+float V_SmithGGXCorrelated(float roughness, float NoV, float NoL)
 {
     float a2 = roughness * roughness;
     float GGXL = NoV * sqrt((NoL - NoL * a2) * NoL + a2);
@@ -18,7 +20,7 @@ float V_SmithGGXCorrelated(float NoV, float NoL, float roughness)
 }
 
 // Saves 2 sqrts but is mathematically wrong.
-float V_SmithGGXCorrelatedFast(float NoV, float NoL, float roughness)
+float V_SmithGGXCorrelatedFast(float roughness, float NoV, float NoL)
 {
     return 0.5 / lerp(2 * NoL * NoV, NoL + NoV, roughness);
 }
@@ -50,7 +52,7 @@ float Fd_Lambert()
 }
 
 // Disney (Burley)
-float Fd_Burley(float NoV, float NoL, float LoH, float roughness)
+float Fd_Burley(float roughness, float NoV, float NoL, float LoH)
 {
     float f90 = 0.5 + 2.0 * roughness * LoH * LoH;
     float lightScatter = F_Schlick(1.0, f90, NoL);
