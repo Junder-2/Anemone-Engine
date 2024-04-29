@@ -32,7 +32,10 @@ namespace Engine
             Children.push_back(std::make_shared<TransformComponent>(child));
         }
 
+        void OnValidate()
+        {
 
+        }
         TransformComponent(const TransformMatrix& transform, const std::shared_ptr<TransformComponent>& parent = nullptr) : Component(typeid(*this).name()), Transform(transform), Parent(parent)
         {
             ANE_ELOG("We are not getting in here");
@@ -44,7 +47,9 @@ namespace Engine
                 .prop("Position"_hs, "Position")
                 .prop("Rotation"_hs, "Rotation")
                 .prop("Scale"_hs, "Scale")
-                .EDITABLE;
+                .prop("OnValidate"_hs,&TransformComponent::OnValidate)
+                .NOT_EDITABLE;
+
 
         }
 

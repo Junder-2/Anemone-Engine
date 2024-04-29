@@ -1,6 +1,7 @@
 #pragma once
 #include "entt.hpp"
 #include "imgui.h"
+#include "imgui_internal.h"
 #include "PhysicsUtilities.h"
 #include "ANE/Core/Scene/Components/Components.h"
 #include "ANE/Math/Types/TransformMatrix.h"
@@ -16,33 +17,21 @@ namespace Engine
 
 
 
-    inline bool inspect_string_field(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool inspect_mutable_string_field(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<std::string>();
         bool propertyWritten = false;
         bool writable = field.prop(EDITABLEHASH).value().cast<bool>();
-        if(writable)
+        char buffer[256] = {};
+        const auto error = strcpy_s(buffer, sizeof(buffer), v.c_str());
+        if(ImGui::InputText(field.prop("display_name"_hs).value().cast<const char*>(),buffer,sizeof(buffer)))
         {
-
-            char buffer[256] = {};
-            const auto error = strcpy_s(buffer, sizeof(buffer), v.c_str());
-            if(ImGui::InputText(field.prop("display_name"_hs).value().cast<const char*>(),buffer,sizeof(buffer)))
-            {
-                propertyWritten = field.set(component_data,std::string(buffer));
-
-            }
+            propertyWritten = field.set(component_data,std::string(buffer));
         }
-        else
-        {
-            ImGui::Text("%s",v.c_str());
-        }
-
         return propertyWritten;
-
-
     }
 
-    inline bool inspect_transform_matrix(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool inspect_mutable_transform_matrix(entt::meta_data& field, entt::meta_any& component_data)
     {
         TransformMatrix newMatrix;
         auto v = field.get(component_data).cast<TransformMatrix>();
@@ -71,7 +60,7 @@ namespace Engine
         return propertyWritten;
     }
 
-    inline bool inspect_colliders(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool inspect_mutable_colliders(entt::meta_data& field, entt::meta_any& component_data)
     {
         bool changed = false;
         auto v = field.get(component_data).cast<std::vector<Collider*>>();
@@ -144,7 +133,7 @@ namespace Engine
         return changed;
     }
 
-    inline bool inspect_float(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool inspect_mutable_float(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<float>();
         bool propertyWritten = false;
@@ -156,7 +145,7 @@ namespace Engine
         return propertyWritten;
         //ImGui::Text("%d",v);
     }
-    inline bool inspect_mesh_asset(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool inspect_mutable_mesh_asset(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<VmaMeshAsset>();
         bool propertyWritten = false;
@@ -165,7 +154,7 @@ namespace Engine
         return propertyWritten;
     }
 
-    inline bool inspect_vector2_field(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool inspect_mutable_vector2_field(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<Vector2>();
         bool propertyWritten = false;
@@ -177,7 +166,8 @@ namespace Engine
         return propertyWritten;
     }
 
-    inline bool inspect_vector3_field(entt::meta_data& field, entt::meta_any& component_data)
+
+    inline bool inspect_mutable_vector3_field(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<Vector3>();
         bool propertyWritten = false;
@@ -188,7 +178,7 @@ namespace Engine
         }
         return propertyWritten;
     }
-    inline bool inspect_vector4_field(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool inspect_mutable_vector4_field(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<Vector4>();
         bool propertyWritten = false;
@@ -202,18 +192,79 @@ namespace Engine
 
     using FieldInspectorFn = bool (*)(entt::meta_data& field, entt::meta_any& component_data);
 
-    inline static std::unordered_map<entt::id_type, FieldInspectorFn> g_data_inspectors
+    inline static std::unordered_map<entt::id_type, FieldInspectorFn> g_mutable_data_inspectors
     {
-        {entt::type_id<std::string>().hash(), inspect_string_field},
-        {entt::type_id<TransformMatrix>().hash(), inspect_transform_matrix},
-        {entt::type_id<std::vector<Collider*>>().hash(), inspect_colliders},
-        {entt::type_id<VmaMeshAsset>().hash(), inspect_mesh_asset},
-        {entt::type_id<float>().hash(), inspect_float},
-        {entt::type_id<Vector2>().hash(), inspect_vector2_field},
-        {entt::type_id<Vector3>().hash(), inspect_vector3_field},
-        {entt::type_id<Vector4>().hash(), inspect_vector4_field}
+        {entt::type_id<std::string>().hash(), inspect_mutable_string_field},
+        {entt::type_id<TransformMatrix>().hash(), inspect_mutable_transform_matrix},
+        {entt::type_id<std::vector<Collider*>>().hash(), inspect_mutable_colliders},
+        {entt::type_id<VmaMeshAsset>().hash(), inspect_mutable_mesh_asset},
+        {entt::type_id<float>().hash(), inspect_mutable_float},
+        {entt::type_id<Vector2>().hash(), inspect_mutable_vector2_field},
+        {entt::type_id<Vector3>().hash(), inspect_mutable_vector3_field},
+        {entt::type_id<Vector4>().hash(), inspect_mutable_vector4_field}
     };
 
+
+    inline bool inspect_immutable_string_field(entt::meta_data& field, entt::meta_any& component_data)
+    {
+        auto v = field.get(component_data).cast<std::string>();
+        ImGui::Text("%s",v.c_str());
+        return true;
+    }
+    inline bool inspect_immutable_transform_matrix(entt::meta_data& field, entt::meta_any& component_data)
+    {
+        auto v = field.get(component_data).cast<TransformMatrix>();
+        Vector3 position = v.GetPosition();
+        Vector3 scale = v.GetScale();
+        Vector3 rotation = v.GetEulerAngles(true);
+        ImGuiInputTextFlags textFlags = ImGuiInputTextFlags_ReadOnly;
+        ImGui::Text("%s","Read Only");
+        static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+
+        if (ImGui::BeginTable("Transform Values", 2, flags))
+        {
+            ImGui::TableSetupColumn("AAA", ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableSetupColumn("CCC", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableHeadersRow();
+            for (int row = 0; row < 5; row++)
+            {
+                ImGui::TableNextRow();
+                for (int column = 0; column < 2; column++)
+                {
+                    ImGui::TableSetColumnIndex(column);
+                    ImGui::Text("%s %d,%d", (column == 2) ? "Stretch" : "Fixed", column, row);
+                }
+            }
+            /*
+            ImGui::TableSetupColumn("##Labels", ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableSetupColumn("##floats", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableHeadersRow();
+            ImGui::TableNextRow();
+            ImGui::AlignTextToFramePadding();
+            ImGui::InputFloat3("##row", &position.X, "%f", textFlags);
+*/
+            ImGui::EndTable();
+        }
+/*
+        ImGui::InputFloat3(field.prop("Position"_hs).value().cast<char const*>(), &position.X, "%f", textFlags);
+        ImGui::InputFloat3(field.prop("Rotation"_hs).value().cast<char const*>(), &rotation.X, "%f",textFlags);
+        ImGui::InputFloat3(field.prop("Scale"_hs).value().cast<char const*>(), &scale.X, "%f",textFlags);
+        */
+        return true;
+    }
+
+    inline static std::unordered_map<entt::id_type, FieldInspectorFn> g_immutable_data_inspectors
+       {
+            {entt::type_id<std::string>().hash(), inspect_immutable_string_field},
+            {entt::type_id<TransformMatrix>().hash(), inspect_immutable_transform_matrix},
+           /*
+            {entt::type_id<std::vector<Collider*>>().hash(), inspect_colliders},
+            {entt::type_id<VmaMeshAsset>().hash(), inspect_mesh_asset},
+            {entt::type_id<float>().hash(), inspect_float},
+            {entt::type_id<Vector2>().hash(), inspect_vector2_field},
+            {entt::type_id<Vector3>().hash(), inspect_vector3_field},
+            {entt::type_id<Vector4>().hash(), inspect_vector4_field}*/
+       };
     template<typename ...Args>
     inline auto InvokeMetaFunction(entt::meta_type meta, entt::id_type func_id, Args&&...args)
     {

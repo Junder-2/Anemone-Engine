@@ -77,33 +77,60 @@ namespace Engine
 
                         const std::string componentType{type.info().name()};
                         std::string fullString = TypePrefixRemoval(componentType);
-                        ImGui::Text(fullString.c_str(), ImGuiTreeNodeFlags_DefaultOpen);
-
-                        for (auto&& data : type.data())
+                        ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
+                        bool open = ImGui::CollapsingHeader(fullString.c_str(),node_flags);
+                        if(open)
                         {
-                            auto& field = data.second;
-                            bool editable = false;
-                            if(field.prop(EDITABLEHASH) != entt::meta_prop{})
+                            for (auto&& data : type.data())
                             {
-                                editable = field.prop(EDITABLEHASH).value().cast<bool>();
-                            }
-
-                            auto itr = g_data_inspectors.find(field.type().info().hash());
-                            if (itr != g_data_inspectors.end())
-                            {
-                                if(itr->second(field, componentData))
-
+                                auto& field = data.second;
+                                bool editable = false;
+                                if(field.prop(EDITABLEHASH))
                                 {
-                                    //selectedEntity.OnValidate();
-                                    ANE_ELOG("OnValidate should occur here");
+                                    editable = field.prop(EDITABLEHASH).value().cast<bool>();
+
                                 }
-                            }
-                            else
-                            {
-                                std::string string;
-                                string.append("No draw function found for data of type: ");
-                                string.append(field.type().info().name());
-                                ImGui::Text("%s", string.c_str());
+                                if(editable)
+                                {
+                                    auto itr = g_mutable_data_inspectors.find(field.type().info().hash());
+                                    if (itr != g_mutable_data_inspectors.end())
+                                    {
+                                        if(itr->second(field, componentData))
+
+                                        {
+                                            //selectedEntity.OnValidate();
+                                            ANE_ELOG("OnValidate should occur here");
+                                        }
+                                        else
+                                        {
+                                            std::string string;
+                                            string.append("No draw function found for data of type: ");
+                                            string.append(field.type().info().name());
+                                            ImGui::Text("%s", string.c_str());
+                                        }
+                                    }
+
+                                }
+                                else
+                                {
+                                    auto itr = g_immutable_data_inspectors.find(field.type().info().hash());
+                                    if (itr != g_immutable_data_inspectors.end())
+                                    {
+                                        if(itr->second(field, componentData))
+
+                                        {
+                                            //selectedEntity.OnValidate();
+                                        }
+                                        else
+                                        {
+                                            std::string string;
+                                            string.append("No draw function found for data of type: ");
+                                            string.append(field.type().info().name());
+                                            ImGui::Text("%s", string.c_str());
+                                        }
+                                    }
+                                }
+
                             }
                         }
                     }
