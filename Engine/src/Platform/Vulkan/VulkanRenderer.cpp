@@ -874,6 +874,10 @@ namespace Engine
         {
             DestroyBuffer(materialConstants);
         });
+
+        _colorTex = LoadTexture("MetalTiles03_1K_BaseColor.png");
+        _normalTex = LoadTexture("MetalTiles03_1K_Normal.png");
+        _ormTex = LoadTexture("MetalTiles03_1K_ORM.png");
     }
 
     void VulkanRenderer::CreateImGuiDescriptorPool()
