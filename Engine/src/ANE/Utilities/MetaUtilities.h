@@ -16,19 +16,23 @@ namespace Engine
     inline bool inspect_string_field(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<std::string>();
+        bool propertyWritten = false;
+
         char buffer[256] = {};
         const auto error = strcpy_s(buffer, sizeof(buffer), v.c_str());
         if(ImGui::InputText(field.prop("display_name"_hs).value().cast<const char*>(),buffer,sizeof(buffer)))
         {
-            return field.set(component_data,std::string(buffer));
+            propertyWritten = field.set(component_data,std::string(buffer));
 
         }
-        return false;
+        return propertyWritten;
     }
 
     inline bool inspect_transform_matrix(entt::meta_data& field, entt::meta_any& component_data)
     {
+        TransformMatrix newMatrix;
         auto v = field.get(component_data).cast<TransformMatrix>();
+        bool propertyWritten = false;
         Vector3 position = v.GetPosition();
         Vector3 scale = v.GetScale();
         Vector3 rotation = v.GetEulerAngles(true);
@@ -36,28 +40,26 @@ namespace Engine
         if (ImGui::DragFloat3(field.prop("Position"_hs).value().cast<char const*>(), &position.X, 0.1f))
         {
             v.SetPosition(position);
-            return field.set(component_data,v);
-
+            propertyWritten = field.set(component_data,v);
         }
         if (ImGui::DragFloat3(field.prop("Rotation"_hs).value().cast<char const*>(), &rotation.X, 0.1f))
         {
             v.SetRotation(rotation,true);
-            return field.set(component_data,v);
+            propertyWritten = field.set(component_data,v);
 
         }
         if (ImGui::DragFloat3(field.prop("Scale"_hs).value().cast<char const*>(), &scale.X, 0.1f))
         {
             v.SetScale(scale);
-            return field.set(component_data,v);
+            propertyWritten = field.set(component_data,v);
 
         }
-        return false;
+        return propertyWritten;
     }
 
     inline bool inspect_colliders(entt::meta_data& field, entt::meta_any& component_data)
     {
         bool changed = false;
-
         auto v = field.get(component_data).cast<std::vector<Collider*>>();
         ImGui::Text("%s",field.prop("display_name"_hs).value().cast<const char*>());
         for (auto collider : v)
@@ -124,57 +126,64 @@ namespace Engine
                 ImGui::TreePop();
             }
         }
-
         if(changed) field.set(component_data,v);
-
         return changed;
     }
 
     inline bool inspect_float(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<float>();
+        bool propertyWritten = false;
+
         if(ImGui::DragFloat(field.prop("display_name"_hs).value().cast<char const*>(),&v,0.1f))
         {
-            return field.set(component_data,v); //insufficient for dirty flag!!!
-
+             propertyWritten = field.set(component_data,v); //insufficient for dirty flag!!!
         }
-        return false;
+        return propertyWritten;
         //ImGui::Text("%d",v);
     }
     inline bool inspect_mesh_asset(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<VmaMeshAsset>();
+        bool propertyWritten = false;
+
         ImGui::Text("%s", v.Name.c_str());
-        return false;
+        return propertyWritten;
     }
 
     inline bool inspect_vector2_field(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<Vector2>();
+        bool propertyWritten = false;
+
         if (ImGui::DragFloat2(field.prop("display_name"_hs).value().cast<char const*>(), &v.X, 0.1f))
         {
-            return field.set(component_data, v);
+            propertyWritten =  field.set(component_data, v);
         }
-        return false;
+        return propertyWritten;
     }
 
     inline bool inspect_vector3_field(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<Vector3>();
+        bool propertyWritten = false;
+
         if (ImGui::DragFloat3(field.prop("display_name"_hs).value().cast<char const*>(), &v.X, 0.1f))
         {
-            return field.set(component_data, v);
+            propertyWritten =  field.set(component_data, v);
         }
-        return false;
+        return propertyWritten;
     }
     inline bool inspect_vector4_field(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<Vector4>();
+        bool propertyWritten = false;
+
         if (ImGui::DragFloat4(field.prop("display_name"_hs).value().cast<char const*>(), &v.X, 0.1f))
         {
-            return field.set(component_data, v);
+            propertyWritten = field.set(component_data, v);
         }
-        return false;
+        return propertyWritten;
     }
 
     using FieldInspectorFn = bool (*)(entt::meta_data& field, entt::meta_any& component_data);
