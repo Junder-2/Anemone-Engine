@@ -4,6 +4,7 @@
 #include "Matrix3x3.h"
 #include "ANE/Math/Types/Quaternion.h"
 #include "ANE/Math/FMath.h"
+#include "ANE/Physics/PhysicsTypes.h"
 #include "glm/gtx/compatibility.hpp"
 
 namespace Engine
@@ -143,9 +144,9 @@ namespace Engine
 
     void Matrix4x4::Scale(const Vector3 scale)
     {
-        _columns[0] *= FMath::Max(scale.X, 0.01f);
-        _columns[1] *= FMath::Max(scale.Y, 0.01f);
-        _columns[2] *= FMath::Max(scale.Z, 0.01f);
+        _columns[0] *= FMath::Max(scale.X, MIN_SCALE);
+        _columns[1] *= FMath::Max(scale.Y, MIN_SCALE);
+        _columns[2] *= FMath::Max(scale.Z, MIN_SCALE);
     }
 
     Vector3 Matrix4x4::GetScale() const

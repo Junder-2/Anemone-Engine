@@ -5,6 +5,7 @@
 #include "Matrix4x4.h"
 #include "ANE/Math/FMath.h"
 #include "ANE/Math/Types/Quaternion.h"
+#include "ANE/Physics/PhysicsTypes.h"
 #include "glm/gtx/euler_angles.hpp"
 #include "glm/gtx/matrix_decompose.hpp"
 
@@ -29,10 +30,11 @@ namespace Engine
     {
         const Vector3 scale = GetScale();
 
-        _columns[0] = Vector4(1, 0, 0, 0) * scale.X;
-        _columns[1] = Vector4(0, 1, 0, 0) * scale.Y;
-        _columns[2] = Vector4(0, 0, 1, 0) * scale.Z;
+        _columns[0] = Vector4(1, 0, 0, 0);
+        _columns[1] = Vector4(0, 1, 0, 0);
+        _columns[2] = Vector4(0, 0, 1, 0);
         Rotate(quat);
+        Scale(scale);
     }
 
     void Matrix3x3::Rotate(const Quaternion& quat)
@@ -50,16 +52,17 @@ namespace Engine
     {
         const Vector3 scale = GetScale();
 
-        _columns[0] = Vector4(1, 0, 0, 0) * scale.X;
-        _columns[1] = Vector4(0, 1, 0, 0) * scale.Y;
-        _columns[2] = Vector4(0, 0, 1, 0) * scale.Z;
+        _columns[0] = Vector4(1, 0, 0, 0);
+        _columns[1] = Vector4(0, 1, 0, 0);
+        _columns[2] = Vector4(0, 0, 1, 0);
 
         if(isDegrees)
         {
             euler *= FMath::DEGREES_TO_RAD;
         }
 
-        Rotate(Quaternion(euler));
+        Rotate(euler, false);
+        Scale(scale);
     }
 
     void Matrix3x3::Rotate(float angle, const Vector3 axis, const bool isDegrees /*= false*/)
@@ -118,9 +121,9 @@ namespace Engine
 
     void Matrix3x3::Scale(const Vector3 scale)
     {
-        _columns[0] *= FMath::Max(scale.X, 0.01f);
-        _columns[1] *= FMath::Max(scale.Y, 0.01f);
-        _columns[2] *= FMath::Max(scale.Z, 0.01f);
+        _columns[0] *= FMath::Max(scale.X, MIN_SCALE);
+        _columns[1] *= FMath::Max(scale.Y, MIN_SCALE);
+        _columns[2] *= FMath::Max(scale.Z, MIN_SCALE);
     }
 
     Vector3 Matrix3x3::GetScale() const

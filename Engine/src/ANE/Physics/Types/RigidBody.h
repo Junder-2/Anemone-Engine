@@ -18,12 +18,12 @@ namespace Engine
         /**
          * Sets the transform of the rigidbody
          */
-        void SetTransform(Vector3 position, const Quaternion& rotation) const;
+        void SetTransform(Vector3 position, const Quaternion& rotation, bool teleport = false) const;
 
         /**
          * Sets the position of the rigidbody
          */
-        void SetPosition(Vector3 position) const;
+        void SetPosition(Vector3 position, bool teleport = false) const;
 
         /**
          * Returns the position of the rigidbody
@@ -33,7 +33,7 @@ namespace Engine
         /**
          * Sets the rotation of the rigidbody
          */
-        void SetRotation(const Quaternion& rotation) const;
+        void SetRotation(const Quaternion& rotation, bool teleport = false) const;
 
         /**
          * Returns the rotation of the rigidbody
