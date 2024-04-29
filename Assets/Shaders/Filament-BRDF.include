@@ -1,0 +1,59 @@
+// ----------------------------------------------------------------
+// Specular BRDF implementations.
+// ----------------------------------------------------------------
+
+float D_GGX(float NoH, float roughness)
+{
+    float a2 = roughness * roughness;
+    float f = (NoH * a2 - NoH) * NoH + 1.0;
+    return a2 / (PI * f * f);
+}
+
+float V_SmithGGXCorrelated(float NoV, float NoL, float roughness)
+{
+    float a2 = roughness * roughness;
+    float GGXL = NoV * sqrt((NoL - NoL * a2) * NoL + a2);
+    float GGXV = NoL * sqrt((NoV - NoV * a2) * NoV + a2);
+    return 0.5 / (GGXV + GGXL);
+}
+
+// Saves 2 sqrts but is mathematically wrong.
+float V_SmithGGXCorrelatedFast(float NoV, float NoL, float roughness)
+{
+    return 0.5 / lerp(2 * NoL * NoV, NoL + NoV, roughness);
+}
+
+float3 F_Schlick(float3 f0, float f90, float VoH)
+{
+    return f0 + (f90 - f0) * pow(1 - VoH, 5);
+}
+
+float3 F_Schlick(float3 f0, float VoH)
+{
+    float f = pow(1.0 - VoH, 5.0);
+    return f + f0 * (1 - f);
+}
+
+float F_Schlick(float f0, float f90, float VoH)
+{
+    return f0 + (f90 - f0) * pow(1 - VoH, 5);
+}
+
+// ----------------------------------------------------------------
+// Diffuse BRDF implementations.
+// ----------------------------------------------------------------
+
+// Filament (Lambertian)
+float Fd_Lambert()
+{
+    return 1.0 / PI;
+}
+
+// Disney (Burley)
+float Fd_Burley(float NoV, float NoL, float LoH, float roughness)
+{
+    float f90 = 0.5 + 2.0 * roughness * LoH * LoH;
+    float lightScatter = F_Schlick(NoL, 1.0, f90);
+    float viewScatter = F_Schlick(NoV, 1.0, f90);
+    return lightScatter * viewScatter / PI;
+}
