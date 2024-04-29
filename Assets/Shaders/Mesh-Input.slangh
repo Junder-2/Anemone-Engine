@@ -1,3 +1,5 @@
+#pragma once
+
 // Uniform data across every shader drawn during a frame.
 struct AppData
 {
