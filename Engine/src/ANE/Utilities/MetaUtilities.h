@@ -59,9 +59,6 @@ namespace Engine
 
     inline bool inspect_colliders(entt::meta_data& field, entt::meta_any& component_data)
     {
-        auto v = field.get(component_data).cast<CollisionShapeType>();
-        ImGui::Text("%f",(CollisionShapeType)v);
-        //ImGui::Text("%d",v);
         bool changed = false;
         auto v = field.get(component_data).cast<std::vector<Collider*>>();
         ImGui::Text("%s",field.prop("display_name"_hs).value().cast<const char*>());
