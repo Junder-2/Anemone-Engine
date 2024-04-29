@@ -27,11 +27,8 @@ namespace Engine
 
     private:
         void OnFixedUpdate(float timeStep);
-        void UpdateRigidBodies();
 
     private:
-        reactphysics3d::PhysicsWorld* _physicsWorld;
-
         float _accumulator = 0;
         float _timeStep = 1.f/50.f;
 

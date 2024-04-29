@@ -129,4 +129,56 @@ namespace Engine
         const auto capsuleCollider = _physicsCommon.createCapsuleShape(radius, height);
         return capsuleCollider;
     }
+
+    void PhysicsSystem::PhysicsUpdate(const float timeStep, Scene* scene)
+    {
+        bool sleepUpdate = false;
+
+        const auto group = scene->_registry.view<TransformComponent, RigidBodyComponent>();
+        for (const auto entity : group) //We need to apply changes in our transform to the internal rigidbody
+        {
+            auto[transform, body] = group.get<TransformComponent, RigidBodyComponent>(entity);
+
+            TransformMatrix& transformMatrix = transform.Transform;
+
+            if(!transformMatrix.IsDirty()) continue;
+
+            if(!sleepUpdate) // Dirty fix for a bug that crashes when a sleeping body tries to collide
+            {
+                for (uint32_t i = 0; i < _world->getNbRigidBodies(); ++i)
+                {
+                    _world->getRigidBody(i)->setIsSleeping(false);
+                }
+                sleepUpdate = true;
+            }
+            body.GetRigidBody()->SetTransform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
+            transformMatrix.ClearDirty();
+        }
+
+        _world->update(timeStep);
+    }
+
+    void PhysicsSystem::UpdateRigidBodies(const float factor, Scene* scene)
+    {
+        ANE_DEEP_PROFILE_FUNCTION();
+
+        const auto group = scene->_registry.view<TransformComponent, RigidBodyComponent>();
+        for (const auto entity : group)
+        {
+            auto[transform, body] = group.get<TransformComponent, RigidBodyComponent>(entity);
+
+            TransformMatrix& transformMatrix = transform.Transform;
+            const RigidBody* rigidBody = body.GetRigidBody();
+
+            if(transformMatrix.IsDirty() || rigidBody->GetBodyType() == BodyType::Static) continue;
+            if(!rigidBody->IsActive() || rigidBody->IsSleeping()) continue;
+
+            auto currentTransform = rp3d::Transform(transformMatrix.GetPosition(), Quaternion::FromEulerAngles(transformMatrix.GetEulerAngles()));
+            auto newTransform = rp3d::Transform::interpolateTransforms(currentTransform, rigidBody->GetReactRigidBody().getTransform(), factor);
+
+            transformMatrix.SetPosition(Vector3::Convert(newTransform.getPosition()));
+            transformMatrix.SetRotation(Quaternion::Convert(newTransform.getOrientation()).GetEulerAngles()); //TODO: Issues with scale and rotation
+            transformMatrix.ClearDirty();
+        }
+    }
 }
