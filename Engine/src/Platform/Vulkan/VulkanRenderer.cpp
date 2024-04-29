@@ -999,7 +999,7 @@ namespace Engine
         });
 
         // Fixed data for now.
-        float time = SDL_GetPerformanceCounter() / static_cast<float>(SDL_GetPerformanceFrequency());
+        float time = static_cast<float>(SDL_GetTicks64()) / 1000.0f;
         frame.AppData.Time = time;
 
         Vector3 ambientColor = Vector3(0.05f, 0.08f, 0.11f);
