@@ -29,6 +29,12 @@ namespace Engine
             return _rigidbody;
         }
 
+        static void RegisterComponentMetaData()
+        {
+            entt::meta<RigidBodyComponent>()
+                .data<&RigidBodyComponent::_rigidbody>("RigidBody"_hs).prop("display_name"_hs, "RigidBody");
+        }
+
     private:
 
         RigidBody* _rigidbody;

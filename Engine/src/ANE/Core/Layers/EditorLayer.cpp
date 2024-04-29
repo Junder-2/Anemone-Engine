@@ -122,6 +122,7 @@ namespace Engine
         TagComponent::RegisterComponentMetaData();
         TransformComponent::RegisterComponentMetaData();
         ColliderComponent::RegisterComponentMetaData();
+        RigidBodyComponent::RegisterComponentMetaData();
         RenderComponent::RegisterComponentMetaData();
         UUIDComponent::RegisterComponentMetaData();
         CameraComponent::RegisterComponentMetaData();
