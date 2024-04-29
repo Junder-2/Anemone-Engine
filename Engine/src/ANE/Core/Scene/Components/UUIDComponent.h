@@ -11,7 +11,8 @@ namespace Engine
         static void RegisterComponentMetaData()
             {
                 entt::meta<UUIDComponent>()
-                 .data<&UUIDComponent::UUID>("UUID"_hs).prop("display_name"_hs, "UUID");
+                 .data<&UUIDComponent::UUID>("UUID"_hs).prop("display_name"_hs, "UUID")
+                 .NOT_EDITABLE;
 
             }
     };

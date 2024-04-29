@@ -82,6 +82,11 @@ namespace Engine
                         for (auto&& data : type.data())
                         {
                             auto& field = data.second;
+                            bool editable = false;
+                            if(field.prop(EDITABLEHASH) != entt::meta_prop{})
+                            {
+                                editable = field.prop(EDITABLEHASH).value().cast<bool>();
+                            }
 
                             auto itr = g_data_inspectors.find(field.type().info().hash());
                             if (itr != g_data_inspectors.end())

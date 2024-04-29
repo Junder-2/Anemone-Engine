@@ -16,7 +16,8 @@ namespace Engine
         static void RegisterComponentMetaData()
         {
             entt::meta<TagComponent>()
-                   .data<&TagComponent::Value>("Tag"_hs).prop("display_name"_hs, "Tag");
+                   .data<&TagComponent::Value>("Tag"_hs).prop("display_name"_hs, "Tag")
+                   .EDITABLE;
         }
 
         //operator const char*&() { return Tag; }

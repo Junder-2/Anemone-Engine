@@ -41,7 +41,8 @@ namespace Engine
             entt::meta<CameraComponent>()
             .data<&CameraComponent::_zNear>("Z Near"_hs).prop("display_name"_hs, "Z Near")
             .data<&CameraComponent::_zFar>("Z Far"_hs).prop("display_name"_hs, "Z Far")
-            .data<&CameraComponent::_fieldOfView>("Field Of View"_hs).prop("display_name"_hs, "Field Of View");
+            .data<&CameraComponent::_fieldOfView>("Field Of View"_hs).prop("display_name"_hs, "Field Of View")
+            .EDITABLE;
             /*
             .data<&CameraComponent::Transform>("Transform"_hs).prop("display_name"_hs, "Transform")
             .prop("Position"_hs, "Position")

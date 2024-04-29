@@ -13,19 +13,33 @@ namespace Engine
 {
     using namespace entt::literals;
 
+
+
+
     inline bool inspect_string_field(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<std::string>();
         bool propertyWritten = false;
-
-        char buffer[256] = {};
-        const auto error = strcpy_s(buffer, sizeof(buffer), v.c_str());
-        if(ImGui::InputText(field.prop("display_name"_hs).value().cast<const char*>(),buffer,sizeof(buffer)))
+        bool writable = field.prop(EDITABLEHASH).value().cast<bool>();
+        if(writable)
         {
-            propertyWritten = field.set(component_data,std::string(buffer));
 
+            char buffer[256] = {};
+            const auto error = strcpy_s(buffer, sizeof(buffer), v.c_str());
+            if(ImGui::InputText(field.prop("display_name"_hs).value().cast<const char*>(),buffer,sizeof(buffer)))
+            {
+                propertyWritten = field.set(component_data,std::string(buffer));
+
+            }
         }
+        else
+        {
+            ImGui::Text("%s",v.c_str());
+        }
+
         return propertyWritten;
+
+
     }
 
     inline bool inspect_transform_matrix(entt::meta_data& field, entt::meta_any& component_data)

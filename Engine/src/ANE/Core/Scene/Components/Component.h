@@ -1,6 +1,8 @@
 ﻿#pragma once
 
-
+#define EDITABLEHASH "is_editable"_hs
+#define EDITABLE prop(EDITABLEHASH, true)
+#define NOT_EDITABLE prop(EDITABLEHASH, false)
 namespace Engine
 {
     struct Component
