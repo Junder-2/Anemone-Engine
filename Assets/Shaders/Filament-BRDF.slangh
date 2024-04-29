@@ -46,6 +46,26 @@ float F_Schlick(float f0, float f90, float VoH)
 }
 
 // ----------------------------------------------------------------
+// Specular BRDF dispatch.
+// ----------------------------------------------------------------
+
+float Distribution(float roughness, float NoH, float3 halfDir)
+{
+    return D_GGX(roughness, NoH, halfDir);
+}
+
+float Visibility(float roughness, float NoV, float NoL)
+{
+    return V_SmithGGXCorrelated(roughness, NoV, NoL);
+}
+
+float3 Fresnel(float3 f0, float LoH)
+{
+    float f90 = saturate(dot(f0, float3(50.0 * 0.33)));
+    return F_Schlick(f0, f90, LoH);
+}
+
+// ----------------------------------------------------------------
 // Diffuse BRDF implementations.
 // ----------------------------------------------------------------
 
@@ -62,4 +82,13 @@ float Fd_Burley(float roughness, float NoV, float NoL, float LoH)
     float lightScatter = F_Schlick(1.0, f90, NoL);
     float viewScatter = F_Schlick(1.0, f90, NoV);
     return lightScatter * viewScatter / PI;
+}
+
+// ----------------------------------------------------------------
+// Diffuse BRDF dispatch.
+// ----------------------------------------------------------------
+
+float Diffuse(float roughness, float NoV, float NoL, float LoH)
+{
+    return Fd_Burley(roughness, NoV, NoL, LoH);
 }
