@@ -50,23 +50,17 @@ namespace Engine
         return Matrix3x3::Convert(mat3_cast(glm::quat(*this)));
     }
 
-    Vector3 Quaternion::GetEulerAngles() const
+    Vector3 Quaternion::GetEulerAngles(bool inDegrees /*= false*/) const
     {
-        return Vector3::Convert(eulerAngles(glm::quat(*this)));
+        return Vector3::Convert(eulerAngles(glm::quat(*this))) * (inDegrees ? FMath::RAD_TO_DEGREES : 1.f);
     }
 
-    Quaternion Quaternion::FromEulerAngles(float angleX, float angleY, float angleZ)
+    Quaternion Quaternion::FromEulerAngles(const Vector3& eulerAngles, bool inDegrees /*= false*/)
     {
         Quaternion quaternion;
-        quaternion.InitWithEulerAngles(angleX, angleY, angleZ);
 
-        return quaternion;
-    }
-
-    Quaternion Quaternion::FromEulerAngles(const Vector3& eulerAngles)
-    {
-        Quaternion quaternion;
-        quaternion.InitWithEulerAngles(eulerAngles.X, eulerAngles.Y, eulerAngles.Z);
+        const float convert = inDegrees ? FMath::DEGREES_TO_RAD : 1.f;
+        quaternion.InitWithEulerAngles(eulerAngles.X * convert, eulerAngles.Y * convert, eulerAngles.Z * convert);
 
         return quaternion;
     }

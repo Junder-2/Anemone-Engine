@@ -110,6 +110,9 @@ namespace Engine
         virtual void OnEvent(Event& e);
         bool IsValidAxisBindings(BindingPair negativeBindingPair, BindingPair positiveBindingPair);
 
+        void OnKeyEvent(Event& e);
+        void OnMouseEvent(Event& e);
+
     protected:
         InputHandler* _inputHandler;
 

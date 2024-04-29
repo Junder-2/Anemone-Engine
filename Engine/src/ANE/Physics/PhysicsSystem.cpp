@@ -2,10 +2,13 @@
 #include "PhysicsSystem.h"
 
 #include "PhysicsLogger.h"
-#include "RigidBody.h"
 #include "ANE/Core/Entity/Entity.h"
 #include "ANE/Math/Types/TransformMatrix.h"
 #include "ANE/Core/Scene/Components/RigidBodyComponent.h"
+#include "Types/BoxCollider.h"
+#include "Types/CapsuleCollider.h"
+#include "Types/RigidBody.h"
+#include "Types/SphereCollider.h"
 
 namespace Engine
 {
@@ -16,6 +19,7 @@ namespace Engine
 
         rp3d::PhysicsWorld::WorldSettings worldSettings;
         worldSettings.worldName = "PhysicsWorld";
+        worldSettings.isSleepingEnabled = false; // Because of a bug this is currently necessary
 
         _world = _physicsCommon.createPhysicsWorld(worldSettings);
         #ifdef ANE_DEBUG
@@ -54,7 +58,7 @@ namespace Engine
         return new RigidBody(rigidBody);
     }
 
-    rp3d::Collider* PhysicsSystem::CreateSphereCollider(Entity entity, const float radius)
+    SphereCollider* PhysicsSystem::CreateSphereCollider(Entity entity, const float radius)
     {
         if(!entity.HasComponent<RigidBodyComponent>())
         {
@@ -63,12 +67,12 @@ namespace Engine
         }
 
         const auto rigidBody = entity.GetComponent<RigidBodyComponent>();
-        const auto sphereCollider = rigidBody.GetRigidBody()->GetReactRigidBody().addCollider(CreateSphereShape(radius), rp3d::Transform::identity());
+        const auto collider = rigidBody.GetRigidBody()->GetReactRigidBody().addCollider(CreateSphereShape(radius), rp3d::Transform::identity());
 
-        return sphereCollider;
+        return new SphereCollider(collider);
     }
 
-    rp3d::Collider* PhysicsSystem::CreateBoxCollider(Entity entity, const Vector3& halfExtents)
+    BoxCollider* PhysicsSystem::CreateBoxCollider(Entity entity, const Vector3& halfExtents)
     {
         if(!entity.HasComponent<RigidBodyComponent>())
         {
@@ -77,12 +81,12 @@ namespace Engine
         }
 
         const auto rigidBody = entity.GetComponent<RigidBodyComponent>();
-        const auto sphereCollider = rigidBody.GetRigidBody()->GetReactRigidBody().addCollider(CreateBoxShape(halfExtents), rp3d::Transform::identity());
+        const auto collider = rigidBody.GetRigidBody()->GetReactRigidBody().addCollider(CreateBoxShape(halfExtents), rp3d::Transform::identity());
 
-        return sphereCollider;
+        return new BoxCollider(collider);
     }
 
-    rp3d::Collider* PhysicsSystem::CreateCapsuleCollider(Entity entity, const float radius, const float height)
+    CapsuleCollider* PhysicsSystem::CreateCapsuleCollider(Entity entity, const float radius, const float height)
     {
         if(!entity.HasComponent<RigidBodyComponent>())
         {
@@ -91,9 +95,21 @@ namespace Engine
         }
 
         const auto rigidBody = entity.GetComponent<RigidBodyComponent>();
-        const auto sphereCollider = rigidBody.GetRigidBody()->GetReactRigidBody().addCollider(CreateCapsuleShape(radius, height), rp3d::Transform::identity());
+        const auto collider = rigidBody.GetRigidBody()->GetReactRigidBody().addCollider(CreateCapsuleShape(radius, height), rp3d::Transform::identity());
 
-        return sphereCollider;
+        return new CapsuleCollider(collider);
+    }
+
+    void PhysicsSystem::RemoveCollider(Entity entity, const Collider* collider)
+    {
+        if(!entity.HasComponent<RigidBodyComponent>())
+        {
+            ANE_ELOG_WARN("Entity has no RigidBodyComponent, cannot remove collider");
+            return;
+        }
+
+        const auto rigidBody = entity.GetComponent<RigidBodyComponent>();
+        rigidBody.GetRigidBody()->GetReactRigidBody().removeCollider(&collider->GetReactCollider());
     }
 
     rp3d::SphereShape* PhysicsSystem::CreateSphereShape(const float radius)

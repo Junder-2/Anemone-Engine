@@ -2,7 +2,7 @@
 #include "RigidBody.h"
 
 #include "ANE/Math/Types/Quaternion.h"
-#include "Physics.h"
+#include "ANE/Physics/Physics.h"
 
 namespace Engine
 {
@@ -24,10 +24,20 @@ namespace Engine
         _reactRigidBody->setTransform(rp3d::Transform(position, _reactRigidBody->getTransform().getOrientation()));
     }
 
+    Vector3 RigidBody::GetPosition() const
+    {
+        return Vector3::Convert(_reactRigidBody->getTransform().getPosition());
+    }
+
     void RigidBody::SetRotation(const Quaternion& rotation) const
     {
         _reactRigidBody->setIsSleeping(false);
         _reactRigidBody->setTransform(rp3d::Transform(_reactRigidBody->getTransform().getPosition(), rotation));
+    }
+
+    Quaternion RigidBody::GetRotation() const
+    {
+        return Quaternion::Convert(_reactRigidBody->getTransform().getOrientation());
     }
 
     void RigidBody::SetVelocity(const Vector3& newVelocity) const

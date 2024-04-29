@@ -3,7 +3,10 @@
 #include "Component.h"
 #include "ANE/Core/Entity/Entity.h"
 #include "ANE/Physics/Physics.h"
-#include "ANE/Physics/PhysicsTypes.h"
+#include "ANE/Physics/Types/Collider.h"
+#include "ANE/Physics/Types/BoxCollider.h"
+#include "ANE/Physics/Types/SphereCollider.h"
+#include "ANE/Physics/Types/CapsuleCollider.h"
 
 namespace Engine
 {
@@ -12,43 +15,67 @@ namespace Engine
     public:
         ANE_COMPONENT_INIT(ColliderComponent)
 
+        ColliderComponent(Collider* collider) : Component(typeid(*this).name())
+        {
+            _colliders.push_back(collider);
+        }
+
         ColliderComponent(const Entity self, const Vector3 halfExtents) : Component(typeid(*this).name())
         {
-            _collider = GetPhysicsSystem().CreateBoxCollider(self, halfExtents);
-            _shapeType = CollisionShapeType::Box;
+            _colliders.push_back(GetPhysicsSystem().CreateBoxCollider(self, halfExtents));
         }
 
         ColliderComponent(const Entity self, const float radius) : Component(typeid(*this).name())
         {
-            _collider = GetPhysicsSystem().CreateSphereCollider(self, radius);
-            _shapeType = CollisionShapeType::Sphere;
+            _colliders.push_back(GetPhysicsSystem().CreateSphereCollider(self, radius));
         }
 
         ColliderComponent(const Entity self, const float radius, const float height) : Component(typeid(*this).name())
         {
-            _collider = GetPhysicsSystem().CreateCapsuleCollider(self, radius, height);
-            _shapeType = CollisionShapeType::Capsule;
+            _colliders.push_back(GetPhysicsSystem().CreateCapsuleCollider(self, radius, height));
         }
 
-        CollisionShapeType GetShapeType() const
+        void AddCollider(Collider* collider)
         {
-            return _shapeType;
+            _colliders.push_back(collider);
         }
 
-        rp3d::Collider* GetCollider() const
+        void RemoveCollider(const Entity self, const Collider* collider)
         {
-            return _collider;
+            if(const auto element = std::ranges::find(_colliders, collider); element != _colliders.end())
+            {
+                _colliders.erase(element);
+            }
+            else
+            {
+                ANE_ELOG_WARN("Trying to remove collider, but its not inside of list");
+                return;
+            }
+
+            GetPhysicsSystem().RemoveCollider(self, collider);
         }
+
+        std::vector<Collider*>& GetColliders()
+        {
+            return _colliders;
+        }
+
+        Collider* GetCollider(const int index = 0) const
+        {
+            if(_colliders.size() < index)
+            {
+                ANE_ELOG_WARN("Trying to access collider at invalid index {0}", index);
+                return nullptr;
+            }
+            return _colliders[index];
+        }
+
         static void RegisterComponentMetaData()
         {
             entt::meta<ColliderComponent>()
-                .data<&ColliderComponent::_collider>("Collider"_hs).prop("display_name"_hs, "Collider")
-                .data<&ColliderComponent::_shapeType>("ColliderShapeType"_hs).prop("display_name"_hs, "Collider Shape Type");
-
-
+                .data<&ColliderComponent::_colliders>("Colliders"_hs).prop("display_name"_hs, "Colliders");
         }
     private:
-        CollisionShapeType _shapeType;
-        rp3d::Collider* _collider;
+        std::vector<Collider*> _colliders;
     };
 }

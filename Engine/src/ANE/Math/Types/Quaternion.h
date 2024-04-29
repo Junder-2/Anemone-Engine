@@ -41,17 +41,16 @@ namespace Engine
 
         void Inverse();
 
+        Quaternion GetNormalized() const;
         Quaternion GetConjugate() const;
         Quaternion GetInverse() const;
 
         Matrix3x3 GetMatrix() const;
-        Vector3 GetEulerAngles() const;
+        Vector3 GetEulerAngles(bool inDegrees = false) const;
 
         std::string ToString() const;
 
-        static Quaternion FromEulerAngles(float angleX, float angleY, float angleZ);
-
-        static Quaternion FromEulerAngles(const Vector3& eulerAngles);
+        static Quaternion FromEulerAngles(const Vector3& eulerAngles, bool inDegrees = false);
 
         // Conversion to other quaternion types
         static Quaternion Convert(const reactphysics3d::Quaternion& quat);
@@ -162,6 +161,16 @@ namespace Engine
         Y /= l;
         Z /= l;
         W /= l;
+    }
+
+    inline Quaternion Quaternion::GetNormalized() const
+    {
+        const float l = Length();
+
+        // Check if the length is not equal to zero
+        ANE_EASSERT(l > FMath::EPSILON);
+
+        return {X/l, Y/l, Z/l, W/l};
     }
 
     inline void Quaternion::Inverse()

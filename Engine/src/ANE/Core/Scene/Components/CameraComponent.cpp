@@ -5,67 +5,36 @@
 
 namespace Engine
 {
-
-
-    void CameraComponent::SetPosition(const Vector3 newPosition)
+    void CameraComponent::SetFOV(const float fov)
     {
-        Transform.SetPosition(newPosition);
-        UpdateViewMatrix();
-    }
+        _fieldOfView = fov;
 
-    void CameraComponent::SetRotation(const Vector3 newRotation)
-    {
-        Transform.SetRotation(newRotation);
-        UpdateViewMatrix();
+        UpdateProjectionMatrix();
     }
 
     void CameraComponent::SetPerspective(const float fov, const float aspect, const float zNear, const float zFar)
     {
-        const Matrix4x4 currentMatrix = PerspectiveMatrix;
+        _aspectRatio = aspect;
         _fieldOfView = fov;
         _zNear = zNear;
         _zFar = zFar;
-        PerspectiveMatrix = Matrix4x4::Convert(glm::perspective(glm::radians(_fieldOfView), aspect, _zNear, _zFar));
+
+        UpdateProjectionMatrix();
+    }
+
+    void CameraComponent::SetAspectRatio(const float aspect)
+    {
+        _aspectRatio = aspect;
+
+        UpdateProjectionMatrix();
+    }
+
+    void CameraComponent::UpdateProjectionMatrix()
+    {
+        PerspectiveMatrix = Matrix4x4::Convert(glm::perspective(glm::radians(_fieldOfView), _aspectRatio, _zNear, _zFar));
         if (_flipY) {
             //flip y axis
             PerspectiveMatrix[1][1] *= -1.0f;
         }
-        if (ViewMatrix != currentMatrix) {
-            _updated = true;
-        }
     }
-
-    void CameraComponent::UpdateAspectRatio(const float aspect)
-    {
-        const Matrix4x4 currentMatrix = PerspectiveMatrix;
-        PerspectiveMatrix = Matrix4x4::Convert(glm::perspective(glm::radians(_fieldOfView), aspect, _zNear, _zFar));
-        if (_flipY) {
-            //flip y axis
-            PerspectiveMatrix[1][1] *= -1.0f;
-        }
-        if (ViewMatrix != currentMatrix) {
-            _updated = true;
-        }
-    }
-
-    void CameraComponent::UpdateViewMatrix()
-    {
-        const Matrix4x4 currentMatrix = ViewMatrix;
-
-        ViewMatrix = Transform.GetWorldToLocal();
-
-        if (_flipY) {
-            //flip y coord
-            ViewMatrix[3][1] *= -1.f;
-            //flip y axis
-            ViewMatrix[1][1] *= -1.f;
-        }
-
-        ViewPos = Vector4(Transform.GetPosition(), 0.0f) * Vector4(-1.0f, 1.0f, -1.0f, 1.0f);
-
-        if (ViewMatrix != currentMatrix) {
-            _updated = true;
-        }
-    }
-
 }

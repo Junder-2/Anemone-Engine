@@ -99,16 +99,16 @@ namespace Engine
                     Shutdown();
                 break;
                 case EventType::WindowResize:
-                    OnWindowResize(dynamic_cast<WindowResizeEvent&>(e));
+                    OnWindowResize(reinterpret_cast<WindowResizeEvent&>(e));
                 break;
                 // case EventType::WindowMoved:
-                //     OnWindowMove(dynamic_cast<WindowMovedEvent&>(e));
+                //     OnWindowMove(reinterpret_cast<WindowMovedEvent&>(e));
                 // break;
                 // case EventType::WindowFocusChange:
-                //     OnWindowFocusChange(dynamic_cast<WindowFocusChangeEvent&>(e));
+                //     OnWindowFocusChange(reinterpret_cast<WindowFocusChangeEvent&>(e));
                 // break;
                 // case EventType::WindowStateChange:
-                //     OnWindowStateChange(dynamic_cast<WindowStateChangeEvent&>(e));
+                //     OnWindowStateChange(reinterpret_cast<WindowStateChangeEvent&>(e));
                 // break;
             }
         }
@@ -119,16 +119,16 @@ namespace Engine
         //     switch (e.GetEventType())
         //     {
         //         case EventType::KeyboardInput:
-        //             OnKeyTest(dynamic_cast<KeyTriggerEvent&>(e));
+        //             OnKeyTest(reinterpret_cast<KeyTriggerEvent&>(e));
         //         break;
         //         case EventType::MouseButton:
-        //             OnMouseKeyTest(dynamic_cast<MouseButtonEvent&>(e));
+        //             OnMouseKeyTest(reinterpret_cast<MouseButtonEvent&>(e));
         //         break;
         //         case EventType::MouseScrolled:
-        //             OnMouseScrollTest(dynamic_cast<MouseScrollEvent&>(e));
+        //             OnMouseScrollTest(reinterpret_cast<MouseScrollEvent&>(e));
         //         break;
         //         case EventType::MouseMovement:
-        //             OnMouseMoveTest(dynamic_cast<MouseMovementEvent&>(e));
+        //             OnMouseMoveTest(reinterpret_cast<MouseMovementEvent&>(e));
         //         break;
         //     }
         // }
