@@ -1,4 +1,4 @@
-#include "Filament-Input.include"
+#include "Filament-Input.slangh"
 
 // Per vertex data.
 /*struct Attributes

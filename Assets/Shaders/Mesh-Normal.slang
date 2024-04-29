@@ -1,4 +1,4 @@
-#include "Mesh-Input.include"
+#include "Mesh-Input.slangh"
 
 // This is a Debug/Example shader which outputs the world normals.
 

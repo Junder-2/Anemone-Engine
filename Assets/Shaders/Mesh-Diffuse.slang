@@ -1,4 +1,4 @@
-#include "Mesh-Input.include"
+#include "Mesh-Input.slangh"
 
 // Per vertex data.
 /*struct Attributes
