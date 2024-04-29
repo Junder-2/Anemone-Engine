@@ -10,11 +10,11 @@ namespace Engine
     void SphereCollider::SetRadius(const float radius) const
     {
         WakeBody();
-        dynamic_cast<reactphysics3d::SphereShape*>(_reactCollider->getCollisionShape())->setRadius(radius);
+        reinterpret_cast<reactphysics3d::SphereShape*>(_reactCollider->getCollisionShape())->setRadius(radius);
     }
 
     float SphereCollider::GetRadius() const
     {
-        return dynamic_cast<reactphysics3d::SphereShape*>(_reactCollider->getCollisionShape())->getRadius();
+        return reinterpret_cast<reactphysics3d::SphereShape*>(_reactCollider->getCollisionShape())->getRadius();
     }
 }

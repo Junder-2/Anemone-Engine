@@ -98,76 +98,86 @@ namespace Engine
 
         if(e.HasCategory(EventCategoryKeyboard))
         {
-            const InputValue keyValue = dynamic_cast<KeyboardKeyEvent&>(e).GetInputValue();
-
-            const BindingPair bindingPair(keyValue.GetDeviceType(), keyValue.GetBindingId());
-
-            if(_actionMappingDelegates.contains(bindingPair))
-            {
-                _actionMappingDelegates[bindingPair](keyValue);
-            }
-
-            if(!_bindingToAxisBinding.empty())
-            {
-                const AxisBinding axisBinding = _bindingToAxisBinding[bindingPair];
-
-                InputValue axisValue(InputTypeAxis, (InputDeviceType)bindingPair.DeviceType, keyValue.GetBindingId());
-
-                const float sign = axisBinding.Sign ? 1.f : -1.f;
-                switch (keyValue.GetValueType())
-                {
-                    case InputTypeTrigger:
-                        axisValue = keyValue.GetTriggerState() != TriggerStopped ? sign : 0;
-                        break;
-                    case InputTypeBoolean:
-                        axisValue = keyValue.GetIntValue() != 0 ? sign : 0;
-                        break;
-                    case InputTypeAxis:
-                        axisValue = keyValue.GetAxis() * sign;
-                        break;
-                }
-
-                _axisActionMappingDelegates[axisBinding.Id](axisValue);
-            }
+            OnKeyEvent(e);
         }
 
         if(e.HasCategory(EventCategoryMouse))
         {
-            switch (e.GetEventType())
+            OnMouseEvent(e);
+        }
+    }
+
+    void InputSystem::OnKeyEvent(Event& e)
+    {
+        const InputValue keyValue = reinterpret_cast<KeyboardKeyEvent&>(e).GetInputValue();
+
+        const BindingPair bindingPair(keyValue.GetDeviceType(), keyValue.GetBindingId());
+
+        if(_actionMappingDelegates.contains(bindingPair))
+        {
+            _actionMappingDelegates[bindingPair](keyValue);
+        }
+
+        if(!_bindingToAxisBinding.empty())
+        {
+            const AxisBinding axisBinding = _bindingToAxisBinding[bindingPair];
+
+            InputValue axisValue(InputTypeAxis, (InputDeviceType)bindingPair.DeviceType, keyValue.GetBindingId());
+
+            const float sign = axisBinding.Sign ? 1.f : -1.f;
+            switch (keyValue.GetValueType())
             {
-                case EventType::MouseMovement:
-                {
-                    const MouseMoveValue mouseMoveValue = dynamic_cast<MouseMovementEvent&>(e).GetInputValue();
-
-                    if(_mouseMoveDelegate) _mouseMoveDelegate(mouseMoveValue);
-                }
+                case InputTypeTrigger:
+                    axisValue = keyValue.GetTriggerState() != TriggerStopped ? sign : 0;
                 break;
-                case EventType::MouseScrolled:
-                {
-                    const MouseScrollEvent mouseScrollEvent = dynamic_cast<MouseScrollEvent&>(e);
-
-                    if(_mouseScrollDelegate) _mouseScrollDelegate({mouseScrollEvent.GetXDelta(), mouseScrollEvent.GetYDelta()});
-                }
+                case InputTypeBoolean:
+                    axisValue = keyValue.GetIntValue() != 0 ? sign : 0;
                 break;
-                case EventType::MouseButton:
-                {
-                    const MouseButtonValues mouseButtonValues = dynamic_cast<MouseButtonEvent&>(e).GetInputValue();
-
-                    if(_mouseButtonValueDelegate) _mouseButtonValueDelegate(mouseButtonValues);
-
-                    const int buttonId = mouseButtonValues.GetCurrentButtonIndex();
-
-                    const BindingPair bindingPair(InputDeviceMouse, buttonId);
-
-                    if(_actionMappingDelegates.contains(bindingPair))
-                    {
-                        const InputValue buttonValue(mouseButtonValues.GetTriggerState(), InputTypeTrigger, InputDeviceMouse, buttonId);
-
-                        _actionMappingDelegates[bindingPair](buttonValue);
-                    }
-                }
+                case InputTypeAxis:
+                    axisValue = keyValue.GetAxis() * sign;
                 break;
             }
+
+            _axisActionMappingDelegates[axisBinding.Id](axisValue);
+        }
+    }
+
+    void InputSystem::OnMouseEvent(Event& e)
+    {
+        switch (e.GetEventType())
+        {
+            case EventType::MouseMovement:
+            {
+                const MouseMoveValue mouseMoveValue = reinterpret_cast<MouseMovementEvent&>(e).GetInputValue();
+
+                if(_mouseMoveDelegate) _mouseMoveDelegate(mouseMoveValue);
+            }
+            break;
+            case EventType::MouseScrolled:
+            {
+                const MouseScrollEvent mouseScrollEvent = reinterpret_cast<MouseScrollEvent&>(e);
+
+                if(_mouseScrollDelegate) _mouseScrollDelegate({mouseScrollEvent.GetXDelta(), mouseScrollEvent.GetYDelta()});
+            }
+            break;
+            case EventType::MouseButton:
+            {
+                const MouseButtonValues mouseButtonValues = reinterpret_cast<MouseButtonEvent&>(e).GetInputValue();
+
+                if(_mouseButtonValueDelegate) _mouseButtonValueDelegate(mouseButtonValues);
+
+                const int buttonId = mouseButtonValues.GetCurrentButtonIndex();
+
+                const BindingPair bindingPair(InputDeviceMouse, buttonId);
+
+                if(_actionMappingDelegates.contains(bindingPair))
+                {
+                    const InputValue buttonValue(mouseButtonValues.GetTriggerState(), InputTypeTrigger, InputDeviceMouse, buttonId);
+
+                    _actionMappingDelegates[bindingPair](buttonValue);
+                }
+            }
+            break;
         }
     }
 

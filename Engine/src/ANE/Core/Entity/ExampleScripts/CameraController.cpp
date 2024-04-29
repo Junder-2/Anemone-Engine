@@ -118,7 +118,7 @@ namespace Engine
     {
         if (event.GetEventType() != EventType::WindowResize) return;
 
-        const WindowResizeEvent& resizeEvent = dynamic_cast<WindowResizeEvent&>(event);
+        const WindowResizeEvent& resizeEvent = reinterpret_cast<WindowResizeEvent&>(event);
         const float w = (float)resizeEvent.GetWidth(), h = (float)resizeEvent.GetHeight();
 
         _cameraComponent->SetAspectRatio(w / h);

@@ -11,11 +11,11 @@ namespace Engine
     void BoxCollider::SetHalfSize(const Vector3 halfSize) const
     {
         WakeBody();
-        dynamic_cast<reactphysics3d::BoxShape*>(_reactCollider->getCollisionShape())->setHalfExtents(halfSize);
+        reinterpret_cast<reactphysics3d::BoxShape*>(_reactCollider->getCollisionShape())->setHalfExtents(halfSize);
     }
 
     Vector3 BoxCollider::GetHalfSize() const
     {
-        return Vector3::Convert(dynamic_cast<reactphysics3d::BoxShape*>(_reactCollider->getCollisionShape())->getHalfExtents());
+        return Vector3::Convert(reinterpret_cast<reactphysics3d::BoxShape*>(_reactCollider->getCollisionShape())->getHalfExtents());
     }
 }

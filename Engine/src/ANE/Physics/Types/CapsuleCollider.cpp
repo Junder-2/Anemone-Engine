@@ -16,22 +16,22 @@ namespace Engine
     void CapsuleCollider::SetRadius(const float radius) const
     {
         WakeBody();
-        dynamic_cast<reactphysics3d::CapsuleShape*>(_reactCollider->getCollisionShape())->setRadius(radius);
+        reinterpret_cast<reactphysics3d::CapsuleShape*>(_reactCollider->getCollisionShape())->setRadius(radius);
     }
 
     void CapsuleCollider::SetHeight(const float height) const
     {
         WakeBody();
-        dynamic_cast<reactphysics3d::CapsuleShape*>(_reactCollider->getCollisionShape())->setHeight(height);
+        reinterpret_cast<reactphysics3d::CapsuleShape*>(_reactCollider->getCollisionShape())->setHeight(height);
     }
 
     float CapsuleCollider::GetRadius() const
     {
-        return dynamic_cast<reactphysics3d::CapsuleShape*>(_reactCollider->getCollisionShape())->getRadius();
+        return reinterpret_cast<reactphysics3d::CapsuleShape*>(_reactCollider->getCollisionShape())->getRadius();
     }
 
     float CapsuleCollider::GetHeight() const
     {
-        return dynamic_cast<reactphysics3d::CapsuleShape*>(_reactCollider->getCollisionShape())->getHeight();
+        return reinterpret_cast<reactphysics3d::CapsuleShape*>(_reactCollider->getCollisionShape())->getHeight();
     }
 }
