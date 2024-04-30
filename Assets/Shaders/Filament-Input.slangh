@@ -68,17 +68,32 @@ ParameterBlock<MaterialProperties> props;
 // Getters.
 float4 GetColor(float2 uv)
 {
+    return GetColor(props, uv);
+}
+
+float4 GetColor(MaterialProperties props, float2 uv)
+{
     float4 colorMap = props.ColorMap.Sample(uv);
     return colorMap;
 }
 
 float3 GetTangentSpaceNormal(float2 uv)
 {
+    return GetTangentSpaceNormal(props, uv);
+}
+
+float3 GetTangentSpaceNormal(MaterialProperties props, float2 uv)
+{
     float3 normalMap = props.NormalMap.Sample(uv).rgb;
     return UnpackNormalMap(normalMap, .5);
 }
 
 float3 GetORM(float2 uv)
+{
+    return GetORM(props, uv);
+}
+
+float3 GetORM(MaterialProperties props, float2 uv)
 {
     float3 ormMap = props.ORMMap.Sample(uv).rgb;
     float3 orm;
