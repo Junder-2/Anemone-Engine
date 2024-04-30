@@ -12,3 +12,12 @@ float3 UnpackNormalMap(float3 packedNormal, float scale)
 
     return normal;
 }
+
+float3 TangentToWorld(float3 normal, float3 tangent, float3 vector)
+{
+    float3 binormal = cross(normal, tangent);
+    return normalize(
+        vector.x * tangent +
+        vector.y * binormal +
+        vector.z * normal);
+}
