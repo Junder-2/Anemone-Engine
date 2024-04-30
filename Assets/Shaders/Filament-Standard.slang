@@ -1,6 +1,7 @@
 #include "Filament-Input.slangh"
 #include "Filament-BRDF.slangh"
 #include "Filament-Material.slangh"
+#include "Filament-Light.slangh"
 
 // Per vertex data.
 /*struct Attributes
@@ -54,12 +55,6 @@ struct Fragment
     float3 position;
     float3 normal;
     float3 viewDir;
-};
-
-struct Light
-{
-    float3 color;
-    float3 direction;
 };
 
 static float3 d1, d2, d3;
@@ -125,9 +120,7 @@ float4 fragmentMain(Varyings input) : SV_TARGET
 
     Material material = SetupMaterial(props, uv);
 
-    Light light;
-    light.color = sceneData.SunlightColor.rgb;
-    light.direction = sceneData.SunlightDirection.xyz;
+    Light light = GetDirectionalLight();
 
     float4 color = GetColor(uv);
 
