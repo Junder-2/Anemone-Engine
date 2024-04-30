@@ -9,9 +9,12 @@
 namespace Engine
 {
     //TODO: I just choose some random colors
-    const ImVec4 EditorLogPanel::colorInfo {0.3f, 0.8f, 0.3f, 1.f };
-    const ImVec4 EditorLogPanel::colorWarn {0.8f, 0.8f, 0.f, 1.f};
-    const ImVec4 EditorLogPanel::colorError {1.0f, 0.1f, 0.1f, 1.f};
+    const ImVec4 EditorLogPanel::colorInfoEven {0.3f, 0.8f, 0.3f, 1.f };
+    const ImVec4 EditorLogPanel::colorInfoOdd {0.6f, 0.8f, 0.6f, 1.f };
+    const ImVec4 EditorLogPanel::colorWarnEven {0.8f, 0.8f, 0.f, 1.f};
+    const ImVec4 EditorLogPanel::colorWarnOdd {0.8f, 0.8f, 0.4f, 1.f};
+    const ImVec4 EditorLogPanel::colorErrorEven {1.0f, 0.1f, 0.1f, 1.f};
+    const ImVec4 EditorLogPanel::colorErrorOdd {1.0f, 0.4f, 0.4f, 1.f};
 
     EditorLogPanel::EditorLogPanel(EditorLayer* layer)
     {
@@ -137,20 +140,23 @@ namespace Engine
             ImGui::PushTextWrapPos(0);
         }
 
-        ImVec4 currentColor = colorError;
+        ImVec4 currentColor = colorErrorEven;
 
         switch (logMessage.LevelCategory)
         {
             case LogLevelCategory::LevelTrace:
             case LogLevelCategory::LevelDebug:
             case LogLevelCategory::LevelInfo:
-                currentColor = colorInfo;
+                if (Even) currentColor = colorInfoEven;
+                else currentColor = colorInfoOdd;
                 break;
             case LogLevelCategory::LevelWarn:
-                currentColor = colorWarn;
+                if (Even) currentColor = colorWarnEven;
+                else currentColor = colorWarnOdd;
                 break;
             case LogLevelCategory::LevelError:
-                currentColor = colorError;
+                if (Even) currentColor = colorErrorEven;
+                else currentColor = colorErrorOdd;
                 break;
         }
 
@@ -204,6 +210,8 @@ namespace Engine
         {
             ImGui::SetTooltip("%s", logMessage.Source.c_str());
         }
+
+        Even = !Even;
     }
 
     void EditorLogPanel::DrawToolBar()

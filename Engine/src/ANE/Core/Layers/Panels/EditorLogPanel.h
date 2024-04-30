@@ -34,9 +34,13 @@ namespace Engine
         EditorLayer* _editorLayer;
 
     private:
-        static const ImVec4 colorInfo;
-        static const ImVec4 colorWarn;
-        static const ImVec4 colorError;
+        static const ImVec4 colorInfoEven;
+        static const ImVec4 colorInfoOdd;
+        static const ImVec4 colorWarnEven;
+        static const ImVec4 colorWarnOdd;
+        static const ImVec4 colorErrorEven;
+        static const ImVec4 colorErrorOdd;
+        bool Even = true;
 
         int _levelFilter;
         entt::dense_map<std::string, bool> _loggerNameFilter;
