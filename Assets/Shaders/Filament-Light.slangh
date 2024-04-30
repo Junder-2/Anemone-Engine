@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Filament-Input.slangh"
+#include "Filament-Material.slangh"
+#include "Filament-Fragment.slangh"
 
 struct Light
 {
@@ -15,4 +17,11 @@ Light GetDirectionalLight()
     light.direction = sceneData.SunlightDirection.xyz;
 
     return light;
+}
+
+float3 EvaluateDirectionalLight(Material material, Fragment fragment)
+{
+    Light light = GetDirectionalLight();
+
+    return SurfaceShading(material, fragment, light);
 }
