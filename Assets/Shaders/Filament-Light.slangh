@@ -1,0 +1,18 @@
+#pragma once
+
+#include "Filament-Input.slangh"
+
+struct Light
+{
+    float3 color;
+    float3 direction;
+};
+
+Light GetDirectionalLight()
+{
+    Light light;
+    light.color = sceneData.SunlightColor.rgb;
+    light.direction = sceneData.SunlightDirection.xyz;
+
+    return light;
+}
