@@ -1,6 +1,7 @@
 #include "Filament-Input.slangh"
 #include "Filament-BRDF.slangh"
 #include "Filament-Material.slangh"
+#include "Filament-Fragment.slangh"
 #include "Filament-Light.slangh"
 
 // Per vertex data.
@@ -49,13 +50,6 @@ float3 TangentDirToWorld(float3 normal, float3 tangent, float3 dir)
         dir.y * binormal +
         dir.z * normal);
 }
-
-struct Fragment
-{
-    float3 position;
-    float3 normal;
-    float3 viewDir;
-};
 
 static float3 d1, d2, d3;
 
