@@ -52,6 +52,7 @@ float4 fragmentMain(Varyings input) : SV_TARGET
     fragment.position = input.worldPosition;
     fragment.normal = normalize(normal);
     fragment.viewDir = normalize(sceneData.CameraPos.xyz - input.worldPosition);
+    fragment.reflected = reflect(-fragment.viewDir, fragment.normal);
 
     Material material = SetupMaterial(props, uv);
 
