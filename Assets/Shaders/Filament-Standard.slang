@@ -118,24 +118,12 @@ float4 fragmentMain(Varyings input) : SV_TARGET
 
     normal = TangentDirToWorld(normal, tangent, GetTangentSpaceNormal(uv));
 
-    float4 baseColor = GetColor(uv);
-    float3 orm = GetORM(uv);
-    orm.g = 1;
-    orm.b = 1;
-
     Fragment fragment;
     fragment.position = input.worldPosition;
     fragment.normal = normalize(normal);
     fragment.viewDir = normalize(sceneData.CameraPos.xyz - input.worldPosition);
 
-    Material material;
-    material.diffuseColor = ComputeDiffuseColor(baseColor, orm.b);
-    material.roughness = ComputeRoughness(orm.g);
-    material.occlusion = orm.r;
-
-    //float reflectance = ComputeDielectricF0(props.Reflectance);
-    float reflectance = ComputeDielectricF0(1);
-    material.f0 = ComputeF0(baseColor, orm.b, reflectance);
+    Material material = SetupMaterial(props, uv);
 
     Light light;
     light.color = sceneData.SunlightColor.rgb;
