@@ -5,7 +5,11 @@ struct Material
     float3 diffuseColor;
     float roughness;
     float occlusion;
-    float3 f0;
+
+    float3 f0; // Reflectance at normal incidence.
+
+    float3 dfg;
+    float3 energyCompensation;
 };
 
 float3 ComputeDiffuseColor(float4 baseColor, float metallic)
