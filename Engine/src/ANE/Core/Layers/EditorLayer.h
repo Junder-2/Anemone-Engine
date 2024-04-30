@@ -3,6 +3,7 @@
 #include "entt.hpp"
 #include "ANE/Core/Entity/Entity.h"
 #include "ANE/Core/Scene/Scene.h"
+#include "ANE/Utilities/SceneSerializer.h"
 #include "Panels/UIUpdateWrapper.h"
 
 namespace Engine
@@ -47,6 +48,7 @@ namespace Engine
         {
             if (!_scenes.contains(sceneName)) AddScene<Scene>(sceneName);
 
+            _sceneSerializer = new SceneSerializer(_activeScene);
             _activeScene = _scenes.at(sceneName);
         }
 
@@ -57,6 +59,7 @@ namespace Engine
         Entity GetEntityWithUUID(std::string UUID);
 
     private:
+        SceneSerializer* _sceneSerializer;
         std::map<std::string, Entity> _entityMap;
         std::vector<UIUpdateWrapper> UIUpdates;
         void CreateTestScene(int numEntitiesToTest);

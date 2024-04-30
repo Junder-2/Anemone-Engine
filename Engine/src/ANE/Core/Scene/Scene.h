@@ -28,6 +28,8 @@ namespace Engine
     private:
         void OnFixedUpdate(float timeStep);
 
+        friend class SceneSerializer;
+
     private:
         float _accumulator = 0;
         float _timeStep = 1.f/50.f;
