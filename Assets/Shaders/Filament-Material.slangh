@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Filament-Input.slangh"
+
+// Contains initialized material values.
 struct Material
 {
     float3 diffuseColor;
@@ -11,6 +14,23 @@ struct Material
     float3 dfg;
     float3 energyCompensation;
 };
+
+Material SetupMaterial(MaterialProperties params, float2 uv)
+{
+    float4 baseColor = GetColor(params, uv);
+    float3 orm = GetORM(params, uv); // Occlusion, Roughness, Metallic.
+
+    Material mat;
+    mat.diffuseColor = ComputeDiffuseColor(baseColor, orm.b);
+    mat.roughness = ComputeRoughness(orm.g); // Perceptual roughness is not used anywhere apart from getting roughness.
+    mat.occlusion = orm.r;
+
+    //float reflectance = ComputeDielectricF0(params.Reflectance);
+    float reflectance = ComputeDielectricF0(1);
+    mat.f0 = ComputeF0(baseColor, orm.b, reflectance);
+
+    return mat;
+}
 
 float3 ComputeDiffuseColor(float4 baseColor, float metallic)
 {
