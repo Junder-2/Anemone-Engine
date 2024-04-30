@@ -6,4 +6,5 @@ struct Fragment
     float3 normal;
     float3 viewDir;
     float3 reflected;
+    float2 uv;
 };
