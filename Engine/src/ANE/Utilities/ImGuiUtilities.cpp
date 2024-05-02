@@ -42,9 +42,9 @@ namespace Engine
         constexpr ImVec4 aneHint = ImVec4(0.57f, 0.62f, 0.87f, 1.00f);
         const ImVec4 aneHintHover = ImLerp(aneHint, imBlack, .1f);
         const ImVec4 aneHintActive = ImLerp(aneHint, imBlack, .2f);
-        const ImVec4 aneBorder = ImLerp(imClear, aneBlack, .5f);
-        const ImVec4 aneBorderHover = ImLerp(aneBorder, imBlack, .1f);
-        const ImVec4 aneBorderActive = ImLerp(aneBorder, imBlack, .2f);
+        const ImVec4 aneFrame = ImLerp(imClear, aneBlack, .5f);
+        const ImVec4 aneFrameHover = ImLerp(aneFrame, imBlack, .1f);
+        const ImVec4 aneFrameActive = ImLerp(aneFrame, imBlack, .2f);
 
         colors[ImGuiCol_Text]                   = aneWhite;
         colors[ImGuiCol_TextDisabled]           = ImLerp(imBlack, aneWhite, .95f);
@@ -55,15 +55,15 @@ namespace Engine
 
         colors[ImGuiCol_Border]                 = ImLerp(aneHint, imClear, .2f);
         colors[ImGuiCol_BorderShadow]           = imClear;
-        colors[ImGuiCol_FrameBg]                = aneBorder;
-        colors[ImGuiCol_FrameBgHovered]         = aneBorderHover;
-        colors[ImGuiCol_FrameBgActive]          = aneBorderActive;
+        colors[ImGuiCol_FrameBg]                = aneFrame;
+        colors[ImGuiCol_FrameBgHovered]         = aneFrameHover;
+        colors[ImGuiCol_FrameBgActive]          = aneFrameActive;
         colors[ImGuiCol_TitleBg]                = aneDark;
         colors[ImGuiCol_TitleBgActive]          = aneDarkHover;
         colors[ImGuiCol_TitleBgCollapsed]       = aneDarkActive;
         colors[ImGuiCol_MenuBarBg]              = aneDark;
 
-        colors[ImGuiCol_ScrollbarBg]            = aneBorder;
+        colors[ImGuiCol_ScrollbarBg]            = aneFrame;
         colors[ImGuiCol_ScrollbarGrab]          = aneColor;
         colors[ImGuiCol_ScrollbarGrabHovered]   = aneColorHover;
         colors[ImGuiCol_ScrollbarGrabActive]    = aneColorActive;
@@ -80,9 +80,9 @@ namespace Engine
         colors[ImGuiCol_HeaderHovered]          = aneDarkHover;
         colors[ImGuiCol_HeaderActive]           = aneDarkActive;
 
-        colors[ImGuiCol_Separator]              = aneBorder;
-        colors[ImGuiCol_SeparatorHovered]       = aneBorderHover;
-        colors[ImGuiCol_SeparatorActive]        = aneBorderActive;
+        colors[ImGuiCol_Separator]              = aneFrame;
+        colors[ImGuiCol_SeparatorHovered]       = aneFrameHover;
+        colors[ImGuiCol_SeparatorActive]        = aneFrameActive;
 
         colors[ImGuiCol_ResizeGrip]             = aneColor;
         colors[ImGuiCol_ResizeGripHovered]      = aneColorHover;
