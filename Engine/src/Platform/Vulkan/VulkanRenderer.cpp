@@ -470,6 +470,7 @@ namespace Engine
         drawImageUsages |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
         drawImageUsages |= VK_IMAGE_USAGE_STORAGE_BIT;
         drawImageUsages |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+        drawImageUsages |= VK_IMAGE_USAGE_SAMPLED_BIT;
 
         const VkImageCreateInfo cImgInfo = VulkanInitializers::ImageCreateInfo(_colorImage.ImageFormat, drawImageUsages, imageExtent);
 
@@ -525,6 +526,12 @@ namespace Engine
         DestroyMainBuffers();
 
         CreateMainBuffers(width, height);
+    }
+
+    void VulkanRenderer::UpdateImGuiViewportSet()
+    {
+        // image_layout should be what the VkImageView was before drawing ImGui. (See: Draw())
+        _imGuiViewportSet = ImGui_ImplVulkan_AddTexture(_samplerNearest, _colorImage.ImageView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     }
 
     void VulkanRenderer::SetupCommandBuffers()

@@ -118,6 +118,7 @@ namespace Engine
         static void DestroyMainBuffers();
         static void ResizeMainBuffers();
         static void ResizeMainBuffers(uint32_t width, uint32_t height);
+        static void UpdateImGuiViewportSet();
 
         static void SetupCommandBuffers();
         static void SetupSyncStructures();
@@ -249,6 +250,7 @@ namespace Engine
         inline static uint32_t _minImageCount = 3;
 
         inline static VkDescriptorPool _imGuiDescriptorPool = VK_NULL_HANDLE;
+        inline static VkDescriptorSet _imGuiViewportSet;
 
         inline static ImGuiIO* _io;
     };
