@@ -757,9 +757,7 @@ namespace Engine
 
         CHECK_RESULT(vkCreatePipelineLayout(_device, &pipelineLayoutInfo, _allocator, &_pipelineLayout));
 
-        VkShaderModule meshVertShader;
-        VkShaderModule meshFragShader;
-
+        VkShaderModule meshVertShader, meshFragShader;
         LoadSlangShader("Mesh_Diffuse", &meshVertShader, &meshFragShader);
 
         VulkanPipelineBuilder builder{ logicalDevice, _pipelineLayout };
@@ -779,9 +777,7 @@ namespace Engine
         vkDestroyShaderModule(_device, meshFragShader, _allocator);
         vkDestroyShaderModule(_device, meshVertShader, _allocator);
 
-        VkShaderModule debugVertShader;
-        VkShaderModule debugFragShader;
-
+        VkShaderModule debugVertShader, debugFragShader;
         LoadSlangShader("Mesh_Wireframe", &debugVertShader, &debugFragShader);
 
         vkb::Result<PipelineWrapper> debugTrianglePipeline = builder
