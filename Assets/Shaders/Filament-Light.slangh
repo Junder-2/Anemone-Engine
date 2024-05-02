@@ -1,14 +1,7 @@
 #pragma once
 
 #include "Filament-Input.slangh"
-#include "Filament-Material.slangh"
-#include "Filament-Fragment.slangh"
-
-struct Light
-{
-    float3 color;
-    float3 direction;
-};
+#include "Filament-Structs.slangh"
 
 Light GetDirectionalLight()
 {

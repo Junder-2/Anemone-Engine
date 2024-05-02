@@ -1,5 +1,8 @@
 #include "Filament-Input.slangh"
 #include "Filament-Shading.slangh"
+#include "Filament-Indirect.slangh"
+#include "Filament-Light.slangh"
+#include "Filament-Material.slangh"
 
 // Per vertex data.
 /*struct Attributes

@@ -1,19 +1,8 @@
 #pragma once
 
 #include "Filament-Input.slangh"
-
-// Contains initialized material values.
-struct Material
-{
-    float3 diffuseColor;
-    float roughness;
-    float occlusion;
-
-    float3 f0; // Reflectance at normal incidence.
-
-    float3 dfg;
-    float3 energyCompensation;
-};
+#include "Filament-Structs.slangh"
+#include "Filament-Indirect.slangh"
 
 Material SetupMaterial(MaterialProperties params, float2 uv)
 {

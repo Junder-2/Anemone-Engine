@@ -1,9 +1,7 @@
 #pragma once
 
 #include "Filament-BRDF.slangh"
-#include "Filament-Material.slangh"
-#include "Filament-Fragment.slangh"
-#include "Filament-Light.slangh"
+#include "Filament-Structs.slangh"
 
 float3 IsotropicLobe(Material material, Light light, float3 halfDir,
     float NoV, float NoL, float NoH, float LoH)
