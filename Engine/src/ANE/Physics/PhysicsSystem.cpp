@@ -5,6 +5,8 @@
 #include "ANE/Core/Entity/Entity.h"
 #include "ANE/Math/Types/TransformMatrix.h"
 #include "ANE/Core/Scene/Components/RigidBodyComponent.h"
+#include "ANE/Math/FMath.h"
+#include "ANE/Math/VMath.h"
 #include "ANE/Renderer/Draw.h"
 #include "ANE/Renderer/Renderer.h"
 #include "ANE/Utilities/ColorUtilities.h"
@@ -174,11 +176,13 @@ namespace Engine
             if(transformMatrix.IsDirty() || rigidBody->GetBodyType() == BodyType::Static) continue;
             if(!rigidBody->IsActive() || rigidBody->IsSleeping()) continue;
 
-            auto currentTransform = rp3d::Transform(transformMatrix.GetPosition(), Quaternion::FromEulerAngles(transformMatrix.GetEulerAngles()));
-            auto newTransform = rp3d::Transform::interpolateTransforms(currentTransform, rigidBody->GetReactRigidBody().getTransform(), factor);
+            const auto currentTransform = rp3d::Transform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
+            const auto targetTransform = rigidBody->GetReactRigidBody().getTransform();
+            if(currentTransform == targetTransform) continue;
+            auto newTransform = rp3d::Transform::interpolateTransforms(currentTransform, targetTransform, factor);
 
-            transformMatrix.SetPosition(Vector3::Convert(newTransform.getPosition()));
-            transformMatrix.SetRotation(Quaternion::Convert(newTransform.getOrientation()).GetEulerAngles()); //TODO: Issues with scale and rotation
+            if(currentTransform.getPosition() != targetTransform.getPosition()) transformMatrix.SetPosition(Vector3::Convert(newTransform.getPosition()));
+            if(currentTransform.getOrientation() != targetTransform.getOrientation()) transformMatrix.SetRotation(Quaternion::Convert(newTransform.getOrientation())); //Todo: still some problems with scale
             transformMatrix.ClearDirty();
         }
 
@@ -189,10 +193,10 @@ namespace Engine
 
     #ifndef ANE_DIST
 
-    void PhysicsSystem::EnableDebugRendering(bool enable)
+    void PhysicsSystem::EnableDebugRendering(const bool enable)
     {
         #ifndef ANE_DIST
-        _isDebugRendering = !_isDebugRendering;
+        _isDebugRendering = enable;
         _world->setIsDebugRenderingEnabled(_isDebugRendering);
 
         for (uint32_t i = 0; i < _world->getNbRigidBodies(); ++i)
