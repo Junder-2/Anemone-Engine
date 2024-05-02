@@ -32,6 +32,7 @@ namespace Engine
         SelectionManager::SelectionContext _selectionContext = SelectionManager::SelectionContext::UI;
         inline static std::string _selected = "";
         EditorLayer* _editorLayer;
+        int style = 0;
 
     };
 }

@@ -10,6 +10,7 @@
 #include "ANE/Core/Layers/EditorLayer.h"
 #include "ANE/Math/Random.h"
 #include "ANE/Core/Scene/Components/Components.h"
+#include "ANE/Utilities/ImGuiUtilities.h"
 
 namespace Engine
 {
@@ -25,6 +26,22 @@ namespace Engine
 
     UIUpdateWrapper InspectorPanel::OnPanelRender()
     {
+        if(ImGui::Button("Swap Style"))
+        {
+            style += 1;
+            style = style % 2;
+            ANE_ELOG(style);
+
+            if(style == 1)
+            {
+                              ImGuiUtilities::StyleAnemoneExperimental();
+            }
+            else
+            {  ImGuiUtilities::StyleAnemoneDark();
+
+            }
+        }
+
         ANE_DEEP_PROFILE_FUNCTION();
         bool open = true;
         UIUpdateWrapper UIUpdate;

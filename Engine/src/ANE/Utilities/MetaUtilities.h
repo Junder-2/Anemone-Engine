@@ -22,11 +22,13 @@ namespace Engine
         bool writable = field.prop(EDITABLEHASH).value().cast<bool>();
         char buffer[256] = {};
         const auto error = strcpy_s(buffer, sizeof(buffer), v.c_str());
-        ImGui::Text("%s",field.prop("display_name"_hs).value().cast<const char*>());
         ImGui::AlignTextToFramePadding();
+        ImGui::Text("%s",field.prop("display_name"_hs).value().cast<const char*>());
         ImGui::SameLine();
+        ImGui::AlignTextToFramePadding();
         if (ImGui::InputText("##stringfield", buffer, sizeof(buffer)))
         {
+
             propertyWritten = field.set(component_data, std::string(buffer));
         }
         return propertyWritten;
@@ -317,7 +319,12 @@ namespace Engine
     inline bool InspectImmutableStringField(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<std::string>();
+        ImGui::Indent( 16.0f );
+
+        ImGui::AlignTextToFramePadding();
         ImGui::Text("%s", v.c_str());
+        ImGui::Unindent( 16.0f );
+
         return true;
     }
 

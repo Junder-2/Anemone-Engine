@@ -194,7 +194,7 @@ namespace Engine
 
         // Setup Dear ImGui style
         ImGuiUtilities::StyleAnemoneDark();
-        ImGui::StyleColorsDark();
+        //ImGui::StyleColorsDark();
         //ImGui::StyleColorsLight();
 
         // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
