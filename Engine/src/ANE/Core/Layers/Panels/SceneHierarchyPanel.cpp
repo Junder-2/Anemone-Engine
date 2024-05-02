@@ -3,7 +3,7 @@
 #include "imgui.h"
 #include "InspectorPanel.h"
 #include "ANE/Core/Editor/SelectionManager.h"
-#include "ANE/Core/Entity/Entity.h"
+#include "UIUpdateWrapper.h"
 #include "ANE/Core/Layers/EditorLayer.h"
 #include "ANE/Core/Scene/Scene.h"
 #include "ANE/Core/Scene/Components/TagComponent.h"
@@ -16,10 +16,12 @@ namespace Engine
         _editorLayer = managingLayer;
     }
 
-    void SceneHierarchyPanel::OnPanelRender()
+    UIUpdateWrapper SceneHierarchyPanel::OnPanelRender()
     {
         _activeScene = _editorLayer->GetActiveScene();
-        if (!_activeScene) return;
+        UIUpdateWrapper UIUpdate;
+
+        if (!_activeScene) return UIUpdate;
 
          bool open = true;
 
@@ -29,7 +31,10 @@ namespace Engine
 
         DrawEntityNodeList();
 
+
         ImGui::End();
+        if (!open) UIUpdate.RemoveSelf = this;
+        return UIUpdate;
     }
 
     void SceneHierarchyPanel::DrawEntityNodeList() const

@@ -3,17 +3,21 @@
 #include <entt.hpp>
 
 #include "imgui.h"
+#include "UIUpdateWrapper.h"
 #include "UILayerPanel.h"
 
 namespace Engine
 {
+    class EditorLayer;
+
     class EditorLogPanel : public UILayerPanel
     {
-    public:
-        EditorLogPanel();
-        ~EditorLogPanel();
 
-        void OnPanelRender() override;
+    public:
+        EditorLogPanel(EditorLayer* layer);
+        ~EditorLogPanel() = default;
+
+        UIUpdateWrapper OnPanelRender() override;
 
         void ShowLogLevelsPopup();
         void ShowLoggerNamePopup();
@@ -26,6 +30,8 @@ namespace Engine
 
         void LoadSettings();
         void SaveSettings();
+
+        EditorLayer* _editorLayer;
 
     private:
         static const ImVec4 colorInfo;
@@ -42,5 +48,6 @@ namespace Engine
         bool _displaySource = true;
         bool _displayLevel = true;
         bool _displayLoggerName = true;
+
     };
 }

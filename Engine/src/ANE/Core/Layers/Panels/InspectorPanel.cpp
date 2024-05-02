@@ -23,11 +23,12 @@ namespace Engine
         _selected = selectedEntityID.UUID;
     }
 
-    void InspectorPanel::OnPanelRender()
+    UIUpdateWrapper InspectorPanel::OnPanelRender()
     {
         ANE_DEEP_PROFILE_FUNCTION();
         bool open = true;
 
+        UIUpdateWrapper UIUpdate;
         const ImGuiDockNodeFlags dockSpaceFlags = ImGuiDockNodeFlags_PassthruCentralNode;
         ImGui::Begin("Inspection", &open, dockSpaceFlags);
 
@@ -39,7 +40,7 @@ namespace Engine
         }
         else
         {
-            Entity selectedEntity = _editorLayer->GetActiveScene()->GetEntityWithUUID(selectedEntityUUIDS->at(0));
+            Entity selectedEntity = _editorLayer->GetEntityWithUUID(selectedEntityUUIDS->at(0));
             DrawEntityComponentList(selectedEntity);
             if (ImGui::Button("Add Physics Suzanne")) // For physics testing
             {
@@ -50,7 +51,12 @@ namespace Engine
             }
         }
         ImGui::ShowDemoWindow();
+
+
         ImGui::End();
+
+        if (!open) UIUpdate.RemoveSelf = this;
+        return UIUpdate;
     }
 
     std::string InspectorPanel::TypePrefixRemoval(std::string fullComponentName)

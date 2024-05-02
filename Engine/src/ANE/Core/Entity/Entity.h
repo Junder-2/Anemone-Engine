@@ -1,9 +1,8 @@
 ﻿#pragma once
-#include <entt.hpp>
+//#include <entt.hpp>
 
 #include "UUIDGenerator.h"
 #include "ANE/Core/Scene/Scene.h"
-#include "ANE/Core/Scene/Components/AttachmentsComponent.h"
 #include "ANE/Core/Scene/Components/Component.h"
 #include "ANE/Core/Scene/Components/TagComponent.h"
 #include "ANE/Core/Scene/Components/TransformComponent.h"

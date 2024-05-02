@@ -1,10 +1,10 @@
 ﻿#pragma once
 
 #include "ANE/Subsystem/SubSystem.h"
-#include <reactphysics3d/reactphysics3d.h>
 
 namespace Engine
 {
+    class Scene;
     class Collider;
     class CapsuleCollider;
     class BoxCollider;
@@ -34,11 +34,13 @@ namespace Engine
         rp3d::BoxShape* CreateBoxShape(const Vector3& halfExtents);
         rp3d::CapsuleShape* CreateCapsuleShape(float radius, float height);
 
+        void PhysicsUpdate(float timeStep, Scene* scene);
+        void UpdateRigidBodies(float factor, Scene* scene);
+
     private:
         rp3d::PhysicsCommon _physicsCommon {};
         rp3d::PhysicsWorld* _world;
-        rp3d::DebugRenderer* _debugRenderer;
-
         PhysicsLogger* _physicsLogger;
+        rp3d::DebugRenderer* _debugRenderer;
     };
 }

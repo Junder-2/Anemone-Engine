@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "MathCommon.h"
 #include "glm/gtx/compatibility.hpp"
 #include "glm/gtx/fast_trigonometry.hpp"
 
@@ -43,6 +44,20 @@ namespace Engine::FMath
     inline float WrapAngle(const float radians)
     {
         return glm::wrapAngle(radians);
+    }
+
+    /**
+     * Returns the shortest angle in radians from -pi to pi
+     */
+    inline float DeltaAngle(const float current, const float target)
+    {
+        float delta = WrapAngle(target - current);
+        if (delta > PI)
+            delta -= 2.f*PI;
+        else if (delta < -PI)
+            delta += 2.f*PI;
+
+        return delta;
     }
 
     /**
@@ -99,6 +114,14 @@ namespace Engine::FMath
     inline float Atan2(const float y, const float x)
     {
         return glm::atan2(y, x);
+    }
+
+    /**
+     * Returns the absolute value
+     */
+    inline float Abs(const float x)
+    {
+        return glm::abs(x);
     }
 
     /**

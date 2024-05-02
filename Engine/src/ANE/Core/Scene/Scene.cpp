@@ -12,8 +12,6 @@ namespace Engine
 {
     Scene::Scene()
     {
-        _physicsWorld = &GetPhysicsSystem().GetPhysicsWorld();
-
         //create an entity
         //entt::entity entity = Registry.create();
         // entt::entity entit2 = _registry.create();
@@ -114,19 +112,6 @@ namespace Engine
 
         _accumulator += timeStep;
 
-        const auto group = _registry.view<TransformComponent, RigidBodyComponent>();
-        for (const auto entity : group) //We need to apply changes in our transform to the internal rigidbody
-        {
-            auto[transform, body] = group.get<TransformComponent, RigidBodyComponent>(entity);
-
-            TransformMatrix& transformMatrix = transform.Transform;
-
-            if(!transformMatrix.IsDirty()) continue;
-
-            body.GetRigidBody()->SetTransform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
-            transformMatrix.ClearDirty();
-        }
-
         // Fixed update
         while (_accumulator >= _timeStep)
         {
@@ -135,7 +120,7 @@ namespace Engine
             OnFixedUpdate(_timeStep);
         }
 
-        UpdateRigidBodies();
+        GetPhysicsSystem().UpdateRigidBodies(FMath::Saturate(_accumulator / _timeStep), this);
 
         SubmitDrawCommands();
     }
@@ -144,7 +129,7 @@ namespace Engine
     {
         ANE_DEEP_PROFILE_FUNCTION();
 
-        _physicsWorld->update(timeStep);
+        GetPhysicsSystem().PhysicsUpdate(timeStep, this);
 
         _registry.view<NativeScriptComponent>().each([&](auto entity, auto& scriptComponent)
         {
@@ -156,31 +141,6 @@ namespace Engine
             }
             scriptComponent.OnFixedUpdateFunction(timeStep);
         });
-    }
-
-    void Scene::UpdateRigidBodies()
-    {
-        ANE_DEEP_PROFILE_FUNCTION();
-
-        const float factor = FMath::Saturate(_accumulator / _timeStep);
-
-        const auto group = _registry.view<TransformComponent, RigidBodyComponent>();
-        for (const auto entity : group)
-        {
-            auto[transform, body] = group.get<TransformComponent, RigidBodyComponent>(entity);
-
-            TransformMatrix& transformMatrix = transform.Transform;
-
-            if(transformMatrix.IsDirty() || body.GetRigidBody()->GetBodyType() == BodyType::Static) continue;
-            if(!body.GetRigidBody()->IsActive() || body.GetRigidBody()->IsSleeping()) continue;
-
-            auto currentTransform = rp3d::Transform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
-            auto newTransform = rp3d::Transform::interpolateTransforms(currentTransform, body.GetRigidBody()->GetReactRigidBody().getTransform(), factor);
-
-            transformMatrix.SetPosition(Vector3::Convert(newTransform.getPosition()));
-            transformMatrix.SetRotation(Quaternion::Convert(newTransform.getOrientation())); //TODO: Issues with scale and rotation
-            transformMatrix.ClearDirty();
-        }
     }
 
     void Scene::SubmitDrawCommands()
@@ -213,29 +173,4 @@ namespace Engine
         //     Renderer::SubmitDrawCommand(draw);
         // }
     }
-
-    /**
-     * \brief Creates a Entity in the scene, adds a Transform and Tag
-     * \param name Name of Entity, if no name is given it will be tagged with: "Untagged"
-     * \return reference of the newly created Entity.
-     */
-    [[nodiscard("Entity never used")]] Entity Scene::Create(const char* name)
-    {
-        Entity ent{this, name};
-        _entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent;// here
-        return ent;
-    }
-    [[nodiscard("Entity never used")]] Entity Scene::Create(std::string stringName)
-    {
-
-        Entity ent{this, stringName.c_str()};
-        _entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent;
-        return ent;
-    }
-
-    Entity Scene::GetEntityWithUUID(std::string UUID)
-    {
-        return _entityMap[UUID];
-    }
-
 }

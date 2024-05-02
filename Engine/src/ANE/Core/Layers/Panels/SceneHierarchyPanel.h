@@ -1,6 +1,7 @@
 #pragma once
 #include "imgui.h"
 #include "UILayerPanel.h"
+#include "UIUpdateWrapper.h"
 #include "ANE/Core/Editor/SelectionManager.h"
 
 namespace Engine
@@ -17,7 +18,7 @@ namespace Engine
         void DrawEntityNode(const UUIDComponent& uuid, const TagComponent& tag, ImGuiTreeNodeFlags nodeFlags) const;
         void DrawEntityNodeList() const;
         SceneHierarchyPanel(EditorLayer* managingLayer);
-        void OnPanelRender() override;
+        UIUpdateWrapper OnPanelRender() override;
 
     private:
         //std::unordered_map<const char*, std::shared_ptr<Scene>>* _managedScenes;
