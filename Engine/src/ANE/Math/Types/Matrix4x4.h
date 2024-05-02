@@ -55,6 +55,7 @@ namespace Engine
         Matrix4x4 GetTranspose() const;
         float GetDeterminant() const;
         Matrix4x4 GetInverse() const;
+        Matrix4x4 GetNormalized() const;
 
         void SetPosition(Vector3 newPos);
         void Translate(Vector3 delta);
