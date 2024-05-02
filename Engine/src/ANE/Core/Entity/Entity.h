@@ -49,9 +49,6 @@ namespace Engine
         template <typename T>
         std::enable_if_t<std::is_base_of_v<Component, T>, T&> GetComponent();
     private:
-        bool IsTagComponent();
-    private:
-
 
         entt::entity EntityHandle = {entt::null};
         Scene* SceneHandle = nullptr;
