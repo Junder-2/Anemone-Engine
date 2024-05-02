@@ -66,7 +66,9 @@ float4 fragmentMain(Varyings input) : SV_TARGET
     //color.rgb *= nDotL * sceneData.SunlightColor.rgb;
     //color.rgb += sceneData.AmbientColor.rgb;
 
-    float3 shading = EvaluateDirectionalLight(material, fragment);
+    float3 shading = 0;
+    //shading += EvaluateIBL(material, fragment);
+    shading += EvaluateDirectionalLight(material, fragment);
 
     // Used for debugging.
     float4 colorMap = props.ColorMap.Sample(uv);
