@@ -1156,10 +1156,9 @@ namespace Engine
         vkCmdEndRendering(cmd);
     }
 
-    void VulkanRenderer::DrawDebugGeometry(VkCommandBuffer cmd, const DrawContext& drawCommands)
+    void VulkanRenderer::DrawDebugGeometry(const VkCommandBuffer cmd, const DrawContext& drawCommands)
     {
         ANE_DEEP_PROFILE_FUNCTION();
-
 
         VulkanFrame& frame = GetFrame();
         for (DebugDrawCommand drawCommand : drawCommands.DebugCommands)
