@@ -3,7 +3,6 @@
 #pragma once
 
 #include "ANE/Math/MathCommon.h"
-#include <string>
 
 struct ImVec4;
 

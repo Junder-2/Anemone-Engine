@@ -1,11 +1,6 @@
 ﻿#pragma once
 #include "entt.hpp"
 
-namespace reactphysics3d
-{
-    class PhysicsWorld;
-}
-
 namespace Engine
 {
     class Event;
@@ -33,6 +28,5 @@ namespace Engine
     private:
         float _accumulator = 0;
         float _timeStep = 1.f/50.f;
-
     };
 }

@@ -30,11 +30,8 @@ namespace Engine
         void AddComponent(Component* component){
             components.push_back(component);
         }
-
-
     protected:
 
     };
-
 
 }

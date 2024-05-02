@@ -74,7 +74,7 @@ namespace Engine
         {
             entt::meta<ColliderComponent>()
                 .data<&ColliderComponent::_colliders>("Colliders"_hs).prop("display_name"_hs, "Colliders")
-               .EDITABLE;
+                .EDITABLE;
         }
     private:
         std::vector<Collider*> _colliders;

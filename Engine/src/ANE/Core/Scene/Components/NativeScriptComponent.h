@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "ANE/Core/Entity/Entity.h"
 #include "ANE/Core/Entity/ScriptableEntity.h"
 
 namespace Engine
@@ -53,11 +52,6 @@ namespace Engine
             {
                 static_cast<T*>(Instance)->OnDestroy();
             };
-
         }
-
-
     };
-
-
 }

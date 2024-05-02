@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Component.h"
 #include "ANE/Utilities/MetaUtilities.h"
 
@@ -6,7 +7,6 @@ namespace Engine
 {
     struct CameraComponent : Component // this might need to be remade..
     {
-    public:
         ANE_COMPONENT_INIT(CameraComponent)
 
         Matrix4x4 PerspectiveMatrix = {};
@@ -39,16 +39,10 @@ namespace Engine
         static void RegisterComponentMetaData()
         {
             entt::meta<CameraComponent>()
-            .data<&CameraComponent::_zNear>("Z Near"_hs).prop("display_name"_hs, "Z Near")
-            .data<&CameraComponent::_zFar>("Z Far"_hs).prop("display_name"_hs, "Z Far")
-            .data<&CameraComponent::_fieldOfView>("Field Of View"_hs).prop("display_name"_hs, "Field Of View")
-            .EDITABLE;
-            /*
-            .data<&CameraComponent::Transform>("Transform"_hs).prop("display_name"_hs, "Transform")
-            .prop("Position"_hs, "Position")
-             .prop("Rotation"_hs, "Rotation")
-             .prop("Scale"_hs, "Scale");
-             */
+                .data<&CameraComponent::_zNear>("Z Near"_hs).prop("display_name"_hs, "Z Near")
+                .data<&CameraComponent::_zFar>("Z Far"_hs).prop("display_name"_hs, "Z Far")
+                .data<&CameraComponent::_fieldOfView>("Field Of View"_hs).prop("display_name"_hs, "Field Of View")
+                .EDITABLE;
         }
 
     private:

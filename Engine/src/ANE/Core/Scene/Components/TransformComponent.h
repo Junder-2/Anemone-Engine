@@ -18,8 +18,6 @@ namespace Engine
 
 
         ANE_COMPONENT_INIT(TransformComponent)
-        // TransformComponent() : Component(typeid(*this).name()) {}
-        // TransformComponent(const TransformComponent&) = default;
 
         void SetParent(const TransformComponent& parent)
         {
@@ -36,10 +34,12 @@ namespace Engine
         {
 
         }
+
         TransformComponent(const TransformMatrix& transform, const std::shared_ptr<TransformComponent>& parent = nullptr) : Component(typeid(*this).name()), Transform(transform), Parent(parent)
         {
             ANE_ELOG("We are not getting in here");
-        };
+        }
+
         static void RegisterComponentMetaData()
         {
             entt::meta<TransformComponent>()

@@ -3,6 +3,9 @@
 
 namespace Engine
 {
+    struct TransformComponent;
+    struct Matrix4x4;
+    struct Vector2;
     struct MouseMoveValue;
     struct InputValue;
     struct CameraComponent;

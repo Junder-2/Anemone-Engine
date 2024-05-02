@@ -32,11 +32,11 @@ namespace Engine
         static void RegisterComponentMetaData()
         {
             entt::meta<RigidBodyComponent>()
-                .data<&RigidBodyComponent::_rigidbody>("RigidBody"_hs).prop("display_name"_hs, "RigidBody");
+                .data<&RigidBodyComponent::_rigidbody>("RigidBody"_hs).prop("display_name"_hs, "RigidBody")
+                .EDITABLE;
         }
 
     private:
-
         RigidBody* _rigidbody;
     };
 }

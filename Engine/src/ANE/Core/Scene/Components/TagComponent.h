@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Component.h"
+
 namespace Engine
 {
     using namespace entt::literals;
@@ -16,13 +17,10 @@ namespace Engine
         static void RegisterComponentMetaData()
         {
             entt::meta<TagComponent>()
-                   .data<&TagComponent::Value>("Tag"_hs).prop("display_name"_hs, "Tag")
-                   .EDITABLE;
-
+                .data<&TagComponent::Value>("Tag"_hs).prop("display_name"_hs, "Tag")
+                .EDITABLE;
         }
 
         //operator const char*&() { return Tag; }
     };
-
-
 }

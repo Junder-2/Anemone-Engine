@@ -1,14 +1,11 @@
 #pragma once
 #include <entt.hpp>
-#include "imgui.h"
-#include "ANE/Utilities/MetaUtilities.h"
 #include "UILayerPanel.h"
 #include "UIUpdateWrapper.h"
 #include "ANE/Core/Editor/SelectionManager.h"
 
 namespace Engine
 {
-
     struct UUIDComponent;
     class Entity;
     class EditorLayer;
@@ -19,11 +16,9 @@ namespace Engine
         InspectorPanel(EditorLayer* editorLayer);
         ~InspectorPanel() = default;
 
-
-        std::string TypePrefixRemoval(std::string fullComponentName);
-
-        static void RegisterSelect(UUIDComponent selectedEntityID);
+        static void RegisterSelect(const UUIDComponent& selectedEntityID);
         //static void WipeSelect();
+        static std::string TypePrefixRemoval(const std::string& fullComponentName);
         void DrawEntityComponentList(Entity& selectedEntity);
 
         UIUpdateWrapper OnPanelRender() override;
@@ -32,7 +27,6 @@ namespace Engine
         SelectionManager::SelectionContext _selectionContext = SelectionManager::SelectionContext::UI;
         inline static std::string _selected = "";
         EditorLayer* _editorLayer;
-        int style = 0;
-
+        int _style = 0;
     };
 }

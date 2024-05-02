@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "UILayerPanel.h"
-#include "UIUpdateWrapper.h"
 
 namespace Engine
 {
