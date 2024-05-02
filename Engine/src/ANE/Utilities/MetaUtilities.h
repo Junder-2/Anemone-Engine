@@ -30,7 +30,6 @@ namespace Engine
 
     inline bool inspect_transform_matrix(entt::meta_data& field, entt::meta_any& component_data)
     {
-        TransformMatrix newMatrix;
         auto v = field.get(component_data).cast<TransformMatrix>();
         bool propertyWritten = false;
         Vector3 position = v.GetPosition();
