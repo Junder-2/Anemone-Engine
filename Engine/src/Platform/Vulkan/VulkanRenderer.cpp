@@ -106,6 +106,12 @@ namespace Engine
         _initialized = false;
     }
 
+    void VulkanRenderer::OnWindowResize()
+    {
+        ResizeMainBuffers();
+        _rebuildSwapchain = true;
+    }
+
     VmaMeshAsset VulkanRenderer::LoadModel(const std::string& modelPath)
     {
         if (_loadedModelMap.contains(modelPath))

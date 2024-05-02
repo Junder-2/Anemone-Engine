@@ -78,6 +78,8 @@ namespace Engine
         void Render(const WindowProperties& props, const DrawContext& drawCommands);
         void Cleanup();
 
+        void OnWindowResize();
+
         VmaMeshAsset LoadModel(const std::string& modelPath);
 
         static VmaMeshBuffers UploadDebugVertices(std::span<uint32_t> indices, std::span<Vertex> vertices);

@@ -137,6 +137,7 @@ namespace Engine
         // }
 
         //todo: should send to renderer
+        Renderer::OnEvent(e);
 
         for (Layer* layer : _layerStack) // raw pointers
         {
