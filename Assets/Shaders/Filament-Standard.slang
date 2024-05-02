@@ -58,7 +58,7 @@ float4 fragmentMain(Varyings input) : SV_TARGET
     fragment.reflected = reflect(-fragment.viewDir, fragment.normal);
     fragment.uv = uv;
 
-    Material material = SetupMaterial(props, uv);
+    Material material = SetupMaterial(props, fragment, uv);
 
     float4 color = GetColor(uv);
 

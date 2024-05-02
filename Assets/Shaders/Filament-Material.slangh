@@ -4,19 +4,26 @@
 #include "Filament-Structs.slangh"
 #include "Filament-Indirect.slangh"
 
-Material SetupMaterial(MaterialProperties params, float2 uv)
+Material SetupMaterial(MaterialProperties params, Fragment frag, float2 uv)
 {
     float4 baseColor = GetColor(params, uv);
     float3 orm = GetORM(params, uv); // Occlusion, Roughness, Metallic.
+    float occlusion = orm.r;
+    float perceptualRoughness = orm.g;
+    float metallic = orm.b;
 
     Material mat;
-    mat.diffuseColor = ComputeDiffuseColor(baseColor, orm.b);
-    mat.roughness = ComputeRoughness(orm.g); // Perceptual roughness is not used anywhere apart from getting roughness.
-    mat.occlusion = orm.r;
+    mat.diffuseColor = ComputeDiffuseColor(baseColor, metallic);
+    mat.roughness = ComputeRoughness(perceptualRoughness); // Perceptual roughness is not used anywhere apart from getting roughness.
+    mat.occlusion = occlusion;
 
     //float reflectance = ComputeDielectricF0(params.Reflectance);
     float reflectance = ComputeDielectricF0(1);
-    mat.f0 = ComputeF0(baseColor, orm.b, reflectance);
+    mat.f0 = ComputeF0(baseColor, metallic, reflectance);
+
+    float NoV = saturate(dot(frag.normal, frag.viewDir));
+    mat.dfg = PrefilteredDFG(perceptualRoughness, NoV);
+    mat.energyCompensation = 1 + mat.f0 * (1 / mat.dfg.y - 1);
 
     return mat;
 }
