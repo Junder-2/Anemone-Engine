@@ -49,6 +49,7 @@ namespace Engine
         Matrix3x3 GetTranspose() const;
         float GetDeterminant() const;
         Matrix3x3 GetInverse() const;
+        Matrix4x4 GetNormalized() const;
 
         void SetRotation(const Quaternion& quat);
         void Rotate(const Quaternion& quat);

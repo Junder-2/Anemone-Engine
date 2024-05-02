@@ -73,7 +73,8 @@ namespace Engine
         static void RegisterComponentMetaData()
         {
             entt::meta<ColliderComponent>()
-                .data<&ColliderComponent::_colliders>("Colliders"_hs).prop("display_name"_hs, "Colliders");
+                .data<&ColliderComponent::_colliders>("Colliders"_hs).prop("display_name"_hs, "Colliders")
+               .EDITABLE;
         }
     private:
         std::vector<Collider*> _colliders;

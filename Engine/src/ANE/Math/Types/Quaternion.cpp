@@ -50,7 +50,7 @@ namespace Engine
         return Matrix3x3::Convert(mat3_cast(glm::quat(*this)));
     }
 
-    Vector3 Quaternion::GetEulerAngles(bool inDegrees /*= false*/) const
+    Vector3 Quaternion::GetEulerAngles(const bool inDegrees /*= false*/) const
     {
         return Vector3::Convert(eulerAngles(glm::quat(*this))) * (inDegrees ? FMath::RAD_TO_DEGREES : 1.f);
     }
