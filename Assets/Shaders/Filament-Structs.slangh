@@ -1,0 +1,30 @@
+#pragma once
+
+// Contains initialized material values.
+struct Material
+{
+    float3 diffuseColor;
+    float roughness;
+    float occlusion;
+
+    float3 f0; // Reflectance at normal incidence.
+
+    float3 dfg;
+    float3 energyCompensation;
+};
+
+// Contains initialized vertex => fragment data.
+struct Fragment
+{
+    float3 position;
+    float3 normal;
+    float3 viewDir;
+    float3 reflected;
+    float2 uv;
+};
+
+struct Light
+{
+    float3 color;
+    float3 direction;
+};

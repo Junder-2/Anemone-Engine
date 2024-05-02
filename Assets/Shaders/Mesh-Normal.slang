@@ -1,4 +1,4 @@
-#include "Mesh-Input.include"
+#include "Mesh-Input.slangh"
 
 // This is a Debug/Example shader which outputs the world normals.
 
@@ -11,29 +11,6 @@
     float4 color : COLOR;
 };*/
 
-// Vertex layout in constant buffer.
-struct Vertex
-{
-    float3 position;
-    float uvX;
-    float3 normal;
-    float uvY;
-    float4 color;
-};
-
-struct PushConstants
-{
-    // Also known as the "Model, View, Projection" matrix,
-    matrix<float, 4, 4> renderMatrix;
-
-    // Also known as the "Local to World" or "Object" matrix.
-    matrix<float, 4, 4> modelMatrix;
-
-    // Similar to a GLSL buffer_reference.
-    // Uses uint64 pointer manipulation to index, hence the GL_EXT_shader_explicit_arithmetic_types_int64 dependency.
-    ConstBufferPointer<Vertex> vertices;
-};
-
 // Data passed from vertex stage to the fragment stage.
 // For details on SV_Position and SV_VertexID, see the HLSL semantics:
 // https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-semantics
@@ -42,15 +19,6 @@ struct Varyings
     float4 position : SV_Position;
     float3 normal;
 };
-
-// Equivalent to GLSL push constants.
-[[vk::push_constant]]
-ConstantBuffer<PushConstants> pushConstants;
-
-// Uniform buffers which are assigned from the CPU-side before drawing.
-ParameterBlock<AppData> appData;
-ParameterBlock<SceneData> sceneData;
-ParameterBlock<Material> material;
 
 // Entry points should be marked using the [Shader()] attribute in Slang.
 // The argument specifies which pipeline stage it is meant for.
@@ -72,7 +40,7 @@ Varyings vertexMain(uint vid : SV_VertexID)
     return output;
 }
 
-// Function to improve the visual of normals by remapping them to [0, 1] from [-1, 1].
+// Function to improve the visual of normals by remapping them to [0..1] from [-1..1].
 float4 DisplayNormals(float3 normal)
 {
     return float4(normal * .5 + .5, 1);

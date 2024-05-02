@@ -17,6 +17,8 @@ namespace Engine
 
     struct SceneData
     {
+        Vector4 CameraPosition;
+
         Vector4 AmbientColor;
 
         Vector4 SunlightDirection;

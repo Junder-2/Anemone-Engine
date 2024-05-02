@@ -5,6 +5,9 @@
 #include "ANE/Core/Entity/Entity.h"
 #include "ANE/Math/Types/TransformMatrix.h"
 #include "ANE/Core/Scene/Components/RigidBodyComponent.h"
+#include "ANE/Renderer/Draw.h"
+#include "ANE/Renderer/Renderer.h"
+#include "ANE/Utilities/ColorUtilities.h"
 #include "Types/BoxCollider.h"
 #include "Types/CapsuleCollider.h"
 #include "Types/RigidBody.h"
@@ -22,13 +25,11 @@ namespace Engine
         //worldSettings.isSleepingEnabled = false; // Because of a bug this is currently necessary
 
         _world = _physicsCommon.createPhysicsWorld(worldSettings);
-        #ifdef ANE_DEBUG
-        _world->setIsDebugRenderingEnabled(true);
+
+        #ifndef ANE_DIST
+        _debugDisplayAlpha = .5f;
         _debugRenderer = &_world->getDebugRenderer();
-
-        _debugRenderer->setIsDebugItemDisplayed(rp3d::DebugRenderer::DebugItem::COLLISION_SHAPE, true);
-        _debugRenderer->setIsDebugItemDisplayed(rp3d::DebugRenderer::DebugItem::COLLIDER_AABB, true);
-
+        EnableDebugRendering(true);
         #endif
     }
 
@@ -51,8 +52,8 @@ namespace Engine
 
         const auto rigidBody = _world->createRigidBody(reactTransform);
 
-        #ifdef ANE_DEBUG
-        rigidBody->setIsDebugEnabled(true);
+        #ifndef ANE_DIST
+        rigidBody->setIsDebugEnabled(IsDebugRendering());
         #endif
 
         return new RigidBody(rigidBody);
@@ -180,5 +181,76 @@ namespace Engine
             transformMatrix.SetRotation(Quaternion::Convert(newTransform.getOrientation()).GetEulerAngles()); //TODO: Issues with scale and rotation
             transformMatrix.ClearDirty();
         }
+
+        #ifndef ANE_DIST
+        DebugDraw();
+        #endif
     }
+
+    #ifndef ANE_DIST
+
+    void PhysicsSystem::EnableDebugRendering(bool enable)
+    {
+        #ifndef ANE_DIST
+        _isDebugRendering = !_isDebugRendering;
+        _world->setIsDebugRenderingEnabled(_isDebugRendering);
+
+        for (uint32_t i = 0; i < _world->getNbRigidBodies(); ++i)
+        {
+            _world->getRigidBody(i)->setIsDebugEnabled(_isDebugRendering);
+        }
+        #else
+        _isDebugRendering = false;
+        #endif
+    }
+
+    void PhysicsSystem::EnableDebugFlag(PhysicsDebugDisplayFlag displayFlag, const bool enable) const
+    {
+        _debugRenderer->setIsDebugItemDisplayed(static_cast<rp3d::DebugRenderer::DebugItem>(displayFlag), enable);
+    }
+
+    bool PhysicsSystem::IsDebugDisplayFlag(PhysicsDebugDisplayFlag displayFlag) const
+    {
+        return _debugRenderer->getIsDebugItemDisplayed(static_cast<rp3d::DebugRenderer::DebugItem>(displayFlag));
+    }
+
+    void PhysicsSystem::DebugDraw()
+    {
+        if(!_isDebugRendering) return;
+
+        if(_debugRenderer->getNbTriangles() > 0)
+        {
+            for (auto triangle : _debugRenderer->getTriangles())
+            {
+                Vertex vertex1;
+                vertex1.Position = Vector3::Convert(triangle.point1);
+                vertex1.Color = Vector4(ColorUtilities::HexToRGB(triangle.color1), _debugDisplayAlpha);
+
+                Vertex vertex2;
+                vertex2.Position = Vector3::Convert(triangle.point2);
+                vertex2.Color = Vector4(ColorUtilities::HexToRGB(triangle.color2), _debugDisplayAlpha);
+
+                Vertex vertex3;
+                vertex3.Position = Vector3::Convert(triangle.point3);
+                vertex3.Color = Vector4(ColorUtilities::HexToRGB(triangle.color3), _debugDisplayAlpha);
+
+                Renderer::DebugDrawTriangle(vertex1, vertex2, vertex3);
+            }
+        }
+        if(_debugRenderer->getNbLines() > 0)
+        {
+            for (auto line : _debugRenderer->getLines())
+            {
+                Vertex vertex1;
+                vertex1.Position = Vector3::Convert(line.point1);
+                vertex1.Color = Vector4(ColorUtilities::HexToRGB(line.color1), _debugDisplayAlpha);
+                Vertex vertex2;
+                vertex2.Position = Vector3::Convert(line.point2);
+                vertex2.Color = Vector4(ColorUtilities::HexToRGB(line.color2), _debugDisplayAlpha);
+
+                Renderer::DebugDrawLine(vertex1, vertex2);
+            }
+        }
+    }
+    #endif
 }

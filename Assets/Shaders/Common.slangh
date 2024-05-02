@@ -1,0 +1,23 @@
+#pragma once
+
+#define PI (3.14159265359f)
+#define TWO_PI (6.28318530718f)
+#define TAU (1.57079632679f)
+
+float3 UnpackNormalMap(float3 packedNormal, float scale)
+{
+    float3 normal;
+    normal.xy = (packedNormal.xy * 2 - 1) * scale;
+    normal.z = sqrt(1.0 - saturate(dot(normal.xy, normal.xy)));
+
+    return normal;
+}
+
+float3 TangentToWorld(float3 normal, float3 tangent, float3 vector)
+{
+    float3 binormal = cross(normal, tangent);
+    return normalize(
+        vector.x * tangent +
+        vector.y * binormal +
+        vector.z * normal);
+}

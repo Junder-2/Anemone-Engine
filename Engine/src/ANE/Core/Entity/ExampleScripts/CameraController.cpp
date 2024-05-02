@@ -38,6 +38,7 @@ namespace Engine
 
         _cameraComponent->SetPerspective(70.0f, w / h, 10000.f, 0.1f);
         Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
+        Renderer::SetCameraPosition(_transformComponent->Transform.GetPosition());
     }
 
     void CameraController::OnUpdate(float deltaTime)
@@ -63,6 +64,7 @@ namespace Engine
             {
                 Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
             }
+            Renderer::SetCameraPosition(_transformComponent->Transform.GetPosition());
         }
     }
 
@@ -102,6 +104,7 @@ namespace Engine
         {
             Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
         }
+        Renderer::SetCameraPosition(_transformComponent->Transform.GetPosition());
     }
 
     void CameraController::OnScroll(Vector2 scrollDelta)
@@ -123,6 +126,7 @@ namespace Engine
 
         _cameraComponent->SetAspectRatio(w / h);
         Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
+        Renderer::SetCameraPosition(_transformComponent->Transform.GetPosition());
     }
 
     Matrix4x4 CameraController::ComputeViewProjMatrix(const CameraComponent& camera)

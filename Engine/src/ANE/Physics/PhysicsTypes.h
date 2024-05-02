@@ -17,4 +17,14 @@ namespace Engine
         Kinematic,
         Dynamic
     };
+
+    enum class PhysicsDebugDisplayFlag
+    {
+        ColliderAABB                = 1 << 0,
+        ColliderBroadphaseAABB      = 1 << 1,
+        CollisionShape              = 1 << 2,
+        ContactPoint                = 1 << 3,
+        ContactNormal               = 1 << 4,
+        CollisionShapeNormal        = 1 << 5,
+    };
 }

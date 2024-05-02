@@ -1,4 +1,4 @@
-#include "Mesh-Input.include"
+#include "Mesh-Input.slangh"
 
 // Per vertex data.
 /*struct Attributes
@@ -9,25 +9,6 @@
     float4 color : COLOR;
 };*/
 
-struct Vertex
-{
-    float3 position;
-    float uvX;
-    float3 normal;
-    float uvY;
-    float4 color;
-};
-
-struct PushConstants
-{
-    matrix<float, 4, 4> renderMatrix;
-    matrix<float, 4, 4> modelMatrix;
-
-    // Similar to a GLSL buffer_reference.
-    // Uses uint64 pointer manipulation to index, hence the GL_EXT_shader_explicit_arithmetic_types_int64 dependency.
-    ConstBufferPointer<Vertex> vertices;
-};
-
 // Data passed from vertex to the next stage.
 struct Varyings
 {
@@ -36,14 +17,6 @@ struct Varyings
     float3 color;
     float2 uv;
 };
-
-// Equivalent to GLSL push constants.
-[[vk::push_constant]]
-ConstantBuffer<PushConstants> pushConstants;
-
-ParameterBlock<AppData> appData;
-ParameterBlock<SceneData> sceneData;
-ParameterBlock<Material> material;
 
 [shader("vertex")]
 Varyings vertexMain(uint vid : SV_VertexID)
@@ -65,7 +38,7 @@ float4 fragmentMain(Varyings input) : SV_TARGET
     float3 normal = normalize(input.normal);
     float2 uv = input.uv;
 
-    float4 color = material.texture.Sample(material.sampler, uv) * float4(input.color, 1);
+    float4 color = material.texture.Sample(uv) * float4(input.color, 1);
 
     float nDotL = saturate(dot(normal, -sceneData.SunlightDirection.rgb));
     color.rgb *= nDotL * sceneData.SunlightColor.rgb;
