@@ -27,7 +27,6 @@ namespace Engine
     {
         ANE_DEEP_PROFILE_FUNCTION();
         bool open = true;
-
         UIUpdateWrapper UIUpdate;
         const ImGuiDockNodeFlags dockSpaceFlags = ImGuiDockNodeFlags_PassthruCentralNode;
         ImGui::Begin("Inspection", &open, dockSpaceFlags);
@@ -109,11 +108,16 @@ namespace Engine
                                         }
                                         else
                                         {
-                                            std::string string;
-                                            string.append("No draw function found for data of type: ");
-                                            string.append(field.type().info().name());
-                                            ImGui::Text("%s", string.c_str());
+                                            //the property was not written too;
                                         }
+
+                                    }
+                                    else
+                                    {
+                                        std::string string;
+                                        string.append("No draw function found for mutable data of type: ");
+                                        string.append(field.type().info().name());
+                                        ImGui::Text("%s", string.c_str());
                                     }
 
                                 }
@@ -130,7 +134,7 @@ namespace Engine
                                         else
                                         {
                                             std::string string;
-                                            string.append("No draw function found for data of type: ");
+                                            string.append("No draw function found for immutable data of type: ");
                                             string.append(field.type().info().name());
                                             ImGui::Text("%s", string.c_str());
                                         }
