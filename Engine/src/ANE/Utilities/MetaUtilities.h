@@ -326,22 +326,42 @@ namespace Engine
         Vector3 rotation = v.GetEulerAngles(true);
         ImGuiInputTextFlags textFlags = ImGuiInputTextFlags_ReadOnly;
         ImGui::Text("%s", "Read Only");
-        static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+        static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
 
         if (ImGui::BeginTable("Transform Values", 2, flags))
         {
-            ImGui::TableSetupColumn("AAA", ImGuiTableColumnFlags_WidthFixed);
-            ImGui::TableSetupColumn("CCC", ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn(" Transform", ImGuiTableColumnFlags_WidthStretch);
+
+            ImGui::TableSetupColumn("TransformComponent", ImGuiTableColumnFlags_NoHeaderLabel | ImGuiTableColumnFlags_WidthFixed);
             ImGui::TableHeadersRow();
-            for (int row = 0; row < 5; row++)
-            {
-                ImGui::TableNextRow();
-                for (int column = 0; column < 2; column++)
-                {
-                    ImGui::TableSetColumnIndex(column);
-                    ImGui::Text("%s %d,%d", (column == 2) ? "Stretch" : "Fixed", column, row);
-                }
-            }
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::AlignTextToFramePadding();
+            ImGui::BeginDisabled();
+            ImGui::DragFloat3("##position", &position.X, 0.1f);
+            ImGui::EndDisabled();
+            ImGui::TableSetColumnIndex(1);
+            ImGui::Text("%s",field.prop("Position"_hs).value().cast<char const*>());
+
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::AlignTextToFramePadding();
+            ImGui::BeginDisabled();
+            ImGui::DragFloat3("##Rotation", &position.X, 0.1f);
+            ImGui::EndDisabled();
+            ImGui::TableSetColumnIndex(1);
+            ImGui::Text("%s",field.prop("Rotation"_hs).value().cast<char const*>());
+
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::AlignTextToFramePadding();
+            ImGui::BeginDisabled();
+            ImGui::DragFloat3("##Scale", &position.X, 0.1f);
+            ImGui::EndDisabled();
+            ImGui::TableSetColumnIndex(1);
+            ImGui::Text("%s",field.prop("Scale"_hs).value().cast<char const*>());
+
+
             /*
             ImGui::TableSetupColumn("##Labels", ImGuiTableColumnFlags_WidthFixed);
             ImGui::TableSetupColumn("##floats", ImGuiTableColumnFlags_WidthStretch);
