@@ -14,6 +14,7 @@ External["VMA"] = "%{wks.location}/Engine/vendor/VMA"
 External["reactphysics3d"] = "%{wks.location}/Engine/vendor/reactphysics"
 External["Assimp"] = "%{wks.location}/Engine/vendor/Assimp"
 External["Slang"] = "%{wks.location}/Engine/vendor/Slang"
+External["stb"] = "%{wks.location}/Engine/vendor/stb"
 
 
 -- Include Directories
@@ -30,6 +31,7 @@ IncludeDir["VMA"] = "%{External.VMA}/include"
 IncludeDir["reactphysics3d"] = "%{External.reactphysics3d}/include"
 IncludeDir["Assimp"] = "%{External.Assimp}/include"
 IncludeDir["Slang"] = "%{External.Slang}"
+IncludeDir["stb"] = "%{External.stb}"
 
 
 -- Library Directories

@@ -4,6 +4,7 @@
 
 namespace Engine
 {
+    enum class PhysicsDebugDisplayFlag;
     class Scene;
     class Collider;
     class CapsuleCollider;
@@ -37,10 +38,29 @@ namespace Engine
         void PhysicsUpdate(float timeStep, Scene* scene);
         void UpdateRigidBodies(float factor, Scene* scene);
 
+        #ifndef ANE_DIST
+        void EnableDebugRendering(bool enable);
+        bool IsDebugRendering() const { return _isDebugRendering; }
+
+        void EnableDebugFlag(PhysicsDebugDisplayFlag displayFlag, bool enable) const;
+        bool IsDebugDisplayFlag(PhysicsDebugDisplayFlag displayFlag) const;
+
+        void SetDebugDisplayAlpha(const float value) { _debugDisplayAlpha = value;}
+        float GetDebugDisplayAlpha() const { return _debugDisplayAlpha; }
+        #endif
+
+    private:
+        #ifndef ANE_DIST
+        void DebugDraw();
+        rp3d::DebugRenderer* _debugRenderer;
+        bool _isDebugRendering;
+        float _debugDisplayAlpha;
+        #endif
+
     private:
         rp3d::PhysicsCommon _physicsCommon {};
         rp3d::PhysicsWorld* _world;
         PhysicsLogger* _physicsLogger;
-        rp3d::DebugRenderer* _debugRenderer;
+
     };
 }

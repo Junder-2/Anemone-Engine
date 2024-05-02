@@ -26,6 +26,16 @@ namespace Engine
         return Convert(inverse(glm::mat3(*this)));
     }
 
+    Matrix4x4 Matrix3x3::GetNormalized() const
+    {
+        auto copy = Matrix3x3(*this);
+        copy[0].Normalize();
+        copy[1].Normalize();
+        copy[2].Normalize();
+
+        return copy;
+    }
+
     void Matrix3x3::SetRotation(const Quaternion& quat)
     {
         const Vector3 scale = GetScale();
@@ -45,7 +55,7 @@ namespace Engine
 
     Quaternion Matrix3x3::GetQuaternion() const
     {
-        return Quaternion::Convert(quat_cast(glm::mat3(*this)));
+        return Quaternion::Convert(quat_cast(glm::mat3(this->GetNormalized())));
     }
 
     void Matrix3x3::SetRotation(Vector3 euler, const bool isDegrees /*= false*/)
@@ -88,26 +98,10 @@ namespace Engine
 
     Vector3 Matrix3x3::GetEulerAngles(const bool isDegrees /*= false*/) const
     {
-        Matrix3x3 copy = *this;
-
-        copy[0].Normalize();
-        copy[1].Normalize();
-        copy[2].Normalize();
-
         Vector3 euler;
+        extractEulerAngleYXZ(glm::mat4x4(*this), euler.Yaw, euler.Pitch, euler.Roll);
 
-        euler.Yaw = FMath::Asin(-copy[0][2]);
-        if (FMath::Cos(euler.Yaw) != 0) {
-            euler.Pitch = FMath::Atan2(copy[1][2], copy[2][2]);
-            euler.Roll = FMath::Atan2(copy[0][1], copy[0][0]);
-        }
-        else {
-            euler.Pitch = FMath::Atan2(-copy[2][0], copy[1][1]);
-            euler.Roll = 0;
-        }
-
-        return euler * (isDegrees ? FMath::RAD_TO_DEGREES : 1);
-        //return Vector3::Convert(eulerAngles(quat_cast(glm::mat4(*this)))) * (isDegrees ? RAD_TO_DEGREES : 1.f);
+        return euler * (isDegrees ? FMath::RAD_TO_DEGREES : 1.f);
     }
 
     void Matrix3x3::SetScale(const Vector3 scale)

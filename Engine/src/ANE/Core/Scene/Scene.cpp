@@ -160,17 +160,5 @@ namespace Engine
 
             Renderer::SubmitDrawCommand(draw);
         }
-        // Todo: add triangle or line rendering pipeline
-        // if(_physicsWorld)
-        // {
-        //     rp3d::DebugRenderer physicsDebugRenderer = _physicsWorld->getDebugRenderer();
-        //
-        //     DrawCommand draw = {};
-        //     draw.ModelMatrix = Matrix4x4::Identity();
-        //     draw.VertexCount = physicsDebugRenderer.getNbLines();
-        //     draw.MeshBuffers = renderer.Model.MeshBuffers;
-        //
-        //     Renderer::SubmitDrawCommand(draw);
-        // }
     }
 }

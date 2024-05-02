@@ -5,9 +5,14 @@
 
 namespace Engine
 {
-    VulkanPipelineBuilder::VulkanPipelineBuilder(vkb::Device const& logicalDevice, const VkPipelineLayout pipelineLayout)
+    VulkanPipelineBuilder::VulkanPipelineBuilder(vkb::Device const& logicalDevice, const VkPipelineLayout pipelineLayout) : VulkanPipelineBuilder(logicalDevice.device, pipelineLayout)
     {
-        _info.LogicalDevice = logicalDevice.device;
+        
+    }
+
+    VulkanPipelineBuilder::VulkanPipelineBuilder(VkDevice const& logicalDevice, VkPipelineLayout pipelineLayout)
+    {
+        _info.LogicalDevice = logicalDevice;
         _info.PipelineLayout = pipelineLayout;
     }
 

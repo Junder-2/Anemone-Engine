@@ -172,4 +172,63 @@ namespace Engine::Math
     {
         return Max(x, Vector4::ZeroVector());
     }
+
+    /**
+     * Wraps the angles in radians from 0 to 2pi
+     */
+    inline Vector2 WrapAngles(const Vector2 euler)
+    {
+        return {FMath::WrapAngle(euler.Pitch), FMath::WrapAngle(euler.Yaw)};
+    }
+
+    /**
+     * Wraps the angles in radians from 0 to 2pi
+     */
+    inline Vector3 WrapAngles(const Vector3 euler)
+    {
+        return {FMath::WrapAngle(euler.Pitch), FMath::WrapAngle(euler.Yaw), FMath::WrapAngle(euler.Roll)};
+    }
+
+    /**
+     * Returns the shortest angles in radians from -pi to pi
+     */
+    inline Vector2 DeltaAngles(const Vector2 current, const Vector2 target)
+    {
+        Vector2 delta = WrapAngles(target - current);
+        if (delta.Pitch > FMath::PI)
+            delta.Pitch -= FMath::TAU;
+        else if (delta.Pitch < -FMath::PI)
+            delta.Pitch += FMath::TAU;
+
+        if (delta.Yaw > FMath::PI)
+            delta.Yaw -= FMath::TAU;
+        else if (delta.Yaw < -FMath::PI)
+            delta.Yaw += FMath::TAU;
+
+        return delta;
+    }
+
+    /**
+     * Returns the shortest angles in radians from -pi to pi
+     */
+    inline Vector3 DeltaAngles(const Vector3 current, const Vector3 target)
+    {
+        Vector3 delta = WrapAngles(target - current);
+        if (delta.Pitch > FMath::PI)
+            delta.Pitch -= FMath::TAU;
+        else if (delta.Pitch < -FMath::PI)
+            delta.Pitch += FMath::TAU;
+
+        if (delta.Yaw > FMath::PI)
+            delta.Yaw -= FMath::TAU;
+        else if (delta.Yaw < -FMath::PI)
+            delta.Yaw += FMath::TAU;
+
+        if (delta.Roll > FMath::PI)
+            delta.Roll -= FMath::TAU;
+        else if (delta.Roll < -FMath::PI)
+            delta.Roll += FMath::TAU;
+
+        return delta;
+    }
 }

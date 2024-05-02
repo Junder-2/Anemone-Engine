@@ -1,0 +1,60 @@
+#pragma once
+
+// Vertex layout in constant buffer. Has to match the byte size of the CPU-side representation.
+struct Vertex
+{
+    float3 position;
+    float uvX;
+    float3 normal;
+    float uvY;
+    float4 color;
+    float4 tangent;
+};
+
+struct PushConstants
+{
+    // Also known as the "Model, View, Projection" matrix,
+    matrix<float, 4, 4> renderMatrix;
+
+    // Also known as the "Local to World" or "Object" matrix.
+    matrix<float, 4, 4> modelMatrix;
+
+    // Similar to a GLSL buffer_reference.
+    // Uses uint64 pointer manipulation to index, hence the GL_EXT_shader_explicit_arithmetic_types_int64 dependency.
+    ConstBufferPointer<Vertex> vertices;
+};
+
+// Uniform data across every shader drawn during a frame.
+struct AppData
+{
+    float Time;
+};
+
+// Per-scene data.
+struct SceneData
+{
+    float4 CameraPos;
+
+    float4 AmbientColor;
+
+    float4 SunlightDirection;
+    float4 SunlightColor;
+};
+
+// Per-material data.
+struct Material
+{
+    // Sampler2D uses a combined texture and sampler, so it takes up 1 binding slot instead of 2.
+    Sampler2D texture;
+};
+
+// Equivalent to GLSL push constants.
+[[vk::push_constant]]
+// ConstantBuffer is the same as a cbuffer in HLSL, or UBO in GLSL.
+ConstantBuffer<PushConstants> pushConstants;
+
+// Parameter Blocks are uniform buffers which are assigned from the CPU-side before drawing.
+// Each ParameterBlock increments the set index by 1.
+ParameterBlock<AppData> appData;
+ParameterBlock<SceneData> sceneData;
+ParameterBlock<Material> material;
