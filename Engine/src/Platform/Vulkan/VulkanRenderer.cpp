@@ -148,7 +148,7 @@ namespace Engine
         const std::string assetPath = std::string("../Assets/Textures/").append(texturePath);
 
         int width, height, channels;
-        const stbi_uc* pixels = stbi_load(assetPath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
+        stbi_uc* pixels = stbi_load(assetPath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
         if (!pixels)
         {
             ANE_ELOG_ERROR("Unable to load texture at path: {}", assetPath);
@@ -157,6 +157,8 @@ namespace Engine
 
         const VkExtent3D imageExtent = VkExtent3D{ (uint32_t)width, (uint32_t)height, 1 };
         const VmaImage imageBuffers = CreateImage(pixels, imageExtent, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT);
+
+        stbi_image_free(pixels);
 
         _mainDeletionQueue.PushFunction([=]
         {
