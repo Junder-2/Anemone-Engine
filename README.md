@@ -21,9 +21,11 @@ The main goals with the Anemone Engine is to use Vulkan for rendering and to cre
 * [Slang](https://github.com/shader-slang/slang) [![License: MIT][MIT Badge]](https://github.com/shader-slang/slang/blob/master/LICENSE)
 * [toml++](https://marzer.github.io/tomlplusplus/) [![License: MIT][MIT Badge]](https://github.com/marzer/tomlplusplus/blob/master/LICENSE)
 * [ReactPhysics3D](https://github.com/DanielChappuis/reactphysics3d) [![License: Zlib][Zlib Badge]](https://github.com/DanielChappuis/reactphysics3d/blob/master/LICENSE)
+* [stb](https://github.com/nothings/stb/) [![License: MIT or Public Domain][MIT Public Domain Badge]](https://github.com/nothings/stb/blob/master/LICENSE)
 
 [Apache 2 Badge]: https://img.shields.io/badge/License-Apache_2.0-blue.svg
 [HBL MIT Badge]: https://img.shields.io/badge/License-Happy_Bunny_License%20or%20MIT-yellow
 [MIT Badge]: https://img.shields.io/badge/License-MIT-yellow.svg
+[MIT Public Domain Badge]: https://img.shields.io/badge/License-MIT_or_Public_Domain-yellow
 [Modified BSD 3-Clause Badge]: https://img.shields.io/badge/License-Modified_BSD_3--Clause-orange
 [Zlib Badge]: https://img.shields.io/badge/License-Zlib-lightgrey.svg
