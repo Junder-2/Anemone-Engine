@@ -54,6 +54,9 @@ struct MaterialProperties
     Sampler2D ColorMap;
     Sampler2D NormalMap;
     Sampler2D ORMMap;
+
+    Sampler2D LightDFG;
+    SamplerCube SpecularIBL;
 };
 
 // Equivalent to GLSL push constants.
