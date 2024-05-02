@@ -8,8 +8,9 @@ namespace Engine
     {
     public:
         static void StyleAnemoneDark(ImGuiStyle* dst = nullptr);
+        static void StyleAnemoneExperimental();
 
-         // Flags for ImGui::DockSpace()
+        // Flags for ImGui::DockSpace()
         enum ImGuiDockNodeFlags
         {
             ImGuiDockNodeFlags_None = 0,
