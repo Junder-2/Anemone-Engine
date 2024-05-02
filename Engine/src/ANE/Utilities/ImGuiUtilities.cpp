@@ -14,12 +14,13 @@ namespace Engine
         ImGuiStyle* style = dst ? dst : &ImGui::GetStyle();
         ImVec4* colors = style->Colors;
 
-        style->WindowRounding = 6.f;
-        style->ChildRounding = 6.f;
-        style->FrameRounding = 6.f;
-        style->PopupRounding = 6.f;
-        style->GrabRounding = 10.f;
+        style->WindowRounding = 4.f;
+        style->ChildRounding = 4.f;
+        style->FrameRounding = 2.f;
+        style->PopupRounding = 2.f;
         style->ScrollbarRounding = 10.f;
+        style->GrabRounding = 1.f;
+        style->TabRounding = 2.f;
 
         style->WindowPadding = ImVec2(10,8);
         style->FramePadding = ImVec2(5,3);
