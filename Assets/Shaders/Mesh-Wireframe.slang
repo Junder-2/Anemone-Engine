@@ -1,4 +1,4 @@
-#include "Mesh-Input.include"
+#include "Mesh-Input.slangh"
 
 // Per vertex data.
 /*struct Attributes
@@ -14,6 +14,7 @@ struct Vertex
     float3 normal;
     float uvY;
     float4 color;
+    float4 tangent;
 };
 
 struct PushConstants
