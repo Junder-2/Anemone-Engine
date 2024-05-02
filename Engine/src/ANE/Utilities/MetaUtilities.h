@@ -15,7 +15,7 @@ namespace Engine
     using namespace entt::literals;
 
 
-    inline bool inspect_mutable_string_field(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool InspectMutableStringField(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<std::string>();
         bool propertyWritten = false;
@@ -29,7 +29,7 @@ namespace Engine
         return propertyWritten;
     }
 
-    inline bool inspect_mutable_transform_matrix(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool InspectMutableTransformMatrix(entt::meta_data& field, entt::meta_any& component_data)
     {
         TransformMatrix newMatrix;
         auto v = field.get(component_data).cast<TransformMatrix>();
@@ -56,7 +56,7 @@ namespace Engine
         return propertyWritten;
     }
 
-    inline bool inspect_mutable_colliders(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool InspectMutableColliders(entt::meta_data& field, entt::meta_any& component_data)
     {
         bool changed = false;
         auto v = field.get(component_data).cast<std::vector<Collider*>>();
@@ -236,7 +236,7 @@ namespace Engine
         return changed;
     }
 
-    inline bool inspect_mutable_float(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool InspectMutableFloat(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<float>();
         bool propertyWritten = false;
@@ -249,7 +249,7 @@ namespace Engine
         //ImGui::Text("%d",v);
     }
 
-    inline bool inspect_mutable_mesh_asset(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool InspectMutableMeshAsset(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<VmaMeshAsset>();
         bool propertyWritten = false;
@@ -258,7 +258,7 @@ namespace Engine
         return propertyWritten;
     }
 
-    inline bool inspect_mutable_vector2_field(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool InspectMutableVector2Field(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<Vector2>();
         bool propertyWritten = false;
@@ -271,7 +271,7 @@ namespace Engine
     }
 
 
-    inline bool inspect_mutable_vector3_field(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool InspectMutableVector3Field(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<Vector3>();
         bool propertyWritten = false;
@@ -283,7 +283,7 @@ namespace Engine
         return propertyWritten;
     }
 
-    inline bool inspect_mutable_vector4_field(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool InspectMutableVector4Field(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<Vector4>();
         bool propertyWritten = false;
@@ -299,26 +299,26 @@ namespace Engine
 
     inline static std::unordered_map<entt::id_type, FieldInspectorFn> g_mutable_data_inspectors
     {
-        {entt::type_id<std::string>().hash(), inspect_mutable_string_field},
-        {entt::type_id<TransformMatrix>().hash(), inspect_mutable_transform_matrix},
-        {entt::type_id<std::vector<Collider*>>().hash(), inspect_mutable_colliders},
-        {entt::type_id<VmaMeshAsset>().hash(), inspect_mutable_mesh_asset},
-        {entt::type_id<float>().hash(), inspect_mutable_float},
-        {entt::type_id<Vector2>().hash(), inspect_mutable_vector2_field},
-        {entt::type_id<Vector3>().hash(), inspect_mutable_vector3_field},
-        {entt::type_id<Vector4>().hash(), inspect_mutable_vector4_field}
+        {entt::type_id<std::string>().hash(), InspectMutableStringField},
+        {entt::type_id<TransformMatrix>().hash(), InspectMutableTransformMatrix},
+        {entt::type_id<std::vector<Collider*>>().hash(), InspectMutableColliders},
+        {entt::type_id<VmaMeshAsset>().hash(), InspectMutableMeshAsset},
+        {entt::type_id<float>().hash(), InspectMutableFloat},
+        {entt::type_id<Vector2>().hash(), InspectMutableVector2Field},
+        {entt::type_id<Vector3>().hash(), InspectMutableVector3Field},
+        {entt::type_id<Vector4>().hash(), InspectMutableVector4Field}
 
     };
 
 
-    inline bool inspect_immutable_string_field(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool InspectImmutableStringField(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<std::string>();
         ImGui::Text("%s", v.c_str());
         return true;
     }
 
-    inline bool inspect_immutable_transform_matrix(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool InspectImmutableTransformMatrix(entt::meta_data& field, entt::meta_any& component_data)
     {
         auto v = field.get(component_data).cast<TransformMatrix>();
         Vector3 position = v.GetPosition();
@@ -382,8 +382,8 @@ namespace Engine
 
     inline static std::unordered_map<entt::id_type, FieldInspectorFn> g_immutable_data_inspectors
     {
-        {entt::type_id<std::string>().hash(), inspect_immutable_string_field},
-        {entt::type_id<TransformMatrix>().hash(), inspect_immutable_transform_matrix},
+        {entt::type_id<std::string>().hash(), InspectImmutableStringField},
+        {entt::type_id<TransformMatrix>().hash(), InspectImmutableTransformMatrix},
         /*
          {entt::type_id<std::vector<Collider*>>().hash(), inspect_colliders},
          {entt::type_id<VmaMeshAsset>().hash(), inspect_mesh_asset},
