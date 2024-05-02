@@ -276,6 +276,8 @@ namespace Engine
         initInfo.CheckVkResultFn = CheckVkResult;
 
         ImGui_ImplVulkan_Init(&initInfo);
+
+        UpdateImGuiViewportSet();
     }
 
     std::vector<const char*> VulkanRenderer::GetAvailableExtensions(SDL_Window* window)
