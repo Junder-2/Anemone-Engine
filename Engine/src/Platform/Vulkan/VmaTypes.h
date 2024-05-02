@@ -39,6 +39,7 @@ namespace Engine
         Vector3 Normal;
         float UvY;
         Vector4 Color;
+        Vector4 Tangent;
     };
 
 }

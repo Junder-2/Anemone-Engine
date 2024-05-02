@@ -19,6 +19,8 @@ namespace Engine
         static VmaMeshAsset LoadModel(const std::string& modelPath);
         static VmaMeshBuffers UploadDebugMesh(std::span<uint32_t> indices, std::span<Vertex> vertices);
 
+        static VmaImage LoadTexture(const std::string& texturePath);
+
         static void SubmitDrawCommand(const DrawCommand& command);
         static void SubmitDebugDrawCommand(const DebugDrawCommand& command);
 
@@ -33,6 +35,8 @@ namespace Engine
         static void EndUIDataBuffer();
 
         static void SetViewProjection(const Matrix4x4& matrix);
+
+        static void SetCameraPosition(Vector3 pos);
 
     private:
         static void FlushDrawCommands();

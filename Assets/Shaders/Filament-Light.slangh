@@ -1,0 +1,20 @@
+#pragma once
+
+#include "Filament-Input.slangh"
+#include "Filament-Structs.slangh"
+
+Light GetDirectionalLight()
+{
+    Light light;
+    light.color = sceneData.SunlightColor.rgb;
+    light.direction = sceneData.SunlightDirection.xyz;
+
+    return light;
+}
+
+float3 EvaluateDirectionalLight(Material material, Fragment fragment)
+{
+    Light light = GetDirectionalLight();
+
+    return SurfaceShading(material, fragment, light);
+}

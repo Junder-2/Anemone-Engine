@@ -1,4 +1,4 @@
-#include "Mesh-Input.include"
+#include "Mesh-Input.slangh"
 
 // Per vertex data.
 /*struct Attributes
@@ -16,6 +16,7 @@ struct Vertex
     float3 normal;
     float uvY;
     float4 color;
+    float4 tangent;
 };
 
 struct PushConstants
@@ -65,7 +66,7 @@ float4 fragmentMain(Varyings input) : SV_TARGET
     float3 normal = normalize(input.normal);
     float2 uv = input.uv;
 
-    float4 color = material.texture.Sample(material.sampler, uv) * float4(input.color, 1);
+    float4 color = material.texture.Sample(uv) * float4(input.color, 1);
 
     float nDotL = saturate(dot(normal, -sceneData.SunlightDirection.rgb));
     color.rgb *= nDotL * sceneData.SunlightColor.rgb;

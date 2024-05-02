@@ -37,6 +37,7 @@ project "Engine"
         "%{IncludeDir.reactphysics3d}",
         "%{IncludeDir.Assimp}",
         "%{IncludeDir.Slang}",
+        "%{IncludeDir.stb}",
     }
 
     libdirs

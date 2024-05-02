@@ -11,6 +11,8 @@
 #include <assimp/postprocess.h>
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 #include <filesystem>
 #include <slang.h>
 #include <slang-com-ptr.h>
@@ -49,6 +51,7 @@ namespace Engine
 
         SetupVulkan(_window);
         SetupImGui(_window);
+
         _initialized = true;
     }
 
@@ -63,7 +66,7 @@ namespace Engine
         }
 
         //ImGui::Render();
-        ImDrawData* drawData = ImGui::GetDrawData();
+        const ImDrawData* drawData = ImGui::GetDrawData();
         const bool isMinimized = (drawData->DisplaySize.x <= 0.0f || drawData->DisplaySize.y <= 0.0f);
         if (!isMinimized)
         {
@@ -96,8 +99,7 @@ namespace Engine
             return;
         }
 
-        const VkResult err = vkDeviceWaitIdle(_device);
-        CheckVkResult(err);
+        CHECK_RESULT(vkDeviceWaitIdle(_device));
 
         CleanupImGui();
         CleanupVulkan();
@@ -136,6 +138,36 @@ namespace Engine
         return vmaMeshAsset;
     }
 
+    VmaImage VulkanRenderer::LoadTexture(const std::string& texturePath)
+    {
+        if (_loadedTextureMap.contains(texturePath))
+        {
+            return _loadedTextureMap[texturePath];
+        }
+
+        const std::string assetPath = std::string("../Assets/Textures/").append(texturePath);
+
+        int width, height, channels;
+        const stbi_uc* pixels = stbi_load(assetPath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
+        if (!pixels)
+        {
+            ANE_ELOG_ERROR("Unable to load texture at path: {}", assetPath);
+            return _errorImage;
+        }
+
+        const VkExtent3D imageExtent = VkExtent3D{ (uint32_t)width, (uint32_t)height, 1 };
+        const VmaImage imageBuffers = CreateImage(pixels, imageExtent, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT);
+
+        _mainDeletionQueue.PushFunction([=]
+        {
+            DestroyImage(imageBuffers);
+        });
+
+        _loadedTextureMap[texturePath] = imageBuffers;
+
+        return imageBuffers;
+    }
+
     float VulkanRenderer::GetFramerate()
     {
         return _io->Framerate;
@@ -144,7 +176,7 @@ namespace Engine
     void VulkanRenderer::SetupVulkan(SDL_Window* window)
     {
         const std::vector<const char*> extensions = GetAvailableExtensions(window);
-        vkb::Instance vkbInstance = CreateVkbInstance(extensions);
+        const vkb::Instance vkbInstance = CreateVkbInstance(extensions);
         _instance = vkbInstance.instance;
         _debugMessenger = vkbInstance.debug_messenger;
 
@@ -209,7 +241,7 @@ namespace Engine
 
         // Setup Platform/Renderer backends
         ImGui_ImplSDL2_InitForVulkan(window);
-        ImGui_ImplVulkanH_Window* wd = &_mainWindowData;
+        const ImGui_ImplVulkanH_Window* wd = &_mainWindowData;
 
         ImGui_ImplVulkan_InitInfo initInfo = {};
         initInfo.Instance = _instance;
@@ -238,15 +270,6 @@ namespace Engine
         ImGui_ImplVulkan_Init(&initInfo);
     }
 
-    void VulkanRenderer::CheckVkResult(VkResult err)
-    {
-        if (err == VK_SUCCESS)
-            return;
-        ANE_ELOG_ERROR("Vulkan Error: VkResult = {0}", (int)err);
-        if (err < 0)
-            abort();
-    }
-
     std::vector<const char*> VulkanRenderer::GetAvailableExtensions(SDL_Window* window)
     {
         uint32_t extensionCount = 0;
@@ -264,11 +287,11 @@ namespace Engine
 
     vkb::Instance VulkanRenderer::CreateVkbInstance(const std::vector<const char*>& extensions)
     {
-        VkDebugUtilsMessageSeverityFlagBitsEXT debugMessageSeverityFlags = (VkDebugUtilsMessageSeverityFlagBitsEXT)(
+        constexpr VkDebugUtilsMessageSeverityFlagBitsEXT debugMessageSeverityFlags = (VkDebugUtilsMessageSeverityFlagBitsEXT)(
             VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
             VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
             VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT);
-        VkDebugUtilsMessageTypeFlagBitsEXT debugMessageTypeFlags = (VkDebugUtilsMessageTypeFlagBitsEXT)(
+        constexpr VkDebugUtilsMessageTypeFlagBitsEXT debugMessageTypeFlags = (VkDebugUtilsMessageTypeFlagBitsEXT)(
             VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
             VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
             VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT);
@@ -344,7 +367,7 @@ namespace Engine
         for (uint32_t i = 0; i < static_cast<uint32_t>(queueFamilies.size ()); i++) {
             if (!(queueFamilies[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)) continue;
 
-            queueDescriptions.push_back(vkb::CustomQueueDescription (i, std::vector<float> (queueFamilies[i].queueCount, 1.0f)));
+            queueDescriptions.emplace_back(i, std::vector(queueFamilies[i].queueCount, 1.0f));
             indices.GraphicsFamily = i;
             break;
         }
@@ -444,13 +467,13 @@ namespace Engine
 
         VmaAllocationCreateInfo cImgAllocInfo = { };
         cImgAllocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
-        cImgAllocInfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        cImgAllocInfo.requiredFlags = (VkMemoryPropertyFlags)VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
 
-        CheckVkResult(vmaCreateImage(_vmaAllocator, &cImgInfo, &cImgAllocInfo, &_colorImage.Image, &_colorImage.Allocation, nullptr));
+        CHECK_RESULT(vmaCreateImage(_vmaAllocator, &cImgInfo, &cImgAllocInfo, &_colorImage.Image, &_colorImage.Allocation, nullptr));
 
         const VkImageViewCreateInfo cViewInfo = VulkanInitializers::ImageViewCreateInfo(_colorImage.ImageFormat, _colorImage.Image, VK_IMAGE_ASPECT_COLOR_BIT);
 
-        CheckVkResult(vkCreateImageView(_device, &cViewInfo, _allocator, &_colorImage.ImageView));
+        CHECK_RESULT(vkCreateImageView(_device, &cViewInfo, _allocator, &_colorImage.ImageView));
 
         // Setup depth buffer.
         _depthImage.ImageFormat = VK_FORMAT_D32_SFLOAT;
@@ -461,11 +484,11 @@ namespace Engine
 
         const VkImageCreateInfo dImgInfo = VulkanInitializers::ImageCreateInfo(_depthImage.ImageFormat, depthImageUsages, imageExtent);
 
-        CheckVkResult(vmaCreateImage(_vmaAllocator, &dImgInfo, &cImgAllocInfo, &_depthImage.Image, &_depthImage.Allocation, nullptr));
+        CHECK_RESULT(vmaCreateImage(_vmaAllocator, &dImgInfo, &cImgAllocInfo, &_depthImage.Image, &_depthImage.Allocation, nullptr));
 
         const VkImageViewCreateInfo dViewInfo = VulkanInitializers::ImageViewCreateInfo(_depthImage.ImageFormat, _depthImage.Image, VK_IMAGE_ASPECT_DEPTH_BIT);
 
-        CheckVkResult(vkCreateImageView(_device, &dViewInfo, _allocator, &_depthImage.ImageView));
+        CHECK_RESULT(vkCreateImageView(_device, &dViewInfo, _allocator, &_depthImage.ImageView));
     }
 
     void VulkanRenderer::DestroyMainBuffers()
@@ -504,11 +527,11 @@ namespace Engine
         // Frame buffers.
         for (VulkanFrame& frame : _frameData)
         {
-            CheckVkResult(vkCreateCommandPool(_device, &commandPoolInfo, _allocator, &frame.CommandPool));
+            CHECK_RESULT(vkCreateCommandPool(_device, &commandPoolInfo, _allocator, &frame.CommandPool));
 
             VkCommandBufferAllocateInfo cmdAllocInfo = VulkanInitializers::CommandBufferAllocateInfo(frame.CommandPool, 1);
 
-            CheckVkResult(vkAllocateCommandBuffers(_device, &cmdAllocInfo, &frame.CommandBuffer));
+            CHECK_RESULT(vkAllocateCommandBuffers(_device, &cmdAllocInfo, &frame.CommandBuffer));
 
             _mainDeletionQueue.PushFunction([=]
             {
@@ -517,11 +540,11 @@ namespace Engine
         }
 
         // Immediate buffer.
-        CheckVkResult(vkCreateCommandPool(_device, &commandPoolInfo, _allocator, &_immBuffer.CommandPool));
+        CHECK_RESULT(vkCreateCommandPool(_device, &commandPoolInfo, _allocator, &_immBuffer.CommandPool));
 
         const VkCommandBufferAllocateInfo cmdAllocInfo = VulkanInitializers::CommandBufferAllocateInfo(_immBuffer.CommandPool, 1);
 
-        CheckVkResult(vkAllocateCommandBuffers(_device, &cmdAllocInfo, &_immBuffer.CommandBuffer));
+        CHECK_RESULT(vkAllocateCommandBuffers(_device, &cmdAllocInfo, &_immBuffer.CommandBuffer));
 
         _mainDeletionQueue.PushFunction([=]
         {
@@ -532,7 +555,7 @@ namespace Engine
     void VulkanRenderer::SetupSyncStructures()
     {
         const VkFenceCreateInfo fenceCreateInfo = VulkanInitializers::FenceCreateInfo(VK_FENCE_CREATE_SIGNALED_BIT);
-        CheckVkResult(vkCreateFence(_device, &fenceCreateInfo, _allocator, &_immBuffer.Fence));
+        CHECK_RESULT(vkCreateFence(_device, &fenceCreateInfo, _allocator, &_immBuffer.Fence));
 
         _mainDeletionQueue.PushFunction([=]
         {
@@ -541,12 +564,12 @@ namespace Engine
 
         for (VulkanFrame& frame : _frameData)
         {
-            CheckVkResult(vkCreateFence(_device, &fenceCreateInfo, _allocator, &frame.Fence));
+            CHECK_RESULT(vkCreateFence(_device, &fenceCreateInfo, _allocator, &frame.Fence));
 
             VkSemaphoreCreateInfo semaphoreCreateInfo = VulkanInitializers::SemaphoreCreateInfo();
 
-            CheckVkResult(vkCreateSemaphore(_device, &semaphoreCreateInfo, _allocator, &frame.SwapchainSemaphore));
-            CheckVkResult(vkCreateSemaphore(_device, &semaphoreCreateInfo, _allocator, &frame.RenderSemaphore));
+            CHECK_RESULT(vkCreateSemaphore(_device, &semaphoreCreateInfo, _allocator, &frame.SwapchainSemaphore));
+            CHECK_RESULT(vkCreateSemaphore(_device, &semaphoreCreateInfo, _allocator, &frame.RenderSemaphore));
 
             _mainDeletionQueue.PushFunction([=]
             {
@@ -559,6 +582,19 @@ namespace Engine
 
     void VulkanRenderer::SetupDescriptors()
     {
+        std::vector<DescriptorAllocator::PoolSizeRatio> sizes =
+        {
+            { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 3 },
+            { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 3 },
+            { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 3 },
+        };
+
+        _mainDescriptors.Init(_device, 10, sizes, _allocator);
+        _mainDeletionQueue.PushFunction([&]
+        {
+            _mainDescriptors.Destroy(_device, _allocator);
+        });
+
         {
             DescriptorLayoutBuilder builder { _device };
             _appDataLayout = builder
@@ -582,7 +618,6 @@ namespace Engine
             _singleImageDataLayout = builder
                 .SetStageFlags(VK_SHADER_STAGE_FRAGMENT_BIT)
                 .AddBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER)
-                .AddBinding(1, VK_DESCRIPTOR_TYPE_SAMPLER)
 
                 .SetAllocationCallbacks(_allocator)
                 .Build();
@@ -698,18 +733,10 @@ namespace Engine
         {
             ANE_ELOG_ERROR("Error when building vertex shader module: {}", slangModule->getName());
         }
-        else
-        {
-            ANE_ELOG_INFO("Built vertex shader module: {}", slangModule->getName());
-        }
 
         if (!VulkanUtils::LoadShaderModule(spirvFragProgram, _device, _allocator, fragShader))
         {
             ANE_ELOG_ERROR("Error when building fragment shader module: {}", slangModule->getName());
-        }
-        else
-        {
-            ANE_ELOG_INFO("Built fragment shader module: {}", slangModule->getName());
         }
     }
 
@@ -728,7 +755,7 @@ namespace Engine
         pipelineLayoutInfo.pPushConstantRanges = &bufferRange;
         pipelineLayoutInfo.pushConstantRangeCount = 1;
 
-        CheckVkResult(vkCreatePipelineLayout(_device, &pipelineLayoutInfo, _allocator, &_pipelineLayout));
+        CHECK_RESULT(vkCreatePipelineLayout(_device, &pipelineLayoutInfo, _allocator, &_pipelineLayout));
 
         VkShaderModule meshVertShader;
         VkShaderModule meshFragShader;
@@ -807,10 +834,11 @@ namespace Engine
         constexpr VkExtent3D defaultImageExtent = VkExtent3D{ 16, 16, 1 };
         constexpr VkFormat defaultImageFormat = VK_FORMAT_R8G8B8A8_UNORM;
 
-        const uint32_t white = packUnorm4x8(glm::vec4(1, 1, 1, 1));
-        const uint32_t black = packUnorm4x8(glm::vec4(0, 0, 0, 1));
-        const uint32_t grey = packUnorm4x8(glm::vec4(0.66f, 0.66f, 0.66f, 1));
-        const uint32_t magenta = packUnorm4x8(glm::vec4(1, 0, 1, 1));
+        const uint32_t white = glm::packUnorm4x8(Vector4(1, 1, 1, 1));
+        const uint32_t black = glm::packUnorm4x8(Vector4(0, 0, 0, 1));
+        const uint32_t grey = glm::packUnorm4x8(Vector4(0.66f, 0.66f, 0.66f, 1));
+        const uint32_t magenta = glm::packUnorm4x8(Vector4(1, 0, 1, 1));
+        const uint32_t normal = glm::packUnorm4x8(Vector4(0.5f, 0.5f, 1, 1));
         uint32_t pixels[16 * 16];
 
         for (uint32_t& pixel : pixels) { pixel = white; }
@@ -821,6 +849,9 @@ namespace Engine
 
         for (uint32_t& pixel : pixels) { pixel = grey; }
         _greyImage = CreateImage((void*)&pixels, defaultImageExtent, defaultImageFormat, VK_IMAGE_USAGE_SAMPLED_BIT);
+
+        for (uint32_t& pixel : pixels) { pixel = normal; }
+        _normalImage = CreateImage((void*)&pixels, defaultImageExtent, defaultImageFormat, VK_IMAGE_USAGE_SAMPLED_BIT);
 
         for (int x = 0; x < 16; x++)
         {
@@ -846,16 +877,58 @@ namespace Engine
             DestroyImage(_whiteImage);
             DestroyImage(_blackImage);
             DestroyImage(_greyImage);
+            DestroyImage(_normalImage);
             DestroyImage(_errorImage);
 
             vkDestroySampler(_device, _samplerLinear, _allocator);
             vkDestroySampler(_device, _samplerNearest, _allocator);
         });
+
+        // Filament material instance.
+        _filamentMaterial.BuildPipelines(this);
+        _mainDeletionQueue.PushFunction([&]
+        {
+            _filamentMaterial.ClearResources(this);
+        });
+
+        FilamentMetallicRoughness::MaterialResources materialResources;
+        materialResources.ColorImage = _whiteImage;
+        materialResources.ColorSampler = _samplerLinear;
+        materialResources.NormalImage = _normalImage;
+        materialResources.NormalSampler = _samplerLinear;
+        materialResources.ORMImage = _blackImage;
+        materialResources.ORMSampler = _samplerLinear;
+
+        VmaBuffer materialConstants = CreateBuffer(sizeof(FilamentMetallicRoughness::MaterialConstants), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+
+        auto* sceneUniformData = (FilamentMetallicRoughness::MaterialConstants*)materialConstants.Allocation->GetMappedData();
+        sceneUniformData->Color = Vector3::OneVector();
+        sceneUniformData->Normal = 1.0f;
+        sceneUniformData->Emission = Vector3::ZeroVector();
+        sceneUniformData->Metallic = 0.0f;
+        sceneUniformData->Roughness = 1.0f;
+        sceneUniformData->Reflectance = 0.0f;
+        sceneUniformData->Height = 0.0f;
+        sceneUniformData->Occlusion = 0.0f;
+
+        materialResources.DataBuffer = materialConstants.Buffer;
+        materialResources.DataBufferOffset = 0;
+
+        _filamentInstance = _filamentMaterial.WriteMaterial(this, MaterialPass::Opaque, materialResources, _mainDescriptors);
+
+        _mainDeletionQueue.PushFunction([=]
+        {
+            DestroyBuffer(materialConstants);
+        });
+
+        _colorTex = LoadTexture("MetalTiles03_1K_BaseColor.png");
+        _normalTex = LoadTexture("MetalTiles03_1K_Normal.png");
+        _ormTex = LoadTexture("MetalTiles03_1K_ORM.png");
     }
 
     void VulkanRenderer::CreateImGuiDescriptorPool()
     {
-        VkDescriptorPoolSize poolSizes[] =
+        constexpr VkDescriptorPoolSize poolSizes[] =
         {
             { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1 },
         };
@@ -867,8 +940,7 @@ namespace Engine
         poolInfo.poolSizeCount = (uint32_t)IM_ARRAYSIZE(poolSizes);
         poolInfo.pPoolSizes = poolSizes;
 
-        VkResult err = vkCreateDescriptorPool(_device, &poolInfo, _allocator, &_imGuiDescriptorPool);
-        CheckVkResult(err);
+        CHECK_RESULT(vkCreateDescriptorPool(_device, &poolInfo, _allocator, &_imGuiDescriptorPool));
 
         _mainDeletionQueue.PushFunction([&]{ vkDestroyDescriptorPool(_device, _imGuiDescriptorPool, _allocator); });
     }
@@ -887,7 +959,7 @@ namespace Engine
         }
 
         VulkanFrame& frame = GetFrame();
-        CheckVkResult(vkWaitForFences(_device, 1, &frame.Fence, true, 1000000000));
+        CHECK_RESULT(vkWaitForFences(_device, 1, &frame.Fence, true, 1000000000));
 
         uint32_t swapchainImageIndex;
         VkResult result = vkAcquireNextImageKHR(_device, _swapchain, 1000000000, frame.SwapchainSemaphore, nullptr, &swapchainImageIndex);
@@ -900,13 +972,13 @@ namespace Engine
         frame.DeletionQueue.Flush();
         frame.Descriptors.Clear(_device);
 
-        CheckVkResult(vkResetFences(_device, 1, &frame.Fence));
+        CHECK_RESULT(vkResetFences(_device, 1, &frame.Fence));
 
         const VkCommandBuffer cmd = frame.CommandBuffer;
 
-        CheckVkResult(vkResetCommandBuffer(cmd, 0));
+        CHECK_RESULT(vkResetCommandBuffer(cmd, 0));
         const VkCommandBufferBeginInfo cmdBeginInfo = VulkanInitializers::CommandBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-        CheckVkResult(vkBeginCommandBuffer(cmd, &cmdBeginInfo));
+        CHECK_RESULT(vkBeginCommandBuffer(cmd, &cmdBeginInfo));
 
         VulkanUtils::TransitionImage(cmd, _colorImage.Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
         VulkanUtils::TransitionImage(cmd, _depthImage.Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_ATTACHMENT_OPTIMAL);
@@ -928,7 +1000,7 @@ namespace Engine
         // Prepare and present active swapchain buffer.
         VulkanUtils::TransitionImage(cmd, swapchainImage, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
-        CheckVkResult(vkEndCommandBuffer(cmd));
+        CHECK_RESULT(vkEndCommandBuffer(cmd));
 
         const VkCommandBufferSubmitInfo cmdInfo = VulkanInitializers::CommandBufferSubmitInfo(cmd);
         const VkSemaphoreSubmitInfo waitInfo = VulkanInitializers::SemaphoreSubmitInfo(VK_PIPELINE_STAGE_2_COLOR_ATTACHMENT_OUTPUT_BIT_KHR, frame.SwapchainSemaphore);
@@ -936,7 +1008,7 @@ namespace Engine
 
         const VkSubmitInfo2 submitInfo = VulkanInitializers::SubmitInfo(&cmdInfo, &signalInfo, &waitInfo);
 
-        CheckVkResult(vkQueueSubmit2(_queue, 1, &submitInfo, frame.Fence));
+        CHECK_RESULT(vkQueueSubmit2(_queue, 1, &submitInfo, frame.Fence));
 
         {
             ANE_DEEP_PROFILE_SCOPE("vkQueuePresentKHR");
@@ -968,16 +1040,18 @@ namespace Engine
 
         VmaBuffer appDataBuffer = CreateBuffer(sizeof(ApplicationData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
         VmaBuffer sceneDataBuffer = CreateBuffer(sizeof(SceneData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+        VmaBuffer filamentDataBuffer = CreateBuffer(sizeof(FilamentMetallicRoughness::MaterialConstants), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
         VulkanFrame& frame = GetFrame();
         frame.DeletionQueue.PushFunction([=]
         {
             DestroyBuffer(appDataBuffer);
             DestroyBuffer(sceneDataBuffer);
+            DestroyBuffer(filamentDataBuffer);
         });
 
         // Fixed data for now.
-        float time = SDL_GetPerformanceCounter() / static_cast<float>(SDL_GetPerformanceFrequency());
+        float time = static_cast<float>(SDL_GetTicks64()) / 1000.0f;
         frame.AppData.Time = time;
 
         Vector3 ambientColor = Vector3(0.05f, 0.08f, 0.11f);
@@ -985,19 +1059,32 @@ namespace Engine
         Vector3 sunDirection = Quaternion::FromEulerAngles(sunAngle) * Vector3::ForwardVector();
         Vector3 sunColor = Vector3(1.0f, 0.9f, 0.67f);
 
+        frame.SceneData.CameraPosition = Vector4(CameraPosition);
         frame.SceneData.AmbientColor = Vector4(ambientColor, 0);
         frame.SceneData.SunlightDirection = Vector4(sunDirection, 0);
         frame.SceneData.SunlightColor = Vector4(sunColor, 0);
 
-        ApplicationData* appUniformData = (ApplicationData*)appDataBuffer.Allocation->GetMappedData();
+        frame.FilamentData.Color = Vector3::OneVector();
+        frame.FilamentData.Normal = 1.0f;
+        frame.FilamentData.Emission = Vector3::ZeroVector();
+        frame.FilamentData.Metallic = 0.0f;
+        frame.FilamentData.Roughness = 1.0f;
+        frame.FilamentData.Reflectance = 0.0f;
+        frame.FilamentData.Height = 0.0f;
+        frame.FilamentData.Occlusion = 1.0f;
+
+        auto* appUniformData = (ApplicationData*)appDataBuffer.Allocation->GetMappedData();
         *appUniformData = frame.AppData;
 
-        SceneData* sceneUniformData = (SceneData*)sceneDataBuffer.Allocation->GetMappedData();
+        auto* sceneUniformData = (SceneData*)sceneDataBuffer.Allocation->GetMappedData();
         *sceneUniformData = frame.SceneData;
+
+        auto* filamentData = (FilamentMetallicRoughness::MaterialConstants*)filamentDataBuffer.Allocation->GetMappedData();
+        *filamentData = frame.FilamentData;
 
         VkDescriptorSet appDescriptor = frame.Descriptors.Allocate(_device, _appDataLayout, _allocator);
         VkDescriptorSet sceneDescriptor = frame.Descriptors.Allocate(_device, _geometryDataLayout, _allocator);
-        VkDescriptorSet imageDescriptor = frame.Descriptors.Allocate(_device, _singleImageDataLayout, _allocator);
+        VkDescriptorSet imageDescriptor = frame.Descriptors.Allocate(_device, _filamentMaterial.MaterialLayout, _allocator);
 
         {
             DescriptorWriter writer;
@@ -1011,8 +1098,10 @@ namespace Engine
         }
         {
             DescriptorWriter writer;
-            writer.WriteImage(0, _errorImage.ImageView, _samplerNearest, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-            writer.WriteImage(1, _errorImage.ImageView, _samplerNearest, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_SAMPLER);
+            writer.WriteBuffer(0, filamentDataBuffer.Buffer, sizeof(FilamentMetallicRoughness::MaterialConstants), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+            writer.WriteImage(1, _colorTex.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+            writer.WriteImage(2, _normalTex.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+            writer.WriteImage(3, _ormTex.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
             writer.UpdateSet(_device, imageDescriptor);
         }
 
@@ -1024,10 +1113,10 @@ namespace Engine
         VkRenderingInfo renderInfo = VulkanInitializers::RenderingInfo(_drawExtent, &colorAttachment, &depthAttachment);
         vkCmdBeginRendering(cmd, &renderInfo);
 
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _meshPipeline);
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _filamentInstance.Pipeline->Pipeline);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 0, 1, &appDescriptor, 0, nullptr);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 1, 1, &sceneDescriptor, 0, nullptr);
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 2, 1, &imageDescriptor, 0, nullptr);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _filamentInstance.Pipeline->Layout, 2, 1, &imageDescriptor, 0, nullptr);
 
         VkViewport viewport;
         viewport.x = 0;
@@ -1096,12 +1185,12 @@ namespace Engine
     }
 
     // TODO: Fully integrate ImGui into rendering loop.
-    void VulkanRenderer::DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView)
+    void VulkanRenderer::DrawImGui(const VkCommandBuffer cmd, const VkImageView targetImageView)
     {
         ANE_DEEP_PROFILE_FUNCTION();
 
-        VkRenderingAttachmentInfo colorAttachment = VulkanInitializers::AttachmentInfo(targetImageView, nullptr, VK_IMAGE_LAYOUT_GENERAL);
-        VkRenderingInfo renderInfo = VulkanInitializers::RenderingInfo(_windowExtent, &colorAttachment, nullptr);
+        const VkRenderingAttachmentInfo colorAttachment = VulkanInitializers::AttachmentInfo(targetImageView, nullptr, VK_IMAGE_LAYOUT_GENERAL);
+        const VkRenderingInfo renderInfo = VulkanInitializers::RenderingInfo(_windowExtent, &colorAttachment, nullptr);
 
         vkCmdBeginRendering(cmd, &renderInfo);
 
@@ -1156,7 +1245,7 @@ namespace Engine
         allocatorInfo.instance = _instance;
         allocatorInfo.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
 
-        CheckVkResult(vmaCreateAllocator(&allocatorInfo, &_vmaAllocator));
+        CHECK_RESULT(vmaCreateAllocator(&allocatorInfo, &_vmaAllocator));
     }
 
     VmaBuffer VulkanRenderer::CreateBuffer(const size_t allocSize, const VkBufferUsageFlags usage, const VmaMemoryUsage memoryUsage)
@@ -1171,7 +1260,7 @@ namespace Engine
         vmaAllocInfo.flags = VMA_ALLOCATION_CREATE_MAPPED_BIT;
 
         VmaBuffer newBuffer;
-        CheckVkResult(vmaCreateBuffer(_vmaAllocator, &bufferInfo, &vmaAllocInfo, &newBuffer.Buffer, &newBuffer.Allocation, &newBuffer.Info));
+        CHECK_RESULT(vmaCreateBuffer(_vmaAllocator, &bufferInfo, &vmaAllocInfo, &newBuffer.Buffer, &newBuffer.Allocation, &newBuffer.Info));
 
         return newBuffer;
     }
@@ -1196,9 +1285,9 @@ namespace Engine
         // Always allocate images on dedicated GPU memory.
         VmaAllocationCreateInfo allocInfo = { };
         allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
-        allocInfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        allocInfo.requiredFlags = (VkMemoryPropertyFlags)VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
 
-        CheckVkResult(vmaCreateImage(_vmaAllocator, &imgInfo, &allocInfo, &newImage.Image, &newImage.Allocation, nullptr));
+        CHECK_RESULT(vmaCreateImage(_vmaAllocator, &imgInfo, &allocInfo, &newImage.Image, &newImage.Allocation, nullptr));
 
         // Depth formats need to use the correct aspect flag.
         VkImageAspectFlags aspectFlag = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -1211,7 +1300,7 @@ namespace Engine
         VkImageViewCreateInfo viewInfo = VulkanInitializers::ImageViewCreateInfo(format, newImage.Image, aspectFlag);
         viewInfo.subresourceRange.levelCount = imgInfo.mipLevels;
 
-        CheckVkResult(vkCreateImageView(_device, &viewInfo, _allocator, &newImage.ImageView));
+        CHECK_RESULT(vkCreateImageView(_device, &viewInfo, _allocator, &newImage.ImageView));
 
         return newImage;
     }
@@ -1259,26 +1348,26 @@ namespace Engine
 
     void VulkanRenderer::ImmediateSubmit(std::function<void(VkCommandBuffer cmd)>&& function)
     {
-        CheckVkResult(vkResetFences(_device, 1, &_immBuffer.Fence));
-        CheckVkResult(vkResetCommandBuffer(_immBuffer.CommandBuffer, 0));
+        CHECK_RESULT(vkResetFences(_device, 1, &_immBuffer.Fence));
+        CHECK_RESULT(vkResetCommandBuffer(_immBuffer.CommandBuffer, 0));
 
         const VkCommandBuffer cmd = _immBuffer.CommandBuffer;
         // The command buffer is used exactly once, so we let Vulkan know that.
         const VkCommandBufferBeginInfo cmdBeginInfo = VulkanInitializers::CommandBufferBeginInfo(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
 
-        CheckVkResult(vkBeginCommandBuffer(cmd, &cmdBeginInfo));
+        CHECK_RESULT(vkBeginCommandBuffer(cmd, &cmdBeginInfo));
 
         function(cmd);
 
-        CheckVkResult(vkEndCommandBuffer(cmd));
+        CHECK_RESULT(vkEndCommandBuffer(cmd));
 
         const VkCommandBufferSubmitInfo cmdInfo = VulkanInitializers::CommandBufferSubmitInfo(cmd);
         const VkSubmitInfo2 submit = VulkanInitializers::SubmitInfo(&cmdInfo, nullptr, nullptr);
 
-        CheckVkResult(vkQueueSubmit2(_queue, 1, &submit, _immBuffer.Fence));
+        CHECK_RESULT(vkQueueSubmit2(_queue, 1, &submit, _immBuffer.Fence));
 
         // Thread will be blocked until the graphic commands finish execution.
-        CheckVkResult(vkWaitForFences(_device, 1, &_immBuffer.Fence, true, 9999999999));
+        CHECK_RESULT(vkWaitForFences(_device, 1, &_immBuffer.Fence, true, 9999999999));
     }
 
     VmaMeshBuffers VulkanRenderer::UploadMesh(const std::span<uint32_t> indices, const std::span<Vertex> vertices)

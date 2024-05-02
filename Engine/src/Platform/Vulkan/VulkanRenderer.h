@@ -5,8 +5,10 @@
 #include <span>
 
 #include "VmaTypes.h"
+#include "VulkanCommon.h"
 #include "VulkanDeletionQueue.h"
 #include "VulkanDescriptors.h"
+#include "VulkanMaterial.h"
 #include "VulkanPipelineBuilder.h"
 #include "ANE/Math/Types/Matrix4x4.h"
 #include "ANE/Renderer/CommonSets.h"
@@ -41,6 +43,7 @@ namespace Engine
         DescriptorAllocator Descriptors;
         ApplicationData AppData;
         SceneData SceneData;
+        FilamentMetallicRoughness::MaterialConstants FilamentData;
     };
 
     struct VulkanImmediateBuffer
@@ -76,18 +79,28 @@ namespace Engine
         void Cleanup();
 
         VmaMeshAsset LoadModel(const std::string& modelPath);
+
         static VmaMeshBuffers UploadDebugVertices(std::span<uint32_t> indices, std::span<Vertex> vertices);
+
+        VmaImage LoadTexture(const std::string& texturePath);
 
         float GetFramerate();
         static ImGuiIO* GetImGuiIO() { return _io; }
 
-    private:
         // Vulkan
-        static void CheckVkResult(VkResult err);
+        static VkDevice GetDevice() { return _device; }
+        static VkAllocationCallbacks* GetAllocator() { return _allocator; }
+        static std::vector<VkDescriptorSetLayout> GetSceneLayouts() { return { _appDataLayout, _geometryDataLayout}; }
+        static VmaImage GetColorBuffer() { return _colorImage; }
+        static VmaImage GetDepthBuffer() { return _depthImage; }
+
+    private:
+        // Function passed for error checking in ImGui.
+        static void CheckVkResult(const VkResult err) { CHECK_RESULT(err); }
 
         static std::vector<const char*> GetAvailableExtensions(SDL_Window* window);
 
-        static void SetupVulkan(SDL_Window* window);
+        void SetupVulkan(SDL_Window* window);
         static void SetupImGui(SDL_Window* window);
 
         static vkb::Instance CreateVkbInstance(const std::vector<const char*>& extensions);
@@ -111,7 +124,7 @@ namespace Engine
 
         static PipelineWrapper CreatePipeline(const vkb::Device& logicalDevice);
 
-        static void CreateDefaultResources();
+        void CreateDefaultResources();
 
         static void CreateImGuiDescriptorPool();
 
@@ -150,6 +163,7 @@ namespace Engine
     public:
         inline static ImVec4 ClearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+        inline static Vector3 CameraPosition;
         inline static Matrix4x4 ViewProjection;
 
     private:
@@ -168,6 +182,7 @@ namespace Engine
 
         // Deletion queue with the scope of the renderer.
         inline static VulkanDeletionQueue _mainDeletionQueue;
+        inline static DescriptorAllocator _mainDescriptors;
 
         inline static VkAllocationCallbacks* _allocator = nullptr;
         inline static VkInstance _instance = VK_NULL_HANDLE;
@@ -207,15 +222,24 @@ namespace Engine
         inline static VulkanImmediateBuffer _immBuffer;
 
         inline static entt::dense_map<std::string, VmaMeshAsset> _loadedModelMap;
+        inline static entt::dense_map<std::string, VmaImage> _loadedTextureMap;
 
         // Engine resources
         inline static VmaImage _whiteImage;
         inline static VmaImage _blackImage;
         inline static VmaImage _greyImage;
+        inline static VmaImage _normalImage;
         inline static VmaImage _errorImage;
+
+        inline static VmaImage _colorTex;
+        inline static VmaImage _normalTex;
+        inline static VmaImage _ormTex;
 
         inline static VkSampler _samplerLinear;
         inline static VkSampler _samplerNearest;
+
+        inline static MaterialInstance _filamentInstance;
+        inline static FilamentMetallicRoughness _filamentMaterial;
 
         // ImGui
         inline static ImGui_ImplVulkanH_Window _mainWindowData;

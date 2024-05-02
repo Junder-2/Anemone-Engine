@@ -84,6 +84,11 @@ namespace Engine
         return _vulkanRenderer->UploadDebugVertices(indices, vertices);
     }
 
+    VmaImage Renderer::LoadTexture(const std::string& texturePath)
+    {
+        return _vulkanRenderer->LoadTexture(texturePath);
+    }
+
     void Renderer::SubmitDrawCommand(const DrawCommand& command)
     {
         _drawCommands.Commands.push_back(command);
@@ -134,6 +139,11 @@ namespace Engine
     void Renderer::SetViewProjection(const Matrix4x4& matrix)
     {
         _vulkanRenderer->ViewProjection = matrix;
+    }
+
+    void Renderer::SetCameraPosition(const Vector3 pos)
+    {
+        _vulkanRenderer->CameraPosition = pos;
     }
 
     void Renderer::FlushDrawCommands()

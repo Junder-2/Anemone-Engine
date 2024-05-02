@@ -28,6 +28,7 @@ namespace Engine
     {
     public:
         explicit VulkanPipelineBuilder(vkb::Device const& logicalDevice, VkPipelineLayout pipelineLayout);
+        explicit VulkanPipelineBuilder(VkDevice const& logicalDevice, VkPipelineLayout pipelineLayout);
 
         vkb::Result<PipelineWrapper> Build() const;
 

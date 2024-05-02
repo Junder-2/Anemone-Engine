@@ -1,3 +1,5 @@
+#pragma once
+
 // Uniform data across every shader drawn during a frame.
 struct AppData
 {
@@ -16,6 +18,5 @@ struct SceneData
 // Per-material data.
 struct Material
 {
-    Texture2D texture;
-    SamplerState sampler;
+    Sampler2D texture;
 };

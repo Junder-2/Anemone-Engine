@@ -1,4 +1,4 @@
-#include "Mesh-Input.include"
+#include "Mesh-Input.slangh"
 
 // This is a Debug/Example shader which outputs the world normals.
 
@@ -19,6 +19,7 @@ struct Vertex
     float3 normal;
     float uvY;
     float4 color;
+    float4 tangent;
 };
 
 struct PushConstants

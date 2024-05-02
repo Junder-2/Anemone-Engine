@@ -72,6 +72,7 @@ namespace Engine
             Vertex vertex = { };
             vertex.Position = { pos->x, pos->y, pos->z };
             vertex.Normal = { normal->x, normal->y, normal->z };
+            vertex.Tangent = { tangent->x, tangent->y, tangent->z, 0 };
             vertex.Color = Vector4{ vertex.Normal, 1 } * .5f + .5f;
             vertex.UvX = uv->x;
             vertex.UvY = uv->y;
