@@ -17,6 +17,7 @@
 #include <slang.h>
 #include <slang-com-ptr.h>
 
+#include "ANE/Core/Application.h"
 #include "ANE/Math/FMath.h"
 
 using Slang::ComPtr;
@@ -398,18 +399,17 @@ namespace Engine
 
     void VulkanRenderer::SetupSwapchain()
     {
-        int w, h;
-        SDL_GetWindowSize(_window, &w, &h);
-        _windowExtent.width = w;
-        _windowExtent.height = h;
+        const auto props = Application::Get().GetWindow().GetActiveViewportProperties();
+        _windowExtent.width = props.Width;
+        _windowExtent.height = props.Height;
 
-        vkb::Swapchain swapchain = CreateSwapchain(w, h);
+        vkb::Swapchain swapchain = CreateSwapchain(_windowExtent.width, _windowExtent.height);
         _swapchainExtent = swapchain.extent;
         _swapchain = swapchain.swapchain;
         _swapchainImages = swapchain.get_images().value();
         _swapchainImageViews = swapchain.get_image_views().value();
 
-        CreateMainBuffers(w, h);
+        CreateMainBuffers(_windowExtent.width, _windowExtent.height);
     }
 
     vkb::Swapchain VulkanRenderer::CreateSwapchain(const uint32_t width, const uint32_t height)
@@ -513,12 +513,11 @@ namespace Engine
 
     void VulkanRenderer::ResizeMainBuffers()
     {
-        int w, h;
-        SDL_GetWindowSize(_window, &w, &h);
-        _windowExtent.width = w;
-        _windowExtent.height = h;
+        const auto props = Application::Get().GetWindow().GetActiveViewportProperties();
+        _windowExtent.width = props.Width;
+        _windowExtent.height = props.Height;
 
-        ResizeMainBuffers(w, h);
+        ResizeMainBuffers(_windowExtent.width, _windowExtent.height);
     }
 
     void VulkanRenderer::ResizeMainBuffers(const uint32_t width, const uint32_t height)
