@@ -100,9 +100,13 @@ float3 GetORM(MaterialProperties props, float2 uv)
 {
     float3 ormMap = props.ORMMap.Sample(uv).rgb;
     float3 orm;
-    orm.x = lerp(1, ormMap.x, props.Occlusion);
-    orm.y = lerp(ormMap.y, 1, props.Roughness);
-    orm.z = ormMap.z * props.Metallic;
+    //orm.x = lerp(1, ormMap.x, props.Occlusion);
+    //orm.y = lerp(ormMap.y, 1, props.Roughness);
+    //orm.z = lerp(0, ormMap.z, props.Metallic);
+
+    orm.x = lerp(1, ormMap.x, 1);
+    orm.y = lerp(ormMap.y, 1, 0);
+    orm.z = lerp(0, ormMap.z, 1);
 
     return orm;
 }
