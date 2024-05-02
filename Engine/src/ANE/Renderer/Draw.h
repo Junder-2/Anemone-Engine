@@ -12,8 +12,17 @@ namespace Engine
         VmaMeshBuffers MeshBuffers;
     };
 
+    struct DebugDrawCommand
+    {
+        Matrix4x4 ModelMatrix;
+        uint32_t VertexCount;
+        VmaMeshBuffers MeshBuffers;
+        bool LineList;
+    };
+
     struct DrawContext
     {
         std::vector<DrawCommand> Commands;
+        std::vector<DebugDrawCommand> DebugCommands;
     };
 }
