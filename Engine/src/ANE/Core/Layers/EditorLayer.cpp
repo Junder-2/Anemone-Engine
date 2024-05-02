@@ -22,6 +22,7 @@
 #include "ANE/Input/EditorInputSystem.h"
 #include "ANE/Input/Input.h"
 #include "ANE/Input/InputAction.h"
+#include "ANE/Utilities/SceneSerializer.h"
 #include "Panels/EditorLogPanel.h"
 #include "Panels/MainMenuPanel.h"
 #include "Panels/CreateScenePanel.h"

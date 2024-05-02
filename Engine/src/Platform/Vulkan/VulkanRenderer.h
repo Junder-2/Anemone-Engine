@@ -79,6 +79,9 @@ namespace Engine
         void Cleanup();
 
         VmaMeshAsset LoadModel(const std::string& modelPath);
+
+        static VmaMeshBuffers UploadDebugVertices(std::span<uint32_t> indices, std::span<Vertex> vertices);
+
         VmaImage LoadTexture(const std::string& texturePath);
 
         float GetFramerate();
@@ -117,6 +120,7 @@ namespace Engine
         static void SetupCommandBuffers();
         static void SetupSyncStructures();
         static void SetupDescriptors();
+        static void LoadSlangShader(const char* moduleName, VkShaderModule* vertShader, VkShaderModule* fragShader);
 
         static PipelineWrapper CreatePipeline(const vkb::Device& logicalDevice);
 
@@ -126,6 +130,7 @@ namespace Engine
 
         inline static void Draw(const WindowProperties& props, const DrawContext& drawCommands);
         inline static void DrawGeometry(VkCommandBuffer cmd, const DrawContext& drawCommands);
+        inline static void DrawDebugGeometry(VkCommandBuffer cmd, const DrawContext& drawCommands);
         inline static void DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView);
 
         static void CleanupVulkan();
@@ -189,6 +194,8 @@ namespace Engine
         inline static VkQueue _queue = VK_NULL_HANDLE;
         inline static VkPipelineCache _pipelineCache = VK_NULL_HANDLE;
         inline static VkPipeline _meshPipeline = VK_NULL_HANDLE;
+        inline static VkPipeline _debugTrianglePipeline = VK_NULL_HANDLE;
+        inline static VkPipeline _debugLinePipeline = VK_NULL_HANDLE;
         inline static VkPipelineLayout _pipelineLayout;
 
         inline static VmaImage _colorImage;

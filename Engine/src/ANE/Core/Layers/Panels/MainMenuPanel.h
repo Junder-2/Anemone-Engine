@@ -1,18 +1,21 @@
 ﻿#pragma once
 #include "UILayerPanel.h"
 #include "UIUpdateWrapper.h"
-#include "ANE/Core/Layers/EditorLayer.h"
 
 namespace Engine
 {
+    class EditorLayer;
+
     class MainMenuPanel : public UILayerPanel
     {
-
-    private:
-        EditorLayer* _editorLayer;
-        ~MainMenuPanel() = default;
     public:
         MainMenuPanel(EditorLayer* editorLayer);
+
         UIUpdateWrapper OnPanelRender() override;
+    private:
+        ~MainMenuPanel() = default;
+        static void PhysicsAnalysisMenu();
+    private:
+        EditorLayer* _editorLayer;
     };
 }

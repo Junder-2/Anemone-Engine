@@ -17,6 +17,8 @@
 #include <slang.h>
 #include <slang-com-ptr.h>
 
+#include "ANE/Math/FMath.h"
+
 using Slang::ComPtr;
 
 #include "MeshLoader.h"
@@ -332,6 +334,7 @@ namespace Engine
         features11.variablePointers = VK_TRUE;
 
         VkPhysicalDeviceFeatures deviceFeatures = {};
+        deviceFeatures.fillModeNonSolid = VK_TRUE;
         deviceFeatures.shaderInt64 = VK_TRUE;
 
         // Use VkBootstrap to select a gpu.
@@ -645,7 +648,8 @@ namespace Engine
         }
     }
 
-    PipelineWrapper VulkanRenderer::CreatePipeline(const vkb::Device& logicalDevice)
+    // todo: Nestor is this okay?!?
+    void VulkanRenderer::LoadSlangShader(const char* moduleName, VkShaderModule* vertShader, VkShaderModule* fragShader)
     {
         ComPtr<slang::IGlobalSession> slangGlobalSession;
         createGlobalSession(slangGlobalSession.writeRef());
@@ -668,78 +672,76 @@ namespace Engine
 
         ComPtr<slang::IBlob> spirvVertProgram;
         ComPtr<slang::IBlob> spirvFragProgram;
+        ComPtr<slang::IBlob> diagnosticBlob;
+        slang::IModule* slangModule = session->loadModule(moduleName, diagnosticBlob.writeRef());
+        //diagnoseIfNeeded(diagnosticBlob);
+
+        if (!slangModule)
         {
-            const char* moduleName = "Mesh_Diffuse";
-            ComPtr<slang::IBlob> diagnosticBlob;
-            slang::IModule* slangModule = session->loadModule(moduleName, diagnosticBlob.writeRef());
-            //diagnoseIfNeeded(diagnosticBlob);
-
-            if (!slangModule)
-            {
-                ANE_ELOG_ERROR("Error when loading shader module: {}", moduleName);
-            }
-
-            ComPtr<slang::IEntryPoint> vertEntry;
-            slangModule->findEntryPointByName("vertexMain", vertEntry.writeRef());
-
-            slang::IComponentType* components[] = { slangModule, vertEntry };
-            ComPtr<slang::IComponentType> program;
-            {
-                ComPtr<slang::IBlob> diagnosticsBlob;
-                SlangResult result = session->createCompositeComponentType(
-                    components,
-                    2,
-                    program.writeRef(),
-                    diagnosticsBlob.writeRef());
-                // diagnoseIfNeeded(diagnosticsBlob);
-                // RETURN_ON_FAIL(result);
-            }
-
-            {
-                ComPtr<slang::IBlob> diagnosticsBlob;
-                SlangResult result = program->getEntryPointCode(
-                    0, 0, spirvVertProgram.writeRef(), diagnosticsBlob.writeRef());
-                //diagnoseIfNeeded(diagnosticsBlob);
-                //RETURN_ON_FAIL(result);
-            }
-
-            ComPtr<slang::IEntryPoint> fragEntry;
-            slangModule->findEntryPointByName("fragmentMain", fragEntry.writeRef());
-
-            slang::IComponentType* components2[] = { slangModule, fragEntry };
-            ComPtr<slang::IComponentType> program2;
-            {
-                ComPtr<slang::IBlob> diagnosticsBlob;
-                SlangResult result = session->createCompositeComponentType(
-                    components2,
-                    2,
-                    program2.writeRef(),
-                    diagnosticsBlob.writeRef());
-                // diagnoseIfNeeded(diagnosticsBlob);
-                // RETURN_ON_FAIL(result);
-            }
-
-            {
-                ComPtr<slang::IBlob> diagnosticsBlob;
-                SlangResult result = program2->getEntryPointCode(
-                    0, 0, spirvFragProgram.writeRef(), diagnosticsBlob.writeRef());
-                //diagnoseIfNeeded(diagnosticsBlob);
-                //RETURN_ON_FAIL(result);
-            }
+            ANE_ELOG_ERROR("Error when loading shader module: {}", moduleName);
         }
 
-        VkShaderModule meshVertShader;
-        if (!VulkanUtils::LoadShaderModule(spirvVertProgram, _device, _allocator, &meshVertShader))
+        ComPtr<slang::IEntryPoint> vertEntry;
+        slangModule->findEntryPointByName("vertexMain", vertEntry.writeRef());
+
+        slang::IComponentType* components[] = { slangModule, vertEntry };
+        ComPtr<slang::IComponentType> program;
         {
-            ANE_ELOG_ERROR("Error when building vertex shader module: Mesh-Diffuse.slang");
+            ComPtr<slang::IBlob> diagnosticsBlob;
+            SlangResult result = session->createCompositeComponentType(
+                components,
+                2,
+                program.writeRef(),
+                diagnosticsBlob.writeRef());
+            // diagnoseIfNeeded(diagnosticsBlob);
+            // RETURN_ON_FAIL(result);
         }
 
-        VkShaderModule meshFragShader;
-        if (!VulkanUtils::LoadShaderModule(spirvFragProgram, _device, _allocator, &meshFragShader))
         {
-            ANE_ELOG_ERROR("Error when building fragment shader module: Mesh-Diffuse.slang");
+            ComPtr<slang::IBlob> diagnosticsBlob;
+            SlangResult result = program->getEntryPointCode(
+                0, 0, spirvVertProgram.writeRef(), diagnosticsBlob.writeRef());
+            //diagnoseIfNeeded(diagnosticsBlob);
+            //RETURN_ON_FAIL(result);
         }
 
+        ComPtr<slang::IEntryPoint> fragEntry;
+        slangModule->findEntryPointByName("fragmentMain", fragEntry.writeRef());
+
+        slang::IComponentType* components2[] = { slangModule, fragEntry };
+        ComPtr<slang::IComponentType> program2;
+        {
+            ComPtr<slang::IBlob> diagnosticsBlob;
+            SlangResult result = session->createCompositeComponentType(
+                components2,
+                2,
+                program2.writeRef(),
+                diagnosticsBlob.writeRef());
+            // diagnoseIfNeeded(diagnosticsBlob);
+            // RETURN_ON_FAIL(result);
+        }
+
+        {
+            ComPtr<slang::IBlob> diagnosticsBlob;
+            SlangResult result = program2->getEntryPointCode(
+                0, 0, spirvFragProgram.writeRef(), diagnosticsBlob.writeRef());
+            //diagnoseIfNeeded(diagnosticsBlob);
+            //RETURN_ON_FAIL(result);
+        }
+
+        if (!VulkanUtils::LoadShaderModule(spirvVertProgram, _device, _allocator, vertShader))
+        {
+            ANE_ELOG_ERROR("Error when building vertex shader module: {}", slangModule->getName());
+        }
+
+        if (!VulkanUtils::LoadShaderModule(spirvFragProgram, _device, _allocator, fragShader))
+        {
+            ANE_ELOG_ERROR("Error when building fragment shader module: {}", slangModule->getName());
+        }
+    }
+
+    PipelineWrapper VulkanRenderer::CreatePipeline(const vkb::Device& logicalDevice)
+    {
         VkPushConstantRange bufferRange;
         bufferRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
         bufferRange.offset = 0;
@@ -754,6 +756,11 @@ namespace Engine
         pipelineLayoutInfo.pushConstantRangeCount = 1;
 
         CHECK_RESULT(vkCreatePipelineLayout(_device, &pipelineLayoutInfo, _allocator, &_pipelineLayout));
+
+        VkShaderModule meshVertShader;
+        VkShaderModule meshFragShader;
+
+        LoadSlangShader("Mesh_Diffuse", &meshVertShader, &meshFragShader);
 
         VulkanPipelineBuilder builder{ logicalDevice, _pipelineLayout };
         vkb::Result<PipelineWrapper> pipeline = builder
@@ -772,10 +779,49 @@ namespace Engine
         vkDestroyShaderModule(_device, meshFragShader, _allocator);
         vkDestroyShaderModule(_device, meshVertShader, _allocator);
 
+        VkShaderModule debugVertShader;
+        VkShaderModule debugFragShader;
+
+        LoadSlangShader("Mesh_Wireframe", &debugVertShader, &debugFragShader);
+
+        vkb::Result<PipelineWrapper> debugTrianglePipeline = builder
+            .SetShaders(debugVertShader, debugFragShader)
+            .SetBlendMode(Alpha)
+            .SetDepthTestOperator(VK_COMPARE_OP_ALWAYS) // Reverse Z for more precision
+            .SetDepthWrite(false)
+
+            .SetColorFormat(_colorImage.ImageFormat)
+            .SetPolygonMode(VK_POLYGON_MODE_LINE)
+            .SetTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
+
+            .SetAllocationCallbacks(_allocator)
+            .Build();
+        _debugTrianglePipeline = debugTrianglePipeline->Pipeline;
+
+        vkb::Result<PipelineWrapper> debugLinePipeline = builder
+            .SetShaders(debugVertShader, debugFragShader)
+            .SetBlendMode(None) //Alpha doesnt work with lines?
+            .SetDepthTestOperator(VK_COMPARE_OP_ALWAYS) // Reverse Z for more precision
+            .SetDepthWrite(false)
+
+            .SetColorFormat(_colorImage.ImageFormat)
+            .SetPolygonMode(VK_POLYGON_MODE_LINE)
+            .SetTopology(VK_PRIMITIVE_TOPOLOGY_LINE_LIST)
+
+            .SetAllocationCallbacks(_allocator)
+            .Build();
+        _debugLinePipeline = debugLinePipeline->Pipeline;
+
+        // Cleanup.
+        vkDestroyShaderModule(_device, debugFragShader, _allocator);
+        vkDestroyShaderModule(_device, debugVertShader, _allocator);
+
         _mainDeletionQueue.PushFunction([&]
         {
             vkDestroyPipelineLayout(_device, _pipelineLayout, _allocator);
             vkDestroyPipeline(_device, _meshPipeline, _allocator);
+            vkDestroyPipeline(_device, _debugTrianglePipeline, _allocator);
+            vkDestroyPipeline(_device, _debugLinePipeline, _allocator);
         });
 
         return pipeline.value();
@@ -1103,7 +1149,38 @@ namespace Engine
             vkCmdDrawIndexed(cmd, drawCommand.VertexCount, 1, 0, 0, 0);
         }
 
+        #ifndef ANE_DIST
+        DrawDebugGeometry(cmd, drawCommands);
+        #endif
+
         vkCmdEndRendering(cmd);
+    }
+
+    void VulkanRenderer::DrawDebugGeometry(const VkCommandBuffer cmd, const DrawContext& drawCommands)
+    {
+        ANE_DEEP_PROFILE_FUNCTION();
+
+        VulkanFrame& frame = GetFrame();
+        for (DebugDrawCommand drawCommand : drawCommands.DebugCommands)
+        {
+            vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, drawCommand.LineList ? _debugLinePipeline : _debugTrianglePipeline);
+
+            frame.DeletionQueue.PushFunction([=]
+            {
+                DestroyBuffer(drawCommand.MeshBuffers.IndexBuffer);
+                DestroyBuffer(drawCommand.MeshBuffers.VertexBuffer);
+            });
+
+            PushConstantBuffer pushConstants;
+            pushConstants.MVPMatrix = ViewProjection * drawCommand.ModelMatrix; // VP * M
+            pushConstants.ModelMatrix = drawCommand.ModelMatrix;
+            pushConstants.VertexBuffer = drawCommand.MeshBuffers.VertexBufferAddress;
+
+            vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstantBuffer), &pushConstants);
+            vkCmdBindIndexBuffer(cmd, drawCommand.MeshBuffers.IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
+
+            vkCmdDrawIndexed(cmd, drawCommand.VertexCount, 1, 0, 0, 0);
+        }
     }
 
     // TODO: Fully integrate ImGui into rendering loop.
@@ -1293,6 +1370,58 @@ namespace Engine
     }
 
     VmaMeshBuffers VulkanRenderer::UploadMesh(const std::span<uint32_t> indices, const std::span<Vertex> vertices)
+    {
+        const size_t vertexBufferSize = vertices.size() * sizeof(Vertex);
+        const size_t indexBufferSize = indices.size() * sizeof(uint32_t);
+
+        VmaMeshBuffers newSurface;
+
+        constexpr VkBufferUsageFlags vertexBufferFlags =
+            VK_BUFFER_USAGE_STORAGE_BUFFER_BIT |
+            VK_BUFFER_USAGE_TRANSFER_DST_BIT |
+            VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
+        newSurface.VertexBuffer = CreateBuffer(vertexBufferSize, vertexBufferFlags, VMA_MEMORY_USAGE_GPU_ONLY);
+
+        // Find the address of the vertex buffer.
+        const VkBufferDeviceAddressInfo deviceAddressInfo{ .sType = VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO, .buffer = newSurface.VertexBuffer.Buffer };
+        newSurface.VertexBufferAddress = vkGetBufferDeviceAddress(_device, &deviceAddressInfo);
+
+        constexpr VkBufferUsageFlags indexBufferFlags =
+            VK_BUFFER_USAGE_INDEX_BUFFER_BIT |
+            VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+        newSurface.IndexBuffer = CreateBuffer(indexBufferSize, indexBufferFlags, VMA_MEMORY_USAGE_GPU_ONLY);
+
+        const VmaBuffer staging = CreateBuffer(vertexBufferSize + indexBufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY);
+
+        // Copy buffers over to VMA allocation address.
+        void* data = staging.Allocation->GetMappedData();
+        memcpy(data, vertices.data(), vertexBufferSize);
+        memcpy((char*)data + vertexBufferSize, indices.data(), indexBufferSize);
+
+        // Copy buffers to the GPU.
+        ImmediateSubmit([&](const VkCommandBuffer cmd)
+        {
+            VkBufferCopy vertexCopy;
+            vertexCopy.srcOffset = 0;
+            vertexCopy.dstOffset = 0;
+            vertexCopy.size = vertexBufferSize;
+
+            vkCmdCopyBuffer(cmd, staging.Buffer, newSurface.VertexBuffer.Buffer, 1, &vertexCopy);
+
+            VkBufferCopy indexCopy;
+            indexCopy.srcOffset = vertexBufferSize;
+            indexCopy.dstOffset = 0;
+            indexCopy.size = indexBufferSize;
+
+            vkCmdCopyBuffer(cmd, staging.Buffer, newSurface.IndexBuffer.Buffer, 1, &indexCopy);
+        });
+
+        DestroyBuffer(staging);
+
+        return newSurface;
+    }
+
+    VmaMeshBuffers VulkanRenderer::UploadDebugVertices(const std::span<uint32_t> indices, const std::span<Vertex> vertices)
     {
         const size_t vertexBufferSize = vertices.size() * sizeof(Vertex);
         const size_t indexBufferSize = indices.size() * sizeof(uint32_t);
