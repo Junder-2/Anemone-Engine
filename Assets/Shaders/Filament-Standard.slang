@@ -63,8 +63,8 @@ float4 fragmentMain(Varyings input) : SV_TARGET
     float4 color = GetColor(uv);
 
     float nDotL = saturate(dot(normal, -sceneData.SunlightDirection.xyz));
-    //color.rgb *= nDotL * sceneData.SunlightColor.rgb;
-    //color.rgb += sceneData.AmbientColor.rgb;
+    color.rgb *= nDotL * sceneData.SunlightColor.rgb;
+    color.rgb += sceneData.AmbientColor.rgb;
 
     float3 shading = 0;
     //shading += EvaluateIBL(material, fragment);
@@ -76,9 +76,9 @@ float4 fragmentMain(Varyings input) : SV_TARGET
     float3 ormMap = props.ORMMap.Sample(uv).rgb;
 
     float3 outputs[6];
-    outputs[0] = shading;
-    outputs[1] = shading;
-    outputs[2] = shading;
+    outputs[0] = color.rgb + shading;
+    outputs[1] = color.rgb + shading;
+    outputs[2] = color.rgb + shading;
     outputs[3] = color.rgb + shading;
     outputs[4] = color.rgb + shading;
     outputs[5] = color.rgb + shading;
