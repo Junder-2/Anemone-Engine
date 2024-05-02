@@ -528,6 +528,8 @@ namespace Engine
         DestroyMainBuffers();
 
         CreateMainBuffers(width, height);
+
+        UpdateImGuiViewportSet();
     }
 
     void VulkanRenderer::UpdateImGuiViewportSet()
