@@ -28,7 +28,7 @@ namespace VulkanInitializers
     VkPipelineLayoutCreateInfo PipelineLayoutCreateInfo();
 
     VkImageCreateInfo ImageCreateInfo(VkFormat format, VkImageUsageFlags usageFlags, VkExtent3D extent);
-    VkImageViewCreateInfo ImageViewCreateInfo(VkFormat format, VkImage image, VkImageAspectFlags aspectFlags, uint32_t mipLevels = 1);
+    VkImageViewCreateInfo ImageViewCreateInfo(VkFormat format, VkImage image, VkImageAspectFlags aspectFlags);
 
     VkImageSubresourceRange ImageSubresourceRange(VkImageAspectFlags aspectMask);
 }

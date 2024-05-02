@@ -193,7 +193,7 @@ namespace VulkanInitializers
         return info;
     }
 
-    VkImageViewCreateInfo ImageViewCreateInfo(const VkFormat format, const VkImage image, const VkImageAspectFlags aspectFlags, const uint32_t mipLevels)
+    VkImageViewCreateInfo ImageViewCreateInfo(const VkFormat format, const VkImage image, const VkImageAspectFlags aspectFlags)
     {
         // Build a image-view for the depth image to use for rendering.
         VkImageViewCreateInfo info = { .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO, .pNext = nullptr };
@@ -203,7 +203,7 @@ namespace VulkanInitializers
         info.format = format;
 
         info.subresourceRange.baseMipLevel = 0;
-        info.subresourceRange.levelCount = mipLevels;
+        info.subresourceRange.levelCount = 1;
         info.subresourceRange.baseArrayLayer = 0;
         info.subresourceRange.layerCount = 1;
         info.subresourceRange.aspectMask = aspectFlags;
