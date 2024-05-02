@@ -980,11 +980,7 @@ namespace Engine
 
         if (_rebuildSwapchain)
         {
-            if (props.Width > 0 && props.Height > 0)
-            {
-                ResizeSwapchain();
-                ResizeMainBuffers();
-            }
+            ResizeSwapchain();
         }
 
         VulkanFrame& frame = GetFrame();
