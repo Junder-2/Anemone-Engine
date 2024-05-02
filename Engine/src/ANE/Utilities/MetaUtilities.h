@@ -10,9 +10,6 @@
 
 namespace Engine
 {
-    using namespace entt::literals;
-
-
     inline bool InspectMutableStringField(entt::meta_data& field, entt::meta_any& componentData)
     {
         auto v = field.get(componentData).cast<std::string>();
@@ -237,10 +234,9 @@ namespace Engine
         {entt::type_id<Vector4>().hash(), InspectMutableVector4Field}
     };
 
-
-    inline bool InspectImmutableStringField(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool InspectImmutableStringField(entt::meta_data& field, entt::meta_any& componentData)
     {
-        auto v = field.get(component_data).cast<std::string>();
+        auto v = field.get(componentData).cast<std::string>();
         ImGui::Indent( 16.0f );
 
         ImGui::AlignTextToFramePadding();
@@ -250,9 +246,9 @@ namespace Engine
         return true;
     }
 
-    inline bool InspectImmutableTransformMatrix(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool InspectImmutableTransformMatrix(entt::meta_data& field, entt::meta_any& componentData)
     {
-        auto v = field.get(component_data).cast<TransformMatrix>();
+        auto v = field.get(componentData).cast<TransformMatrix>();
         Vector3 position = v.GetPosition();
         Vector3 scale = v.GetScale();
         Vector3 rotation = v.GetEulerAngles(true);
@@ -301,23 +297,22 @@ namespace Engine
             ImGui::TableNextRow();
             ImGui::AlignTextToFramePadding();
             ImGui::InputFloat3("##row", &position.X, "%f", textFlags);
-*/
+            */
             ImGui::EndTable();
         }
         /*
-                ImGui::InputFloat3(field.prop("Position"_hs).value().cast<char const*>(), &position.X, "%f", textFlags);
-                ImGui::InputFloat3(field.prop("Rotation"_hs).value().cast<char const*>(), &rotation.X, "%f",textFlags);
-                ImGui::InputFloat3(field.prop("Scale"_hs).value().cast<char const*>(), &scale.X, "%f",textFlags);
-                */
+        ImGui::InputFloat3(field.prop("Position"_hs).value().cast<char const*>(), &position.X, "%f", textFlags);
+        ImGui::InputFloat3(field.prop("Rotation"_hs).value().cast<char const*>(), &rotation.X, "%f",textFlags);
+        ImGui::InputFloat3(field.prop("Scale"_hs).value().cast<char const*>(), &scale.X, "%f",textFlags);
+        */
         return true;
     }
 
-    inline static std::unordered_map<entt::id_type, FieldInspectorFn> g_immutable_data_inspectors
+    inline static std::unordered_map<entt::id_type, FieldInspectorFn> _immutableDataInspectors
     {
         {entt::type_id<std::string>().hash(), InspectImmutableStringField},
         {entt::type_id<TransformMatrix>().hash(), InspectImmutableTransformMatrix},
         /*
-         {entt::type_id<std::vector<Collider*>>().hash(), inspect_colliders},
          {entt::type_id<VmaMeshAsset>().hash(), inspect_mesh_asset},
          {entt::type_id<float>().hash(), inspect_float},
          {entt::type_id<Vector2>().hash(), inspect_vector2_field},
@@ -326,7 +321,7 @@ namespace Engine
     };
 
     template <typename ...Args>
-    inline auto InvokeMetaFunction(entt::meta_type meta, entt::id_type func_id, Args&&...args)
+    inline auto InvokeMetaFunction(entt::meta_type meta, const entt::id_type func_id, Args&&...args)
     {
         if (!meta)
         {
@@ -340,8 +335,8 @@ namespace Engine
     }
 
     template <typename ...Args>
-    inline auto InvokeMetaFunction(entt::id_type id, entt::id_type func_id, Args&&...args)
+    inline auto InvokeMetaFunction(entt::id_type id, entt::id_type funcId, Args&&...args)
     {
-        return InvokeMetaFunction(entt::resolve(id), func_id, std::forward<Args>(args)...);
+        return InvokeMetaFunction(entt::resolve(id), funcId, std::forward<Args>(args)...);
     }
 }

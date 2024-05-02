@@ -9,8 +9,9 @@
 #include "ANE/Core/Editor/SelectionManager.h"
 #include "ANE/Core/Layers/EditorLayer.h"
 #include "ANE/Math/Random.h"
+#include "UIUpdateWrapper.h"
 #include "ANE/Core/Scene/Components/Components.h"
-#include "ANE/Utilities/ImGuiUtilities.h"
+#include "ANE/Utilities/MetaUtilities.h"
 
 namespace Engine
 {
@@ -19,36 +20,38 @@ namespace Engine
         _editorLayer = editorLayer;
     }
 
-    void InspectorPanel::RegisterSelect(UUIDComponent selectedEntityID)
+    void InspectorPanel::RegisterSelect(const UUIDComponent& selectedEntityID)
     {
         _selected = selectedEntityID.UUID;
     }
 
     UIUpdateWrapper InspectorPanel::OnPanelRender()
     {
-        if(ImGui::Button("Swap Style"))
-        {
-            style += 1;
-            style = style % 2;
-            ANE_ELOG(style);
-
-            if(style == 1)
-            {
-                              ImGuiUtilities::StyleAnemoneExperimental();
-            }
-            else
-            {  ImGuiUtilities::StyleAnemoneDark();
-
-            }
-        }
-
         ANE_DEEP_PROFILE_FUNCTION();
+
+        // if(ImGui::Button("Swap Style"))
+        // {
+        //     _style += 1;
+        //     _style = _style % 2;
+        //     ANE_ELOG(_style);
+        //
+        //     if(_style == 1)
+        //     {
+        //                       ImGuiUtilities::StyleAnemoneExperimental();
+        //     }
+        //     else
+        //     {  ImGuiUtilities::StyleAnemoneDark();
+        //
+        //     }
+        // }
+        //ImGui::ShowDemoWindow();
+
         bool open = true;
-        UIUpdateWrapper UIUpdate;
+        UIUpdateWrapper uiUpdate;
         const ImGuiDockNodeFlags dockSpaceFlags = ImGuiDockNodeFlags_PassthruCentralNode;
         ImGui::Begin("Inspection", &open, dockSpaceFlags);
 
-        std::vector<std::string>* selectedEntityUUIDS = SelectionManager::GetSelection(SelectionManager::UI);
+        const std::vector<std::string>* selectedEntityUUIDS = SelectionManager::GetSelection(SelectionManager::UI);
 
         if (selectedEntityUUIDS->empty())
         {
@@ -66,18 +69,16 @@ namespace Engine
                 selectedEntity.AddComponent<ColliderComponent>(selectedEntity, 1.f);
             }
         }
-        ImGui::ShowDemoWindow();
-
 
         ImGui::End();
 
-        if (!open) UIUpdate.RemoveSelf = this;
-        return UIUpdate;
+        if (!open) uiUpdate.RemoveSelf = this;
+        return uiUpdate;
     }
 
-    std::string InspectorPanel::TypePrefixRemoval(std::string fullComponentName)
+    std::string InspectorPanel::TypePrefixRemoval(const std::string& fullComponentName)
     {
-        std::string prefix = "struct Engine::";
+        const std::string prefix = "struct Engine::";
 
         // prefix removal
         std::string result1 = fullComponentName.substr(prefix.length());
@@ -86,89 +87,78 @@ namespace Engine
 
     void InspectorPanel::DrawEntityComponentList(Entity& selectedEntity)
     {
+        for (auto&& [fst, snd] : _editorLayer->GetActiveScene()->_registry.storage())
         {
-            for (auto&& [fst, snd] : _editorLayer->GetActiveScene()->_registry.storage())
+            if (!snd.contains(selectedEntity)) continue;
+            entt::id_type componentTypeID = fst;
+            auto type = entt::resolve(componentTypeID);
+            if (type)
             {
-                if (snd.contains(selectedEntity))
+                auto componentData = type.from_void(snd.value(selectedEntity));
+
+                const std::string componentType{type.info().name()};
+                std::string fullString = TypePrefixRemoval(componentType);
+                ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_SpanAllColumns;
+                if(ImGui::CollapsingHeader(fullString.c_str(),nodeFlags))
                 {
-                    entt::id_type componentTypeID = fst;
-                    auto type = entt::resolve(componentTypeID);
-                    if (type)
+                    for (auto&& data : type.data())
                     {
-                        auto componentData = type.from_void(snd.value(selectedEntity));
-
-                        const std::string componentType{type.info().name()};
-                        std::string fullString = TypePrefixRemoval(componentType);
-                        ImGuiTreeNodeFlags node_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
-                        bool open = ImGui::CollapsingHeader(fullString.c_str(),node_flags);
-                        if(open)
+                        auto& field = data.second;
+                        bool editable = false;
+                        if(field.prop(EDITABLEHASH))
                         {
-                            for (auto&& data : type.data())
+                            editable = field.prop(EDITABLEHASH).value().cast<bool>();
+                        }
+                        if(editable)
+                        {
+                            auto itr = g_mutable_data_inspectors.find(field.type().info().hash());
+                            if (itr != g_mutable_data_inspectors.end())
                             {
-                                auto& field = data.second;
-                                bool editable = false;
-                                if(field.prop(EDITABLEHASH))
+                                if (itr->second(field, componentData))
                                 {
-                                    editable = field.prop(EDITABLEHASH).value().cast<bool>();
-
-                                }
-                                if(editable)
-                                {
-                                    auto itr = g_mutable_data_inspectors.find(field.type().info().hash());
-                                    if (itr != g_mutable_data_inspectors.end())
-                                    {
-                                        if(itr->second(field, componentData))
-
-                                        {
-                                            //selectedEntity.OnValidate();
-                                            ANE_ELOG("OnValidate should occur here");
-                                        }
-                                        else
-                                        {
-                                            //the property was not written too;
-                                        }
-
-                                    }
-                                    else
-                                    {
-                                        std::string string;
-                                        string.append("No draw function found for mutable data of type: ");
-                                        string.append(field.type().info().name());
-                                        ImGui::Text("%s", string.c_str());
-                                    }
-
+                                    //selectedEntity.OnValidate();
+                                    //ANE_ELOG("OnValidate should occur here");
                                 }
                                 else
                                 {
-                                    auto itr = g_immutable_data_inspectors.find(field.type().info().hash());
-                                    if (itr != g_immutable_data_inspectors.end())
-                                    {
-                                        if(itr->second(field, componentData))
-
-                                        {
-                                            //selectedEntity.OnValidate();
-                                        }
-                                        else
-                                        {
-                                            std::string string;
-                                            string.append("No draw function found for immutable data of type: ");
-                                            string.append(field.type().info().name());
-                                            ImGui::Text("%s", string.c_str());
-                                        }
-                                    }
+                                    //the property was not written too;
                                 }
-
+                            }
+                            else
+                            {
+                                std::string string;
+                                string.append("No draw function found for mutable data of type: ");
+                                string.append(field.type().info().name());
+                                ImGui::Text("%s", string.c_str());
+                            }
+                        }
+                        else
+                        {
+                            auto itr = _immutableDataInspectors.find(field.type().info().hash());
+                            if (itr != _immutableDataInspectors.end())
+                            {
+                                if (itr->second(field, componentData))
+                                {
+                                    //selectedEntity.OnValidate();
+                                }
+                                else
+                                {
+                                    std::string string;
+                                    string.append("No draw function found for immutable data of type: ");
+                                    string.append(field.type().info().name());
+                                    ImGui::Text("%s", string.c_str());
+                                }
                             }
                         }
                     }
-                    else
-                    {
-                        std::string string;
-                        string.append("Component Type could not be resolved: ");
-                        string.append(std::to_string(componentTypeID));
-                        ImGui::Text("%s", string.c_str());
-                    }
                 }
+            }
+            else
+            {
+                std::string string;
+                string.append("Component Type could not be resolved: ");
+                string.append(std::to_string(componentTypeID));
+                ImGui::Text("%s", string.c_str());
             }
         }
     }

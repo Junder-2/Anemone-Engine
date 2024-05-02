@@ -1,33 +1,23 @@
 ﻿#pragma once
 
 #include "Component.h"
-#include "ANE/Core/Entity/Entity.h"
-#include "ANE/Physics/Physics.h"
-#include "ANE/Physics/PhysicsTypes.h"
 #include "ANE/Physics/Types/RigidBody.h"
 
 namespace Engine
 {
+    enum class BodyType;
+    class Entity;
+
     struct RigidBodyComponent : Component
     {
     public:
         ANE_COMPONENT_INIT(RigidBodyComponent)
 
-        RigidBodyComponent(const Entity self) : Component(typeid(*this).name())
-        {
-            _rigidbody = GetPhysicsSystem().CreateRigidBody(self);
-        }
+        RigidBodyComponent(const Entity self);
 
-        RigidBodyComponent(const Entity self, const BodyType bodyType) : Component(typeid(*this).name())
-        {
-            _rigidbody = GetPhysicsSystem().CreateRigidBody(self);
-            _rigidbody->SetBodyType(bodyType);
-        }
+        RigidBodyComponent(const Entity self, const BodyType bodyType);
 
-        RigidBody* GetRigidBody() const
-        {
-            return _rigidbody;
-        }
+        RigidBody* GetRigidBody() const { return _rigidbody; }
 
         static void RegisterComponentMetaData()
         {

@@ -3,9 +3,11 @@
 
 #include "ANE/Core/Entity/Entity.h"
 #include "ANE/Math/FMath.h"
+#include "ANE/Physics/Physics.h"
 #include "Components/NativeScriptComponent.h"
 #include "Components/RenderComponent.h"
 #include "Components/RigidBodyComponent.h"
+#include "Components/TransformComponent.h"
 #include "Components/UUIDComponent.h"
 
 namespace Engine

@@ -4,6 +4,7 @@
 #include "ANE/Core/Application.h"
 #include "ANE/Core/Window.h"
 #include "ANE/Core/Scene/Components/CameraComponent.h"
+#include "ANE/Core/Scene/Components/TransformComponent.h"
 #include "ANE/Events/Event.h"
 #include "ANE/Events/EventHandler.h"
 #include "ANE/Input/Input.h"

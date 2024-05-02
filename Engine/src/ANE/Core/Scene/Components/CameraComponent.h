@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Component.h"
-#include "ANE/Utilities/MetaUtilities.h"
+#include "ANE/Math/Types/Matrix4x4.h"
 
 namespace Engine
 {

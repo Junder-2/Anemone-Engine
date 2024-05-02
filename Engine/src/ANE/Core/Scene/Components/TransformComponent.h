@@ -48,9 +48,7 @@ namespace Engine
                 .prop("Rotation"_hs, "Rotation")
                 .prop("Scale"_hs, "Scale")
                 .prop("OnValidate"_hs,&TransformComponent::OnValidate)
-                .NOT_EDITABLE;
-
-
+                .EDITABLE;
         }
 
 

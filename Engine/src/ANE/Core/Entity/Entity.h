@@ -1,29 +1,16 @@
 ﻿#pragma once
-//#include <entt.hpp>
 
-#include "UUIDGenerator.h"
 #include "ANE/Core/Scene/Scene.h"
-#include "ANE/Core/Scene/Components/Component.h"
 #include "ANE/Core/Scene/Components/TagComponent.h"
-#include "ANE/Core/Scene/Components/TransformComponent.h"
-#include "ANE/Core/Scene/Components/UUIDComponent.h"
 
 namespace Engine
 {
+    struct Component;
+
     class Entity
     {
     public:
-        Entity(Scene* scene, const char* name) // only access this during creation
-        {
-            SceneHandle = scene;
-
-            EntityHandle = SceneHandle->_registry.create();
-            //this->AddComponent<AttachmentsComponent>();
-            this->AddComponent<UUIDComponent>(UUIDGenerator::GetUUID());
-            this->AddComponent<TagComponent>(name);
-            this->AddComponent<TransformComponent>();
-
-        }
+        Entity(Scene* scene, const char* name); // only access this during creation
 
         Entity(entt::entity handle, Scene* scene) : EntityHandle(handle), SceneHandle(scene) {}
 
@@ -62,6 +49,9 @@ namespace Engine
         template <typename T>
         std::enable_if_t<std::is_base_of_v<Component, T>, T&> GetComponent();
     private:
+        bool IsTagComponent();
+    private:
+
 
         entt::entity EntityHandle = {entt::null};
         Scene* SceneHandle = nullptr;
