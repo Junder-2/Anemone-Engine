@@ -96,6 +96,8 @@ namespace Engine
         static VmaImage GetColorBuffer() { return _colorImage; }
         static VmaImage GetDepthBuffer() { return _depthImage; }
 
+        static VkDescriptorSet GetImGuiViewportSet() { return _imGuiViewportSet; }
+
     private:
         // Function passed for error checking in ImGui.
         static void CheckVkResult(const VkResult err) { CHECK_RESULT(err); }
