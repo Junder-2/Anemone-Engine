@@ -10,6 +10,9 @@ namespace Engine
     {
         ANE_COMPONENT_INIT(NativeScriptComponent)
 
+        std::string ScriptName;
+        bool Running = true;
+
         ScriptableEntity* Instance = nullptr;
 
         std::function<void()> Instantiate;
@@ -25,7 +28,14 @@ namespace Engine
         {
             Instantiate = [&]()
             {
+
                 Instance = new T();
+                ScriptName = ToString();
+                const std::string prefix = "struct Engine::";
+
+                // prefix removal
+                std::string result1 = ScriptName.substr(prefix.length());
+                ScriptName =  result1;
             };
 
             Destroy = [&]()
@@ -52,6 +62,15 @@ namespace Engine
             {
                 static_cast<T*>(Instance)->OnDestroy();
             };
+        }
+
+        static void RegisterComponentMetaData()
+        {
+            entt::meta<NativeScriptComponent>()
+                .data<&NativeScriptComponent::ScriptName>("Script Name"_hs).prop("display_name"_hs, "Script Name")
+                .NOT_EDITABLE
+                .data<&NativeScriptComponent::Running>("Running"_hs).prop("display_name"_hs, "Is Running")
+                .EDITABLE;
         }
     };
 }
