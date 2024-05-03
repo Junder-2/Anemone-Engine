@@ -10,6 +10,8 @@
 
 namespace Engine
 {
+
+
     inline bool InspectMutableStringField(entt::meta_data& field, entt::meta_any& componentData)
     {
         auto v = field.get(componentData).cast<std::string>();
@@ -18,7 +20,7 @@ namespace Engine
         char buffer[256] = {};
         const auto error = strcpy_s(buffer, sizeof(buffer), v.c_str());
         ImGui::AlignTextToFramePadding();
-        ImGui::Text("%s",field.prop("display_name"_hs).value().cast<const char*>());
+        ImGui::Text("%s", field.prop("display_name"_hs).value().cast<const char*>());
         ImGui::SameLine();
         ImGui::AlignTextToFramePadding();
         if (ImGui::InputText("##stringfield", buffer, sizeof(buffer)))
@@ -27,31 +29,81 @@ namespace Engine
         }
         return propertyWritten;
     }
-
+    inline bool InspectMutableBoolField(entt::meta_data& field, entt::meta_any& componentData)
+    {
+        auto v = field.get(componentData).cast<bool>();
+        bool propertyWritten = false;
+        ImGui::Text("%s", field.prop("display_name"_hs).value().cast<const char*>());
+        ImGui::SameLine();
+        if(ImGui::Checkbox("##boolfield",&v))
+        {
+            propertyWritten = field.set(componentData,v);
+        }
+        return propertyWritten;
+    }
     inline bool InspectMutableTransformMatrix(entt::meta_data& field, entt::meta_any& componentData)
     {
+
+
         auto v = field.get(componentData).cast<TransformMatrix>();
         bool propertyWritten = false;
         Vector3 position = v.GetPosition();
         Vector3 scale = v.GetScale();
         Vector3 rotation = v.GetEulerAngles(true);
-        ImGui::Text("%s", field.prop("display_name"_hs).value().cast<const char*>());
-        if (ImGui::DragFloat3(field.prop("Position"_hs).value().cast<char const*>(), &position.X, 0.1f))
+        ImGuiInputTextFlags textFlags = ImGuiInputTextFlags_ReadOnly;
+        static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+        if (ImGui::BeginTable("Transform Values", 2, flags))
         {
-            v.SetPosition(position);
-            propertyWritten = field.set(componentData, v);
+            ImGui::TableSetupColumn(" Transform", ImGuiTableColumnFlags_WidthStretch);
+
+            ImGui::TableSetupColumn("TransformComponent", ImGuiTableColumnFlags_NoHeaderLabel | ImGuiTableColumnFlags_WidthFixed);
+            ImGui::TableHeadersRow();
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::AlignTextToFramePadding();
+
+            if (ImGui::DragFloat3("##Position", &position.X, 0.1f))
+            {
+                v.SetPosition(position);
+                propertyWritten = field.set(componentData, v);
+            }
+            ImGui::TableSetColumnIndex(1);
+
+            ImGui::Text("%s", field.prop("Position"_hs).value().cast<const char*>());
+
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::AlignTextToFramePadding();
+
+            if ( ImGui::DragFloat3("##Rotation", &rotation.X, 0.1f))
+            {
+                v.SetRotation(rotation,true);
+                propertyWritten = field.set(componentData, v);
+            }
+            ImGui::TableSetColumnIndex(1);
+            ImGui::Text("%s", field.prop("Rotation"_hs).value().cast<char const*>());
+
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::AlignTextToFramePadding();
+
+            if (ImGui::DragFloat3("##Scale", &scale.X, 0.1f))
+            {
+                v.SetScale(scale);
+                propertyWritten = field.set(componentData, v);
+            }
+            ImGui::TableSetColumnIndex(1);
+            ImGui::Text("%s", field.prop("Scale"_hs).value().cast<char const*>());
+            ImGui::EndTable();
+
+            return propertyWritten;
+
         }
-        if (ImGui::DragFloat3(field.prop("Rotation"_hs).value().cast<char const*>(), &rotation.X, 0.1f))
-        {
-            v.SetRotation(rotation, true);
-            propertyWritten = field.set(componentData, v);
-        }
-        if (ImGui::DragFloat3(field.prop("Scale"_hs).value().cast<char const*>(), &scale.X, 0.1f))
-        {
-            v.SetScale(scale);
-            propertyWritten = field.set(componentData, v);
-        }
-        return propertyWritten;
+
+
+
+
+
     }
 
     inline bool InspectMutableColliders(entt::meta_data& field, entt::meta_any& componentData)
@@ -178,7 +230,8 @@ namespace Engine
     {
         auto v = field.get(componentData).cast<VmaMeshAsset>();
         bool propertyWritten = false;
-
+        ImGui::Text("%s", field.prop("display_name"_hs).value().cast<const char*>());
+        ImGui::SameLine();
         ImGui::Text("%s", v.Name.c_str());
         return propertyWritten;
     }
@@ -231,17 +284,18 @@ namespace Engine
         {entt::type_id<float>().hash(), InspectMutableFloat},
         {entt::type_id<Vector2>().hash(), InspectMutableVector2Field},
         {entt::type_id<Vector3>().hash(), InspectMutableVector3Field},
-        {entt::type_id<Vector4>().hash(), InspectMutableVector4Field}
+        {entt::type_id<Vector4>().hash(), InspectMutableVector4Field},
+        {entt::type_id<bool>().hash(), InspectMutableBoolField}
     };
 
     inline bool InspectImmutableStringField(entt::meta_data& field, entt::meta_any& componentData)
     {
         auto v = field.get(componentData).cast<std::string>();
-        ImGui::Indent( 16.0f );
 
         ImGui::AlignTextToFramePadding();
+        ImGui::Text("%s", field.prop("display_name"_hs).value().cast<const char*>());
+        ImGui::SameLine();
         ImGui::Text("%s", v.c_str());
-        ImGui::Unindent( 16.0f );
 
         return true;
     }
@@ -269,7 +323,7 @@ namespace Engine
             ImGui::DragFloat3("##position", &position.X, 0.1f);
             ImGui::EndDisabled();
             ImGui::TableSetColumnIndex(1);
-            ImGui::Text("%s",field.prop("Position"_hs).value().cast<char const*>());
+            ImGui::Text("%s", field.prop("Position"_hs).value().cast<char const*>());
 
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0);
@@ -278,7 +332,7 @@ namespace Engine
             ImGui::DragFloat3("##Rotation", &position.X, 0.1f);
             ImGui::EndDisabled();
             ImGui::TableSetColumnIndex(1);
-            ImGui::Text("%s",field.prop("Rotation"_hs).value().cast<char const*>());
+            ImGui::Text("%s", field.prop("Rotation"_hs).value().cast<char const*>());
 
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0);
@@ -287,33 +341,27 @@ namespace Engine
             ImGui::DragFloat3("##Scale", &position.X, 0.1f);
             ImGui::EndDisabled();
             ImGui::TableSetColumnIndex(1);
-            ImGui::Text("%s",field.prop("Scale"_hs).value().cast<char const*>());
-
-
-            /*
-            ImGui::TableSetupColumn("##Labels", ImGuiTableColumnFlags_WidthFixed);
-            ImGui::TableSetupColumn("##floats", ImGuiTableColumnFlags_WidthStretch);
-            ImGui::TableHeadersRow();
-            ImGui::TableNextRow();
-            ImGui::AlignTextToFramePadding();
-            ImGui::InputFloat3("##row", &position.X, "%f", textFlags);
-            */
+            ImGui::Text("%s", field.prop("Scale"_hs).value().cast<char const*>());
             ImGui::EndTable();
         }
-        /*
-        ImGui::InputFloat3(field.prop("Position"_hs).value().cast<char const*>(), &position.X, "%f", textFlags);
-        ImGui::InputFloat3(field.prop("Rotation"_hs).value().cast<char const*>(), &rotation.X, "%f",textFlags);
-        ImGui::InputFloat3(field.prop("Scale"_hs).value().cast<char const*>(), &scale.X, "%f",textFlags);
-        */
         return true;
     }
+    inline bool InspectImmutableMeshAsset(entt::meta_data& field, entt::meta_any& componentData)
+    {
+        auto v = field.get(componentData).cast<VmaMeshAsset>();
+        ImGui::Text("%s", field.prop("display_name"_hs).value().cast<const char*>());
+        ImGui::SameLine();
+        ImGui::Text("%s", v.Name.c_str());
 
+        return true;
+    }
     inline static std::unordered_map<entt::id_type, FieldInspectorFn> _immutableDataInspectors
     {
         {entt::type_id<std::string>().hash(), InspectImmutableStringField},
         {entt::type_id<TransformMatrix>().hash(), InspectImmutableTransformMatrix},
-        /*
-         {entt::type_id<VmaMeshAsset>().hash(), inspect_mesh_asset},
+
+         {entt::type_id<VmaMeshAsset>().hash(), InspectImmutableMeshAsset}
+          /*,
          {entt::type_id<float>().hash(), inspect_float},
          {entt::type_id<Vector2>().hash(), inspect_vector2_field},
          {entt::type_id<Vector3>().hash(), inspect_vector3_field},
