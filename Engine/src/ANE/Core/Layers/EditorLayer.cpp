@@ -60,10 +60,7 @@ namespace Engine
 
         //Then you would load the scene from the file path listed from that project
 
-        GetEditorInputSystem().BindKeyboardInput(KeyCodeEscape, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
-        GetEditorInputSystem().BindMouseButton(MouseButtonLeft, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
         GetEditorInputSystem().BindMouseButton(MouseButtonRight, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
-        GetEditorInputSystem().BindMouseButton(MouseButtonMiddle, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
 
         //TEMP need to set the initial state should be elsewhere
         EventHandler::SetBlockAppInputs(true);
@@ -193,29 +190,21 @@ namespace Engine
     void EditorLayer::OnSwitchEditorFocus(InputValue inputValue)
     {
         bool blockingAppInputs = IsMouseVisible();
+        if(inputValue.GetDeviceType() != InputDeviceMouse) return;
 
-        if (inputValue.GetDeviceType() == InputDeviceKeyboard)
-        {
-            if (inputValue.GetTriggerState() != TriggerStarted || blockingAppInputs) return;
-            switch (inputValue.GetBindingId())
-            {
-                case KeyCodeEscape:
-                    ShowMouse();
-                    blockingAppInputs = true;
-                    break;
-                default: return;
-            }
-        }
-        else if (inputValue.GetDeviceType() == InputDeviceMouse) //Any mouse click should return focus
-        {
-            //Reject any refocus it is not a doubleclick or if the mouse is not over viewport
-            if (inputValue.GetTriggerState() != TriggerStarted || !blockingAppInputs) return;
-            if (!GetInputSystem().GetMouseButtonValues().GetIsDoubleClick()) return;
-            if (!Application::Get().GetWindow().IsOverViewport()) return;
+        const TriggerState triggerState = inputValue.GetTriggerState();
 
+        if(triggerState == TriggerStarted && blockingAppInputs && Application::Get().GetWindow().IsOverViewport())
+        {
             HideMouse();
             blockingAppInputs = false;
         }
+        else if(triggerState == TriggerStopped && !blockingAppInputs)
+        {
+            ShowMouse();
+            blockingAppInputs = true;
+        }
+        else return;
 
         EventHandler::SetBlockAppInputs(blockingAppInputs);
         EventHandler::ConsumeEvent();
