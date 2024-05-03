@@ -20,7 +20,7 @@ namespace Engine
         style->PopupRounding = 2.f;
         style->ScrollbarRounding = 10.f;
         style->GrabRounding = 1.f;
-        style->TabRounding = 2.f;
+        style->TabRounding = 4.f;
 
         style->WindowPadding = ImVec2(10,8);
         style->FramePadding = ImVec2(5,3);
