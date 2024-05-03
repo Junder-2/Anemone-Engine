@@ -4,6 +4,7 @@
 #include "ANE/Core/Log/Logging.h"
 #include "ANE/Core/Assert.h"
 #include "ANE/Core/Window.h"
+#include "ANE/Core/Core.h"
 
 //------Entity----------------------
 
