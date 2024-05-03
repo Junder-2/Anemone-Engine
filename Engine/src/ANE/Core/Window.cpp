@@ -145,12 +145,12 @@ namespace Engine
             continue;
         }
 
-        if(!IsViewportMainWindow())
+        if(!IsViewportMainWindow() && !ImGui::IsMouseDown(ImGuiMouseButton_Left))
         {
             ProcessViewportEvents(_previousViewportProperties);
-        }
 
-        _previousViewportProperties = GetActiveViewportProperties();
+            _previousViewportProperties = GetActiveViewportProperties();
+        }
 
         if(prevHasFocus && !HasFocus())
         {
@@ -306,7 +306,7 @@ namespace Engine
         }
 
         const ImGuiWindow* imGuiWindow = ImGui::FindWindowByID(_activeViewportId);
-        return ViewportProperties(_activeViewportId, imGuiWindow->Size.x, imGuiWindow->Size.y, imGuiWindow->Pos.x, imGuiWindow->Pos.y);
+        return ViewportProperties(_activeViewportId, imGuiWindow->ContentSize.x, imGuiWindow->ContentSize.y, imGuiWindow->Pos.x, imGuiWindow->Pos.y);
     }
 
     void Window::SetActiveViewport(const uint32_t id)

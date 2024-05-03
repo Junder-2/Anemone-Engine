@@ -78,6 +78,8 @@ namespace Engine
         void Render(const WindowProperties& props, const DrawContext& drawCommands);
         void Cleanup();
 
+        void OnWindowResize();
+
         VmaMeshAsset LoadModel(const std::string& modelPath);
 
         static VmaMeshBuffers UploadDebugVertices(std::span<uint32_t> indices, std::span<Vertex> vertices);
@@ -93,6 +95,8 @@ namespace Engine
         static std::vector<VkDescriptorSetLayout> GetSceneLayouts() { return { _appDataLayout, _geometryDataLayout}; }
         static VmaImage GetColorBuffer() { return _colorImage; }
         static VmaImage GetDepthBuffer() { return _depthImage; }
+
+        static VkDescriptorSet GetImGuiViewportSet() { return _imGuiViewportSet; }
 
     private:
         // Function passed for error checking in ImGui.
@@ -116,6 +120,7 @@ namespace Engine
         static void DestroyMainBuffers();
         static void ResizeMainBuffers();
         static void ResizeMainBuffers(uint32_t width, uint32_t height);
+        static void UpdateImGuiViewportSet();
 
         static void SetupCommandBuffers();
         static void SetupSyncStructures();
@@ -148,6 +153,7 @@ namespace Engine
         static VmaImage CreateImage(VkExtent3D size, VkFormat format, VkImageUsageFlags usage, bool mipmaps = false);
         static VmaImage CreateImage(const void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, bool mipmaps = false);
         static void DestroyImage(const VmaImage& image);
+        static void GenerateMipMaps(const VmaImage& image, VkExtent3D size, uint32_t mipLevels);
 
         static void ImmediateSubmit(std::function<void(VkCommandBuffer cmd)>&& function);
 
@@ -246,6 +252,7 @@ namespace Engine
         inline static uint32_t _minImageCount = 3;
 
         inline static VkDescriptorPool _imGuiDescriptorPool = VK_NULL_HANDLE;
+        inline static VkDescriptorSet _imGuiViewportSet;
 
         inline static ImGuiIO* _io;
     };

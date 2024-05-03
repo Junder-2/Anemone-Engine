@@ -8,6 +8,7 @@
 #include "ANE/Math/Types/Matrix4x4.h"
 #include "Mesh.h"
 #include "Draw.h"
+#include "ANE/Events/Event.h"
 
 namespace Engine
 {
@@ -72,6 +73,13 @@ namespace Engine
 
         _vulkanRenderer->Render(props, _drawCommands);
         FlushDrawCommands();
+    }
+
+    void Renderer::OnEvent(const Event& e)
+    {
+        if (e.GetEventType() != EventType::WindowResize) return;
+
+        _vulkanRenderer->OnWindowResize();
     }
 
     VmaMeshAsset Renderer::LoadModel(const std::string& modelPath)

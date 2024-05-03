@@ -25,6 +25,7 @@
 #include "Panels/MainMenuPanel.h"
 #include "Panels/CreateScenePanel.h"
 #include "Panels/UIUpdateWrapper.h"
+#include "Panels/ViewportPanel.h"
 
 namespace Engine
 {
@@ -49,6 +50,7 @@ namespace Engine
         // You would have a "Read from config files to find correct panel layout" method here
 
         CreateTestScene(50);
+        AttachUIPanel(new ViewportPanel(this));
         AttachUIPanel(new SceneHierarchyPanel(this));
         AttachUIPanel(new InspectorPanel(this));
         AttachUIPanel(new EditorLogPanel(this));

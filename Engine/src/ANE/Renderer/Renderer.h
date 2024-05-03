@@ -5,6 +5,7 @@
 
 namespace Engine
 {
+    class Event;
     struct DrawCommand;
     struct DebugDrawCommand;
     struct DrawContext;
@@ -15,6 +16,8 @@ namespace Engine
         static void Init(SDL_Window* window);
         static void Shutdown();
         static void Render(const WindowProperties& props);
+
+        static void OnEvent(const Event& e);
 
         static VmaMeshAsset LoadModel(const std::string& modelPath);
         static VmaMeshBuffers UploadDebugMesh(std::span<uint32_t> indices, std::span<Vertex> vertices);

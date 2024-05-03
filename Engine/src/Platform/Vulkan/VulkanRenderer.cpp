@@ -17,6 +17,7 @@
 #include <slang.h>
 #include <slang-com-ptr.h>
 
+#include "ANE/Core/Application.h"
 #include "ANE/Math/FMath.h"
 
 using Slang::ComPtr;
@@ -106,6 +107,12 @@ namespace Engine
         _initialized = false;
     }
 
+    void VulkanRenderer::OnWindowResize()
+    {
+        ResizeMainBuffers();
+        _rebuildSwapchain = true;
+    }
+
     VmaMeshAsset VulkanRenderer::LoadModel(const std::string& modelPath)
     {
         if (_loadedModelMap.contains(modelPath))
@@ -148,7 +155,7 @@ namespace Engine
         const std::string assetPath = std::string("../Assets/Textures/").append(texturePath);
 
         int width, height, channels;
-        const stbi_uc* pixels = stbi_load(assetPath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
+        stbi_uc* pixels = stbi_load(assetPath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
         if (!pixels)
         {
             ANE_ELOG_ERROR("Unable to load texture at path: {}", assetPath);
@@ -156,7 +163,9 @@ namespace Engine
         }
 
         const VkExtent3D imageExtent = VkExtent3D{ (uint32_t)width, (uint32_t)height, 1 };
-        const VmaImage imageBuffers = CreateImage(pixels, imageExtent, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT);
+        const VmaImage imageBuffers = CreateImage(pixels, imageExtent, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, true);
+
+        stbi_image_free(pixels);
 
         _mainDeletionQueue.PushFunction([=]
         {
@@ -268,6 +277,8 @@ namespace Engine
         initInfo.CheckVkResultFn = CheckVkResult;
 
         ImGui_ImplVulkan_Init(&initInfo);
+
+        UpdateImGuiViewportSet();
     }
 
     std::vector<const char*> VulkanRenderer::GetAvailableExtensions(SDL_Window* window)
@@ -388,18 +399,17 @@ namespace Engine
 
     void VulkanRenderer::SetupSwapchain()
     {
-        int w, h;
-        SDL_GetWindowSize(_window, &w, &h);
-        _windowExtent.width = w;
-        _windowExtent.height = h;
+        const auto props = Application::Get().GetWindow().GetActiveViewportProperties();
+        _windowExtent.width = props.Width;
+        _windowExtent.height = props.Height;
 
-        vkb::Swapchain swapchain = CreateSwapchain(w, h);
+        vkb::Swapchain swapchain = CreateSwapchain(_windowExtent.width, _windowExtent.height);
         _swapchainExtent = swapchain.extent;
         _swapchain = swapchain.swapchain;
         _swapchainImages = swapchain.get_images().value();
         _swapchainImageViews = swapchain.get_image_views().value();
 
-        CreateMainBuffers(w, h);
+        CreateMainBuffers(_windowExtent.width, _windowExtent.height);
     }
 
     vkb::Swapchain VulkanRenderer::CreateSwapchain(const uint32_t width, const uint32_t height)
@@ -462,6 +472,7 @@ namespace Engine
         drawImageUsages |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
         drawImageUsages |= VK_IMAGE_USAGE_STORAGE_BIT;
         drawImageUsages |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+        drawImageUsages |= VK_IMAGE_USAGE_SAMPLED_BIT;
 
         const VkImageCreateInfo cImgInfo = VulkanInitializers::ImageCreateInfo(_colorImage.ImageFormat, drawImageUsages, imageExtent);
 
@@ -502,12 +513,11 @@ namespace Engine
 
     void VulkanRenderer::ResizeMainBuffers()
     {
-        int w, h;
-        SDL_GetWindowSize(_window, &w, &h);
-        _windowExtent.width = w;
-        _windowExtent.height = h;
+        const auto props = Application::Get().GetWindow().GetActiveViewportProperties();
+        _windowExtent.width = props.Width;
+        _windowExtent.height = props.Height;
 
-        ResizeMainBuffers(w, h);
+        ResizeMainBuffers(_windowExtent.width, _windowExtent.height);
     }
 
     void VulkanRenderer::ResizeMainBuffers(const uint32_t width, const uint32_t height)
@@ -517,6 +527,14 @@ namespace Engine
         DestroyMainBuffers();
 
         CreateMainBuffers(width, height);
+
+        UpdateImGuiViewportSet();
+    }
+
+    void VulkanRenderer::UpdateImGuiViewportSet()
+    {
+        // image_layout should be what the VkImageView was before drawing ImGui. (See: Draw())
+        _imGuiViewportSet = ImGui_ImplVulkan_AddTexture(_samplerNearest, _colorImage.ImageView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     }
 
     void VulkanRenderer::SetupCommandBuffers()
@@ -757,9 +775,7 @@ namespace Engine
 
         CHECK_RESULT(vkCreatePipelineLayout(_device, &pipelineLayoutInfo, _allocator, &_pipelineLayout));
 
-        VkShaderModule meshVertShader;
-        VkShaderModule meshFragShader;
-
+        VkShaderModule meshVertShader, meshFragShader;
         LoadSlangShader("Mesh_Diffuse", &meshVertShader, &meshFragShader);
 
         VulkanPipelineBuilder builder{ logicalDevice, _pipelineLayout };
@@ -779,9 +795,7 @@ namespace Engine
         vkDestroyShaderModule(_device, meshFragShader, _allocator);
         vkDestroyShaderModule(_device, meshVertShader, _allocator);
 
-        VkShaderModule debugVertShader;
-        VkShaderModule debugFragShader;
-
+        VkShaderModule debugVertShader, debugFragShader;
         LoadSlangShader("Mesh_Wireframe", &debugVertShader, &debugFragShader);
 
         vkb::Result<PipelineWrapper> debugTrianglePipeline = builder
@@ -863,6 +877,10 @@ namespace Engine
         _errorImage = CreateImage((void*)&pixels, defaultImageExtent, defaultImageFormat, VK_IMAGE_USAGE_SAMPLED_BIT);
 
         VkSamplerCreateInfo samplerInfo = { .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO, .pNext = nullptr };
+        samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+        samplerInfo.minLod = 0.0f;
+        samplerInfo.maxLod = VK_LOD_CLAMP_NONE;
+        samplerInfo.mipLodBias = 0.0f;
 
         samplerInfo.magFilter = VK_FILTER_LINEAR;
         samplerInfo.minFilter = VK_FILTER_LINEAR;
@@ -930,13 +948,23 @@ namespace Engine
     {
         constexpr VkDescriptorPoolSize poolSizes[] =
         {
-            { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1 },
+            {VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
+            {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000},
+            {VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000},
+            {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000},
+            {VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000},
+            {VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000},
+            {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000},
+            {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000},
+            {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000},
+            {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000},
+            {VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000}
         };
 
         VkDescriptorPoolCreateInfo poolInfo = { };
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-        poolInfo.maxSets = 1;
+        poolInfo.maxSets = 1000 * IM_ARRAYSIZE(poolSizes);;
         poolInfo.poolSizeCount = (uint32_t)IM_ARRAYSIZE(poolSizes);
         poolInfo.pPoolSizes = poolSizes;
 
@@ -951,11 +979,7 @@ namespace Engine
 
         if (_rebuildSwapchain)
         {
-            if (props.Width > 0 && props.Height > 0)
-            {
-                ResizeSwapchain();
-                ResizeMainBuffers();
-            }
+            ResizeSwapchain();
         }
 
         VulkanFrame& frame = GetFrame();
@@ -994,6 +1018,7 @@ namespace Engine
 
         // Prepare and draw ImGui into active swapchain buffer.
         VulkanUtils::TransitionImage(cmd, swapchainImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+        VulkanUtils::TransitionImage(cmd, _colorImage.Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
         DrawImGui(cmd, _swapchainImageViews[swapchainImageIndex]);
 
@@ -1331,10 +1356,17 @@ namespace Engine
             // Copy the buffer into the image.
             vkCmdCopyBufferToImage(cmd, uploadBuffer.Buffer, newImage.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
 
-            VulkanUtils::TransitionImage(cmd, newImage.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            //VulkanUtils::TransitionImage(cmd, newImage.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         });
 
         DestroyBuffer(uploadBuffer);
+
+        uint32_t mipLevels = 1;
+        if (mipmaps)
+        {
+            mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(size.width, size.height)))) + 1;
+        }
+        GenerateMipMaps(newImage, size, mipLevels);
 
         return newImage;
     }
@@ -1343,6 +1375,86 @@ namespace Engine
     {
         vkDestroyImageView(_device, image.ImageView, _allocator);
         vmaDestroyImage(_vmaAllocator, image.Image, image.Allocation);
+    }
+
+    void VulkanRenderer::GenerateMipMaps(const VmaImage& image, const VkExtent3D size, const uint32_t mipLevels)
+    {
+        ImmediateSubmit([&](const VkCommandBuffer cmd)
+        {
+            VkImageMemoryBarrier barrier = { };
+            barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+            barrier.image = image.Image;
+            barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+            barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+            barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            barrier.subresourceRange.baseArrayLayer = 0;
+            barrier.subresourceRange.layerCount = 1;
+            barrier.subresourceRange.levelCount = 1;
+
+            int32_t mipWidth = (int32_t)size.width;
+            int32_t mipHeight = (int32_t)size.height;
+
+            for (uint32_t i = 1; i < mipLevels; i++)
+            {
+                barrier.subresourceRange.baseMipLevel = i - 1;
+                barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+                barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+                barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+                barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+
+                vkCmdPipelineBarrier(cmd,
+                    VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0,
+                    0, nullptr,
+                    0, nullptr,
+                    1, &barrier);
+
+                VkImageBlit blit{};
+                blit.srcOffsets[0] = { 0, 0, 0 };
+                blit.srcOffsets[1] = { mipWidth, mipHeight, 1 };
+                blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+                blit.srcSubresource.mipLevel = i - 1;
+                blit.srcSubresource.baseArrayLayer = 0;
+                blit.srcSubresource.layerCount = 1;
+                blit.dstOffsets[0] = { 0, 0, 0 };
+                blit.dstOffsets[1] = { mipWidth > 1 ? mipWidth / 2 : 1, mipHeight > 1 ? mipHeight / 2 : 1, 1 };
+                blit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+                blit.dstSubresource.mipLevel = i;
+                blit.dstSubresource.baseArrayLayer = 0;
+                blit.dstSubresource.layerCount = 1;
+
+                vkCmdBlitImage(cmd,
+                    image.Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                    image.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                    1, &blit,
+                    VK_FILTER_LINEAR);
+
+                barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+                barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+                barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+                vkCmdPipelineBarrier(cmd,
+                    VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0,
+                    0, nullptr,
+                    0, nullptr,
+                    1, &barrier);
+
+                if (mipWidth > 1) mipWidth /= 2;
+                if (mipHeight > 1) mipHeight /= 2;
+            }
+
+            barrier.subresourceRange.baseMipLevel = mipLevels - 1;
+            barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+            barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+            barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+            vkCmdPipelineBarrier(cmd,
+                VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0,
+                0, nullptr,
+                0, nullptr,
+                1, &barrier);
+        });
     }
 
     void VulkanRenderer::ImmediateSubmit(std::function<void(VkCommandBuffer cmd)>&& function)
