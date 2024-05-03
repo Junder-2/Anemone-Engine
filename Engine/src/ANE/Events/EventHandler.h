@@ -70,6 +70,7 @@ namespace Engine
         static void SetBlockAppInputs(const bool enable)
         {
             _blockAppInputs = enable;
+            // TODO: flush app inputs?
         }
         static bool IsBlockingAppInputs() { return _blockAppInputs; }
 
