@@ -24,7 +24,13 @@ namespace Engine
 
         style->WindowPadding = ImVec2(10,8);
         style->FramePadding = ImVec2(5,3);
-        style->WindowBorderSize = 1.f;
+
+        style->WindowBorderSize = 0;
+        style->ChildBorderSize = 1;
+        style->PopupBorderSize = 1;
+        style->FrameBorderSize = 0;
+        style->TabBorderSize = 0;
+        style-> TabBarBorderSize = 0;
 
         constexpr auto imBlack = ImVec4(0, 0, 0, 1);
         constexpr auto imWhite = ImVec4(1, 1, 1, 1);
