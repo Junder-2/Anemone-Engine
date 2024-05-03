@@ -234,6 +234,7 @@ namespace Engine
         //_io->ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows. Doesn't seem to like custom swapchains.
         //_io->ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
         //_io->ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
+        _io->ConfigWindowsMoveFromTitleBarOnly = true;
 
         // Setup Dear ImGui style
         ImGuiUtilities::StyleAnemoneDark();
