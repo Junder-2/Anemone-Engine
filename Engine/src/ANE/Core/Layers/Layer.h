@@ -1,16 +1,17 @@
 #pragma once
+#include <string> //these includes are necessary for compilation in sandbox
+#include <vector> //these includes are necessary for compilation in sandbox
 
 namespace Engine
 {
     class UILayerPanel;
     class Event;
 
-    class ANE_API Layer // should probaly be abstract
+    class  Layer // should probaly be abstract
     {
     public:
         Layer(const std::string& name = "Layer") : _debugName(name) { }
         virtual ~Layer() = default;
-
         virtual void OnAttach() {}
         virtual void OnDetach() {}
         virtual void OnUpdate(float deltaTime);

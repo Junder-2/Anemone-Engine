@@ -164,7 +164,6 @@ namespace Engine
         API::WINDOW_SIZE = Vector2(e.GetWidth(), e.GetHeight());
         ANE_ELOG_DEBUG("new size ({0}, {1})", e.GetWidth(), e.GetHeight());
     }
-
     void Application::OnWindowMove(WindowMovedEvent& e)
     {
         ANE_ELOG_DEBUG("new pos ({0}, {1})", e.GetX(), e.GetY());

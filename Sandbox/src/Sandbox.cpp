@@ -1,12 +1,7 @@
-#include <cstdio>
-#include <ANE.h>
+#pragma once
 
-class Sandbox : public Engine::Application
-{
-public:
-    Sandbox(const Engine::ApplicationSpecification& specification) : Application(specification) { }
-    ~Sandbox() { }
-};
+#include "Sandbox.h"
+
 
 std::string Engine::GetApplicationName()
 {
