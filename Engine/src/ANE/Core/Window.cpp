@@ -75,15 +75,13 @@ namespace Engine
         inputHandler->OnUpdate();
 
         const bool prevHasFocus = HasFocus();
-        const bool relativeMouseMode = SDL_GetRelativeMouseMode();
 
         _imGuiHasFocus = ImGui::GetIO().WantCaptureKeyboard && !IsOverViewport();
 
         SDL_Event event;
         while(SDL_PollEvent(&event))
         {
-            // While mouse is hidden we dont want to be able to interact with imgui
-            if(!relativeMouseMode) ImGui_ImplSDL2_ProcessEvent(&event);
+            ImGui_ImplSDL2_ProcessEvent(&event);
 
             switch (event.type)
             {
@@ -140,8 +138,8 @@ namespace Engine
                     inputHandler->ProcessAbsoluteMouseMovement(absolutePos);
                     inputHandler->ProcessMouseMovement(Vector2(relX, relY), Vector2(relDeltaX, relDeltaY));
                 }
+                continue;
             }
-            continue;
         }
 
         if(!IsViewportMainWindow() && !ImGui::IsMouseDown(ImGuiMouseButton_Left))
@@ -346,6 +344,20 @@ namespace Engine
     {
         // TODO: This seems to unfocus out of the window
         SDL_SetRelativeMouseMode(enable ? SDL_FALSE : SDL_TRUE);
+        SDL_ShowCursor(enable);
+
+        if(enable)
+        {
+            ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+            ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+            ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
+        }
+        else
+        {
+            ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NavEnableKeyboard;
+            ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NavEnableGamepad;
+            ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouse;
+        }
     }
 
     bool Window::IsMouseVisible()
