@@ -23,7 +23,8 @@ namespace Engine
     {
         UIUpdateWrapper uiUpdate;
 
-        if(ImGui::Begin("Viewport"))
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
+        if (ImGui::Begin("Viewport"))
         {
             if(!_initialized)
             {
@@ -33,6 +34,7 @@ namespace Engine
             ImGui::Image(VulkanRenderer::GetImGuiViewportSet(), ImGui::GetContentRegionAvail());
         }
         ImGui::End();
+        ImGui::PopStyleVar();
 
         return uiUpdate;
     }
