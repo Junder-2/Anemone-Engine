@@ -4,6 +4,7 @@
 #include "CreateScenePanel.h"
 #include "EditorLogPanel.h"
 #include "imgui.h"
+#include "imgui_internal.h"
 #include "InspectorPanel.h"
 #include "SceneHierarchyPanel.h"
 #include "ANE/Physics/Physics.h"
@@ -19,6 +20,15 @@ namespace Engine
     UIUpdateWrapper MainMenuPanel::OnPanelRender()
     {
         UIUpdateWrapper UIUpdate;
+
+        constexpr auto imBlack = ImVec4(0, 0, 0, 1);
+        constexpr auto imClear = ImVec4(0, 0, 0, 0);
+
+        constexpr ImVec4 aneBlack = ImVec4(0.10f, 0.11f, 0.18f, 1.00f);
+        const ImVec4 aneFrame = ImLerp(imClear, aneBlack, .5f);
+        const ImVec4 aneFrameActive = ImLerp(aneFrame, imBlack, .2f);
+
+        ImGui::PushStyleColor(ImGuiCol_MenuBarBg, aneFrameActive);
         if (ImGui::BeginMainMenuBar())
         {
             if (ImGui::BeginMenu("File"))
@@ -59,6 +69,8 @@ namespace Engine
 
             ImGui::EndMainMenuBar();
         }
+        ImGui::PopStyleColor();
+
         return UIUpdate;
     }
 
