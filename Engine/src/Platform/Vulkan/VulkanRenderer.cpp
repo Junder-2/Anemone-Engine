@@ -399,7 +399,7 @@ namespace Engine
 
     void VulkanRenderer::SetupSwapchain()
     {
-        const auto props = Application::Get().GetWindow().GetActiveViewportProperties();
+        const auto props = Application::Get().GetWindow().GetWindowProperties();
         _windowExtent.width = props.Width;
         _windowExtent.height = props.Height;
 
@@ -409,7 +409,9 @@ namespace Engine
         _swapchainImages = swapchain.get_images().value();
         _swapchainImageViews = swapchain.get_image_views().value();
 
-        CreateMainBuffers(_windowExtent.width, _windowExtent.height);
+        const auto viewportProps = Application::Get().GetWindow().GetWindowProperties();
+
+        CreateMainBuffers(viewportProps.Width, viewportProps.Height);
     }
 
     vkb::Swapchain VulkanRenderer::CreateSwapchain(const uint32_t width, const uint32_t height)
@@ -446,12 +448,11 @@ namespace Engine
 
         DestroySwapchain();
 
-        int w, h;
-        SDL_GetWindowSize(_window, &w, &h);
-        _windowExtent.width = w;
-        _windowExtent.height = h;
+        const auto props = Application::Get().GetWindow().GetWindowProperties();
+        _windowExtent.width = props.Width;
+        _windowExtent.height = props.Height;
 
-        vkb::Swapchain swapchain = CreateSwapchain(w, h);
+        vkb::Swapchain swapchain = CreateSwapchain(_windowExtent.width, _windowExtent.height);
         _swapchainExtent = swapchain.extent;
         _swapchain = swapchain.swapchain;
         _swapchainImages = swapchain.get_images().value();
@@ -514,10 +515,10 @@ namespace Engine
     void VulkanRenderer::ResizeMainBuffers()
     {
         const auto props = Application::Get().GetWindow().GetActiveViewportProperties();
-        _windowExtent.width = props.Width;
-        _windowExtent.height = props.Height;
+        //_windowExtent.width = props.Width;
+        //_windowExtent.height = props.Height;
 
-        ResizeMainBuffers(_windowExtent.width, _windowExtent.height);
+        ResizeMainBuffers(props.Width, props.Height);
     }
 
     void VulkanRenderer::ResizeMainBuffers(const uint32_t width, const uint32_t height)

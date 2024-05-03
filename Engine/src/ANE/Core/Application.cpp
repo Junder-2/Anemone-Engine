@@ -48,7 +48,7 @@ namespace Engine
         _imGuiLayer = ImGuiLayer::Create("ImGuiLayer");
         PushLayer(_imGuiLayer);
 
-        API::WINDOW_SIZE = Vector2(_window->GetWidth(), _window->GetHeight());
+        API::WINDOW_SIZE = Vector2(_window->GetWindowWidth(), _window->GetWindowHeight());
     }
 
     void Application::Run()
@@ -81,7 +81,7 @@ namespace Engine
             }
             Renderer::EndUIDataBuffer();
 
-            Renderer::Render(_window->GetProperties());
+            Renderer::Render(_window->GetWindowProperties());
         }
 
         // TODO: Figure out where this function should go.

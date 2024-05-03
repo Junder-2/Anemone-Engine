@@ -23,6 +23,7 @@ namespace Engine
     {
         UIUpdateWrapper uiUpdate;
 
+        ImGui::SetNextWindowSizeConstraints(Vector2(100.f, 100.f), Vector2(FLT_MAX, FLT_MAX));
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
         if (ImGui::Begin("Viewport"))
         {

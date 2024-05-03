@@ -34,8 +34,8 @@ namespace Engine
 
         _cameraComponent = &GetComponent<CameraComponent>();
 
-        const WindowProperties windowProps = Application::Get().GetWindow().GetProperties();
-        const float w = (float)windowProps.Width, h = (float)windowProps.Height;
+        const ViewportProperties viewport = Application::Get().GetWindow().GetActiveViewportProperties();
+        const float w = viewport.Width, h = viewport.Height;
 
         _cameraComponent->SetPerspective(70.0f, w / h, 10000.f, 0.1f);
         Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
@@ -123,6 +123,7 @@ namespace Engine
         if (event.GetEventType() != EventType::WindowResize) return;
 
         const WindowResizeEvent& resizeEvent = reinterpret_cast<WindowResizeEvent&>(event);
+        if(!resizeEvent.IsActiveViewport()) return;
         const float w = (float)resizeEvent.GetWidth(), h = (float)resizeEvent.GetHeight();
 
         _cameraComponent->SetAspectRatio(w / h);

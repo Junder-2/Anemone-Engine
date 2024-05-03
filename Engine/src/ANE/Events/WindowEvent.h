@@ -65,7 +65,8 @@ namespace Engine
         uint32_t GetHeight() const { return _height; }
 
         uint32_t GetWindowIndex() const { return _windowIndex; }
-        bool IsMainWindow() const { return _windowIndex > 1; }
+        bool IsMainWindow() const;
+        bool IsActiveViewport() const;
 
     private:
         uint32_t _width;

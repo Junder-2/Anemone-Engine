@@ -79,12 +79,13 @@ namespace Engine
         bool ImGuiHasFocus() const { return _imGuiHasFocus; }
 
         bool IsVSync() const { return  _windowData.VSync; }
-        uint32_t GetWidth() const { return _windowData.Width; }
-        uint32_t GetHeight() const { return _windowData.Height; }
-        WindowProperties GetProperties() { return _windowData; }
+        uint32_t GetWindowWidth() const { return _windowData.Width; }
+        uint32_t GetWindowHeight() const { return _windowData.Height; }
+        WindowProperties GetWindowProperties() const { return _windowData; }
         SDL_Window* GetWindowContext() const { return _windowContext; }
 
         ViewportProperties GetActiveViewportProperties() const;
+        uint32_t GetViewportId() const { return _activeViewportId; }
         bool IsViewportMainWindow() const { return _activeViewportId == _windowData.Id; }
         bool IsOverViewport() const;
 

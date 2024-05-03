@@ -8,9 +8,8 @@
 
 #include "Application.h"
 #include "ANE/Events/WindowEvent.h"
-#include "ANE/Input/Input.h"
 #include "ANE/Input/InputHandler.h"
-#include "ANE/Utilities/InputUtilities.h"
+#include "ANE/Math/FMath.h"
 #include "Platform/Vulkan/VulkanRenderer.h"
 
 namespace Engine
@@ -306,7 +305,7 @@ namespace Engine
         }
 
         const ImGuiWindow* imGuiWindow = ImGui::FindWindowByID(_activeViewportId);
-        return ViewportProperties(_activeViewportId, imGuiWindow->ContentSize.x, imGuiWindow->ContentSize.y, imGuiWindow->Pos.x, imGuiWindow->Pos.y);
+        return ViewportProperties(_activeViewportId, FMath::Max(imGuiWindow->ContentSize.x, 1.f), FMath::Max(imGuiWindow->ContentSize.y, 1.f), imGuiWindow->Pos.x, imGuiWindow->Pos.y);
     }
 
     void Window::SetActiveViewport(const uint32_t id)
