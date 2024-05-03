@@ -35,14 +35,24 @@ namespace Engine
         {
             return _zFar;
         }
+        void OnValidate()
+        {
+            ANE_ELOG("Camera recalculating");
+            UpdateProjectionMatrix();
+        }
 
         static void RegisterComponentMetaData()
         {
             entt::meta<CameraComponent>()
-                .data<&CameraComponent::_zNear>("Z Near"_hs).prop("display_name"_hs, "Z Near")
-                .data<&CameraComponent::_zFar>("Z Far"_hs).prop("display_name"_hs, "Z Far")
+                .data<&CameraComponent::_zNear>("Z_Near"_hs).prop("display_name"_hs, "Z Near")
+                .EDITABLE
+                .data<&CameraComponent::_zFar>("Z_Far"_hs).prop("display_name"_hs, "Z Far")
+                .EDITABLE
                 .data<&CameraComponent::_fieldOfView>("Field Of View"_hs).prop("display_name"_hs, "Field Of View")
-                .EDITABLE;
+                .EDITABLE
+                .data<&CameraComponent::_aspectRatio>("Aspect Ratio"_hs).prop("display_name"_hs, "Aspect Ratio")
+                .EDITABLE
+                .func<&CameraComponent::OnValidate>("OnValidate"_hs);
         }
 
     private:

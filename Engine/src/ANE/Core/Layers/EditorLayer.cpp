@@ -82,7 +82,7 @@ namespace Engine
     void EditorLayer::OnUIRender()
     {
         ImGuiIO& io = ImGui::GetIO();
-
+        ImGui::ShowDemoWindow();
         for (UILayerPanel* panel : _UIpanels)
         {
             if (panel == nullptr) continue;
@@ -125,6 +125,7 @@ namespace Engine
         RenderComponent::RegisterComponentMetaData();
         UUIDComponent::RegisterComponentMetaData();
         CameraComponent::RegisterComponentMetaData();
+        NativeScriptComponent::RegisterComponentMetaData();
     }
 
     void EditorLayer::OnUpdate(float deltaTime)
