@@ -59,7 +59,7 @@ namespace Engine
         colors[ImGuiCol_ChildBg]                = aneBlackBg;
         colors[ImGuiCol_PopupBg]                = aneBlackBg;
 
-        colors[ImGuiCol_Border]                 = ImLerp(aneHint, imClear, .2f);
+        colors[ImGuiCol_Border]                 = aneFrameActive;
         colors[ImGuiCol_BorderShadow]           = imClear;
         colors[ImGuiCol_FrameBg]                = aneFrame;
         colors[ImGuiCol_FrameBgHovered]         = aneFrameHover;
