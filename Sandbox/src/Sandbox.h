@@ -1,6 +1,6 @@
 #pragma once
 
-#include <..\..\Engine\src\ANE.h>
+#include <ANE.h>
 #include "UI/SandboxLayer.h"
 
 class Sandbox : public Engine::Application

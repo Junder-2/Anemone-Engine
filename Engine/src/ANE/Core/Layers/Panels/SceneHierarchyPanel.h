@@ -1,7 +1,6 @@
 #pragma once
 #include "imgui.h"
 #include "UILayerPanel.h"
-#include "UIUpdateWrapper.h"
 #include "ANE/Core/Editor/SelectionManager.h"
 
 namespace Engine

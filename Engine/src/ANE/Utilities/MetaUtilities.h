@@ -10,8 +10,6 @@
 
 namespace Engine
 {
-
-
     inline bool InspectMutableStringField(entt::meta_data& field, entt::meta_any& componentData)
     {
         auto v = field.get(componentData).cast<std::string>();
@@ -29,6 +27,7 @@ namespace Engine
         }
         return propertyWritten;
     }
+
     inline bool InspectMutableBoolField(entt::meta_data& field, entt::meta_any& componentData)
     {
         auto v = field.get(componentData).cast<bool>();
@@ -41,10 +40,9 @@ namespace Engine
         }
         return propertyWritten;
     }
+
     inline bool InspectMutableTransformMatrix(entt::meta_data& field, entt::meta_any& componentData)
     {
-
-
         auto v = field.get(componentData).cast<TransformMatrix>();
         bool propertyWritten = false;
         Vector3 position = v.GetPosition();
@@ -95,15 +93,8 @@ namespace Engine
             ImGui::TableSetColumnIndex(1);
             ImGui::Text("%s", field.prop("Scale"_hs).value().cast<char const*>());
             ImGui::EndTable();
-
-            return propertyWritten;
-
         }
-
-
-
-
-
+        return propertyWritten;
     }
 
     inline bool InspectMutableColliders(entt::meta_data& field, entt::meta_any& componentData)

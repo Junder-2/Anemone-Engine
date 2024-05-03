@@ -3,7 +3,6 @@
 #include <entt.hpp>
 
 #include "imgui.h"
-#include "UIUpdateWrapper.h"
 #include "UILayerPanel.h"
 
 namespace Engine

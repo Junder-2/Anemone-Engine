@@ -16,7 +16,7 @@
 namespace Engine
 {
     template <class T>
-  void OnValidate(T* obj)
+    void OnValidate(T* obj)
     {
         if constexpr (requires { obj->OnValidate(); })
             return obj->OnValidate();
@@ -24,6 +24,7 @@ namespace Engine
         {
         }
     }
+
     InspectorPanel::InspectorPanel(EditorLayer* editorLayer)
     {
         _editorLayer = editorLayer;
@@ -37,23 +38,6 @@ namespace Engine
     UIUpdateWrapper InspectorPanel::OnPanelRender()
     {
         ANE_DEEP_PROFILE_FUNCTION();
-
-        // if(ImGui::Button("Swap Style"))
-        // {
-        //     _style += 1;
-        //     _style = _style % 2;
-        //     ANE_ELOG(_style);
-        //
-        //     if(_style == 1)
-        //     {
-        //                       ImGuiUtilities::StyleAnemoneExperimental();
-        //     }
-        //     else
-        //     {  ImGuiUtilities::StyleAnemoneDark();
-        //
-        //     }
-        // }
-        //ImGui::ShowDemoWindow();
 
         bool open = true;
         UIUpdateWrapper uiUpdate;
@@ -71,12 +55,12 @@ namespace Engine
             Entity selectedEntity = _editorLayer->GetEntityWithUUID(selectedEntityUUIDS->at(0));
             DrawEntityComponentList(selectedEntity);
             if (ImGui::Button("Add Physics Suzanne")) // For physics testing
-            {
+                {
                 selectedEntity.GetComponent<TransformComponent>().Transform.AddPosition(Random::InSphere(.2f));
                 selectedEntity.AddComponent<RenderComponent>("Suzanne.fbx");
                 selectedEntity.AddComponent<RigidBodyComponent>(selectedEntity);
                 selectedEntity.AddComponent<ColliderComponent>(selectedEntity, 1.f);
-            }
+                }
         }
 
         ImGui::End();
@@ -126,56 +110,54 @@ namespace Engine
                             {
                                 if (itr->second(field, componentData))
                                 {
-                                    ANE_ELOG("writing to property");
+                                    //ANE_ELOG("writing to property");
                                     if (auto func = type.func("OnValidate"_hs); func)
                                     {
-                                        ANE_ELOG("Calling on validate");
+                                        //ANE_ELOG("Calling on validate");
                                         func.invoke(componentData);
                                     }
                                 }
                                 else
                                 {
-                                //the property was not written too;
+                                    //the property was not written too;
                                 }
-                            }
-                        else
-                        {
-                            std::string string;
-                            string.append("No draw function found for mutable data of type: ");
-                            string.append(field.type().info().name());
-                            ImGui::Text("%s", string.c_str());
-                        }
-                    }
-                    else
-                    {
-                        auto itr = _immutableDataInspectors.find(field.type().info().hash());
-                        if (itr != _immutableDataInspectors.end())
-                        {
-                            if (itr->second(field, componentData))
-                            {
                             }
                             else
                             {
                                 std::string string;
-                                string.append("No draw function found for immutable data of type: ");
+                                string.append("No draw function found for mutable data of type: ");
                                 string.append(field.type().info().name());
                                 ImGui::Text("%s", string.c_str());
                             }
                         }
+                        else
+                        {
+                            auto itr = _immutableDataInspectors.find(field.type().info().hash());
+                            if (itr != _immutableDataInspectors.end())
+                            {
+                                if (itr->second(field, componentData))
+                                {
+                                }
+                                else
+                                {
+                                    std::string string;
+                                    string.append("No draw function found for immutable data of type: ");
+                                    string.append(field.type().info().name());
+                                    ImGui::Text("%s", string.c_str());
+                                }
+                            }
+                        }
                     }
+                    ImGui::Unindent();
                 }
-                ImGui::Unindent();
-
+            }
+            else
+            {
+                std::string string;
+                string.append("Component Type could not be resolved: ");
+                string.append(std::to_string(componentTypeID));
+                ImGui::Text("%s", string.c_str());
             }
         }
-        else
-        {
-            std::string string;
-            string.append("Component Type could not be resolved: ");
-            string.append(std::to_string(componentTypeID));
-            ImGui::Text("%s", string.c_str());
-        }
     }
-}
-
 }

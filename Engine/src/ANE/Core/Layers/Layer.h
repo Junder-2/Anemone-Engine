@@ -7,11 +7,12 @@ namespace Engine
     class UILayerPanel;
     class Event;
 
-    class  Layer // should probaly be abstract
+    class Layer // should probaly be abstract
     {
     public:
         Layer(const std::string& name = "Layer") : _debugName(name) { }
         virtual ~Layer() = default;
+
         virtual void OnAttach() {}
         virtual void OnDetach() {}
         virtual void OnUpdate(float deltaTime);

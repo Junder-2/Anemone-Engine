@@ -1,7 +1,4 @@
-#pragma once
-
 #include "Sandbox.h"
-
 
 std::string Engine::GetApplicationName()
 {

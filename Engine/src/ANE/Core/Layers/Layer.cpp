@@ -34,6 +34,5 @@ namespace Engine
     {
         auto it = std::ranges::find(_UIpanels, panelToRemove);
         if (it != _UIpanels.end()) _UIpanels.erase(it);
-
     }
 }
