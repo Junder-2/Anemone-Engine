@@ -24,6 +24,7 @@ namespace Engine
 
         style->WindowPadding = ImVec2(10,8);
         style->FramePadding = ImVec2(5,3);
+        style->WindowMenuButtonPosition = ImGuiDir_None;
 
         style->WindowBorderSize = 0;
         style->ChildBorderSize = 1;
