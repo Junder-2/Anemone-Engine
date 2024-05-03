@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "Core.h"
 #include "Layers/LayerStack.h"
 
 namespace Engine
@@ -20,13 +19,12 @@ namespace Engine
     class Layer;
     class SubSystemCollection;
 
-    struct ANE_API ApplicationSpecification
+    struct ApplicationSpecification
     {
         std::string Name = "Anemone Application";
-        std::string LogName = "ANE APP";
     };
 
-    class ANE_API Application
+    class Application
     {
     public:
         Application(const ApplicationSpecification& specification);

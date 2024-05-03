@@ -1,12 +1,4 @@
-#include <cstdio>
-#include <ANE.h>
-
-class Sandbox : public Engine::Application
-{
-public:
-    Sandbox(const Engine::ApplicationSpecification& specification) : Application(specification) { }
-    ~Sandbox() { }
-};
+#include "Sandbox.h"
 
 std::string Engine::GetApplicationName()
 {
@@ -17,7 +9,6 @@ Engine::Application* Engine::CreateApplication()
 {
     ApplicationSpecification spec;
     spec.Name = GetApplicationName();
-    spec.LogName = "SANDBOX";
 
     return new Sandbox(spec);
 }

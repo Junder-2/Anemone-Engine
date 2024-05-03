@@ -10,7 +10,7 @@ namespace Engine
 {
     class Event;
 
-    struct ANE_API WindowProperties
+    struct WindowProperties
     {
         std::string Title;
         uint32_t Width;
@@ -27,7 +27,7 @@ namespace Engine
     };
 
     // ImGuiViewport
-    struct ANE_API ViewportProperties
+    struct ViewportProperties
     {
         ViewportProperties() = default;
         ViewportProperties(const uint32_t id, const uint32_t width, const uint32_t height, const uint32_t xPos = 0, const uint32_t yPos = 0) : Id(id),  Width(width), Height(height), XPos(xPos), YPos(yPos) {}
@@ -53,7 +53,7 @@ namespace Engine
         }
     };
 
-    class ANE_API Window
+    class Window
     {
     public:
         static std::unique_ptr<Window> Create(const WindowProperties& props = WindowProperties());

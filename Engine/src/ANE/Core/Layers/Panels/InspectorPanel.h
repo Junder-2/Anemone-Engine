@@ -1,7 +1,5 @@
 #pragma once
-#include <entt.hpp>
 #include "UILayerPanel.h"
-#include "UIUpdateWrapper.h"
 #include "ANE/Core/Editor/SelectionManager.h"
 
 namespace Engine

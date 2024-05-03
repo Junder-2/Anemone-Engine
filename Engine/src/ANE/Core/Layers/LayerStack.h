@@ -3,7 +3,7 @@
 
 namespace Engine
 {
-    class ANE_API LayerStack
+    class LayerStack
     {
     public:
         LayerStack() = default;
