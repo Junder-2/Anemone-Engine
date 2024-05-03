@@ -17,7 +17,7 @@ namespace Engine
     class LogFileWriter;
     using log_msg = spdlog::details::log_msg;
 
-    class ANE_API Logging
+    class Logging
     {
     public:
         /**

@@ -1,10 +1,11 @@
 ﻿#pragma once
 
+#include "ANE/Core/Core.h"
+
 #include "ANE/Core/Application.h"
 #include "ANE/Core/Log/Logging.h"
 #include "ANE/Core/Assert.h"
 #include "ANE/Core/Window.h"
-#include "ANE/Core/Core.h"
 
 //------Entity----------------------
 

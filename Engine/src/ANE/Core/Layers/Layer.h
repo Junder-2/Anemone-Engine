@@ -1,6 +1,4 @@
 #pragma once
-#include <string> //these includes are necessary for compilation in sandbox
-#include <vector> //these includes are necessary for compilation in sandbox
 
 namespace Engine
 {
