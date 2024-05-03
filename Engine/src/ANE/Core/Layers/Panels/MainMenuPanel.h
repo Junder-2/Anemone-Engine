@@ -13,7 +13,6 @@ namespace Engine
         UIUpdateWrapper OnPanelRender() override;
     private:
         ~MainMenuPanel() = default;
-        static void PhysicsAnalysisMenu();
     private:
         EditorLayer* _editorLayer;
     };

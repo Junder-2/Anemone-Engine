@@ -5,6 +5,8 @@
 #include "imgui_internal.h"
 #include "ANE/Core/Application.h"
 #include "ANE/Core/Window.h"
+#include "ANE/Physics/Physics.h"
+#include "ANE/Physics/PhysicsTypes.h"
 #include "Platform/Vulkan/VulkanRenderer.h"
 
 namespace Engine
@@ -23,20 +25,96 @@ namespace Engine
     {
         UIUpdateWrapper uiUpdate;
 
+        const ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_MenuBar;
+
         ImGui::SetNextWindowSizeConstraints(Vector2(100.f, 100.f), Vector2(FLT_MAX, FLT_MAX));
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
-        if (ImGui::Begin("Viewport"))
+        const bool open = ImGui::Begin("Viewport", 0, flags);
+        if (open)
         {
-            if(!_initialized)
+            if(open) ImGui::PopStyleVar();
+            if (!_initialized)
             {
                 Application::Get().GetWindow().SetActiveViewport(ImGui::GetCurrentWindow()->ID);
                 _initialized = false;
             }
+
+            if (ImGui::BeginMenuBar())
+            {
+                ViewMenu();
+
+                ImGui::EndMenuBar();
+            }
+
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
             ImGui::Image(VulkanRenderer::GetImGuiViewportSet(), ImGui::GetContentRegionAvail());
+            ImGui::PopStyleVar();
         }
+        if(!open) ImGui::PopStyleVar();
         ImGui::End();
-        ImGui::PopStyleVar();
 
         return uiUpdate;
+    }
+
+    void ViewportPanel::ViewMenu()
+    {
+        ViewPhysicsDebugMenu();
+    }
+
+    void ViewportPanel::ViewPhysicsDebugMenu()
+    {
+        #ifndef ANE_DIST
+        if (ImGui::BeginMenu("Debug Rendering"))
+        {
+            bool drawDebug = GetPhysicsSystem().IsDebugRendering();
+            if(ImGui::Checkbox("Enable", &drawDebug))
+            {
+                GetPhysicsSystem().EnableDebugRendering(drawDebug);
+            }
+            ImGui::BeginDisabled(!drawDebug);
+
+            float displayAlpha = GetPhysicsSystem().GetDebugDisplayAlpha();
+            if(ImGui::SliderFloat("Display Alpha", &displayAlpha, 0.f, 1.f))
+            {
+                GetPhysicsSystem().SetDebugDisplayAlpha(displayAlpha);
+            }
+
+            ImGui::Spacing();
+
+            bool showAABB = GetPhysicsSystem().IsDebugDisplayFlag(PhysicsDebugDisplayFlag::ColliderAABB);
+            if(ImGui::Checkbox("Show AABB", &showAABB))
+            {
+                GetPhysicsSystem().EnableDebugFlag(PhysicsDebugDisplayFlag::ColliderAABB, showAABB);
+            }
+            bool showBroadphaseAABB = GetPhysicsSystem().IsDebugDisplayFlag(PhysicsDebugDisplayFlag::ColliderBroadphaseAABB);
+            if(ImGui::Checkbox("Show Broadphase AABB", &showBroadphaseAABB))
+            {
+                GetPhysicsSystem().EnableDebugFlag(PhysicsDebugDisplayFlag::ColliderBroadphaseAABB, showBroadphaseAABB);
+            }
+            bool showCollisionShape = GetPhysicsSystem().IsDebugDisplayFlag(PhysicsDebugDisplayFlag::CollisionShape);
+            if(ImGui::Checkbox("Show Colliders", &showCollisionShape))
+            {
+                GetPhysicsSystem().EnableDebugFlag(PhysicsDebugDisplayFlag::CollisionShape, showCollisionShape);
+            }
+            bool showShapeNormal = GetPhysicsSystem().IsDebugDisplayFlag(PhysicsDebugDisplayFlag::CollisionShapeNormal);
+            if(ImGui::Checkbox("Show Collider Normal", &showShapeNormal))
+            {
+                GetPhysicsSystem().EnableDebugFlag(PhysicsDebugDisplayFlag::CollisionShapeNormal, showShapeNormal);
+            }
+            bool showContactPoint = GetPhysicsSystem().IsDebugDisplayFlag(PhysicsDebugDisplayFlag::ContactPoint);
+            if(ImGui::Checkbox("Show Contact Point", &showContactPoint))
+            {
+                GetPhysicsSystem().EnableDebugFlag(PhysicsDebugDisplayFlag::ContactPoint, showContactPoint);
+            }
+            bool showContactNormal = GetPhysicsSystem().IsDebugDisplayFlag(PhysicsDebugDisplayFlag::ContactNormal);
+            if(ImGui::Checkbox("Show Contact Normal", &showContactNormal))
+            {
+                GetPhysicsSystem().EnableDebugFlag(PhysicsDebugDisplayFlag::ContactNormal, showContactNormal);
+            }
+
+            ImGui::EndDisabled();
+            ImGui::EndMenu();
+        }
+        #endif
     }
 }

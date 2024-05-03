@@ -14,6 +14,9 @@ namespace Engine
         UIUpdateWrapper OnPanelRender() override;
 
     private:
+        static void ViewMenu();
+        static void ViewPhysicsDebugMenu();
+    private:
         bool _initialized = false;
         EditorLayer* _editorLayer;
     };
