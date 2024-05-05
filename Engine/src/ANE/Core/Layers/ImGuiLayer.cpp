@@ -8,24 +8,12 @@
 
 namespace Engine
 {
-    //std::queue<std::string_view> Logger::Texts;
-
     ImGuiLayer::ImGuiLayer(const char* layerName): Layer(layerName)
     {
         //EnableFlag("MainMenuWindow");
         //EnableFlag("LogWindow");
         //EnableFlag("SceneViewWindow");
         //EnableFlag("HierarchyWindow");
-        GetEditorInputSystem().BindKeyboardInput(KeyCodeB, MakeDelegate(this, &ImGuiLayer::AddDebugMessage));
-        // GetInputSystem().BindKeyboardInput(KeyCodeB, MakeDelegate(this, &ImGuiLayer::AddDebugMessage));
-    }
-
-    void ImGuiLayer::AddDebugMessage(InputValue value)
-    {
-        //ANE_ELOG("We are pressing five");
-        //std::string_view hey = "yo";
-        //Logger::SubmitText(hey);
-        ANE_ELOG("Hey");
     }
 
     ImGuiLayer::~ImGuiLayer()
@@ -55,7 +43,6 @@ namespace Engine
     ImGuiLayer* ImGuiLayer::Create(const char* str)
     {
         return new ImGuiLayer(str);
-
     }
 
 

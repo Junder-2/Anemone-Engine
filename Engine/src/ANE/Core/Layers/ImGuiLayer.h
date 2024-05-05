@@ -10,8 +10,6 @@ namespace Engine
     {
     public:
         ImGuiLayer(const char* layerName);
-        //void AddDebugMessage();
-         void AddDebugMessage(InputValue value);
         ~ImGuiLayer() override;
 
         void OnAttach() override;
