@@ -10,6 +10,7 @@ namespace Engine
     */
     typedef enum : uint8_t
     {
+        InputDeviceUndefined,
         InputDeviceKeyboard,
         InputDeviceGamepad,
         InputDeviceMouse,

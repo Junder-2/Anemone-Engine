@@ -10,7 +10,7 @@ namespace Engine
     {
         None = 0,
         WindowClose, WindowResize, WindowStateChange, WindowFocusChange, WindowMoved,
-        KeyboardInput,
+        InputFlush, KeyboardInput,
         MouseButton, MouseMovement, MouseScrolled
     };
 

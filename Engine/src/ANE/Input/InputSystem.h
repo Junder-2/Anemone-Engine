@@ -112,6 +112,7 @@ namespace Engine
 
         void OnKeyEvent(Event& e);
         void OnMouseEvent(Event& e);
+        void OnFlush();
 
     protected:
         InputHandler* _inputHandler;

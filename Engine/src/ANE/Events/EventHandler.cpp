@@ -74,4 +74,24 @@ namespace Engine
     {
         _appEventDelegate += delegate;
     }
+
+    void EventHandler::SetBlockAllAppEvents(const bool enable)
+    {
+        _blockAllAppEvents = enable;
+        if(enable)
+        {
+            InputFlushEvent flushEvent;
+            if(_appEventDelegate) _appEventDelegate(flushEvent);
+        }
+    }
+
+    void EventHandler::SetBlockAppInputs(const bool enable)
+    {
+        _blockAppInputs = enable;
+        if(enable)
+        {
+            InputFlushEvent flushEvent;
+            if(_appEventDelegate) _appEventDelegate(flushEvent);
+        }
+    }
 }

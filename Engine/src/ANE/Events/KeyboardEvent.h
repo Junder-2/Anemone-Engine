@@ -20,4 +20,17 @@ namespace Engine
     private:
         InputValue _inputValue;
     };
+
+    /**
+    * Input Event, tells listeners to zero any inputs
+    */
+    class InputFlushEvent final : public Event
+    {
+    public:
+        InputFlushEvent() { MarkFlush(); }
+
+        EventType GetEventType() const override { return EventType::InputFlush; }
+        int GetEventCategories() const override { return (EventCategoryInput); }
+    };
+
 }

@@ -113,21 +113,14 @@ namespace Engine
 
         for (const auto val : _keyboardInputActions | std::views::values)
         {
-            if(val->FlushAction())
-            {
-                KeyboardKeyEvent keyTriggerEvent(val->GetInputValue());
-                keyTriggerEvent.MarkFlush();
-                DispatchEvent(keyTriggerEvent);
-            }
+            val->FlushAction();
         }
 
-        if(_mouseInputAction.FlushAction())
-        {
-            MouseButtonEvent mouseButtonEvent(_mouseInputAction.GetButtonValue());
-            mouseButtonEvent.MarkFlush();
-            DispatchEvent(mouseButtonEvent);
-        }
+        _mouseInputAction.FlushAction();
         _currentKeyStates = nullptr;
+
+        InputFlushEvent flushEvent;
+        DispatchEvent(flushEvent);
     }
 
     void InputHandler::ProcessKey(const int keyCode, const bool press)

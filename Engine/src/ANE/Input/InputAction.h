@@ -71,7 +71,7 @@ namespace Engine
     protected:
         float _value = 0;
         InputValueType _valueType = InputTypeBoolean;
-        InputDeviceType _deviceType = InputDeviceKeyboard;
+        InputDeviceType _deviceType = InputDeviceUndefined;
         int _bindingId;
     };
 

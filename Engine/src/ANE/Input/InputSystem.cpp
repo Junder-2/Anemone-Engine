@@ -1,6 +1,8 @@
 #include "anepch.h"
 #include "InputSystem.h"
 
+#include <ranges>
+
 #include "InputHandler.h"
 #include "ANE/Core/Application.h"
 #include "ANE/Events/Event.h"
@@ -96,14 +98,22 @@ namespace Engine
 
         if(!e.HasCategory(EventCategoryInput)) return;
 
+        if(e.GetEventType() == EventType::InputFlush)
+        {
+            OnFlush();
+            return;
+        }
+
         if(e.HasCategory(EventCategoryKeyboard))
         {
             OnKeyEvent(e);
+            return;
         }
 
         if(e.HasCategory(EventCategoryMouse))
         {
             OnMouseEvent(e);
+            return;
         }
     }
 
@@ -179,6 +189,22 @@ namespace Engine
             }
             break;
         }
+    }
+
+    void InputSystem::OnFlush()
+    {
+        const InputValue inputFlush;
+        for (auto& val : _actionMappingDelegates | std::views::values)
+        {
+            val(inputFlush);
+        }
+
+        for (auto& val : _axisActionMappingDelegates | std::views::values)
+        {
+            val(inputFlush);
+        }
+        
+        _mouseButtonValueDelegate(MouseButtonValues());
     }
 
     bool InputSystem::IsValidAxisBindings(const BindingPair negativeBindingPair, const BindingPair positiveBindingPair)

@@ -58,20 +58,13 @@ namespace Engine
         /**
         * Blocks all events from passing into the app stage (certain events will be marked as flush and will still pass)
         */
-        static void SetBlockAllAppEvents(const bool enable)
-        {
-            _blockAllAppEvents = enable;
-        }
+        static void SetBlockAllAppEvents(bool enable);
         static bool IsBlockingAllAppEvents() { return _blockAllAppEvents; }
 
         /**
         * Blocks all input events from passing into the app stage (certain events will be marked as flush and will still pass)
         */
-        static void SetBlockAppInputs(const bool enable)
-        {
-            _blockAppInputs = enable;
-            // TODO: flush app inputs?
-        }
+        static void SetBlockAppInputs(bool enable);
         static bool IsBlockingAppInputs() { return _blockAppInputs; }
 
     private:
