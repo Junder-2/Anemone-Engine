@@ -47,16 +47,10 @@ namespace Engine
 
     private:
         void OnEvent(Event& e);
-        void OnWindowResize(WindowResizeEvent& e);
-        void OnWindowMove(WindowMovedEvent& e);
+        void OnWindowResize(const WindowResizeEvent& e);
+        void OnWindowMove(const WindowMovedEvent& e);
         void OnWindowStateChange(WindowStateChangeEvent& e);
         void OnWindowFocusChange(WindowFocusChangeEvent& e);
-
-        //Test functions
-        void OnKeyTest(KeyboardKeyEvent& keyTriggerEvent);
-        void OnMouseKeyTest(MouseButtonEvent& mouseButtonEvent);
-        void OnMouseScrollTest(MouseScrollEvent& mouseScrollEvent);
-        void OnMouseMoveTest(MouseMovementEvent& mouseMovementEvent);
 
     private:
         ApplicationSpecification _appSpec;

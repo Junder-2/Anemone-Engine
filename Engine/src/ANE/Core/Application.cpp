@@ -104,9 +104,9 @@ namespace Engine
                 case EventType::WindowResize:
                     OnWindowResize(reinterpret_cast<WindowResizeEvent&>(e));
                 break;
-                // case EventType::WindowMoved:
-                //     OnWindowMove(reinterpret_cast<WindowMovedEvent&>(e));
-                // break;
+                case EventType::WindowMoved:
+                    OnWindowMove(reinterpret_cast<WindowMovedEvent&>(e));
+                break;
                 // case EventType::WindowFocusChange:
                 //     OnWindowFocusChange(reinterpret_cast<WindowFocusChangeEvent&>(e));
                 // break;
@@ -116,27 +116,6 @@ namespace Engine
             }
         }
 
-        //Input debugging
-        // if(e.HasCategory(EventCategoryInput))
-        // {
-        //     switch (e.GetEventType())
-        //     {
-        //         case EventType::KeyboardInput:
-        //             OnKeyTest(reinterpret_cast<KeyTriggerEvent&>(e));
-        //         break;
-        //         case EventType::MouseButton:
-        //             OnMouseKeyTest(reinterpret_cast<MouseButtonEvent&>(e));
-        //         break;
-        //         case EventType::MouseScrolled:
-        //             OnMouseScrollTest(reinterpret_cast<MouseScrollEvent&>(e));
-        //         break;
-        //         case EventType::MouseMovement:
-        //             OnMouseMoveTest(reinterpret_cast<MouseMovementEvent&>(e));
-        //         break;
-        //     }
-        // }
-
-        //todo: should send to renderer
         Renderer::OnEvent(e);
 
         for (Layer* layer : _layerStack) // raw pointers
@@ -160,15 +139,30 @@ namespace Engine
         layer->OnAttach();
     }
 
-    void Application::OnWindowResize(WindowResizeEvent& e)
+    void Application::OnWindowResize(const WindowResizeEvent& e)
     {
-        API::WINDOW_SIZE = Vector2(e.GetWidth(), e.GetHeight());
-        ANE_ELOG_DEBUG("new size ({0}, {1})", e.GetWidth(), e.GetHeight());
+        if(e.IsMainWindow())
+        {
+            API::WINDOW_SIZE = Vector2(e.GetWidth(), e.GetHeight());
+        }
+        else if(e.IsActiveViewport())
+        {
+            API::VIEWPORT_SIZE = Vector2(e.GetWidth(), e.GetHeight());
+        }
+        //ANE_ELOG_DEBUG("new size {0} ({1}, {2})", e.GetWindowIndex(), e.GetWidth(), e.GetHeight());
     }
 
-    void Application::OnWindowMove(WindowMovedEvent& e)
+    void Application::OnWindowMove(const WindowMovedEvent& e)
     {
-        ANE_ELOG_DEBUG("new pos ({0}, {1})", e.GetX(), e.GetY());
+        if(e.IsMainWindow())
+        {
+            API::WINDOW_POS = Vector2(e.GetX(), e.GetY());
+        }
+        else if(e.IsActiveViewport())
+        {
+            API::VIEWPORT_POS = Vector2(e.GetX(), e.GetY());
+        }
+        //ANE_ELOG_DEBUG("new pos {0} ({1}, {2})",e.GetWindowIndex(), e.GetX(), e.GetY());
     }
 
     void Application::OnWindowStateChange(WindowStateChangeEvent& e)
@@ -179,30 +173,5 @@ namespace Engine
     void Application::OnWindowFocusChange(WindowFocusChangeEvent& e)
     {
         ANE_ELOG_DEBUG("window focus change {0}", e.IsFocused());
-    }
-
-    void Application::OnKeyTest(KeyboardKeyEvent& keyTriggerEvent)
-    {
-        const InputValue inputValue = keyTriggerEvent.GetInputValue();
-        ANE_ELOG_DEBUG("pressed {0}: {1}", inputValue.GetBindingId(), InputUtilities::ToString(inputValue.GetTriggerState()));
-    }
-
-    void Application::OnMouseKeyTest(MouseButtonEvent& mouseButtonEvent)
-    {
-        const MouseButtonValues inputValue = mouseButtonEvent.GetInputValue();
-        ANE_ELOG_DEBUG("pressed mouse key {0}, with {1}, is doubleclick {2}", InputUtilities::ToString((MouseButton)inputValue.GetCurrentButtonIndex()),
-            InputUtilities::ToString(inputValue.GetTriggerState()), inputValue.GetIsDoubleClick());
-        ANE_ELOG_DEBUG("raw mouse button state {0}", std::bitset<16>(inputValue.GetRawButtonStates()).to_string());
-    }
-
-    void Application::OnMouseScrollTest(MouseScrollEvent& mouseScrollEvent)
-    {
-        ANE_ELOG_DEBUG("scrolled mouse ({0}, {1})", mouseScrollEvent.GetXDelta(), mouseScrollEvent.GetYDelta());
-    }
-
-    void Application::OnMouseMoveTest(MouseMovementEvent& mouseMovementEvent)
-    {
-        const MouseMoveValue inputValue = mouseMovementEvent.GetInputValue();
-        ANE_ELOG_DEBUG("moved mouse pos:({0}), delta:({1})", inputValue.GetMousePos().ToString(), inputValue.GetMouseDelta().ToString());
     }
 }

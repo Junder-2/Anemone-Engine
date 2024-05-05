@@ -15,4 +15,14 @@ namespace Engine
     {
         return Application::Get().GetWindow().GetViewportId() == _windowIndex;
     }
+
+    bool WindowMovedEvent::IsMainWindow() const
+    {
+        return Application::Get().GetWindow().GetWindowProperties().Id == _windowIndex;
+    }
+
+    bool WindowMovedEvent::IsActiveViewport() const
+    {
+        return Application::Get().GetWindow().GetViewportId() == _windowIndex;
+    }
 }
