@@ -36,7 +36,7 @@ namespace Engine
             if (!_initialized)
             {
                 Application::Get().GetWindow().SetActiveViewport(ImGui::GetCurrentWindow()->ID);
-                _initialized = false;
+                _initialized = true;
             }
 
             if (ImGui::BeginMenuBar())

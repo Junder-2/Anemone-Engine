@@ -7,8 +7,6 @@
 #include "imgui_internal.h"
 #include "InspectorPanel.h"
 #include "SceneHierarchyPanel.h"
-#include "ANE/Physics/Physics.h"
-#include "ANE/Physics/PhysicsTypes.h"
 
 namespace Engine
 {

@@ -22,7 +22,7 @@ namespace Engine
 
         bool open;
         ImGui::Begin("Create Scene", &open, flags);
-        
+
         if (ImGui::InputText("Scene name", buffer, sizeof(buffer))) sceneName = std::string(buffer);
 
         if (ImGui::Button("Create", Vector2(60, 20))) // clears the buffer...
