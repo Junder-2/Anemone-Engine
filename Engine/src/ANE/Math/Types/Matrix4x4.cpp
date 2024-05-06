@@ -4,8 +4,8 @@
 #include "Matrix3x3.h"
 #include "ANE/Math/Types/Quaternion.h"
 #include "ANE/Math/FMath.h"
+#include "ANE/Math/VMath.h"
 #include "ANE/Physics/PhysicsTypes.h"
-#include "glm/gtx/compatibility.hpp"
 #include "glm/gtx/euler_angles.hpp"
 
 namespace Engine
@@ -43,6 +43,7 @@ namespace Engine
         _columns[1] = Vector4(0, 1, 0, 0);
         _columns[2] = Vector4(0, 0, 1, 0);
         Rotate(quat);
+        if(Vector3::Equal(scale, Vector3::OneVector())) return;
         Scale(scale);
     }
 
@@ -54,9 +55,53 @@ namespace Engine
         *this *= rotMatrix;
     }
 
+    Quaternion Matrix4x4::GetQuaternionFast() const
+    {
+        auto quat = Quaternion::Convert(quat_cast(glm::mat3(this->GetNormalized())));
+        return quat;
+    }
+
     Quaternion Matrix4x4::GetQuaternion() const
     {
-        return Quaternion::Convert(quat_cast(glm::mat3(this->GetNormalized())));
+        // glm::decompose()
+
+        Matrix3x3 copy = this->GetNormalized();
+        if(Vector3::Dot(copy[0], Vector3::Cross(copy[1], copy[2])) < 0)
+        {
+            copy[0] *= -1.f;
+            copy[1] *= -1.f;
+            copy[2] *= -1.f;
+        }
+
+        Quaternion orientation;
+        float root;
+        if(const float trace = copy[0].X + copy[1].Y + copy[2].Z; trace > 0.f)
+        {
+            root = sqrt(trace + 1.f);
+            orientation.W = 0.5f * root;
+            root = 0.5f / root;
+            orientation.X = root * (copy[1].Z - copy[2].Y);
+            orientation.Y = root * (copy[2].X - copy[0].Z);
+            orientation.Z = root * (copy[0].Y - copy[1].X);
+        }
+        else
+        {
+            const int next[3] = {1, 2, 0};
+            int i = 0;
+            if(copy[1].Y > copy[0].X) i = 1;
+            if(copy[2].Z > copy[i][i]) i = 2;
+            const int j = next[i];
+            const int k = next[j];
+
+            root = sqrt(copy[i][i] - copy[j][j] - copy[k][k] + 1.f);
+
+            orientation[i] = 0.5f * root;
+            root = 0.5f / root;
+            orientation[j] = root * (copy[i][j] + copy[j][i]);
+            orientation[k] = root * (copy[i][k] + copy[k][i]);
+            orientation.W = root * (copy[j][k] - copy[k][j]);
+        }
+        return orientation;
     }
 
     void Matrix4x4::SetRotation(Vector3 euler, const bool isDegrees /*= false*/)
@@ -73,6 +118,7 @@ namespace Engine
         }
 
         Rotate(euler, false);
+        if(Vector3::Equal(scale, Vector3::OneVector())) return;
         Scale(scale);
     }
 
@@ -130,23 +176,47 @@ namespace Engine
 
     void Matrix4x4::SetScale(const Vector3 scale)
     {
+        if(const Vector3 prevScale = GetScale(); !Vector3::Equal(prevScale, Vector3::OneVector()))
+        {
+            if(Vector3::Equal(prevScale, scale)) return;
+            _columns[0] /= prevScale.X;
+            _columns[1] /= prevScale.Y;
+            _columns[2] /= prevScale.Z;
+        }
+
         _columns[0].Normalize();
         _columns[1].Normalize();
         _columns[2].Normalize();
 
+        if(Vector3::Equal(scale, Vector3::OneVector())) return;
         Scale(scale);
     }
 
     void Matrix4x4::Scale(const Vector3 scale)
     {
-        _columns[0] *= FMath::Max(scale.X, MIN_SCALE);
-        _columns[1] *= FMath::Max(scale.Y, MIN_SCALE);
-        _columns[2] *= FMath::Max(scale.Z, MIN_SCALE);
+        _columns[0] *= FMath::MaxOrMin(scale.X, MIN_SCALE);
+        _columns[1] *= FMath::MaxOrMin(scale.Y, MIN_SCALE);
+        _columns[2] *= FMath::MaxOrMin(scale.Z, MIN_SCALE);
+    }
+
+    Vector3 Matrix4x4::GetAbsoluteScale() const
+    {
+        const Vector3 scale(Vector3(_columns[0]).Length(), Vector3(_columns[1]).Length(), Vector3(_columns[2]).Length());
+        return scale;
     }
 
     Vector3 Matrix4x4::GetScale() const
     {
-        const Vector3 scale(Vector3(_columns[0]).Length(), Vector3(_columns[1]).Length(), Vector3(_columns[2]).Length());
+        Matrix3x3 copy = this->GetNormalized();
+        Vector3 scale = GetAbsoluteScale();
+
+        if(Vector3::Dot(copy[0], Vector3::Cross(copy[1], copy[2])) < 0)
+        {
+            scale.X *= -1.f;
+            scale.Y *= -1.f;
+            scale.Z *= -1.f;
+        }
+
         return scale;
     }
 

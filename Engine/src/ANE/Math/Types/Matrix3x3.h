@@ -53,6 +53,7 @@ namespace Engine
 
         void SetRotation(const Quaternion& quat);
         void Rotate(const Quaternion& quat);
+        Quaternion GetQuaternionFast() const;
         Quaternion GetQuaternion() const;
 
         void SetRotation(Vector3 euler, bool isDegrees = false);
@@ -62,6 +63,7 @@ namespace Engine
 
         void SetScale(Vector3 scale);
         void Scale(Vector3 scale);
+        Vector3 GetScaleFast() const;
         Vector3 GetScale() const;
 
         Vector3 GetRight() const;
