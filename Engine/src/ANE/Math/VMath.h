@@ -174,6 +174,39 @@ namespace Engine::Math
     }
 
     /**
+     * Returns Max if value is above 0 and Min if value is below 0
+     */
+    inline Vector2 MaxOrMin(const Vector2 x, const Vector2 minValue)
+    {
+        return { FMath::MaxOrMin(x.X, minValue.X),
+                FMath::MaxOrMin(x.Y, minValue.Y),
+        };
+    }
+
+    /**
+     * Returns Max if value is above 0 and Min if value is below 0
+     */
+    inline Vector3 MaxOrMin(const Vector3 x, const Vector3 minValue)
+    {
+        return { FMath::MaxOrMin(x.X, minValue.X),
+                FMath::MaxOrMin(x.Y, minValue.Y),
+                FMath::MaxOrMin(x.Z, minValue.Z),
+        };
+    }
+
+    /**
+     * Returns Max if value is above 0 and Min if value is below 0
+     */
+    inline Vector4 MaxOrMin(const Vector4 x, const Vector4 minValue)
+    {
+        return { FMath::MaxOrMin(x.X, minValue.X),
+                FMath::MaxOrMin(x.Y, minValue.Y),
+                FMath::MaxOrMin(x.Z, minValue.Z),
+                FMath::MaxOrMin(x.W, minValue.W),
+        };
+    }
+
+    /**
      * Wraps the angles in radians from 0 to 2pi
      */
     inline Vector2 WrapAngles(const Vector2 euler)

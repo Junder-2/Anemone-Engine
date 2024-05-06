@@ -127,17 +127,17 @@ namespace Engine::FMath
     /**
      * Returns the smallest of the two values
      */
-    inline float Min(const float x, const float y)
+    inline float Min(const float x, const float min)
     {
-        return glm::min(x, y);
+        return glm::min(x, min);
     }
 
     /**
      * Returns the biggest of the two values
      */
-    inline float Max(const float x, const float y)
+    inline float Max(const float x, const float max)
     {
-        return glm::max(x, y);
+        return glm::max(x, max);
     }
 
     /**
@@ -170,5 +170,13 @@ namespace Engine::FMath
     inline float Max0(const float x)
     {
         return glm::max(x, 0.f);
+    }
+
+    /**
+     * Returns Max if value is above 0 and Min if value is below 0
+     */
+    inline float MaxOrMin(const float x, const float minValue)
+    {
+        return x >= 0 ? Max(x, minValue) : Min(x, -minValue);
     }
 }
