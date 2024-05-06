@@ -36,14 +36,14 @@ namespace Engine
     public:
         struct MaterialConstants
         {
-            Vector3 Color;
-            float Normal;
-            Vector3 Emission;
-            float Metallic;
-            float Roughness;
-            float Reflectance;
-            float Height;
-            float Occlusion;
+            Vector3 Color; //default value = 1
+            float Normal; // default = 1
+            Vector3 Emission; // 0
+            float Metallic;// 1
+            float Roughness;//0
+            float Reflectance;//1
+            float Height;//1
+            float Occlusion;//1
 
             // Padding so we meet 256 byte alignment.
             Vector4 Extra[13];

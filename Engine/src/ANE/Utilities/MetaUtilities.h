@@ -1,5 +1,7 @@
 #pragma once
 #include <imgui.h>
+
+#include "imgui_internal.h"
 #include "PhysicsUtilities.h"
 #include "ANE/Physics/Types/Collider.h"
 #include "ANE/Physics/Types/BoxCollider.h"
@@ -262,6 +264,49 @@ namespace Engine
         }
         return propertyWritten;
     }
+    inline bool InspectMutableMaterialPropertyBlock(entt::meta_data& field, entt::meta_any& componentData)
+    {
+        auto v = field.get(componentData).cast<FilamentMetallicRoughness::MaterialConstants>();
+        bool propertyWritten = false;
+        if(ImGui::DragFloat("Height multiplier",&v.Height,0.1f,0,1))
+        {
+            propertyWritten =  true;
+        }
+        if(ImGui::DragFloat3("Color",&v.Color.X,0.1f,0,255))
+        {
+            propertyWritten =  true;
+        }
+        if(ImGui::DragFloat3("Emission",&v.Emission.X,0.1f,0,255))
+        {
+            propertyWritten =  true;
+        }
+        if(ImGui::DragFloat("Metallic",&v.Metallic,0.1f,0,1))
+        {
+            propertyWritten =  true;
+        }
+        if(ImGui::DragFloat("Height",&v.Normal,0.1f,0,1))
+        {
+            propertyWritten =  true;
+        }
+        if(ImGui::DragFloat("Normal",&v.Height,0.1f,0,1))
+        {
+            propertyWritten =  true;
+        }
+        if(ImGui::DragFloat("Occlusion",&v.Occlusion,0.1f,0,1))
+        {
+            propertyWritten =  true;
+        }
+        if(ImGui::DragFloat("Reflectance",&v.Reflectance,0.1f,0,1))
+        {
+            propertyWritten =  true;
+        }
+        if(ImGui::DragFloat("Roughness",&v.Roughness,0.1f,0,1))
+        {
+            propertyWritten =  true;
+        }
+        field.set(componentData,v);
+        return propertyWritten;
+    }
 
     using FieldInspectorFn = bool (*)(entt::meta_data& field, entt::meta_any& component_data);
 
@@ -276,7 +321,8 @@ namespace Engine
         {entt::type_id<Vector2>().hash(), InspectMutableVector2Field},
         {entt::type_id<Vector3>().hash(), InspectMutableVector3Field},
         {entt::type_id<Vector4>().hash(), InspectMutableVector4Field},
-        {entt::type_id<bool>().hash(), InspectMutableBoolField}
+        {entt::type_id<bool>().hash(), InspectMutableBoolField},
+        {entt::type_id<FilamentMetallicRoughness::MaterialConstants>().hash(), InspectMutableMaterialPropertyBlock}
     };
 
     inline bool InspectImmutableStringField(entt::meta_data& field, entt::meta_any& componentData)
@@ -378,4 +424,13 @@ namespace Engine
     {
         return InvokeMetaFunction(entt::resolve(id), funcId, std::forward<Args>(args)...);
     }
+
+    /*
+     * Mesh - VMA Mesh asset
+     * String - File
+     * Material Property - two floats, one int, a blah blah
+     *
+     *
+     *
+     */
 }
