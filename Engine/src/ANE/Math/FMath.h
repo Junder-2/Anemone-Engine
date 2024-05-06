@@ -125,6 +125,14 @@ namespace Engine::FMath
     }
 
     /**
+     * Returns the sign of the value
+     */
+    inline float Sign(const float x)
+    {
+        return glm::sign(x);
+    }
+
+    /**
      * Returns the smallest of the two values
      */
     inline float Min(const float x, const float min)
