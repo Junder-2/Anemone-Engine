@@ -153,7 +153,7 @@ namespace Engine
         static VmaImage CreateImage(VkExtent3D size, VkFormat format, VkImageUsageFlags usage, bool mipmaps = false);
         static VmaImage CreateImage(const void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, bool mipmaps = false);
         static void DestroyImage(const VmaImage& image);
-        static void GenerateMipMaps(const VmaImage& image, VkExtent3D size, uint32_t mipLevels);
+        static void GenerateMipMaps(const VmaImage& image, VkExtent3D size, uint32_t mipLevels, bool cubemap = false);
 
         static void ImmediateSubmit(std::function<void(VkCommandBuffer cmd)>&& function);
 
