@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Vector3.h"
+#include "ANE/Math/FMath.h"
 
 namespace reactphysics3d
 {
@@ -48,6 +49,8 @@ namespace Engine
         Matrix3x3 GetMatrix() const;
         Vector3 GetEulerAngles(bool inDegrees = false) const;
 
+        bool IsUnit() const;
+
         std::string ToString() const;
 
         static Quaternion FromEulerAngles(const Vector3& eulerAngles, bool inDegrees = false);
@@ -76,6 +79,16 @@ namespace Engine
             Z = quaternion.Z;
             W = quaternion.W;
             return *this;
+        }
+
+        float& operator[](const int index)
+        {
+            return (&X)[index];
+        }
+
+        const float& operator[](const int index) const
+        {
+            return (&X)[index];
         }
 
         Quaternion& operator+=(const Quaternion& quaternion)
@@ -194,6 +207,12 @@ namespace Engine
     inline float Quaternion::Dot(const Quaternion& quaternion) const
     {
         return (X*quaternion.X + Y*quaternion.Y + Z*quaternion.Z + W*quaternion.W);
+    }
+
+    inline bool Quaternion::IsUnit() const
+    {
+        const float length = Length();
+        return FMath::Abs(length - 1.f) < FMath::EPSILON;
     }
 
     inline std::string Quaternion::ToString() const

@@ -40,6 +40,7 @@ namespace Engine
 
         void Normalize();
 
+        static Vector4 Dot(const Vector4& vec1, const Vector4& vec2);
         static bool Equal(const Vector4& vec1, const Vector4& vec2, float epsilon = FMath::EPSILON);
 
         static Vector4 Convert(const glm::vec4& vec);
@@ -62,12 +63,30 @@ namespace Engine
             return !(*this == vector);
         }
 
+        Vector4& operator+=(const float& scalar)
+        {
+            X += scalar;
+            Y += scalar;
+            Z += scalar;
+            W += scalar;
+            return *this;
+        }
+
         Vector4& operator+=(const Vector4& vector)
         {
             X += vector.X;
             Y += vector.Y;
             Z += vector.Z;
             W += vector.W;
+            return *this;
+        }
+
+        Vector4& operator-=(const float& scalar)
+        {
+            X -= scalar;
+            Y -= scalar;
+            Z -= scalar;
+            W -= scalar;
             return *this;
         }
 
@@ -89,6 +108,15 @@ namespace Engine
             return *this;
         }
 
+        Vector4& operator*=(const Vector4& vector)
+        {
+            X *= vector.X;
+            Y *= vector.Y;
+            Z *= vector.Z;
+            W *= vector.W;
+            return *this;
+        }
+
         Vector4& operator/=(const float& scalar)
         {
             assert(scalar > FMath::EPSILON);
@@ -96,6 +124,20 @@ namespace Engine
             Y /= scalar;
             Z /= scalar;
             W /= scalar;
+            return *this;
+        }
+
+        Vector4& operator/=(const Vector4& vector)
+        {
+            ANE_EASSERT(vector.X > FMath::EPSILON);
+            ANE_EASSERT(vector.Y > FMath::EPSILON);
+            ANE_EASSERT(vector.Z > FMath::EPSILON);
+            ANE_EASSERT(vector.W > FMath::EPSILON);
+
+            X /= vector.X;
+            Y /= vector.Y;
+            Z /= vector.Z;
+            W /= vector.W;
             return *this;
         }
 
@@ -123,9 +165,19 @@ namespace Engine
             return (X == vector.X ? (Y == vector.Y ? (Z == vector.Z ? W < vector.W : Z < vector.Z) : Y < vector.Y) : X < vector.X);
         }
 
+        friend Vector4 operator+(const Vector4& vector1, const float& scalar)
+        {
+            return {vector1.X + scalar, vector1.Y + scalar, vector1.Z + scalar, vector1.W + scalar};
+        }
+
         friend Vector4 operator+(const Vector4& vector1, const Vector4& vector2)
         {
             return {vector1.X + vector2.X, vector1.Y + vector2.Y, vector1.Z + vector2.Z, vector1.W + vector2.W};
+        }
+
+        friend Vector4 operator-(const Vector4& vector1, const float& scalar)
+        {
+            return {vector1.X - scalar, vector1.Y - scalar, vector1.Z - scalar, vector1.W - scalar};
         }
 
         friend Vector4 operator-(const Vector4& vector1, const Vector4& vector2)
@@ -212,5 +264,10 @@ namespace Engine
     {
         return FMath::Equal(vec1.X, vec2.X, epsilon) && FMath::Equal(vec1.Y, vec2.Y, epsilon) &&
             FMath::Equal(vec1.Z, vec2.Z, epsilon) && FMath::Equal(vec1.W, vec2.W, epsilon);
+    }
+
+    inline Vector4 Vector4::Dot(const Vector4& vec1, const Vector4& vec2)
+    {
+        return vec1.Dot(vec2);
     }
 }

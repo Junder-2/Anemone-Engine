@@ -44,6 +44,7 @@ namespace Engine
 
         void Normalize();
 
+        static Vector2 Dot(const Vector2& vec1, const Vector2& vec2);
         static bool Equal(const Vector2& vec1, const Vector2& vec2, const float epsilon = FMath::EPSILON);
 
         // Conversion to other vector2 types
@@ -68,10 +69,24 @@ namespace Engine
             return !(*this == vector);
         }
 
+        Vector2& operator+=(const float& scalar)
+        {
+            X += scalar;
+            Y += scalar;
+            return *this;
+        }
+
         Vector2& operator+=(const Vector2& vector)
         {
             X += vector.X;
             Y += vector.Y;
+            return *this;
+        }
+
+        Vector2& operator-=(const float& scalar)
+        {
+            X -= scalar;
+            Y -= scalar;
             return *this;
         }
 
@@ -89,11 +104,28 @@ namespace Engine
             return *this;
         }
 
+        Vector2& operator*=(const Vector2& vector)
+        {
+            X *= vector.X;
+            Y *= vector.Y;
+            return *this;
+        }
+
         Vector2& operator/=(const float& scalar)
         {
             ANE_EASSERT(scalar > FMath::EPSILON);
             X /= scalar;
             Y /= scalar;
+            return *this;
+        }
+
+        Vector2& operator/=(const Vector2& vector)
+        {
+            ANE_EASSERT(vector.X > FMath::EPSILON);
+            ANE_EASSERT(vector.Y > FMath::EPSILON);
+
+            X /= vector.X;
+            Y /= vector.Y;
             return *this;
         }
 
@@ -119,9 +151,19 @@ namespace Engine
             return (X == vector.X ? Y < vector.Y : X < vector.X);
         }
 
+        friend Vector2 operator+(const Vector2& vector1, const float& scalar)
+        {
+            return {vector1.X + scalar, vector1.Y + scalar};
+        }
+
         friend Vector2 operator+(const Vector2& vector1, const Vector2& vector2)
         {
             return {vector1.X + vector2.X, vector1.Y + vector2.Y};
+        }
+
+        friend Vector2 operator-(const Vector2& vector1, const float& scalar)
+        {
+            return {vector1.X - scalar, vector1.Y - scalar};
         }
 
         friend Vector2 operator-(const Vector2& vector1, const Vector2& vector2)
@@ -203,5 +245,10 @@ namespace Engine
     inline bool Vector2::Equal(const Vector2& vec1, const Vector2& vec2, const float epsilon)
     {
         return FMath::Equal(vec1.X, vec2.X, epsilon) && FMath::Equal(vec1.Y, vec2.Y, epsilon);
+    }
+
+    inline Vector2 Vector2::Dot(const Vector2& vec1, const Vector2& vec2)
+    {
+        return vec1.Dot(vec2);
     }
 }

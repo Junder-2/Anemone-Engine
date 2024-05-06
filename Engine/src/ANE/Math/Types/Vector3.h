@@ -29,7 +29,7 @@ namespace Engine
         static Vector3 RightVector() { return {1, 0, 0}; }
         static Vector3 UpVector() { return {0, 1, 0}; }
         static Vector3 ForwardVector() { return {0, 0, 1}; }
-        static Vector3 OneVector() { return {1, 1, 0}; }
+        static Vector3 OneVector() { return {1, 1, 1}; }
 
         float LengthSquare() const;
 
@@ -45,7 +45,9 @@ namespace Engine
 
         Vector3 GetNormalized() const;
 
-        static bool Equal(const Vector3& vec1, const Vector3& vec2, const float epsilon = FMath::EPSILON);
+        static Vector3 Dot(const Vector3& vec1, const Vector3& vec2);
+        static Vector3 Cross(const Vector3& vec1, const Vector3& vec2);
+        static bool Equal(const Vector3& vec1, const Vector3& vec2, float epsilon = FMath::EPSILON);
 
         static Vector3 Convert(const reactphysics3d::Vector3& vec);
         static Vector3 Convert(const glm::vec3& vec);
@@ -67,11 +69,27 @@ namespace Engine
             return !(*this == vector);
         }
 
+        Vector3& operator+=(const float& scalar)
+        {
+            X += scalar;
+            Y += scalar;
+            Z += scalar;
+            return *this;
+        }
+
         Vector3& operator+=(const Vector3& vector)
         {
             X += vector.X;
             Y += vector.Y;
             Z += vector.Z;
+            return *this;
+        }
+
+        Vector3& operator-=(const float& scalar)
+        {
+            X -= scalar;
+            Y -= scalar;
+            Z -= scalar;
             return *this;
         }
 
@@ -91,12 +109,32 @@ namespace Engine
             return *this;
         }
 
+        Vector3& operator*=(const Vector3& vector)
+        {
+            X *= vector.X;
+            Y *= vector.Y;
+            Z *= vector.Z;
+            return *this;
+        }
+
         Vector3& operator/=(const float& scalar)
         {
             ANE_EASSERT(scalar > FMath::EPSILON);
             X /= scalar;
             Y /= scalar;
             Z /= scalar;
+            return *this;
+        }
+
+        Vector3& operator/=(const Vector3& vector)
+        {
+            ANE_EASSERT(vector.X > FMath::EPSILON);
+            ANE_EASSERT(vector.Y > FMath::EPSILON);
+            ANE_EASSERT(vector.Z > FMath::EPSILON);
+
+            X /= vector.X;
+            Y /= vector.Y;
+            Z /= vector.Z;
             return *this;
         }
 
@@ -123,9 +161,19 @@ namespace Engine
             return (X == vector.X ? (Y == vector.Y ? Z < vector.Z : Y < vector.Y) : X < vector.X);
         }
 
+        friend Vector3 operator+(const Vector3& vector1, const float& scalar)
+        {
+            return {vector1.X + scalar, vector1.Y + scalar, vector1.Z + scalar};
+        }
+
         friend Vector3 operator+(const Vector3& vector1, const Vector3& vector2)
         {
             return {vector1.X + vector2.X, vector1.Y + vector2.Y, vector1.Z + vector2.Z};
+        }
+
+        friend Vector3 operator-(const Vector3& vector1, const float& scalar)
+        {
+            return {vector1.X - scalar, vector1.Y - scalar, vector1.Z - scalar};
         }
 
         friend Vector3 operator-(const Vector3& vector1, const Vector3& vector2)
@@ -226,4 +274,15 @@ namespace Engine
         return FMath::Equal(vec1.X, vec2.X, epsilon) && FMath::Equal(vec1.Y, vec2.Y, epsilon) &&
             FMath::Equal(vec1.Z, vec2.Z, epsilon);
     }
+
+    inline Vector3 Vector3::Dot(const Vector3& vec1, const Vector3& vec2)
+    {
+        return vec1.Dot(vec2);
+    }
+
+    inline Vector3 Vector3::Cross(const Vector3& vec1, const Vector3& vec2)
+    {
+        return vec1.Cross(vec2);
+    }
+
 }
