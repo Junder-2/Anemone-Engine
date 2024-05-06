@@ -277,27 +277,51 @@ namespace Engine
     {
         auto v = field.get(componentData).cast<FilamentMetallicRoughness::MaterialConstants>();
         bool propertyWritten = false;
+        float col[3];
+        col[0] = v.Color.X;
+        col[1] = v.Color.Y;
+        col[2] = v.Color.Z;
+        if(ImGui::CollapsingHeader("Base Color"))
+        {
+            if(ImGui::ColorPicker3("##Color",col))
+            {
+                v.Color.X = col[0];
+                v.Color.Y = col[1];
+                v.Color.Z = col[2];
+                propertyWritten =  true;
+            }
+        }
+
+        float emissionCol[3];
+        emissionCol[0] = v.Emission.X;
+        emissionCol[1] = v.Emission.Y;
+        emissionCol[2] = v.Emission.Z;
+        if(ImGui::CollapsingHeader("Emission Color"))
+        {
+            if(ImGui::ColorPicker3("##Emission",col))
+            {
+                v.Color.X = emissionCol[0];
+                v.Color.Y = emissionCol[1];
+                v.Color.Z = emissionCol[2];
+                propertyWritten =  true;
+            }
+        }
+
         if(ImGui::DragFloat("Height multiplier",&v.Height,0.1f,0,1))
         {
             propertyWritten =  true;
         }
-        if(ImGui::DragFloat3("Color",&v.Color.X,0.1f,0,255))
-        {
-            propertyWritten =  true;
-        }
-        if(ImGui::DragFloat3("Emission",&v.Emission.X,0.1f,0,255))
-        {
-            propertyWritten =  true;
-        }
+
+
         if(ImGui::DragFloat("Metallic",&v.Metallic,0.1f,0,1))
         {
             propertyWritten =  true;
         }
-        if(ImGui::DragFloat("Height",&v.Normal,0.1f,0,1))
+        if(ImGui::DragFloat("Height",&v.Height,0.1f,0,1))
         {
             propertyWritten =  true;
         }
-        if(ImGui::DragFloat("Normal",&v.Height,0.1f,0,1))
+        if(ImGui::DragFloat("Normal",&v.Normal,0.1f,0,1))
         {
             propertyWritten =  true;
         }
