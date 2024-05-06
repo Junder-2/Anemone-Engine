@@ -37,6 +37,8 @@ namespace Engine
         float Dot(const Vector4& vector) const;
 
         bool IsZero() const;
+        bool HasPositive() const;
+        bool HasNegative() const;
 
         void Normalize();
 
@@ -119,7 +121,7 @@ namespace Engine
 
         Vector4& operator/=(const float& scalar)
         {
-            assert(scalar > FMath::EPSILON);
+            ANE_EASSERT(abs(scalar) >= FMath::EPSILON);
             X /= scalar;
             Y /= scalar;
             Z /= scalar;
@@ -129,10 +131,10 @@ namespace Engine
 
         Vector4& operator/=(const Vector4& vector)
         {
-            ANE_EASSERT(vector.X > FMath::EPSILON);
-            ANE_EASSERT(vector.Y > FMath::EPSILON);
-            ANE_EASSERT(vector.Z > FMath::EPSILON);
-            ANE_EASSERT(vector.W > FMath::EPSILON);
+            ANE_EASSERT(abs(vector.X) >= FMath::EPSILON);
+            ANE_EASSERT(abs(vector.Y) >= FMath::EPSILON);
+            ANE_EASSERT(abs(vector.Z) >= FMath::EPSILON);
+            ANE_EASSERT(abs(vector.W) >= FMath::EPSILON);
 
             X /= vector.X;
             Y /= vector.Y;
@@ -207,16 +209,16 @@ namespace Engine
 
         friend Vector4 operator/(const Vector4& vector, const float scalar)
         {
-            ANE_EASSERT(scalar > FMath::EPSILON);
+            ANE_EASSERT(abs(scalar) >= FMath::EPSILON);
             return {vector.X / scalar, vector.Y / scalar, vector.Z / scalar, vector.W / scalar};
         }
 
         friend Vector4 operator/(const Vector4& vector1, const Vector4& vector2)
         {
-            ANE_EASSERT(vector2.X > FMath::EPSILON);
-            ANE_EASSERT(vector2.Y > FMath::EPSILON);
-            ANE_EASSERT(vector2.Z > FMath::EPSILON);
-            ANE_EASSERT(vector2.W > FMath::EPSILON);
+            ANE_EASSERT(abs(vector2.X) >= FMath::EPSILON);
+            ANE_EASSERT(abs(vector2.Y) >= FMath::EPSILON);
+            ANE_EASSERT(abs(vector2.Z) >= FMath::EPSILON);
+            ANE_EASSERT(abs(vector2.W) >= FMath::EPSILON);
             return {vector1.X / vector2.X, vector1.Y / vector2.Y, vector1.Z / vector2.Z, vector1.W / vector2.W};
         }
 
@@ -241,6 +243,16 @@ namespace Engine
     inline bool Vector4::IsZero() const
     {
         return (std::abs(LengthSquare() - 0) < FMath::EPSILON);
+    }
+
+    inline bool Vector4::HasPositive() const
+    {
+        return (X > 0 || Y > 0 || Z > 0 || W < 0);
+    }
+
+    inline bool Vector4::HasNegative() const
+    {
+        return (X < 0 || Y < 0 || Z < 0 || W < 0);
     }
 
     inline void Vector4::Normalize()
