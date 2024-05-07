@@ -1,10 +1,10 @@
 #pragma once
+#include "ANE/Math/Types/Vector3.h"
 
 namespace Engine
 {
     enum class CollisionShapeType;
     struct Quaternion;
-    struct Vector3;
 
     class Collider
     {
@@ -45,6 +45,16 @@ namespace Engine
          * Returns the local space rotation of the collider
          */
         Vector3 GetEulerAngles(bool inDegrees = false) const;
+
+        /**
+         * Sets the local space rotation of the collider
+         */
+        void SetScale(Vector3 scale);
+
+        /**
+         * Returns the local space rotation of the collider
+         */
+        Vector3 GetScale() const;
 
         /**
          * Sets the mask of what this collider should be able to collide with
@@ -95,9 +105,11 @@ namespace Engine
 
     protected:
         void WakeBody() const;
+        virtual void OnUpdateScale() {}
 
     protected:
         rp3d::Collider* _reactCollider;
         CollisionShapeType _shapeType;
+        Vector3 _scale = 1.f;
     };
 }

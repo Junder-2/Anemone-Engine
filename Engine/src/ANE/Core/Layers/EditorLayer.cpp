@@ -147,7 +147,7 @@ namespace Engine
         AddScene<Scene>("Game");
 
         //Create a Entity
-        Entity ent = Create("Square Entity");
+        Entity ent = Create("Camera");
         std::stringstream oss;
 
         for (int i = 0; i < numEntitiesToTest; i++)
@@ -180,11 +180,11 @@ namespace Engine
         Entity floor = Create("Floor");
         TransformMatrix& transformMatrix = floor.GetComponent<TransformComponent>().Transform;
         transformMatrix.SetPosition(Vector3(0, -5.f, 0));
-        transformMatrix.Scale(Vector3(10.f));
+        transformMatrix.Scale(Vector3(10.f, 1.f, 10.f));
 
         floor.AddComponent<RenderComponent>("Plane.obj");
         floor.AddComponent<RigidBodyComponent>(floor, BodyType::Static);
-        floor.AddComponent<ColliderComponent>(floor, Vector3(10.f, .1f, 10.f));
+        floor.AddComponent<ColliderComponent>(floor, Vector3(1.f, .1f, 1.f));
     }
 
     void EditorLayer::OnSwitchEditorFocus(InputValue inputValue)

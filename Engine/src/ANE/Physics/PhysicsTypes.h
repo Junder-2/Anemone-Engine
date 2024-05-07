@@ -21,11 +21,11 @@ namespace Engine
 
     enum class PhysicsDebugDisplayFlag
     {
-        ColliderAABB                = 1 << 0,
-        ColliderBroadphaseAABB      = 1 << 1,
-        CollisionShape              = 1 << 2,
-        ContactPoint                = 1 << 3,
-        ContactNormal               = 1 << 4,
-        CollisionShapeNormal        = 1 << 5,
+        ColliderAABB                = BIT(0),
+        ColliderBroadphaseAABB      = BIT(1),
+        CollisionShape              = BIT(2),
+        ContactPoint                = BIT(3),
+        ContactNormal               = BIT(4),
+        CollisionShapeNormal        = BIT(5),
     };
 }

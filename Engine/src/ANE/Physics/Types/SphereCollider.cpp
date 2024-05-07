@@ -6,16 +6,29 @@
 
 namespace Engine
 {
-    SphereCollider::SphereCollider(rp3d::Collider* collider): Collider(collider, CollisionShapeType::Sphere) {}
-
-    void SphereCollider::SetRadius(const float radius) const
+    SphereCollider::SphereCollider(rp3d::Collider* collider): Collider(collider, CollisionShapeType::Sphere)
     {
+        const auto sphereCollider = reinterpret_cast<reactphysics3d::SphereShape*>(_reactCollider->getCollisionShape());
+        _radius = sphereCollider->getRadius();
+    }
+
+    void SphereCollider::SetRadius(const float radius)
+    {
+        _radius = FMath::Max(radius, MIN_SCALE);
+
         WakeBody();
-        reinterpret_cast<reactphysics3d::SphereShape*>(_reactCollider->getCollisionShape())->setRadius(FMath::Max(radius, MIN_SCALE));
+        const auto sphereCollider = reinterpret_cast<reactphysics3d::SphereShape*>(_reactCollider->getCollisionShape());
+        const float scale = FMath::Max(FMath::Max(_scale.X, _scale.Y), _scale.Z);
+        sphereCollider->setRadius(FMath::Max(_radius*scale, MIN_SCALE));
     }
 
     float SphereCollider::GetRadius() const
     {
-        return reinterpret_cast<reactphysics3d::SphereShape*>(_reactCollider->getCollisionShape())->getRadius();
+        return _radius;
+    }
+
+    void SphereCollider::OnUpdateScale()
+    {
+        SetRadius(GetRadius());
     }
 }

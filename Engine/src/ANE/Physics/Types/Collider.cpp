@@ -1,8 +1,10 @@
 #include "anepch.h"
 #include "Collider.h"
 
+#include "ANE/Math/VMath.h"
 #include "ANE/Math/Types/Quaternion.h"
 #include "ANE/Math/Types/Vector3.h"
+#include "ANE/Physics/PhysicsTypes.h"
 
 namespace Engine
 {
@@ -40,6 +42,17 @@ namespace Engine
     Vector3 Collider::GetEulerAngles(const bool inDegrees /*= false*/) const
     {
         return Quaternion::Convert(_reactCollider->getLocalToBodyTransform().getOrientation()).GetEulerAngles(inDegrees);
+    }
+
+    void Collider::SetScale(const Vector3 scale)
+    {
+        _scale = Math::Max(Math::Abs(scale), MIN_SCALE);
+        OnUpdateScale();
+    }
+
+    Vector3 Collider::GetScale() const
+    {
+        return _scale;
     }
 
     void Collider::SetCollisionMask(const uint16_t collisionMask) const
