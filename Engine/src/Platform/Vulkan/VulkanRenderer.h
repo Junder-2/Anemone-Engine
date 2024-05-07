@@ -85,6 +85,7 @@ namespace Engine
         static VmaMeshBuffers UploadDebugVertices(std::span<uint32_t> indices, std::span<Vertex> vertices);
 
         VmaImage LoadTexture(const std::string& texturePath);
+        VmaImage LoadCubeTexture(const std::string& texturePath);
 
         float GetFramerate();
         static ImGuiIO* GetImGuiIO() { return _io; }
@@ -150,8 +151,9 @@ namespace Engine
         static VmaBuffer CreateBuffer(size_t allocSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage);
         static void DestroyBuffer(const VmaBuffer& buffer);
 
-        static VmaImage CreateImage(VkExtent3D size, VkFormat format, VkImageUsageFlags usage, bool mipmaps = false);
-        static VmaImage CreateImage(const void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, bool mipmaps = false);
+        static VmaImage CreateImage(VkExtent3D size, VkFormat format, VkImageUsageFlags usage, VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D, bool mipmaps = false);
+        static VmaImage CreateImage(const void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D, bool mipmaps = false);
+        static VmaImage CreateCubeImage(const void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D, bool mipmaps = false);
         static void DestroyImage(const VmaImage& image);
         static void GenerateMipMaps(const VmaImage& image, VkExtent3D size, uint32_t mipLevels, bool cubemap = false);
 

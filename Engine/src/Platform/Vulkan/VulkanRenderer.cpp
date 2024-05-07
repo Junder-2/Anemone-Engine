@@ -163,7 +163,40 @@ namespace Engine
         }
 
         const VkExtent3D imageExtent = VkExtent3D{ (uint32_t)width, (uint32_t)height, 1 };
-        const VmaImage imageBuffers = CreateImage(pixels, imageExtent, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, true);
+        const VmaImage imageBuffers = CreateImage(pixels, imageExtent, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, VK_IMAGE_VIEW_TYPE_2D, true);
+
+        stbi_image_free(pixels);
+
+        _mainDeletionQueue.PushFunction([=]
+        {
+            DestroyImage(imageBuffers);
+        });
+
+        _loadedTextureMap[texturePath] = imageBuffers;
+
+        return imageBuffers;
+    }
+
+    VmaImage VulkanRenderer::LoadCubeTexture(const std::string& texturePath)
+    {
+        if (_loadedTextureMap.contains(texturePath))
+        {
+            return _loadedTextureMap[texturePath];
+        }
+
+        const std::string assetPath = std::string("../Assets/Textures/").append(texturePath);
+
+        int width, height, channels;
+        stbi_uc* pixels = stbi_load(assetPath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
+        if (!pixels)
+        {
+            ANE_ELOG_ERROR("Unable to load texture at path: {}", assetPath);
+            return _errorImage;
+        }
+
+        //const VkExtent3D imageExtent = VkExtent3D{ (uint32_t)width / 4, (uint32_t)height / 3, 1 }; // Horizontal flag layout
+        const VkExtent3D imageExtent = VkExtent3D{ (uint32_t)width, (uint32_t)height / 6, 1 }; // Vertical layout
+        const VmaImage imageBuffers = CreateCubeImage(pixels, imageExtent, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, VK_IMAGE_VIEW_TYPE_CUBE, true);
 
         stbi_image_free(pixels);
 
@@ -1296,7 +1329,7 @@ namespace Engine
         vmaDestroyBuffer(_vmaAllocator, buffer.Buffer, buffer.Allocation);
     }
 
-    VmaImage VulkanRenderer::CreateImage(const VkExtent3D size, const VkFormat format, const VkImageUsageFlags usage, const bool mipmaps)
+    VmaImage VulkanRenderer::CreateImage(const VkExtent3D size, const VkFormat format, const VkImageUsageFlags usage, const VkImageViewType viewType, const bool mipmaps)
     {
         VmaImage newImage;
         newImage.ImageFormat = format;
@@ -1306,6 +1339,13 @@ namespace Engine
         if (mipmaps)
         {
             imgInfo.mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(size.width, size.height)))) + 1;
+        }
+
+        const bool isCubeMap = viewType == VK_IMAGE_VIEW_TYPE_CUBE;
+        if (isCubeMap)
+        {
+            imgInfo.flags |= VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
+            imgInfo.arrayLayers = 6;
         }
 
         // Always allocate images on dedicated GPU memory.
@@ -1324,21 +1364,27 @@ namespace Engine
 
         // Build a image-view for the image.
         VkImageViewCreateInfo viewInfo = VulkanInitializers::ImageViewCreateInfo(format, newImage.Image, aspectFlag);
+        viewInfo.viewType = viewType;
         viewInfo.subresourceRange.levelCount = imgInfo.mipLevels;
+
+        if (isCubeMap)
+        {
+            viewInfo.subresourceRange.layerCount = 6;
+        }
 
         CHECK_RESULT(vkCreateImageView(_device, &viewInfo, _allocator, &newImage.ImageView));
 
         return newImage;
     }
 
-    VmaImage VulkanRenderer::CreateImage(const void* data, const VkExtent3D size, const VkFormat format, const VkImageUsageFlags usage, const bool mipmaps)
+    VmaImage VulkanRenderer::CreateImage(const void* data, const VkExtent3D size, const VkFormat format, const VkImageUsageFlags usage, const VkImageViewType viewType, const bool mipmaps)
     {
         const size_t dataSize = (size_t)(size.depth * size.width * size.height * 4);
         const VmaBuffer uploadBuffer = CreateBuffer(dataSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
         memcpy(uploadBuffer.Info.pMappedData, data, dataSize);
 
-        const VmaImage newImage = CreateImage(size, format, usage | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, mipmaps);
+        const VmaImage newImage = CreateImage(size, format, usage | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, viewType, mipmaps);
 
         ImmediateSubmit([&](const VkCommandBuffer cmd)
         {
@@ -1369,6 +1415,56 @@ namespace Engine
             mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(size.width, size.height)))) + 1;
         }
         GenerateMipMaps(newImage, size, mipLevels);
+
+        return newImage;
+    }
+
+    VmaImage VulkanRenderer::CreateCubeImage(const void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, VkImageViewType viewType, bool mipmaps)
+    {
+        const VkDeviceSize layerSize = (VkDeviceSize)size.depth * size.width * size.height * 4;
+        const VkDeviceSize imageSize = layerSize * 6;
+
+        const VmaBuffer uploadBuffer = CreateBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+
+        memcpy(uploadBuffer.Info.pMappedData, data, imageSize);
+
+        const VmaImage newImage = CreateImage(size, format, usage | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, viewType, mipmaps);
+
+        ImmediateSubmit([&](const VkCommandBuffer cmd)
+        {
+            VulkanUtils::TransitionImage(cmd, newImage.Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+            std::vector<VkBufferImageCopy> copyRegions;
+            copyRegions.reserve(6);
+            for (uint32_t layer = 0; layer < 6; layer++)
+            {
+                VkBufferImageCopy region = {};
+                region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+                region.imageSubresource.mipLevel = 0;
+                region.imageSubresource.baseArrayLayer = layer;
+                region.imageSubresource.layerCount = 1;
+                region.imageExtent.width = size.width;
+                region.imageExtent.height = size.height;
+                region.imageExtent.depth = size.depth;
+                region.bufferOffset = layerSize * layer;
+
+                copyRegions.push_back(region);
+            }
+
+            // Copy the buffer into the image.
+            vkCmdCopyBufferToImage(cmd, uploadBuffer.Buffer, newImage.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, copyRegions.size(), copyRegions.data());
+
+            //VulkanUtils::TransitionImage(cmd, newImage.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        });
+
+        DestroyBuffer(uploadBuffer);
+
+        uint32_t mipLevels = 1;
+        if (mipmaps)
+        {
+            mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(size.width, size.height)))) + 1;
+        }
+        GenerateMipMaps(newImage, size, mipLevels, true);
 
         return newImage;
     }
@@ -1462,22 +1558,7 @@ namespace Engine
                     0, nullptr,
                     0, nullptr,
                     1, &barrier);
-
-                if (mipWidth > 1) mipWidth /= 2;
-                if (mipHeight > 1) mipHeight /= 2;
             }
-
-            barrier.subresourceRange.baseMipLevel = mipLevels - 1;
-            barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-            barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-            barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-            barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-            vkCmdPipelineBarrier(cmd,
-                VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0,
-                0, nullptr,
-                0, nullptr,
-                1, &barrier);
         });
     }
 
