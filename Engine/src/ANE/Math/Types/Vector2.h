@@ -4,10 +4,6 @@
 
 #include "ANE/Math/MathCommon.h"
 
-#include <sstream>
-#include <string>
-#include <iostream>
-
 struct ImVec2;
 
 namespace reactphysics3d
@@ -41,10 +37,12 @@ namespace Engine
         float Dot(const Vector2& vector) const;
 
         bool IsZero() const;
+        bool HasPositive() const;
+        bool HasNegative() const;
 
         void Normalize();
 
-        static Vector2 Dot(const Vector2& vec1, const Vector2& vec2);
+        static float Dot(const Vector2& vec1, const Vector2& vec2);
         static bool Equal(const Vector2& vec1, const Vector2& vec2, const float epsilon = FMath::EPSILON);
 
         // Conversion to other vector2 types
@@ -113,7 +111,7 @@ namespace Engine
 
         Vector2& operator/=(const float& scalar)
         {
-            ANE_EASSERT(scalar > FMath::EPSILON);
+            ANE_EASSERT(abs(scalar) >= FMath::EPSILON);
             X /= scalar;
             Y /= scalar;
             return *this;
@@ -121,8 +119,8 @@ namespace Engine
 
         Vector2& operator/=(const Vector2& vector)
         {
-            ANE_EASSERT(vector.X > FMath::EPSILON);
-            ANE_EASSERT(vector.Y > FMath::EPSILON);
+            ANE_EASSERT(abs(vector.X) >= FMath::EPSILON);
+            ANE_EASSERT(abs(vector.Y) >= FMath::EPSILON);
 
             X /= vector.X;
             Y /= vector.Y;
@@ -193,14 +191,14 @@ namespace Engine
 
         friend Vector2 operator/(const Vector2& vector, const float scalar)
         {
-            ANE_EASSERT(scalar > FMath::EPSILON);
+            ANE_EASSERT(abs(scalar) >= FMath::EPSILON);
             return  {vector.X / scalar, vector.Y / scalar};
         }
 
         friend Vector2 operator/(const Vector2& vector1, const Vector2& vector2)
         {
-            ANE_EASSERT(vector2.X > FMath::EPSILON);
-            ANE_EASSERT(vector2.Y > FMath::EPSILON);
+            ANE_EASSERT(abs(vector2.X) >= FMath::EPSILON);
+            ANE_EASSERT(abs(vector2.Y) >= FMath::EPSILON);
             return {vector1.X / vector2.X, vector1.Y / vector2.Y};
         }
 
@@ -224,7 +222,17 @@ namespace Engine
 
     inline bool Vector2::IsZero() const
     {
-        return (std::abs(LengthSquare() - 0) < FMath::EPSILON);
+        return (abs(LengthSquare() - 0) < FMath::EPSILON);
+    }
+
+    inline bool Vector2::HasPositive() const
+    {
+        return (X > 0 || Y > 0);
+    }
+
+    inline bool Vector2::HasNegative() const
+    {
+        return (X < 0 || Y < 0);
     }
 
     inline void Vector2::Normalize()
@@ -247,7 +255,7 @@ namespace Engine
         return FMath::Equal(vec1.X, vec2.X, epsilon) && FMath::Equal(vec1.Y, vec2.Y, epsilon);
     }
 
-    inline Vector2 Vector2::Dot(const Vector2& vec1, const Vector2& vec2)
+    inline float Vector2::Dot(const Vector2& vec1, const Vector2& vec2)
     {
         return vec1.Dot(vec2);
     }

@@ -31,6 +31,30 @@ namespace Engine::Math
     }
 
     /**
+     * Returns the signs of the value
+     */
+    inline Vector2 Sign(const Vector2 x)
+    {
+        return {FMath::Sign(x.X), FMath::Sign(x.Y)};
+    }
+
+    /**
+     * Returns the signs of the value
+     */
+    inline Vector3 Sign(const Vector3 x)
+    {
+        return {FMath::Sign(x.X), FMath::Sign(x.Y), FMath::Sign(x.Z)};
+    }
+
+    /**
+     * Returns the signs of the value
+     */
+    inline Vector4 Sign(const Vector4 x)
+    {
+        return {FMath::Sign(x.X), FMath::Sign(x.Y), FMath::Sign(x.Z), FMath::Sign(x.W)};
+    }
+
+    /**
      * Returns the smallest of the two values
      */
     inline Vector2 Min(const Vector2 x, const Vector2 y)

@@ -3,7 +3,6 @@
 #pragma once
 
 #include "Vector3.h"
-#include "ANE/Math/FMath.h"
 
 namespace reactphysics3d
 {
@@ -212,7 +211,7 @@ namespace Engine
     inline bool Quaternion::IsUnit() const
     {
         const float length = Length();
-        return FMath::Abs(length - 1.f) < FMath::EPSILON;
+        return abs(length - 1.f) < FMath::EPSILON;
     }
 
     inline std::string Quaternion::ToString() const

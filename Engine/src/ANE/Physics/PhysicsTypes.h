@@ -1,8 +1,9 @@
 #pragma once
+#include "ANE/Math/MathCommon.h"
 
 namespace Engine
 {
-    const float MIN_SCALE = 0.01f;
+    const float MIN_SCALE = FMath::EPSILON;
 
     enum class CollisionShapeType
     {

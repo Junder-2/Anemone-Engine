@@ -40,12 +40,14 @@ namespace Engine
         Vector3 Cross(const Vector3& vector) const;
 
         bool IsZero() const;
+        bool HasPositive() const;
+        bool HasNegative() const;
 
         void Normalize();
 
         Vector3 GetNormalized() const;
 
-        static Vector3 Dot(const Vector3& vec1, const Vector3& vec2);
+        static float Dot(const Vector3& vec1, const Vector3& vec2);
         static Vector3 Cross(const Vector3& vec1, const Vector3& vec2);
         static bool Equal(const Vector3& vec1, const Vector3& vec2, float epsilon = FMath::EPSILON);
 
@@ -119,7 +121,7 @@ namespace Engine
 
         Vector3& operator/=(const float& scalar)
         {
-            ANE_EASSERT(scalar > FMath::EPSILON);
+            ANE_EASSERT(abs(scalar) >= FMath::EPSILON);
             X /= scalar;
             Y /= scalar;
             Z /= scalar;
@@ -128,9 +130,9 @@ namespace Engine
 
         Vector3& operator/=(const Vector3& vector)
         {
-            ANE_EASSERT(vector.X > FMath::EPSILON);
-            ANE_EASSERT(vector.Y > FMath::EPSILON);
-            ANE_EASSERT(vector.Z > FMath::EPSILON);
+            ANE_EASSERT(abs(vector.X) >= FMath::EPSILON);
+            ANE_EASSERT(abs(vector.Y) >= FMath::EPSILON);
+            ANE_EASSERT(abs(vector.Z) >= FMath::EPSILON);
 
             X /= vector.X;
             Y /= vector.Y;
@@ -203,15 +205,15 @@ namespace Engine
 
         friend Vector3 operator/(const Vector3& vector, const float scalar)
         {
-            ANE_EASSERT(scalar > FMath::EPSILON);
+            ANE_EASSERT(abs(scalar) >= FMath::EPSILON);
             return {vector.X / scalar, vector.Y / scalar, vector.Z / scalar};
         }
 
         friend Vector3 operator/(const Vector3& vector1, const Vector3& vector2)
         {
-            ANE_EASSERT(vector2.X > FMath::EPSILON);
-            ANE_EASSERT(vector2.Y > FMath::EPSILON);
-            ANE_EASSERT(vector2.Z > FMath::EPSILON);
+            ANE_EASSERT(abs(vector2.X) >= FMath::EPSILON);
+            ANE_EASSERT(abs(vector2.Y) >= FMath::EPSILON);
+            ANE_EASSERT(abs(vector2.Z) >= FMath::EPSILON);
             return {vector1.X / vector2.X, vector1.Y / vector2.Y, vector1.Z / vector2.Z};
         }
 
@@ -245,6 +247,16 @@ namespace Engine
         return (std::abs(LengthSquare() - 0) < FMath::EPSILON);
     }
 
+    inline bool Vector3::HasPositive() const
+    {
+        return (X > 0 || Y > 0 || Z > 0);
+    }
+
+    inline bool Vector3::HasNegative() const
+    {
+        return (X < 0 || Y < 0 || Z < 0);
+    }
+
     inline Vector3 Vector3::GetNormalized() const
     {
         Vector3 copy = *this;
@@ -275,7 +287,7 @@ namespace Engine
             FMath::Equal(vec1.Z, vec2.Z, epsilon);
     }
 
-    inline Vector3 Vector3::Dot(const Vector3& vec1, const Vector3& vec2)
+    inline float Vector3::Dot(const Vector3& vec1, const Vector3& vec2)
     {
         return vec1.Dot(vec2);
     }

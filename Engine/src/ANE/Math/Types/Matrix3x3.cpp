@@ -44,6 +44,7 @@ namespace Engine
         _columns[1] = Vector4(0, 1, 0, 0);
         _columns[2] = Vector4(0, 0, 1, 0);
         Rotate(quat);
+        if(Vector3::Equal(scale, Vector3::OneVector())) return;
         Scale(scale);
     }
 
@@ -53,14 +54,57 @@ namespace Engine
         *this *= rotMatrix;
     }
 
-    Quaternion Matrix3x3::GetQuaternion() const
+    Quaternion Matrix3x3::GetQuaternionFast() const
     {
         return Quaternion::Convert(quat_cast(glm::mat3(this->GetNormalized())));
     }
 
+    Quaternion Matrix3x3::GetQuaternion() const
+    {
+        // glm::decompose()
+
+        Matrix3x3 copy = this->GetNormalized();
+        if(Vector3::Dot(copy[0], Vector3::Cross(copy[1], copy[2])) < 0)
+        {
+            copy[0] *= -1.f;
+            copy[1] *= -1.f;
+            copy[2] *= -1.f;
+        }
+
+        Quaternion orientation;
+        float root;
+        if(const float trace = copy[0].X + copy[1].Y + copy[2].Z; trace > 0.f)
+        {
+            root = sqrt(trace + 1.f);
+            orientation.W = 0.5f * root;
+            root = 0.5f / root;
+            orientation.X = root * (copy[1].Z - copy[2].Y);
+            orientation.Y = root * (copy[2].X - copy[0].Z);
+            orientation.Z = root * (copy[0].Y - copy[1].X);
+        }
+        else
+        {
+            const int next[3] = {1, 2, 0};
+            int i = 0;
+            if(copy[1].Y > copy[0].X) i = 1;
+            if(copy[2].Z > copy[i][i]) i = 2;
+            const int j = next[i];
+            const int k = next[j];
+
+            root = sqrt(copy[i][i] - copy[j][j] - copy[k][k] + 1.f);
+
+            orientation[i] = 0.5f * root;
+            root = 0.5f / root;
+            orientation[j] = root * (copy[i][j] + copy[j][i]);
+            orientation[k] = root * (copy[i][k] + copy[k][i]);
+            orientation.W = root * (copy[j][k] - copy[k][j]);
+        }
+        return orientation;
+    }
+
     void Matrix3x3::SetRotation(Vector3 euler, const bool isDegrees /*= false*/)
     {
-        const Vector3 scale = GetScale();
+        const Vector3 scale = GetScaleFast();
 
         _columns[0] = Vector4(1, 0, 0, 0);
         _columns[1] = Vector4(0, 1, 0, 0);
@@ -72,6 +116,7 @@ namespace Engine
         }
 
         Rotate(euler, false);
+        if(Vector3::Equal(scale, Vector3::OneVector())) return;
         Scale(scale);
     }
 
@@ -110,19 +155,36 @@ namespace Engine
         _columns[1].Normalize();
         _columns[2].Normalize();
 
+        if(Vector3::Equal(scale, Vector3::OneVector())) return;
         Scale(scale);
     }
 
     void Matrix3x3::Scale(const Vector3 scale)
     {
-        _columns[0] *= FMath::Max(scale.X, MIN_SCALE);
-        _columns[1] *= FMath::Max(scale.Y, MIN_SCALE);
-        _columns[2] *= FMath::Max(scale.Z, MIN_SCALE);
+        _columns[0] *= FMath::MaxOrMin(scale.X, MIN_SCALE);
+        _columns[1] *= FMath::MaxOrMin(scale.Y, MIN_SCALE);
+        _columns[2] *= FMath::MaxOrMin(scale.Z, MIN_SCALE);
+    }
+
+    Vector3 Matrix3x3::GetScaleFast() const
+    {
+        const Vector3 scale(Vector3(_columns[0]).Length(), Vector3(_columns[1]).Length(), Vector3(_columns[2]).Length());
+        return scale;
     }
 
     Vector3 Matrix3x3::GetScale() const
     {
-        const Vector3 scale(Vector3(_columns[0]).Length(), Vector3(_columns[1]).Length(), Vector3(_columns[2]).Length());
+        Matrix3x3 copy = this->GetNormalized();
+        Vector3 scale = GetScaleFast();
+
+        const Vector3 pDum3 = Vector3::Cross(copy[1], copy[2]);
+        if(Vector3::Dot(copy[0], pDum3) < 0)
+        {
+            scale.X *= -1.f;
+            scale.Y *= -1.f;
+            scale.Z *= -1.f;
+        }
+
         return scale;
     }
 
