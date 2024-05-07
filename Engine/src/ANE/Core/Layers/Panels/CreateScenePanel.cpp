@@ -42,6 +42,6 @@ namespace Engine
 
     void CreateScenePanel::CreateScene(const char* name) const
     {
-        _editorLayer->AddScene<Scene>(name);
+        _editorLayer->CreateScene(name);
     }
 }
