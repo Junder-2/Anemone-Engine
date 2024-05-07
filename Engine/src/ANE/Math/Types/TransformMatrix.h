@@ -11,6 +11,7 @@ namespace Engine
         TransformMatrix(const Matrix4x4& transform = Matrix4x4::Identity()) : _localToWorld(transform)
         {
             SyncEulerAngles();
+            _scale = _localToWorld.GetScale();
         }
         TransformMatrix(const TransformMatrix&) = default;
 
@@ -121,7 +122,12 @@ namespace Engine
          */
         void SetScale(const Vector3 scale)
         {
-            _localToWorld.SetScale(scale);
+            // Matrix4x4 cannot keep track of what component is negative only that is has a negative scale somewhere
+            // by neutralizing the scale with our recorded scale per component scale can be functional
+            _localToWorld.Scale(1.f/_scale);
+            _scale = scale;
+            MakeScaleSafe();
+            _localToWorld.SetScale(_scale);
             MarkDirty();
         }
 
@@ -131,7 +137,12 @@ namespace Engine
          */
         void Scale(const Vector3 scale)
         {
-            _localToWorld.Scale(scale);
+            // Matrix4x4 cannot keep track of what component is negative only that is has a negative scale somewhere
+            // by neutralizing the scale with our recorded scale per component scale can be functional
+            _localToWorld.Scale(1.f/_scale);
+            _scale *= scale;
+            MakeScaleSafe();
+            _localToWorld.SetScale(_scale);
             MarkDirty();
         }
 
@@ -140,7 +151,7 @@ namespace Engine
          */
         Vector3 GetScale() const
         {
-            return _localToWorld.GetScale();
+            return _scale;
         }
 
         /**
@@ -199,6 +210,8 @@ namespace Engine
         }
 
     private:
+        void MakeScaleSafe();
+
         void SyncEulerAngles()
         {
             _eulerAngles = _localToWorld.GetEulerAngles();
@@ -206,6 +219,7 @@ namespace Engine
 
         Matrix4x4 _localToWorld;
         Vector3 _eulerAngles = 0;
+        Vector3 _scale;
         bool _isDirty = false;
     };
 }
