@@ -21,6 +21,8 @@ project "Engine"
         "vendor/VMA/include/vk_mem_alloc.h",
     }
 
+
+
     includedirs
     {
         "src/",
@@ -63,6 +65,8 @@ project "Engine"
 
     filter "system:windows"
         systemversion "latest"
+
+        links{"Dwmapi.lib"}
 
         defines
         {

@@ -22,7 +22,7 @@ namespace SandBox
     private:
         std::unordered_map<const char*, std::shared_ptr<Engine::Scene>> _scenes;
         std::shared_ptr<Engine::Scene> _activeScene;
-        Engine::SceneSerializer* _sceneSerializer;
+        //Engine::SceneSerializer* _sceneSerializer;
 
     };
 

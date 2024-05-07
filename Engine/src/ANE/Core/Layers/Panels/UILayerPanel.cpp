@@ -3,7 +3,7 @@
 
 namespace Engine
 {
-    UIUpdateWrapper Engine::UILayerPanel::OnPanelRender()
+    UIUpdateWrapper UILayerPanel::OnPanelRender()
     {
         return UIUpdateWrapper{};
     }

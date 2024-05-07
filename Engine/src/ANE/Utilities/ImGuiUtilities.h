@@ -1,4 +1,5 @@
 #pragma once
+#include "imgui.h"
 
 struct ImGuiStyle;
 
@@ -9,6 +10,8 @@ namespace Engine
     public:
         static void StyleAnemoneDark(ImGuiStyle* dst = nullptr);
         static void StyleAnemoneExperimental();
+
+        inline static ImVec4 aneColor = ImVec4(0.25f, 0.30f, 0.55f, 1.00f);
 
         // Flags for ImGui::DockSpace()
         enum ImGuiDockNodeFlags

@@ -27,8 +27,12 @@ namespace Engine
         const ImVec4 aneFrameActive = ImLerp(aneFrame, imBlack, .2f);
 
         ImGui::PushStyleColor(ImGuiCol_MenuBarBg, aneFrameActive);
+
+        //ImGui::PushStyleVar( ImGuiStyleVar_FramePadding, ImVec2( 0, 9 ) );
         if (ImGui::BeginMainMenuBar())
         {
+            //ImGui::Image()
+
             if (ImGui::BeginMenu("File"))
             {
                 if (ImGui::MenuItem("Create Scene")) UIUpdate.AddPanel(new CreateScenePanel(_editorLayer));
@@ -66,8 +70,11 @@ namespace Engine
 
             ImGui::EndMainMenuBar();
         }
+
         ImGui::PopStyleColor();
 
+       // ImGui::PopStyleVar();
         return UIUpdate;
+
     }
 }

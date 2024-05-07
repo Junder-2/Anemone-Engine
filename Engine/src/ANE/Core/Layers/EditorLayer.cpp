@@ -17,9 +17,13 @@
 #include "Panels/SceneHierarchyPanel.h"
 #include "ANE/Input/EditorInputSystem.h"
 #include "ANE/Input/Input.h"
+#include "ANE/Physics/Types/BoxCollider.h"
 #include "ANE/Input/InputAction.h"
 #include "ANE/Math/Types/TransformMatrix.h"
+#include "ANE/Physics/Physics.h"
 #include "ANE/Physics/PhysicsTypes.h"
+#include "ANE/Physics/Types/CapsuleCollider.h"
+#include "ANE/Physics/Types/SphereCollider.h"
 #include "ANE/Utilities/SceneSerializer.h"
 #include "Panels/EditorLogPanel.h"
 #include "Panels/MainMenuPanel.h"
@@ -60,6 +64,7 @@ namespace Engine
 
         //Then you would load the scene from the file path listed from that project
 
+        GetEditorInputSystem().BindKeyboardInput(KeyCodeO, MakeDelegate(this, &EditorLayer::SaveScene));
         GetEditorInputSystem().BindMouseButton(MouseButtonRight, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
 
         //TEMP need to set the initial state should be elsewhere
@@ -125,6 +130,8 @@ namespace Engine
         UUIDComponent::RegisterComponentMetaData();
         CameraComponent::RegisterComponentMetaData();
         NativeScriptComponent::RegisterComponentMetaData();
+
+        _sceneSerializer = new SceneSerializer();
     }
 
     void EditorLayer::OnUpdate(float deltaTime)
@@ -147,17 +154,17 @@ namespace Engine
         AddScene<Scene>("Game");
 
         //Create a Entity
-        Entity ent = Create("Square Entity");
+        Entity ent = _activeScene->Create("Camera Entity");
         std::stringstream oss;
 
         for (int i = 0; i < numEntitiesToTest; i++)
         {
             //ANE_LOG_INFO(UUIDGenerator::GetUUID());
 
-            std::string string = "Entity";
-            string.append(std::to_string(i));
-            string.append("\n");
-            Create(string);
+            std::string entityName = "Entity";
+            entityName.append(std::to_string(i));
+            //string.append("\n");
+            _activeScene->Create(entityName);
         }
         //Add component to entity
         //ent.AddComponent<RenderComponent>();
@@ -177,14 +184,15 @@ namespace Engine
 
     void EditorLayer::CreateFloor()
     {
-        Entity floor = Create("Floor");
+        Entity floor = _activeScene->Create("Floor");
         TransformMatrix& transformMatrix = floor.GetComponent<TransformComponent>().Transform;
         transformMatrix.SetPosition(Vector3(0, -5.f, 0));
         transformMatrix.Scale(Vector3(10.f));
 
         floor.AddComponent<RenderComponent>("Plane.obj");
         floor.AddComponent<RigidBodyComponent>(floor, BodyType::Static);
-        floor.AddComponent<ColliderComponent>(floor, Vector3(10.f, .1f, 10.f));
+        auto& compo = floor.AddComponent<ColliderComponent>(floor, Vector3(10.f, .1f, 10.f));
+        const Vector3 HalfExtends = Vector3(10.0f, 10.0f, 10.0f);
     }
 
     void EditorLayer::OnSwitchEditorFocus(InputValue inputValue)
@@ -247,29 +255,14 @@ namespace Engine
         ImGui::PopID();
     }
 
-
-    /**
-    * \brief Creates a Entity in the scene, adds a Transform and Tag
-    * \param name Name of Entity, if no name is given it will be tagged with: "Untagged"
-    * \return reference of the newly created Entity.
-    */
-    [[nodiscard("Entity never used")]] Entity EditorLayer::Create(const char* name)
+    void EditorLayer::SaveScene(InputValue inputValue)
     {
-        Entity ent{GetActiveScene().get(), name};
-        _entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent; // here
-        return ent;
+        if (inputValue.GetTriggerState() == TriggerStarted)
+        {
+            ANE_ELOG("Saving Scene");
+            _sceneSerializer->Serialize(_activeScene);
+        }
     }
 
-    [[nodiscard("Entity never used")]] Entity EditorLayer::Create(std::string stringName)
-    {
-        Entity ent{GetActiveScene().get(), stringName.c_str()};
-        _entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent;
-        return ent;
-    }
 
-    Entity EditorLayer::GetEntityWithUUID(std::string UUID)
-    {
-        return _entityMap[UUID];
-        return {};
-    }
 }

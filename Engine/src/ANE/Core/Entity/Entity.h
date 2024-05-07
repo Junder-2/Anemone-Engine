@@ -112,7 +112,7 @@ namespace Engine
             return true;
         }
 
-        ANE_ELOG_WARN("Attempted to try get component of type {} that doesn't exist", typeid(T).name());
+       // ANE_ELOG_WARN("Attempted to try get component of type {} that doesn't exist", typeid(T).name());
         return false;
     }
     template<typename Type>
