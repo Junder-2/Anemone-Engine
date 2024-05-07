@@ -999,7 +999,7 @@ namespace Engine
         VkDescriptorPoolCreateInfo poolInfo = { };
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-        poolInfo.maxSets = 1000 * IM_ARRAYSIZE(poolSizes);;
+        poolInfo.maxSets = 1000 * IM_ARRAYSIZE(poolSizes);
         poolInfo.poolSizeCount = (uint32_t)IM_ARRAYSIZE(poolSizes);
         poolInfo.pPoolSizes = poolSizes;
 
