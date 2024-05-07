@@ -157,11 +157,15 @@ namespace Engine
             }
 
             body.GetRigidBody()->SetTransform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
-            if(const auto colliderComp = scene->_registry.try_get<ColliderComponent>(entity))
+
+            if(transformMatrix.GetDirtyFlags() & DirtyScale)
             {
-                for (const auto collider : colliderComp->GetColliders())
+                if(const auto colliderComp = scene->_registry.try_get<ColliderComponent>(entity))
                 {
-                    collider->SetScale(transformMatrix.GetScale());
+                    for (const auto collider : colliderComp->GetColliders())
+                    {
+                        collider->SetScale(transformMatrix.GetScale());
+                    }
                 }
             }
             transformMatrix.ClearDirty();

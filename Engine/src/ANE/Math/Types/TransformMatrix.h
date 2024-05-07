@@ -5,6 +5,15 @@
 
 namespace Engine
 {
+    typedef uint8_t TransformDirtyFlags;
+
+    typedef enum : uint8_t
+    {
+        DirtyPosition = BIT(0),
+        DirtyRotation = BIT(1),
+        DirtyScale = BIT(2),
+    } TransformDirtyFlag;
+
     struct TransformMatrix
     {
     public:
@@ -22,7 +31,7 @@ namespace Engine
         void SetPosition(const Vector3 newPosition)
         {
             _localToWorld[3] = Vector4(newPosition, 1);
-            MarkDirty();
+            MarkDirty(DirtyPosition);
         }
 
         /**
@@ -32,7 +41,7 @@ namespace Engine
         void AddPosition(const Vector3 delta)
         {
             _localToWorld.AddPosition(delta);
-            MarkDirty();
+            MarkDirty(DirtyPosition);
         }
 
         /**
@@ -42,7 +51,7 @@ namespace Engine
         void AddLocalPosition(const Vector3 delta)
         {
             _localToWorld.Translate(delta);
-            MarkDirty();
+            MarkDirty(DirtyPosition);
         }
 
         /**
@@ -61,7 +70,7 @@ namespace Engine
         {
             _localToWorld.SetRotation(newRotation);
             SyncEulerAngles();
-            MarkDirty();
+            MarkDirty(DirtyRotation);
         }
 
         /**
@@ -72,7 +81,7 @@ namespace Engine
         {
             _localToWorld.Rotate(delta);
             SyncEulerAngles();
-            MarkDirty();
+            MarkDirty(DirtyRotation);
         }
 
         /**
@@ -92,7 +101,7 @@ namespace Engine
         {
             _eulerAngles = newRotation * (isDegrees ? FMath::DEGREES_TO_RAD : 1.f);
             _localToWorld.SetRotation(_eulerAngles, false);
-            MarkDirty();
+            MarkDirty(DirtyRotation);
         }
 
         /**
@@ -104,7 +113,7 @@ namespace Engine
         {
             _eulerAngles += delta * (isDegrees ? FMath::DEGREES_TO_RAD : 1.f);
             _localToWorld.SetRotation(_eulerAngles, false);
-            MarkDirty();
+            MarkDirty(DirtyRotation);
         }
 
         /**
@@ -128,7 +137,7 @@ namespace Engine
             _scale = scale;
             MakeScaleSafe();
             _localToWorld.SetScale(_scale);
-            MarkDirty();
+            MarkDirty(DirtyScale);
         }
 
         /**
@@ -143,7 +152,7 @@ namespace Engine
             _scale *= scale;
             MakeScaleSafe();
             _localToWorld.SetScale(_scale);
-            MarkDirty();
+            MarkDirty(DirtyScale);
         }
 
         /**
@@ -194,19 +203,24 @@ namespace Engine
             return _localToWorld.GetForward();
         }
 
-        void MarkDirty()
+        void MarkDirty(const TransformDirtyFlag flag)
         {
-            _isDirty = true;
+            _dirtyFlags |= flag;
         }
 
         void ClearDirty()
         {
-            _isDirty = false;
+            _dirtyFlags = 0;
         }
 
         bool IsDirty() const
         {
-            return _isDirty;
+            return _dirtyFlags != 0;
+        }
+
+        TransformDirtyFlags GetDirtyFlags() const
+        {
+            return _dirtyFlags;
         }
 
     private:
@@ -220,6 +234,6 @@ namespace Engine
         Matrix4x4 _localToWorld;
         Vector3 _eulerAngles = 0;
         Vector3 _scale;
-        bool _isDirty = false;
+        TransformDirtyFlags _dirtyFlags = 0;
     };
 }
