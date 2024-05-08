@@ -26,35 +26,32 @@ namespace Engine
 
     toml::table SceneSerializer::EntitySerializer(Entity& entity)
     {
-        toml::array componentArray;
+        toml::table componentArray;
 
-        TagComponent tagComp;
-        if (entity.TryGetComponent(tagComp))
+        if (UUIDComponent uuidComponent; entity.TryGetComponent(uuidComponent))
         {
-            auto table = toml::table{
-                {
-                    "_tag", tagComp.Value
-                }
-            };
-            componentArray.emplace_back(table);
+            componentArray.insert_or_assign("_uuid", uuidComponent.UUID);
         }
+        //
+        // if (TagComponent tagComp; entity.TryGetComponent(tagComp))
+        // {
+        //     componentArray.insert_or_assign("_tag", tagComp.Value);
+        // }
 
-        TransformComponent transformComp;
-        if (entity.TryGetComponent(transformComp))
+        if (TransformComponent transformComp; entity.TryGetComponent(transformComp))
         {
-            auto table = toml::table{
-                {
+            auto table = toml::table{{
                     "_position", toml::array{
                         transformComp.Transform.GetPosition().X,
-                        transformComp.Transform.GetPosition().Y,
-                        transformComp.Transform.GetPosition().Z
+                            transformComp.Transform.GetPosition().Y,
+                            transformComp.Transform.GetPosition().Z
                     }
                 },
                 {
                     "_rotation", toml::array{
                         transformComp.Transform.GetEulerAngles().X,
-                        transformComp.Transform.GetEulerAngles().Y,
-                        transformComp.Transform.GetEulerAngles().Z
+                            transformComp.Transform.GetEulerAngles().Y,
+                            transformComp.Transform.GetEulerAngles().Z
                     }
                 },
                 {
@@ -65,157 +62,151 @@ namespace Engine
                     }
                 }
             };
-            componentArray.emplace_back(table);
+
+            componentArray.insert_or_assign("_transformComponent", table);
         }
 
-        CameraComponent cameraComp;
-        if (entity.TryGetComponent(cameraComp))
-        {
-            auto table = toml::table{
-                {"_aspectRatio", cameraComp.GetAspectRatio()},
-                {"_fieldOfView", cameraComp.GetFOV()},
-                {"zNear", cameraComp.GetNearClip()},
-                {"zFar", cameraComp.GetFarClip()}
-            };
-            componentArray.emplace_back(table);
-        }
+        if (CameraComponent cameraComp; entity.TryGetComponent(cameraComp))
+         {
+             auto table = toml::table{
+                 {"_aspectRatio", cameraComp.GetAspectRatio()},
+                 {"_fieldOfView", cameraComp.GetFOV()},
+                 {"zNear", cameraComp.GetNearClip()},
+                 {"zFar", cameraComp.GetFarClip()}
+             };
+             componentArray.insert_or_assign("_cameraComponent", table);
+         }
 
 
-        //Not completed
-        ColliderComponent colliderComp;
-        if (entity.TryGetComponent(colliderComp))
-        {
-            toml::array colliders;
-            for (auto collider : colliderComp.GetColliders())
-            {
-                toml::array payload;
-                switch (collider->GetShapeType())
-                {
-                    case CollisionShapeType::Box:
-                    {
-                        auto castedBoxCollider = reinterpret_cast<BoxCollider*>(collider);
-                        payload.emplace_back<toml::array>("_boxCollider", toml::array{
-                                                              "_halfSize", toml::array{
-                                                                  castedBoxCollider->GetHalfSize().X,
-                                                                  castedBoxCollider->GetHalfSize().Y,
-                                                                  castedBoxCollider->GetHalfSize().Z
-                                                              }
-                                                          });
-                        break;
-                    }
-                    case CollisionShapeType::Sphere:
-                    {
-                        auto castedSphereCollider = reinterpret_cast<SphereCollider*>(collider);
-                        payload.emplace_back<toml::array>("_sphereCollider", toml::array{"_radius", castedSphereCollider->GetRadius()});
-                        break;
-                    }
-                    case CollisionShapeType::Capsule:
-                    {
-                        auto castedCapsuleCollider = reinterpret_cast<CapsuleCollider*>(collider);
-                        payload.emplace_back<toml::array>("_capsuleCollider", toml::array{toml::array{"_radius", castedCapsuleCollider->GetRadius()}},
-                                                          toml::array{"_height", castedCapsuleCollider->GetHeight()});
-                        break;
-                    }
-                }
+         //Not completed
+        if (ColliderComponent colliderComp; entity.TryGetComponent(colliderComp))
+         {
+             toml::array colliders;
+             for (auto collider : colliderComp.GetColliders())
+             {
+                 toml::array payload;
+                 switch (collider->GetShapeType())
+                 {
+                     case CollisionShapeType::Box:
+                     {
+                         auto castedBoxCollider = reinterpret_cast<BoxCollider*>(collider);
+                         payload.emplace_back<toml::array>("_boxCollider", toml::array{
+                                                               "_halfSize", toml::array{
+                                                                   castedBoxCollider->GetHalfSize().X,
+                                                                   castedBoxCollider->GetHalfSize().Y,
+                                                                   castedBoxCollider->GetHalfSize().Z
+                                                               }
+                                                           });
+                         break;
+                     }
+                     case CollisionShapeType::Sphere:
+                     {
+                         auto castedSphereCollider = reinterpret_cast<SphereCollider*>(collider);
+                         payload.emplace_back<toml::array>("_sphereCollider", toml::array{"_radius", castedSphereCollider->GetRadius()});
+                         break;
+                     }
+                     case CollisionShapeType::Capsule:
+                     {
+                         auto castedCapsuleCollider = reinterpret_cast<CapsuleCollider*>(collider);
+                         payload.emplace_back<toml::array>("_capsuleCollider", toml::array{toml::array{"_radius", castedCapsuleCollider->GetRadius()}},
+                                                           toml::array{"_height", castedCapsuleCollider->GetHeight()});
+                         break;
+                     }
+                 }
 
-                auto table = toml::table{
-                    {
-                        "_colliderPosition", toml::array{
-                            collider->GetPosition().X,
-                            collider->GetPosition().Y,
-                            collider->GetPosition().Z
-                        }
-                    },
-                    {
-                        "_colliderRotation", toml::array{
-                            collider->GetEulerAngles().X,
-                            collider->GetEulerAngles().Y,
-                            collider->GetEulerAngles().Z
-                        }
-                    },
-                    {
-                        "_colliderMaterial",
-                        toml::array{
-                            collider->GetMaterial().getFrictionCoefficient(), // squared?
-                            collider->GetMaterial().getBounciness(),
-                            collider->GetMaterial().getMassDensity()
-                        }
-                    },
-                    {"_colliderCollisionMask", collider->GetCollisionMask()},
-                    {"_shapeType", collider->GetShapeType()},
-                    {"_colliderSpecificData", payload}
-                };
+                 auto table = toml::table{
+                     {
+                         "_colliderPosition", toml::array{
+                             collider->GetPosition().X,
+                             collider->GetPosition().Y,
+                             collider->GetPosition().Z
+                         }
+                     },
+                     {
+                         "_colliderRotation", toml::array{
+                             collider->GetEulerAngles().X,
+                             collider->GetEulerAngles().Y,
+                             collider->GetEulerAngles().Z
+                         }
+                     },
+                     {
+                         "_colliderMaterial",
+                         toml::array{
+                             collider->GetMaterial().getFrictionCoefficient(), // squared?
+                             collider->GetMaterial().getBounciness(),
+                             collider->GetMaterial().getMassDensity()
+                         }
+                     },
+                     {"_colliderCollisionMask", collider->GetCollisionMask()},
+                     {"_shapeType", collider->GetShapeType()},
+                     {"_colliderSpecificData", payload}
+                 };
 
-                colliders.emplace_back(table);
-            }
+                 colliders.emplace_back(table);
+             }
 
-            auto table = toml::table{
-                {"_colliders", colliders}
-            };
-            componentArray.emplace_back(table);
-        }
+             auto table = toml::table{
+                 {"_colliders", colliders}
+             };
+             componentArray.insert_or_assign("_colliderComponent", table);
+         }
 
-        // difficult
-        // NativeScriptComponent scriptComp;
-        // if (entity.TryGetComponent(scriptComp))
-        // {
-        //     toml::table table{
-        //         {"_aspectRatio", cameraComp.GetAspectRatio()},
-        //         {"_fieldOfView", cameraComp.GetFOV()},
-        //         {"zNear", cameraComp.GetNearClip()},
-        //         {"zFar", cameraComp.GetFarClip()}
-        //     };
-        //     componentArray.emplace_back(table);
-        // }
+         // difficult
+         // NativeScriptComponent scriptComp;
+         // if (entity.TryGetComponent(scriptComp))
+         // {
+         //     toml::table table{
+         //         {"_aspectRatio", cameraComp.GetAspectRatio()},
+         //         {"_fieldOfView", cameraComp.GetFOV()},
+         //         {"zNear", cameraComp.GetNearClip()},
+         //         {"zFar", cameraComp.GetFarClip()}
+         //     };
+         //     componentArray.emplace_back(table);
+         // }
 
-        RenderComponent renderComp;
-        if (entity.TryGetComponent(renderComp))
-        {
-            auto table = toml::table{
-                {"_modelPath", renderComp.GetModelPath()}
-            };
+        if (RenderComponent renderComp; entity.TryGetComponent(renderComp))
+         {
+             auto table = toml::table{
+                 {"_modelPath", renderComp.GetModelPath()}
+             };
 
-            componentArray.emplace_back(table);
-        }
+             componentArray.insert_or_assign("_renderComponent", table);
+         }
 
-        RigidBodyComponent rigidComp;
-        if (entity.TryGetComponent(rigidComp))
-        {
-            auto table = toml::table{
-                {"_bodyType", rigidComp.GetRigidBody()->GetBodyType()},
-                {"_useGravity", rigidComp.GetRigidBody()->IsGravityEnabled()},
-                {"_mass", rigidComp.GetRigidBody()->GetMass()},
-                {"_active", rigidComp.GetRigidBody()->IsActive()}
-            };
-            componentArray.emplace_back(table);
-        }
+        if (RigidBodyComponent rigidComp; entity.TryGetComponent(rigidComp))
+         {
+             auto table = toml::table{
+                 {"_bodyType", rigidComp.GetRigidBody()->GetBodyType()},
+                 {"_useGravity", rigidComp.GetRigidBody()->IsGravityEnabled()},
+                 {"_mass", rigidComp.GetRigidBody()->GetMass()},
+                 {"_active", rigidComp.GetRigidBody()->IsActive()}
+             };
+             componentArray.insert_or_assign("_rigidBodyComponent", table);
+         }
 
 
-        // UUIDComponent UUIDComp;
-        // if (entity.TryGetComponent(UUIDComp))
-        // {
-        //     toml::table table{
-        //         {"UUID", UUIDComp.UUID}
-        //     };
-        //     componentArray.emplace_back(table);
-        // }
+         // UUIDComponent UUIDComp;
+         // if (entity.TryGetComponent(UUIDComp))
+         // {
+         //     toml::table table{
+         //         {"UUID", UUIDComp.UUID}
+         //     };
+         //     componentArray.emplace_back(table);
+         // }
 
-        toml::table EntityTable{
-            {entity.GetComponent<TagComponent>().Value, componentArray}
-        };
-        return EntityTable;
+        return componentArray;
     }
 
     void SceneSerializer::Serialize(const std::shared_ptr<Scene>& scene)
     {
-        toml::array arr;
+        toml::table arr;
         // auto path = _filepath << _scene.
 
         for (auto entity : scene->_registry.view<TagComponent>())
         {
             Entity ent = {entity, scene.get()};
 
-            arr.push_back(EntitySerializer(ent));
+            arr.insert_or_assign(ent.GetComponent<TagComponent>().Value, EntitySerializer(ent));
         }
 
         // toml::array tables;
@@ -236,11 +227,11 @@ namespace Engine
         // tables.push_back(TestTable);
         // tables.push_back(TestTable2);
 
-        //toml::table outerTable{{"hej", tables}};
-        auto table = toml::table{
-            {"Scene", scene->Name},
-            {"Entities", arr},
-        };
+
+         auto table = toml::table{
+             {"Scene", scene->Name},
+             {"Entities", arr}
+         };
 
         std::string path = _filepath + scene->Name + ".toml";
 
