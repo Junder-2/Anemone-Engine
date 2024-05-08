@@ -12,7 +12,7 @@ namespace Engine
     {
     public:
         SceneSerializer();
-        toml::array EntitySerializer(Entity& entity);
+        toml::table EntitySerializer(Entity& entity);
         void Serialize(const std::shared_ptr<Scene>& scene); // toml
         void SerializeBinary(); // binary
         bool HasFile(const char* fileName);

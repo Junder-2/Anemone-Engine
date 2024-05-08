@@ -134,15 +134,16 @@ namespace Engine {
         return ComponentTypeMap[id];
     }
 
-    void EditorLayer::CreateTestScene(int numEntitiesToTest) {
+    void EditorLayer::CreateTestScene(int numEntitiesToTest) { // this should be remade and be replaced with default scene
         ANE_PROFILE_FUNCTION();
 
-        //Add scene to layer
-        //std::shared_ptr<Scene> scene;
         if (!_sceneSerializer->HasFile("Game")) _activeScene = _sceneSerializer->CreateEmptySceneFile("Game");
-        else _activeScene = _sceneSerializer->Deserialize("Game", this);
+        else
+        {
+            _activeScene = _sceneSerializer->Deserialize("Game", this);
+            return;
+        }
 
-        //Create a Entity
         Entity ent = _activeScene->Create("Camera Entity");
         std::stringstream oss;
 

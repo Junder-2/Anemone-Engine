@@ -18,24 +18,31 @@
 #include "ANE/Physics/Types/SphereCollider.h"
 
 
-namespace Engine {
-    SceneSerializer::SceneSerializer() {
+namespace Engine
+{
+    SceneSerializer::SceneSerializer()
+    {
     }
 
-    toml::array SceneSerializer::EntitySerializer(Entity& entity) {
+    toml::table SceneSerializer::EntitySerializer(Entity& entity)
+    {
         toml::array componentArray;
 
         TagComponent tagComp;
-        if (entity.TryGetComponent(tagComp)) {
-            toml::table table{
-                {"_tag", tagComp.Value}
+        if (entity.TryGetComponent(tagComp))
+        {
+            auto table = toml::table{
+                {
+                    "_tag", tagComp.Value
+                }
             };
             componentArray.emplace_back(table);
         }
 
         TransformComponent transformComp;
-        if (entity.TryGetComponent(transformComp)) {
-            toml::table table{
+        if (entity.TryGetComponent(transformComp))
+        {
+            auto table = toml::table{
                 {
                     "_position", toml::array{
                         transformComp.Transform.GetPosition().X,
@@ -62,8 +69,9 @@ namespace Engine {
         }
 
         CameraComponent cameraComp;
-        if (entity.TryGetComponent(cameraComp)) {
-            toml::table table{
+        if (entity.TryGetComponent(cameraComp))
+        {
+            auto table = toml::table{
                 {"_aspectRatio", cameraComp.GetAspectRatio()},
                 {"_fieldOfView", cameraComp.GetFOV()},
                 {"zNear", cameraComp.GetNearClip()},
@@ -75,11 +83,14 @@ namespace Engine {
 
         //Not completed
         ColliderComponent colliderComp;
-        if (entity.TryGetComponent(colliderComp)) {
+        if (entity.TryGetComponent(colliderComp))
+        {
             toml::array colliders;
-            for (auto collider : colliderComp.GetColliders()) {
+            for (auto collider : colliderComp.GetColliders())
+            {
                 toml::array payload;
-                switch (collider->GetShapeType()) {
+                switch (collider->GetShapeType())
+                {
                     case CollisionShapeType::Box:
                     {
                         auto castedBoxCollider = reinterpret_cast<BoxCollider*>(collider);
@@ -107,7 +118,7 @@ namespace Engine {
                     }
                 }
 
-                toml::table table{
+                auto table = toml::table{
                     {
                         "_colliderPosition", toml::array{
                             collider->GetPosition().X,
@@ -138,7 +149,7 @@ namespace Engine {
                 colliders.emplace_back(table);
             }
 
-            toml::table table{
+            auto table = toml::table{
                 {"_colliders", colliders}
             };
             componentArray.emplace_back(table);
@@ -158,8 +169,9 @@ namespace Engine {
         // }
 
         RenderComponent renderComp;
-        if (entity.TryGetComponent(renderComp)) {
-            toml::table table{
+        if (entity.TryGetComponent(renderComp))
+        {
+            auto table = toml::table{
                 {"_modelPath", renderComp.GetModelPath()}
             };
 
@@ -167,8 +179,9 @@ namespace Engine {
         }
 
         RigidBodyComponent rigidComp;
-        if (entity.TryGetComponent(rigidComp)) {
-            toml::table table{
+        if (entity.TryGetComponent(rigidComp))
+        {
+            auto table = toml::table{
                 {"_bodyType", rigidComp.GetRigidBody()->GetBodyType()},
                 {"_useGravity", rigidComp.GetRigidBody()->IsGravityEnabled()},
                 {"_mass", rigidComp.GetRigidBody()->GetMass()},
@@ -187,24 +200,46 @@ namespace Engine {
         //     componentArray.emplace_back(table);
         // }
 
-
-        return componentArray;
+        toml::table EntityTable{
+            {entity.GetComponent<TagComponent>().Value, componentArray}
+        };
+        return EntityTable;
     }
 
-    void SceneSerializer::Serialize(const std::shared_ptr<Scene>& scene) {
+    void SceneSerializer::Serialize(const std::shared_ptr<Scene>& scene)
+    {
         toml::array arr;
         // auto path = _filepath << _scene.
 
-        for (auto entity : scene->_registry.view<TagComponent>()) {
+        for (auto entity : scene->_registry.view<TagComponent>())
+        {
             Entity ent = {entity, scene.get()};
 
             arr.push_back(EntitySerializer(ent));
         }
 
+        // toml::array tables;
+        // toml::array data1{3, 2
+        // };
+        // toml::array data2{3, 2
+        // };
+        // auto TestTable = toml::table{
+        //     {"ID", "value"},
+        //     {"ID2", data1}
+        // };
+        //
+        // auto TestTable2 = toml::table{
+        //     {"ID3", "value2"},
+        //     {"ID24", data2}
+        // };
+        //
+        // tables.push_back(TestTable);
+        // tables.push_back(TestTable2);
 
-        const toml::table table{
+        //toml::table outerTable{{"hej", tables}};
+        auto table = toml::table{
             {"Scene", scene->Name},
-            {"Entities", arr}
+            {"Entities", arr},
         };
 
         std::string path = _filepath + scene->Name + ".toml";
@@ -216,19 +251,22 @@ namespace Engine {
     }
 
 
-    void SceneSerializer::SerializeBinary() {
+    void SceneSerializer::SerializeBinary()
+    {
     }
 
-    bool SceneSerializer::HasFile(const char* fileName) {
+    bool SceneSerializer::HasFile(const char* fileName)
+    {
         std::string filePath = _filepath + fileName + ".toml";
         return std::filesystem::is_regular_file(filePath);
     }
 
-    std::shared_ptr<Scene> SceneSerializer::CreateEmptySceneFile(const char* sceneName) {
+    std::shared_ptr<Scene> SceneSerializer::CreateEmptySceneFile(const char* sceneName)
+    {
         std::string filePath = _filepath + sceneName + ".toml";
 
         std::shared_ptr<Scene> scene = std::make_shared<Scene>(sceneName);
-        const toml::table table{
+        auto table = toml::table{
             {"Scene", scene->Name},
             {"Entities", toml::array{}}
         };
@@ -243,37 +281,53 @@ namespace Engine {
         std::string filePath = _filepath + key + ".toml";
 
         toml::table table;
-        try {
+        try
+        {
             table = toml::parse_file(filePath);
         }
-        catch (...) {
-            ANE_ELOG_WARN("Scene with name {} doesn't exist or has been moved", key);
-            throw;
+        catch (const toml::parse_error& err)
+        {
+            ANE_ELOG(err.description());
         }
 
-        const auto sceneName = table["Scene"].value_or("sv"); // dont know if sv is correct here
+        const auto sceneName = table["Scene"].value_or("NoSceneFound"); // dont know if sv is correct here
+        ANE_ELOG(sceneName);
         auto scene = std::make_shared<Scene>(sceneName);
 
-        if (!table.empty()) {
+        if (!table.empty())
+        {
             auto nodeView = table["Entities"];
-            if (toml::array* entityArray = nodeView.as_array()) {
-                entityArray->for_each([=](auto&& element) {
-                    //toml::array* componentsArray = element[]
+            if (toml::array* entityArray = nodeView.as_array())
+            {
+                for (auto& entity : *entityArray)
+                {
+                    if constexpr (toml::is_array<decltype(entity)>)
+                    {
+                        ANE_ELOG("We are an array");
+                    }
+                    else if constexpr (toml::is_table<decltype(entity)>)
+                    {
+                        ANE_ELOG("We are a table");
+                    }
 
-                    //auto tag = tagTable["_tag"].value_or("sv"); // dont know if sv is correct here
-
-                    // scene.get()->Create(tag);
-
-
-                    //layer->Create()
-                });
+                    //     ANE_ELOG("We have type of: {}", entity.type());
+                    // if (const auto& entityTable = entity.as_table())
+                    // {
+                    //
+                    //     if (auto tag = (*entityTable)["_tag"].value<std::string>())
+                    //     {
+                    //         scene->Create(*tag);
+                    //     }
+                    // }
+                }
             }
         }
 
         return scene;
     }
 
-    std::shared_ptr<Scene> SceneSerializer::DeserializeBinary() {
+    std::shared_ptr<Scene> SceneSerializer::DeserializeBinary()
+    {
         // not implemented
         ANE_ASSERT(false);
 
@@ -282,8 +336,9 @@ namespace Engine {
         return std::make_shared<Scene>("key");
     }
 
-    void SceneSerializer::WriteToFile(std::string filepath, const toml::table& content) {
-        std::ofstream output(filepath, std::ios::app);
+    void SceneSerializer::WriteToFile(std::string filepath, const toml::table& content)
+    {
+        std::ofstream output(filepath, std::ios::trunc);
 
         if (!output.is_open()) output.open(filepath);
 
@@ -292,7 +347,8 @@ namespace Engine {
         output.close();
     }
 
-    void SceneSerializer::WriteToFile(std::string filepath) {
+    void SceneSerializer::WriteToFile(std::string filepath)
+    {
         std::ofstream output(filepath, std::ios::app);
 
         if (!output.is_open()) output.open(filepath);
