@@ -5,12 +5,22 @@
 
 namespace Engine
 {
+    typedef uint8_t TransformDirtyFlags;
+
+    typedef enum : uint8_t
+    {
+        DirtyPosition = BIT(0),
+        DirtyRotation = BIT(1),
+        DirtyScale = BIT(2),
+    } TransformDirtyFlag;
+
     struct TransformMatrix
     {
     public:
         TransformMatrix(const Matrix4x4& transform = Matrix4x4::Identity()) : _localToWorld(transform)
         {
             SyncEulerAngles();
+            _scale = _localToWorld.GetScale();
         }
         TransformMatrix(const TransformMatrix&) = default;
 
@@ -21,7 +31,7 @@ namespace Engine
         void SetPosition(const Vector3 newPosition)
         {
             _localToWorld[3] = Vector4(newPosition, 1);
-            MarkDirty();
+            MarkDirty(DirtyPosition);
         }
 
         /**
@@ -31,7 +41,7 @@ namespace Engine
         void AddPosition(const Vector3 delta)
         {
             _localToWorld.AddPosition(delta);
-            MarkDirty();
+            MarkDirty(DirtyPosition);
         }
 
         /**
@@ -41,7 +51,7 @@ namespace Engine
         void AddLocalPosition(const Vector3 delta)
         {
             _localToWorld.Translate(delta);
-            MarkDirty();
+            MarkDirty(DirtyPosition);
         }
 
         /**
@@ -60,7 +70,7 @@ namespace Engine
         {
             _localToWorld.SetRotation(newRotation);
             SyncEulerAngles();
-            MarkDirty();
+            MarkDirty(DirtyRotation);
         }
 
         /**
@@ -71,7 +81,7 @@ namespace Engine
         {
             _localToWorld.Rotate(delta);
             SyncEulerAngles();
-            MarkDirty();
+            MarkDirty(DirtyRotation);
         }
 
         /**
@@ -91,7 +101,7 @@ namespace Engine
         {
             _eulerAngles = newRotation * (isDegrees ? FMath::DEGREES_TO_RAD : 1.f);
             _localToWorld.SetRotation(_eulerAngles, false);
-            MarkDirty();
+            MarkDirty(DirtyRotation);
         }
 
         /**
@@ -103,7 +113,7 @@ namespace Engine
         {
             _eulerAngles += delta * (isDegrees ? FMath::DEGREES_TO_RAD : 1.f);
             _localToWorld.SetRotation(_eulerAngles, false);
-            MarkDirty();
+            MarkDirty(DirtyRotation);
         }
 
         /**
@@ -121,8 +131,13 @@ namespace Engine
          */
         void SetScale(const Vector3 scale)
         {
-            _localToWorld.SetScale(scale);
-            MarkDirty();
+            // Matrix4x4 cannot keep track of what component is negative only that is has a negative scale somewhere
+            // by neutralizing the scale with our recorded scale per component scale can be functional
+            _localToWorld.Scale(1.f/_scale);
+            _scale = scale;
+            MakeScaleSafe();
+            _localToWorld.SetScale(_scale);
+            MarkDirty(DirtyScale);
         }
 
         /**
@@ -131,8 +146,13 @@ namespace Engine
          */
         void Scale(const Vector3 scale)
         {
-            _localToWorld.Scale(scale);
-            MarkDirty();
+            // Matrix4x4 cannot keep track of what component is negative only that is has a negative scale somewhere
+            // by neutralizing the scale with our recorded scale per component scale can be functional
+            _localToWorld.Scale(1.f/_scale);
+            _scale *= scale;
+            MakeScaleSafe();
+            _localToWorld.SetScale(_scale);
+            MarkDirty(DirtyScale);
         }
 
         /**
@@ -140,7 +160,7 @@ namespace Engine
          */
         Vector3 GetScale() const
         {
-            return _localToWorld.GetScale();
+            return _scale;
         }
 
         /**
@@ -183,22 +203,29 @@ namespace Engine
             return _localToWorld.GetForward();
         }
 
-        void MarkDirty()
+        void MarkDirty(const TransformDirtyFlag flag)
         {
-            _isDirty = true;
+            _dirtyFlags |= flag;
         }
 
         void ClearDirty()
         {
-            _isDirty = false;
+            _dirtyFlags = 0;
         }
 
         bool IsDirty() const
         {
-            return _isDirty;
+            return _dirtyFlags != 0;
+        }
+
+        TransformDirtyFlags GetDirtyFlags() const
+        {
+            return _dirtyFlags;
         }
 
     private:
+        void MakeScaleSafe();
+
         void SyncEulerAngles()
         {
             _eulerAngles = _localToWorld.GetEulerAngles();
@@ -206,6 +233,7 @@ namespace Engine
 
         Matrix4x4 _localToWorld;
         Vector3 _eulerAngles = 0;
-        bool _isDirty = false;
+        Vector3 _scale;
+        TransformDirtyFlags _dirtyFlags = 0;
     };
 }

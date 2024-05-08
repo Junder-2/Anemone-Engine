@@ -4,6 +4,7 @@
 #include "PhysicsLogger.h"
 #include "PhysicsTypes.h"
 #include "ANE/Core/Entity/Entity.h"
+#include "ANE/Core/Scene/Components/ColliderComponent.h"
 #include "ANE/Math/Types/TransformMatrix.h"
 #include "ANE/Core/Scene/Components/RigidBodyComponent.h"
 #include "ANE/Core/Scene/Components/TransformComponent.h"
@@ -154,7 +155,19 @@ namespace Engine
                 }
                 sleepUpdate = true;
             }
+
             body.GetRigidBody()->SetTransform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
+
+            if(transformMatrix.GetDirtyFlags() & DirtyScale)
+            {
+                if(const auto colliderComp = scene->_registry.try_get<ColliderComponent>(entity))
+                {
+                    for (const auto collider : colliderComp->GetColliders())
+                    {
+                        collider->SetScale(transformMatrix.GetScale());
+                    }
+                }
+            }
             transformMatrix.ClearDirty();
         }
 
