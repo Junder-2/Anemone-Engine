@@ -14,10 +14,10 @@
 
 namespace Engine
 {
-    //TODO: I just choose some random colors
-    const ImVec4 EditorLogPanel::colorInfo {0.3f, 0.8f, 0.3f, 1.f };
-    const ImVec4 EditorLogPanel::colorWarn {0.8f, 0.8f, 0.f, 1.f};
-    const ImVec4 EditorLogPanel::colorError {1.0f, 0.1f, 0.1f, 1.f};
+    const Vector4 EditorLogPanel::colorTrace {ColorUtilities::HexToRGB(0x66b2cd), 1.f };
+    const Vector4 EditorLogPanel::colorInfo {ColorUtilities::HexToRGB(0x37d274), 1.f };
+    const Vector4 EditorLogPanel::colorWarn {ColorUtilities::HexToRGB(0xe7d653), 1.f};
+    const Vector4 EditorLogPanel::colorError {ColorUtilities::HexToRGB(0xc03244), 1.f};
 
     EditorLogPanel::EditorLogPanel(EditorLayer* layer)
     {
@@ -31,6 +31,8 @@ namespace Engine
             }
         }
         _editorLayer = layer;
+
+        GetEditorInputSystem().BindMouseScroll(MakeDelegate(this, &EditorLogPanel::OnScroll));
     }
 
     UIUpdateWrapper EditorLogPanel::OnPanelRender()
@@ -69,6 +71,11 @@ namespace Engine
                 ImGui::SetScrollHereY(1.f);
             }
             ImGui::EndChild();
+
+            _panelRect.X = ImGui::GetItemRectMin().x;
+            _panelRect.Y = ImGui::GetItemRectMin().y;
+            _panelRect.Z = ImGui::GetItemRectMax().x;
+            _panelRect.W = ImGui::GetItemRectMax().y;
         }
 
         ImGui::End();
@@ -134,7 +141,7 @@ namespace Engine
         ImGui::Checkbox("Logger", &_displayLoggerName);
     }
 
-    void EditorLogPanel::DrawLogMessage(const LogMessage& logMessage)
+    void EditorLogPanel::DrawLogMessage(const LogMessage& logMessage, int index) const
     {
         ANE_DEEP_PROFILE_FUNCTION();
 
@@ -151,6 +158,8 @@ namespace Engine
         {
             case LogLevelCategory::Trace:
             case LogLevelCategory::Debug:
+                currentColor = colorTrace;
+                break;
             case LogLevelCategory::Info:
                 currentColor = colorInfo;
                 break;
@@ -207,6 +216,21 @@ namespace Engine
         }
 
         ImGui::EndGroup();
+
+        if(index % 2 != 0)
+        {
+            const auto window = ImGui::GetCurrentWindow();
+            const auto style = ImGui::GetStyle();
+
+            auto bgMin = ImGui::GetItemRectMin();
+            bgMin.y -= style.CellPadding.y;
+            bgMin.x = window->WorkRect.Min.x - style.CellPadding.x;
+            auto bgMax = ImGui::GetItemRectMax();
+            bgMax.y += style.CellPadding.y;
+            bgMax.x = window->WorkRect.Max.x + style.CellPadding.x;
+
+            ImGui::GetWindowDrawList()->AddRectFilled(bgMin, bgMax, IM_COL32(0,0,0,15), style.FrameRounding, ImDrawFlags_RoundCornersDefault_);
+        }
 
         if (ImGui::IsItemHovered())
         {
@@ -286,5 +310,13 @@ namespace Engine
     void EditorLogPanel::SaveSettings()
     {
 
+    }
+
+    void EditorLogPanel::OnScroll(const Vector2 delta)
+    {
+        if(FMath::Abs(delta.Y) < 1) return;
+        if(!ImGui::IsMouseHoveringRect(ImVec2(_panelRect.X, _panelRect.Y), ImVec2(_panelRect.Z, _panelRect.W), false)) return;
+
+        _autoScroll = false;
     }
 }

@@ -30,11 +30,14 @@ namespace Engine
         void LoadSettings();
         void SaveSettings();
 
+    private:
+        void OnScroll(Vector2 delta);
 
     private:
-        static const ImVec4 colorInfo;
-        static const ImVec4 colorWarn;
-        static const ImVec4 colorError;
+        static const Vector4 colorTrace;
+        static const Vector4 colorInfo;
+        static const Vector4 colorWarn;
+        static const Vector4 colorError;
 
         LogLevelCategories _levelFilter;
         entt::dense_map<std::string, bool> _loggerNameFilter;
@@ -43,9 +46,11 @@ namespace Engine
         bool _autoScroll = false;
 
         bool _displayTime = true;
-        bool _displaySource = true;
+        bool _displaySource = false;
         bool _displayLevel = true;
         bool _displayLoggerName = true;
+
+        Vector4 _panelRect;
 
         EditorLayer* _editorLayer;
     };
