@@ -242,6 +242,7 @@ namespace Engine
         inline static VmaImage _colorTex;
         inline static VmaImage _normalTex;
         inline static VmaImage _ormTex;
+        inline static VmaImage _cubeMap;
 
         inline static VkSampler _samplerLinear;
         inline static VkSampler _samplerNearest;

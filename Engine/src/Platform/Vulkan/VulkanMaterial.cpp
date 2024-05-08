@@ -68,6 +68,8 @@ namespace Engine
         Writer.WriteImage(1, resources.ColorImage.ImageView, resources.ColorSampler, readOnly, combinedSampler);
         Writer.WriteImage(2, resources.NormalImage.ImageView, resources.NormalSampler, readOnly, combinedSampler);
         Writer.WriteImage(3, resources.ORMImage.ImageView, resources.ORMSampler, readOnly, combinedSampler);
+        //Writer.WriteImage(4, resources.ORMImage.ImageView, resources.ORMSampler, readOnly, combinedSampler);
+        Writer.WriteImage(5, resources.CubeMap.ImageView, resources.CubeMapSampler, readOnly, combinedSampler);
 
         Writer.UpdateSet(device, materialData.MaterialSet);
 
@@ -189,6 +191,8 @@ namespace Engine
             .AddBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) // Color
             .AddBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) // Normal
             .AddBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) // Occlusion, Roughness, Metallic
+            //.AddBinding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) // DFG
+            .AddBinding(5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) // Cubemap
 
             .Build();
 

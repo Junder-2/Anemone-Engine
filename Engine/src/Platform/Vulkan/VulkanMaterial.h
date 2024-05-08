@@ -61,6 +61,9 @@ namespace Engine
             VmaImage ORMImage;
             VkSampler ORMSampler;
 
+            VmaImage CubeMap;
+            VkSampler CubeMapSampler;
+
             VkBuffer DataBuffer;
             uint32_t DataBufferOffset;
         };
