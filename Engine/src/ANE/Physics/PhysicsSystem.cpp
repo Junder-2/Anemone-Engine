@@ -134,10 +134,21 @@ namespace Engine
         return capsuleCollider;
     }
 
+    void PhysicsSystem::WakeBodies()
+    {
+        if(_hasAwokenBodies) return;
+
+        // Dirty fix for a bug that crashes when a sleeping body tries to collide
+        for (uint32_t i = 0; i < _world->getNbRigidBodies(); ++i)
+        {
+            _world->getRigidBody(i)->setIsSleeping(false);
+        }
+
+        _hasAwokenBodies = true;
+    }
+
     void PhysicsSystem::PhysicsUpdate(const float timeStep, Scene* scene)
     {
-        bool sleepUpdate = false;
-
         const auto group = scene->_registry.view<TransformComponent, RigidBodyComponent>();
         for (const auto entity : group) //We need to apply changes in our transform to the internal rigidbody
         {
@@ -147,16 +158,7 @@ namespace Engine
 
             if(!transformMatrix.IsDirty()) continue;
 
-            if(!sleepUpdate) // Dirty fix for a bug that crashes when a sleeping body tries to collide
-            {
-                for (uint32_t i = 0; i < _world->getNbRigidBodies(); ++i)
-                {
-                    _world->getRigidBody(i)->setIsSleeping(false);
-                }
-                sleepUpdate = true;
-            }
-
-            body.GetRigidBody()->SetTransform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
+            WakeBodies();
 
             if(transformMatrix.GetDirtyFlags() & DirtyScale)
             {
@@ -168,10 +170,14 @@ namespace Engine
                     }
                 }
             }
+            body.GetRigidBody()->SetTransform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
+
             transformMatrix.ClearDirty();
         }
 
         _world->update(timeStep);
+
+        _hasAwokenBodies = false;
     }
 
     void PhysicsSystem::UpdateRigidBodies(const float factor, Scene* scene)

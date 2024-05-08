@@ -20,6 +20,8 @@ namespace Engine
         const auto sphereCollider = reinterpret_cast<reactphysics3d::SphereShape*>(_reactCollider->getCollisionShape());
         const float scale = FMath::Max(FMath::Max(_scale.X, _scale.Y), _scale.Z);
         sphereCollider->setRadius(FMath::Max(_radius*scale, MIN_SCALE));
+
+        ForceUpdateBody();
     }
 
     float SphereCollider::GetRadius() const
