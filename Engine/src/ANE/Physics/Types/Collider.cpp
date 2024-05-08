@@ -8,6 +8,11 @@
 
 namespace Engine
 {
+    Collider::Collider(rp3d::Collider* collider, const CollisionShapeType shapeType): _reactCollider(collider), _shapeType(shapeType)
+    {
+        SetCollisionMask(EnumCast(CollisionLayerPreset::Default));
+    }
+
     void Collider::SetTransform(const Vector3 position, const Quaternion& rotation) const
     {
         WakeBody();
@@ -55,22 +60,22 @@ namespace Engine
         return _scale;
     }
 
-    void Collider::SetCollisionMask(const uint16_t collisionMask) const
+    void Collider::SetCollisionMask(const CollisionLayerMask collisionMask) const
     {
         _reactCollider->setCollideWithMaskBits(collisionMask);
     }
 
-    uint16_t Collider::GetCollisionMask() const
+    CollisionLayerMask Collider::GetCollisionMask() const
     {
         return _reactCollider->getCollideWithMaskBits();
     }
 
-    void Collider::SetCollisionCategories(const uint16_t collisionCategories) const
+    void Collider::SetCollisionCategories(const CollisionLayerMask collisionCategories) const
     {
         _reactCollider->setCollisionCategoryBits(collisionCategories);
     }
 
-    uint16_t Collider::GetCollisionCategories() const
+    CollisionLayerMask Collider::GetCollisionCategories() const
     {
         return _reactCollider->getCollisionCategoryBits();
     }
