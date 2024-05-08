@@ -3,10 +3,11 @@
 
 #include "CreateScenePanel.h"
 #include "EditorLogPanel.h"
-#include "imgui.h"
-#include "imgui_internal.h"
 #include "InspectorPanel.h"
 #include "SceneHierarchyPanel.h"
+
+#include <imgui.h>
+#include <imgui_internal.h>
 
 namespace Engine
 {

@@ -4,9 +4,6 @@
 #include "ANE/Core/Entity/Entity.h"
 #include "ANE/Math/Types/Vector3.h"
 #include "ANE/Physics/Physics.h"
-#include "ANE/Physics/Types/BoxCollider.h"
-#include "ANE/Physics/Types/CapsuleCollider.h"
-#include "ANE/Physics/Types/SphereCollider.h"
 
 namespace Engine
 {

@@ -3,8 +3,14 @@
 
 #include <ranges>
 #include "imgui.h"
+#include "imgui_internal.h"
 #include "ANE/Utilities/LoggingUtilities.h"
 #include "ANE/Core/Layers/EditorLayer.h"
+#include "ANE/Input/EditorInputSystem.h"
+#include "ANE/Input/Input.h"
+#include "ANE/Math/FMath.h"
+#include "ANE/Math/Types/Vector2.h"
+#include "ANE/Utilities/ColorUtilities.h"
 
 namespace Engine
 {
@@ -15,8 +21,7 @@ namespace Engine
 
     EditorLogPanel::EditorLogPanel(EditorLayer* layer)
     {
-        _levelFilter = (int)LogLevelCategory::LevelError | (int)LogLevelCategory::LevelWarn | (int)LogLevelCategory::LevelInfo
-                            | (int)LogLevelCategory::LevelDebug | (int)LogLevelCategory::LevelTrace;
+        _levelFilter = EnumCast(LogLevelCategory::Error | LogLevelCategory::Warn | LogLevelCategory::Info | LogLevelCategory::Debug | LogLevelCategory::Trace);
 
         for (const auto& loggerName : Logging::GetRegisteredLoggerNames())
         {
@@ -32,36 +37,39 @@ namespace Engine
     {
         ANE_DEEP_PROFILE_FUNCTION();
 
-        bool open;
-
         UIUpdateWrapper UIUpdate;
 
-        ImGui::Begin("Log Window", &open);
+        bool open;
 
-
-        DrawToolBar();
-
-        ImGui::Separator();
-        ImGui::BeginChild("Scrolling", ImVec2(0, 0), false, _wrap ? 0 : ImGuiWindowFlags_HorizontalScrollbar);
-
-        const auto logMessages = Logging::GetMessages();
-
-        // Using a reverse iterator because imgui draws the text top to bottom and the latest message is first
-        for (const LogMessage& logMessage : logMessages | std::views::reverse)
+        if(ImGui::Begin("Log Window", &open))
         {
-            if(logMessage.LevelCategory == LogLevelCategory::LevelNone) continue;
-            if(!_loggerNameFilter[logMessage.LoggerName]) continue;
-            if(!((int)logMessage.LevelCategory & _levelFilter)) continue;
+            DrawToolBar();
 
-            DrawLogMessage(logMessage);
-        }
+            ImGui::Separator();
 
-        // TODO: auto scroll could be improved. Maybe cancel when manually scrolling or disabling it
-        if (_autoScroll)
-        {
-            ImGui::SetScrollHereY(1.f);
+            const ImGuiWindowFlags flags = (_wrap ? 0 : ImGuiWindowFlags_HorizontalScrollbar) | (_autoScroll ? ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoInputs : 0);
+            ImGui::BeginChild("Scrolling", ImVec2(0, 0), false, flags);
+
+            const auto logMessages = Logging::GetMessages();
+
+            int messageIndex = 0;
+            // Using a reverse iterator because imgui draws the text top to bottom and the latest message is first
+            for (const LogMessage& logMessage : logMessages | std::views::reverse)
+            {
+                if(logMessage.LevelCategory == LogLevelCategory::None) continue;
+                if(!_loggerNameFilter[logMessage.LoggerName]) continue;
+                if(!(EnumCast(logMessage.LevelCategory) & _levelFilter)) continue;
+
+                DrawLogMessage(logMessage, messageIndex);
+                messageIndex++;
+            }
+
+            if (_autoScroll)
+            {
+                ImGui::SetScrollHereY(1.f);
+            }
+            ImGui::EndChild();
         }
-        ImGui::EndChild();
 
         ImGui::End();
         if (!open) UIUpdate.RemoveSelf = this;
@@ -73,30 +81,30 @@ namespace Engine
         ANE_DEEP_PROFILE_FUNCTION();
 
         ImGui::MenuItem("Filter Levels", nullptr, false, false);
-        bool filterTrace = _levelFilter & (int)LogLevelCategory::LevelTrace;
+        bool filterTrace = _levelFilter & EnumCast(LogLevelCategory::Trace);
         if(ImGui::Checkbox("Trace", &filterTrace))
         {
-            _levelFilter ^= (int)LogLevelCategory::LevelTrace;
+            _levelFilter ^= EnumCast(LogLevelCategory::Trace);
         }
-        bool filterDebug = _levelFilter & (int)LogLevelCategory::LevelDebug;
+        bool filterDebug = _levelFilter & EnumCast(LogLevelCategory::Debug);
         if(ImGui::Checkbox("Debug", &filterDebug))
         {
-            _levelFilter ^= (int)LogLevelCategory::LevelDebug;
+            _levelFilter ^= EnumCast(LogLevelCategory::Debug);
         }
-        bool filterInfo = _levelFilter & (int)LogLevelCategory::LevelInfo;
+        bool filterInfo = _levelFilter & EnumCast(LogLevelCategory::Info);
         if(ImGui::Checkbox("Info", &filterInfo))
         {
-            _levelFilter ^= (int)LogLevelCategory::LevelInfo;
+            _levelFilter ^= EnumCast(LogLevelCategory::Info);
         }
-        bool filterWarn = _levelFilter & (int)LogLevelCategory::LevelWarn;
+        bool filterWarn = _levelFilter & EnumCast(LogLevelCategory::Warn);
         if(ImGui::Checkbox("Warn", &filterWarn))
         {
-            _levelFilter ^= (int)LogLevelCategory::LevelWarn;
+            _levelFilter ^= EnumCast(LogLevelCategory::Warn);
         }
-        bool filterError = _levelFilter & (int)LogLevelCategory::LevelError;
+        bool filterError = _levelFilter & EnumCast(LogLevelCategory::Error);
         if(ImGui::Checkbox("Error", &filterError))
         {
-            _levelFilter ^= (int)LogLevelCategory::LevelError;
+            _levelFilter ^= EnumCast(LogLevelCategory::Error);
         }
     }
 
@@ -141,15 +149,15 @@ namespace Engine
 
         switch (logMessage.LevelCategory)
         {
-            case LogLevelCategory::LevelTrace:
-            case LogLevelCategory::LevelDebug:
-            case LogLevelCategory::LevelInfo:
+            case LogLevelCategory::Trace:
+            case LogLevelCategory::Debug:
+            case LogLevelCategory::Info:
                 currentColor = colorInfo;
                 break;
-            case LogLevelCategory::LevelWarn:
+            case LogLevelCategory::Warn:
                 currentColor = colorWarn;
                 break;
-            case LogLevelCategory::LevelError:
+            case LogLevelCategory::Error:
                 currentColor = colorError;
                 break;
         }

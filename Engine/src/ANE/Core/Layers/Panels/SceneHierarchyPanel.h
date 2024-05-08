@@ -1,10 +1,11 @@
 #pragma once
-#include "imgui.h"
 #include "UILayerPanel.h"
 #include "ANE/Core/Editor/SelectionManager.h"
 
 namespace Engine
 {
+    typedef int ImGuiTreeNodeFlags;
+
     class Scene;
     class EditorLayer;
     struct TagComponent;

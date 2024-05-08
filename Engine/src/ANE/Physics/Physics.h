@@ -8,3 +8,5 @@ namespace Engine
 }
 
 #include "PhysicsSystem.h"
+#include "Types/RigidBody.h"
+#include "Types/Colliders.h"
