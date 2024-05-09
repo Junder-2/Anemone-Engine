@@ -42,7 +42,7 @@ namespace Engine
         static void RegisterComponentMetaData()
         {
             entt::meta<RenderComponent>()
-                .data<&RenderComponent::_modelPath>("Model File Location"_hs).prop("display_name"_hs, "Model File Location")
+                //.data<&RenderComponent::_modelPath>("Model File Location"_hs).prop("display_name"_hs, "Model File Location")
                 .data<&RenderComponent::Model>("Mesh Asset"_hs).prop("display_name"_hs, "Mesh Asset")
                 .EDITABLE
                 .data<&RenderComponent::_materialPropertyBlock>("Material Properties"_hs).prop("display_name"_hs,"Material Properties Block")
