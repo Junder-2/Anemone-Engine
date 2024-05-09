@@ -266,4 +266,11 @@ namespace Engine
     {
         return Matrix4x4::Convert(glm::mat4(matrix1) * glm::mat4(matrix2));
     }
+
+    Vector3 operator*(const Matrix4x4& matrix, const Vector3& vector)
+    {
+        return {matrix[0][0]*vector.X + matrix[0][1]*vector.Y + matrix[2][0]*vector.Z,
+            matrix[0][1]*vector.X + matrix[1][1]*vector.Y + matrix[2][1]*vector.Z,
+            matrix[0][2]*vector.X + matrix[1][2]*vector.Y + matrix[2][2]*vector.Z };
+    }
 }
