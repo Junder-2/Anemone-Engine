@@ -82,7 +82,7 @@ namespace Engine
 
         VmaMeshAsset LoadModel(const std::string& modelPath);
 
-        static VmaMeshBuffers UploadDebugVertices(std::span<uint32_t> indices, std::span<Vertex> vertices);
+        static VmaMeshBuffers UploadRawMesh(std::span<uint32_t> indices, std::span<Vertex> vertices);
 
         VmaImage LoadTexture(const std::string& texturePath);
 

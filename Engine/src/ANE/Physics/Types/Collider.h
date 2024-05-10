@@ -1,15 +1,15 @@
 #pragma once
+#include "ANE/Math/Types/Vector3.h"
+#include "ANE/Physics/PhysicsTypes.h"
 
 namespace Engine
 {
-    enum class CollisionShapeType;
     struct Quaternion;
-    struct Vector3;
 
     class Collider
     {
     public:
-        Collider(rp3d::Collider* collider, const CollisionShapeType shapeType) : _reactCollider(collider), _shapeType(shapeType) {}
+        Collider(rp3d::Collider* collider, const CollisionShapeType shapeType);
 
         /**
          * Sets the local space transform of the collider
@@ -47,24 +47,34 @@ namespace Engine
         Vector3 GetEulerAngles(bool inDegrees = false) const;
 
         /**
+         * Sets the local space rotation of the collider
+         */
+        void SetScale(Vector3 scale);
+
+        /**
+         * Returns the local space rotation of the collider
+         */
+        Vector3 GetScale() const;
+
+        /**
          * Sets the mask of what this collider should be able to collide with
          */
-        void SetCollisionMask(uint16_t collisionMask) const;
+        void SetCollisionMask(CollisionLayerMask collisionMask) const;
 
         /**
          * Returns the mask of what this collider should be able to collide with
          */
-        uint16_t GetCollisionMask() const;
+        CollisionLayerMask GetCollisionMask() const;
 
         /**
          * Sets bits of what collision categories this collider is part of
          */
-        void SetCollisionCategories(uint16_t collisionCategories) const;
+        void SetCollisionCategories(CollisionLayerMask collisionCategories) const;
 
         /**
          * Returns the bits of what collision categories this collider is part of
          */
-        uint16_t GetCollisionCategories() const;
+        CollisionLayerMask GetCollisionCategories() const;
 
         /**
          * Sets the physics material
@@ -94,10 +104,13 @@ namespace Engine
         }
 
     protected:
+        void ForceUpdateBody() const;
         void WakeBody() const;
+        virtual void OnUpdateScale() {}
 
     protected:
         rp3d::Collider* _reactCollider;
         CollisionShapeType _shapeType;
+        Vector3 _scale = 1.f;
     };
 }

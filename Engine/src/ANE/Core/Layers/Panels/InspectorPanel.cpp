@@ -1,11 +1,6 @@
 #include "anepch.h"
 #include "InspectorPanel.h"
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <utility>
-#include <cstring>
-#include "imgui.h"
+#include <imgui.h>
 #include "ANE/Core/Editor/SelectionManager.h"
 #include "ANE/Core/Layers/EditorLayer.h"
 #include "ANE/Math/Random.h"

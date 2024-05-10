@@ -105,23 +105,23 @@ namespace Engine
         switch (logMsg.level)
         {
             case spdlog::level::trace:
-                newLogMessage.LevelCategory = LogLevelCategory::LevelTrace;
+                newLogMessage.LevelCategory = LogLevelCategory::Trace;
             break;
             case spdlog::level::debug:
-                newLogMessage.LevelCategory = LogLevelCategory::LevelDebug;
+                newLogMessage.LevelCategory = LogLevelCategory::Debug;
             break;
             case spdlog::level::info:
-                newLogMessage.LevelCategory = LogLevelCategory::LevelInfo;
+                newLogMessage.LevelCategory = LogLevelCategory::Info;
             break;
             case spdlog::level::warn:
-                newLogMessage.LevelCategory = LogLevelCategory::LevelWarn;
+                newLogMessage.LevelCategory = LogLevelCategory::Warn;
             break;
             case spdlog::level::err:
             case spdlog::level::critical:
-                newLogMessage.LevelCategory = LogLevelCategory::LevelError;
+                newLogMessage.LevelCategory = LogLevelCategory::Error;
             break;
             default:
-                newLogMessage.LevelCategory = LogLevelCategory::LevelNone;
+                newLogMessage.LevelCategory = LogLevelCategory::None;
             break;
         }
 

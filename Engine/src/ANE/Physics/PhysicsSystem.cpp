@@ -4,11 +4,12 @@
 #include "PhysicsLogger.h"
 #include "PhysicsTypes.h"
 #include "ANE/Core/Entity/Entity.h"
+#include "ANE/Core/Scene/Components/ColliderComponent.h"
 #include "ANE/Math/Types/TransformMatrix.h"
 #include "ANE/Core/Scene/Components/RigidBodyComponent.h"
 #include "ANE/Core/Scene/Components/TransformComponent.h"
 #include "ANE/Math/VMath.h"
-#include "ANE/Renderer/Renderer.h"
+#include "ANE/Renderer/DebugRenderer.h"
 #include "ANE/Utilities/ColorUtilities.h"
 #include "Types/BoxCollider.h"
 #include "Types/CapsuleCollider.h"
@@ -24,7 +25,6 @@ namespace Engine
 
         rp3d::PhysicsWorld::WorldSettings worldSettings;
         worldSettings.worldName = "PhysicsWorld";
-        //worldSettings.isSleepingEnabled = false; // Because of a bug this is currently necessary
 
         _world = _physicsCommon.createPhysicsWorld(worldSettings);
 
@@ -133,10 +133,21 @@ namespace Engine
         return capsuleCollider;
     }
 
+    void PhysicsSystem::WakeBodies()
+    {
+        if(_hasAwokenBodies) return;
+
+        // Dirty fix for a bug that crashes when a sleeping body tries to collide
+        for (uint32_t i = 0; i < _world->getNbRigidBodies(); ++i)
+        {
+            _world->getRigidBody(i)->setIsSleeping(false);
+        }
+
+        _hasAwokenBodies = true;
+    }
+
     void PhysicsSystem::PhysicsUpdate(const float timeStep, Scene* scene)
     {
-        bool sleepUpdate = false;
-
         const auto group = scene->_registry.view<TransformComponent, RigidBodyComponent>();
         for (const auto entity : group) //We need to apply changes in our transform to the internal rigidbody
         {
@@ -146,19 +157,26 @@ namespace Engine
 
             if(!transformMatrix.IsDirty()) continue;
 
-            if(!sleepUpdate) // Dirty fix for a bug that crashes when a sleeping body tries to collide
+            WakeBodies();
+
+            if(transformMatrix.GetDirtyFlags() & DirtyScale)
             {
-                for (uint32_t i = 0; i < _world->getNbRigidBodies(); ++i)
+                if(const auto colliderComp = scene->_registry.try_get<ColliderComponent>(entity))
                 {
-                    _world->getRigidBody(i)->setIsSleeping(false);
+                    for (const auto collider : colliderComp->GetColliders())
+                    {
+                        collider->SetScale(transformMatrix.GetScale());
+                    }
                 }
-                sleepUpdate = true;
             }
             body.GetRigidBody()->SetTransform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
+
             transformMatrix.ClearDirty();
         }
 
         _world->update(timeStep);
+
+        _hasAwokenBodies = false;
     }
 
     void PhysicsSystem::UpdateRigidBodies(const float factor, Scene* scene)
@@ -192,10 +210,8 @@ namespace Engine
     }
 
     #ifndef ANE_DIST
-
     void PhysicsSystem::EnableDebugRendering(const bool enable)
     {
-        #ifndef ANE_DIST
         _isDebugRendering = enable;
         _world->setIsDebugRenderingEnabled(_isDebugRendering);
 
@@ -203,9 +219,6 @@ namespace Engine
         {
             _world->getRigidBody(i)->setIsDebugEnabled(_isDebugRendering);
         }
-        #else
-        _isDebugRendering = false;
-        #endif
     }
 
     void PhysicsSystem::EnableDebugFlag(PhysicsDebugDisplayFlag displayFlag, const bool enable) const
@@ -226,33 +239,16 @@ namespace Engine
         {
             for (auto triangle : _debugRenderer->getTriangles())
             {
-                Vertex vertex1;
-                vertex1.Position = Vector3::Convert(triangle.point1);
-                vertex1.Color = Vector4(ColorUtilities::HexToRGB(triangle.color1), _debugDisplayAlpha);
-
-                Vertex vertex2;
-                vertex2.Position = Vector3::Convert(triangle.point2);
-                vertex2.Color = Vector4(ColorUtilities::HexToRGB(triangle.color2), _debugDisplayAlpha);
-
-                Vertex vertex3;
-                vertex3.Position = Vector3::Convert(triangle.point3);
-                vertex3.Color = Vector4(ColorUtilities::HexToRGB(triangle.color3), _debugDisplayAlpha);
-
-                Renderer::DebugDrawTriangle(vertex1, vertex2, vertex3);
+                DebugRenderer::PushColor(Vector4(ColorUtilities::HexToRGB(triangle.color1), _debugDisplayAlpha));
+                DebugRenderer::DrawTriangle(Vector3::Convert(triangle.point1), Vector3::Convert(triangle.point2), Vector3::Convert(triangle.point3));
             }
         }
         if(_debugRenderer->getNbLines() > 0)
         {
             for (auto line : _debugRenderer->getLines())
             {
-                Vertex vertex1;
-                vertex1.Position = Vector3::Convert(line.point1);
-                vertex1.Color = Vector4(ColorUtilities::HexToRGB(line.color1), _debugDisplayAlpha);
-                Vertex vertex2;
-                vertex2.Position = Vector3::Convert(line.point2);
-                vertex2.Color = Vector4(ColorUtilities::HexToRGB(line.color2), _debugDisplayAlpha);
-
-                Renderer::DebugDrawLine(vertex1, vertex2);
+                DebugRenderer::PushColor(Vector4(ColorUtilities::HexToRGB(line.color1), _debugDisplayAlpha));
+                DebugRenderer::DrawLine(Vector3::Convert(line.point1), Vector3::Convert(line.point2));
             }
         }
     }

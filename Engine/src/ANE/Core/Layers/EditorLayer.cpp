@@ -144,7 +144,9 @@ namespace Engine {
             return;
         }
 
-        Entity ent = _activeScene->Create("Camera Entity");
+
+        //Create a Entity
+        Entity ent = Create("Camera");
         std::stringstream oss;
 
         for (int i = 0; i < numEntitiesToTest; i++) {
@@ -174,12 +176,11 @@ namespace Engine {
         Entity floor = _activeScene->Create("Floor");
         TransformMatrix& transformMatrix = floor.GetComponent<TransformComponent>().Transform;
         transformMatrix.SetPosition(Vector3(0, -5.f, 0));
-        transformMatrix.Scale(Vector3(10.f));
+        transformMatrix.Scale(Vector3(10.f, 1.f, 10.f));
 
         floor.AddComponent<RenderComponent>("Plane.obj");
         floor.AddComponent<RigidBodyComponent>(floor, BodyType::Static);
-        auto& compo = floor.AddComponent<ColliderComponent>(floor, Vector3(10.f, .1f, 10.f));
-        const Vector3 HalfExtends = Vector3(10.0f, 10.0f, 10.0f);
+        floor.AddComponent<ColliderComponent>(floor, Vector3(1.f, .1f, 1.f));
     }
 
     void EditorLayer::OnSwitchEditorFocus(InputValue inputValue) {

@@ -8,11 +8,11 @@ namespace Engine
         {
             switch (type)
             {
-                case LogLevelCategory::LevelTrace: return "Trace";
-                case LogLevelCategory::LevelDebug: return "Debug";
-                case LogLevelCategory::LevelInfo: return "Info";
-                case LogLevelCategory::LevelWarn: return "Warn";
-                case LogLevelCategory::LevelError: return "Error";
+                case LogLevelCategory::Trace: return "Trace";
+                case LogLevelCategory::Debug: return "Debug";
+                case LogLevelCategory::Info: return "Info";
+                case LogLevelCategory::Warn: return "Warn";
+                case LogLevelCategory::Error: return "Error";
                 default: return "Unknown";
             }
         }

@@ -1,11 +1,19 @@
 #include "anepch.h"
 #include "Collider.h"
 
+#include "ANE/Math/VMath.h"
 #include "ANE/Math/Types/Quaternion.h"
 #include "ANE/Math/Types/Vector3.h"
+#include "ANE/Physics/Physics.h"
+#include "ANE/Physics/PhysicsTypes.h"
 
 namespace Engine
 {
+    Collider::Collider(rp3d::Collider* collider, const CollisionShapeType shapeType): _reactCollider(collider), _shapeType(shapeType)
+    {
+        SetCollisionMask(EnumCast(CollisionLayerPreset::Default));
+    }
+
     void Collider::SetTransform(const Vector3 position, const Quaternion& rotation) const
     {
         WakeBody();
@@ -42,22 +50,33 @@ namespace Engine
         return Quaternion::Convert(_reactCollider->getLocalToBodyTransform().getOrientation()).GetEulerAngles(inDegrees);
     }
 
-    void Collider::SetCollisionMask(const uint16_t collisionMask) const
+    void Collider::SetScale(const Vector3 scale)
+    {
+        _scale = Math::Max(Math::Abs(scale), MIN_SCALE);
+        OnUpdateScale();
+    }
+
+    Vector3 Collider::GetScale() const
+    {
+        return _scale;
+    }
+
+    void Collider::SetCollisionMask(const CollisionLayerMask collisionMask) const
     {
         _reactCollider->setCollideWithMaskBits(collisionMask);
     }
 
-    uint16_t Collider::GetCollisionMask() const
+    CollisionLayerMask Collider::GetCollisionMask() const
     {
         return _reactCollider->getCollideWithMaskBits();
     }
 
-    void Collider::SetCollisionCategories(const uint16_t collisionCategories) const
+    void Collider::SetCollisionCategories(const CollisionLayerMask collisionCategories) const
     {
         _reactCollider->setCollisionCategoryBits(collisionCategories);
     }
 
-    uint16_t Collider::GetCollisionCategories() const
+    CollisionLayerMask Collider::GetCollisionCategories() const
     {
         return _reactCollider->getCollisionCategoryBits();
     }
@@ -87,12 +106,14 @@ namespace Engine
         return _shapeType;
     }
 
+    void Collider::ForceUpdateBody() const
+    {
+        SetPosition(GetPosition());
+    }
+
     void Collider::WakeBody() const
     {
-        if(const auto rigidbody = dynamic_cast<rp3d::RigidBody*>(_reactCollider->getBody()))
-        {
-            rigidbody->setIsSleeping(false);
-        }
+        GetPhysicsSystem().WakeBodies();
     }
 }
 

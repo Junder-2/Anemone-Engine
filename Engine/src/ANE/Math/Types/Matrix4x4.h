@@ -190,6 +190,8 @@ namespace Engine
                     matrix[0][3]*vector.X + matrix[1][3]*vector.Y + matrix[2][3]*vector.Z + matrix[3][3]*vector.W};
         }
 
+        friend Vector3 operator*(const Matrix4x4& matrix, const Vector3& vector);
+
         std::string ToString() const;
 
     private:
