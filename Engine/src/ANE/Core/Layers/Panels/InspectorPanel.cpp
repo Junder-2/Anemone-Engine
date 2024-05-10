@@ -47,7 +47,7 @@ namespace Engine
         }
         else
         {
-            Entity selectedEntity = _editorLayer->GetEntityWithUUID(selectedEntityUUIDS->at(0));
+            Entity selectedEntity = _editorLayer->GetActiveScene()->GetEntityWithUUID(selectedEntityUUIDS->at(0));
             DrawEntityComponentList(selectedEntity);
             if (ImGui::Button("Add Physics Suzanne")) // For physics testing
                 {

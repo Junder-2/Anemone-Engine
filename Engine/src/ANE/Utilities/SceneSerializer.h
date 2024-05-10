@@ -2,19 +2,30 @@
 #include "ANE/Core/Scene/Scene.h"
 #include "toml.hpp"
 #include "ANE/Core/Entity/Entity.h"
+#include "ANE/Core/Layers/Layer.h"
 
 namespace Engine
 {
+    class EditorLayer;
+
     class SceneSerializer
     {
     public:
-        SceneSerializer(const std::shared_ptr<Scene>& scene);
-        std::string EntitySerializer(Entity entity);
-        void Serialize(const std::string& filepath); // toml
-        void SerializeBinary(const std::string& filepath); // binary
-        bool Deserialize(const std::string& filepath); // toml
-        bool DeserializeBinary(const std::string& filepath); // binary
+        SceneSerializer();
+        toml::table EntitySerializer(Entity& entity);
+        void Serialize(const std::shared_ptr<Scene>& scene); // toml
+        void SerializeBinary(); // binary
+        bool HasFile(const char* fileName);
+        std::shared_ptr<Scene> CreateEmptySceneFile(const char* sceneName);
+        std::shared_ptr<Scene> Deserialize(const char* key, EditorLayer* layer) const; // toml
+        std::shared_ptr<Scene> DeserializeBinary(); // binary
+
+        void WriteToFile(std::string filepath, const toml::table& content);
+        void WriteToFile(std::string filepath);
+
     private:
-        std::shared_ptr<Scene> _scene;
+        //map?
+        std::string _filepath; // path + key
+        std::string _binaryFilepath;
     };
 }

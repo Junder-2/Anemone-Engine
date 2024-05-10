@@ -43,7 +43,7 @@ namespace Engine
         entt::dense_map<std::string, bool> _loggerNameFilter;
 
         bool _wrap = true;
-        bool _autoScroll = false;
+        bool _autoScroll = true;
 
         bool _displayTime = true;
         bool _displaySource = false;

@@ -6,13 +6,11 @@
 #include "ANE/Utilities/SceneSerializer.h"
 #include "Panels/UIUpdateWrapper.h"
 
-namespace Engine
-{
+namespace Engine {
     struct InputValue;
     class UILayerPanel;
 
-    class EditorLayer : public Layer
-    {
+    class EditorLayer : public Layer {
     public:
         EditorLayer(const std::string& name = "EditorLayer");
 
@@ -33,63 +31,63 @@ namespace Engine
 
         template <class EntityType>
         void EntityWidget(EntityType& e, entt::basic_registry<EntityType>& reg, bool dropTarget = false);
+        std::shared_ptr<Scene> CreateScene(const char* sceneName) const;
+        void SaveScene(InputValue inputValue);
 
         std::string GetComponentNameFromEnttId(entt::id_type id);
 
         template <class TValue>
         std::enable_if_t<std::is_base_of_v<UILayerPanel, TValue>> AddPanel(TValue* panel);
-        template <class TValue>
-        std::enable_if_t<std::is_base_of_v<Scene, TValue>> AddScene(const char* key);
 
-        template <class TValue>
-        std::enable_if_t<std::is_base_of_v<Scene, TValue>> AddScene(const char* key, const std::vector<entt::entity> entities);
+        // template <class TValue>
+        // std::enable_if_t<std::is_base_of_v<Scene, TValue>> AddScene(const char* key);
+        //
+        // template <class TValue>
+        // std::enable_if_t<std::is_base_of_v<Scene, TValue>> AddScene(const char* key, const std::vector<entt::entity> entities);
 
-        void SetActiveScene(const char* sceneName)
-        {
-            if (!_scenes.contains(sceneName)) AddScene<Scene>(sceneName);
+        void SetActiveScene(const char* sceneName) {
+            std::shared_ptr<Scene> scene = nullptr;
+            if (_activeScene == nullptr) scene = CreateScene(sceneName);
+            else scene = _sceneSerializer->Deserialize(sceneName, this);
 
-            _sceneSerializer = new SceneSerializer(_activeScene);
-            _activeScene = _scenes.at(sceneName);
+            ANE_ASSERT(scene == nullptr, "Scene with name: {} does not exist", sceneName);
+
+            _activeScene = scene;
         }
 
         std::shared_ptr<Scene> GetActiveScene() { return _activeScene; }
 
-        Entity Create(const char* name = "Untagged");
-        Entity Create(std::string = "Untagged");
-        Entity GetEntityWithUUID(std::string UUID);
-
     private:
         SceneSerializer* _sceneSerializer;
-        std::map<std::string, Entity> _entityMap;
         std::vector<UIUpdateWrapper> UIUpdates;
         void CreateTestScene(int numEntitiesToTest);
         void CreateFloor();
 
         void OnSwitchEditorFocus(InputValue inputValue);
 
-
     private:
-        std::unordered_map<const char*, std::shared_ptr<Scene>> _scenes;
+        //std::unordered_map<const char*, std::shared_ptr<Scene>> _scenes; // todo: cleanup
         std::shared_ptr<Scene> _activeScene;
         std::map<entt::id_type, std::string> ComponentTypeMap;
     };
 
-    template <class TValue>
-    std::enable_if_t<std::is_base_of_v<Scene, TValue>> EditorLayer::AddScene(const char* key, std::vector<entt::entity> entities)
-    {
-        std::unique_ptr<TValue> tempScene = std::make_unique<TValue>(entities);
-        _scenes.emplace(std::make_pair(key, std::move(tempScene)));
-    }
 
-    template <class TValue>
-    std::enable_if_t<std::is_base_of_v<Scene, TValue>> EditorLayer::AddScene(const char* key)
-    {
-        std::unique_ptr<TValue> tempScene = std::make_unique<TValue>();
-        _scenes.emplace(std::make_pair(key, std::move(tempScene)));
-        if (_scenes.size() == 1)
-            SetActiveScene(key);
-    }
-
+    // template <class TValue>
+    // std::enable_if_t<std::is_base_of_v<Scene, TValue>> EditorLayer::AddScene(const char* key, std::vector<entt::entity> entities)
+    // {
+    //     std::unique_ptr<TValue> tempScene = std::make_unique<TValue>(entities); // scene creation
+    //    // _scenes.emplace(std::make_pair(key, std::move(tempScene)));
+    // }
+    //
+    // template <class TValue>
+    // std::enable_if_t<std::is_base_of_v<Scene, TValue>> EditorLayer::AddScene(const char* key)
+    // {
+    //     std::unique_ptr<TValue> tempScene = std::make_unique<TValue>(std::string(key)); // scene creation
+    //     //_scenes.emplace(std::make_pair(key, std::move(tempScene))); // there shouldn't be a scenes dictionary here at all, unnesseray to keep stuff in ram...
+    //     if (_activeScene == nullptr)
+    //         SetActiveScene(key); //
+    // }
+    //
     template <class TValue>
     std::enable_if_t<std::is_base_of_v<UILayerPanel, TValue>> EditorLayer::AddPanel(TValue* panel)
     {

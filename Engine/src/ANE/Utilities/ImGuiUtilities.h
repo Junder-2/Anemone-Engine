@@ -1,4 +1,5 @@
 #pragma once
+
 #include "ANE/Math/Types/Vector4.h"
 
 struct ImGuiStyle;
@@ -27,6 +28,8 @@ namespace Engine
 
             AneColorCount,
         };
+
+        inline static ImVec4 aneColor = ImVec4(0.25f, 0.30f, 0.55f, 1.00f);
 
         // Flags for ImGui::DockSpace()
         enum ImGuiDockNodeFlags
