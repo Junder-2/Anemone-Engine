@@ -18,6 +18,9 @@ namespace Engine
         ColliderComponent(Entity self, float radius, float height);
 
         void AddCollider(Collider* collider);
+        void AddBoxCollider(Entity self, Vector3 halfExtents);
+        void AddSphereCollider(Entity self, float radius);
+        void AddCapsuleCollider(Entity self, float radius, float height);
 
         void RemoveCollider(Entity self, const Collider* collider);
 

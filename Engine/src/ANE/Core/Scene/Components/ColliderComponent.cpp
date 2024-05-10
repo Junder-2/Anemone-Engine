@@ -14,22 +14,37 @@ namespace Engine
 
     ColliderComponent::ColliderComponent(const Entity self, const Vector3 halfExtents): Component(typeid(*this).name())
     {
-        _colliders.push_back(GetPhysicsSystem().CreateBoxCollider(self, halfExtents));
+        AddBoxCollider(self, halfExtents);
     }
 
     ColliderComponent::ColliderComponent(const Entity self, const float radius): Component(typeid(*this).name())
     {
-        _colliders.push_back(GetPhysicsSystem().CreateSphereCollider(self, radius));
+        AddSphereCollider(self, radius);
     }
 
     ColliderComponent::ColliderComponent(const Entity self, const float radius, const float height): Component(typeid(*this).name())
     {
-        _colliders.push_back(GetPhysicsSystem().CreateCapsuleCollider(self, radius, height));
+        AddCapsuleCollider(self, radius, height);
     }
 
     void ColliderComponent::AddCollider(Collider* collider)
     {
         _colliders.push_back(collider);
+    }
+
+    void ColliderComponent::AddBoxCollider(const Entity self, const Vector3 halfExtents)
+    {
+        _colliders.push_back(GetPhysicsSystem().CreateBoxCollider(self, halfExtents));
+    }
+
+    void ColliderComponent::AddSphereCollider(const Entity self, const float radius)
+    {
+        _colliders.push_back(GetPhysicsSystem().CreateSphereCollider(self, radius));
+    }
+
+    void ColliderComponent::AddCapsuleCollider(const Entity self, const float radius, const float height)
+    {
+        _colliders.push_back(GetPhysicsSystem().CreateCapsuleCollider(self, radius, height));
     }
 
     void ColliderComponent::RemoveCollider(const Entity self, const Collider* collider)
