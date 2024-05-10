@@ -137,11 +137,19 @@ namespace Engine {
     void EditorLayer::CreateTestScene(int numEntitiesToTest) { // this should be remade and be replaced with default scene
         ANE_PROFILE_FUNCTION();
 
-        if (!_sceneSerializer->HasFile("Game")) _activeScene = _sceneSerializer->CreateEmptySceneFile("Game");
+        if(false)
+        {
+            if (!_sceneSerializer->HasFile("Game")) _activeScene = _sceneSerializer->CreateEmptySceneFile("Game");
+            else
+            {
+                _activeScene = _sceneSerializer->Deserialize("Game", this);
+                return;
+            }
+        }
         else
         {
-            _activeScene = _sceneSerializer->Deserialize("Game", this);
-            return;
+            _activeScene = _sceneSerializer->CreateEmptySceneFile("Game");
+            ANE_ELOG_WARN("Note SceneSerializer is not enabled");
         }
 
 
