@@ -47,6 +47,7 @@ namespace Engine
         constexpr ImVec4 aneDark = ImVec4(0.20f, 0.22f, 0.36f, 1.00f);
         const ImVec4 aneDarkHover = ImLerp(aneDark, imBlack, .1f);
         const ImVec4 aneDarkActive = ImLerp(aneDark, imBlack, .2f);
+        constexpr ImVec4 aneColor = ImVec4(0.25f, 0.30f, 0.55f, 1.00f);
         const ImVec4 aneColorHover = ImLerp(aneColor, imBlack, .1f);
         const ImVec4 aneColorActive = ImLerp(aneColor, imBlack, .2f);
         constexpr ImVec4 aneHint = ImVec4(0.57f, 0.62f, 0.87f, 1.00f);

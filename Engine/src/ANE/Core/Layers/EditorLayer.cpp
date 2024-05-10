@@ -146,7 +146,7 @@ namespace Engine {
 
 
         //Create a Entity
-        Entity ent = Create("Camera");
+        Entity ent = _activeScene->Create("Camera");
         std::stringstream oss;
 
         for (int i = 0; i < numEntitiesToTest; i++) {
