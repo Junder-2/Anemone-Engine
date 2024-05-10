@@ -21,7 +21,7 @@ namespace Engine
         void DetachUIPanel(UILayerPanel* panelToRemove);
 
     protected:
-        std::vector<UILayerPanel*> _UIpanels; // todo: make into smartpointer
+        std::vector<UILayerPanel*> _uiPanels; // todo: make into smartpointer
         std::string _debugName;
     };
 }

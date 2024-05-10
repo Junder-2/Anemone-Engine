@@ -2,20 +2,8 @@
 #include "SceneSerializer.h"
 
 #include "ANE/Core/Layers/EditorLayer.h"
-#include "ANE/Core/Layers/Layer.h"
-#include "ANE/Core/Scene/Components/CameraComponent.h"
-#include "ANE/Core/Scene/Components/ColliderComponent.h"
-#include "ANE/Core/Scene/Components/NativeScriptComponent.h"
-#include "ANE/Core/Scene/Components/RenderComponent.h"
-#include "ANE/Core/Scene/Components/RigidBodyComponent.h"
-#include "ANE/Core/Scene/Components/TagComponent.h"
-#include "ANE/Core/Scene/Components/TransformComponent.h"
-#include "ANE/Core/Scene/Components/UUIDComponent.h"
-#include "ANE/Math/Types/Quaternion.h"
-#include "ANE/Physics/PhysicsTypes.h"
-#include "ANE/Physics/Types/BoxCollider.h"
-#include "ANE/Physics/Types/CapsuleCollider.h"
-#include "ANE/Physics/Types/SphereCollider.h"
+#include "ANE/Core/Scene/Components/Components.h"
+#include "ANE/Physics/Physics.h"
 
 
 namespace Engine

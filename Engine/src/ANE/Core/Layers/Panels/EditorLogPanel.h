@@ -1,8 +1,8 @@
 #pragma once
 
-#include <entt.hpp>
-
 #include "UILayerPanel.h"
+
+#include <entt.hpp>
 #include "ANE/Core/Log/LoggingTypes.h"
 #include "ANE/Math/Types/Vector4.h"
 

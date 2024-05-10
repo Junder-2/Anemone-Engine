@@ -1,5 +1,4 @@
 ﻿#pragma once
-
 #include "MathCommon.h"
 #include "glm/gtx/compatibility.hpp"
 #include "glm/gtx/fast_trigonometry.hpp"

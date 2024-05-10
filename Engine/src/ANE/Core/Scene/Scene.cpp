@@ -24,7 +24,7 @@ namespace Engine
         return ent;
     }
 
-    [[nodiscard("Entity never used")]] Entity Scene::Create(std::string stringName)
+    [[nodiscard("Entity never used")]] Entity Scene::Create(const std::string& stringName)
     {
         Entity ent{this, stringName.c_str()};
         _entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent;
@@ -34,7 +34,6 @@ namespace Engine
     Entity Scene::GetEntityWithUUID(std::string UUID)
     {
         return _entityMap[UUID];
-        return {};
     }
 
     void Scene::OnEvent(Event& e)
@@ -98,7 +97,7 @@ namespace Engine
 
         // TODO: Sort based on pivot or bounds.
         const auto view = _registry.view<TransformComponent, RenderComponent>();
-        for (entt::entity entity : view)
+        for (const auto entity : view)
         {
             auto [transform, renderer] = view.get<TransformComponent, RenderComponent>(entity);
 

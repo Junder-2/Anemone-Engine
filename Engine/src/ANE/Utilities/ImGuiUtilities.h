@@ -1,5 +1,4 @@
 #pragma once
-
 #include "ANE/Math/Types/Vector4.h"
 
 struct ImGuiStyle;

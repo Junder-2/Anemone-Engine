@@ -14,10 +14,10 @@ namespace Engine
     class SceneHierarchyPanel : public UILayerPanel
     {
     public:
+        SceneHierarchyPanel(EditorLayer* managingLayer);
         ~SceneHierarchyPanel() = default;
         void DrawEntityNode(const UUIDComponent& uuid, const TagComponent& tag, ImGuiTreeNodeFlags nodeFlags) const;
         void DrawEntityNodeList() const;
-        SceneHierarchyPanel(EditorLayer* managingLayer);
         UIUpdateWrapper OnPanelRender() override;
 
     private:

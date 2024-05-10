@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Component.h"
 #include "ANE/Math/Types/Matrix4x4.h"
 

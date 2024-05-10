@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "UILayerPanel.h"
 #include "ANE/Math/Types/Vector2.h"
-#include "UIUpdateWrapper.h"
 
 namespace Engine
 {
@@ -24,7 +23,7 @@ namespace Engine
         const float WindowXSize = 300;
         const float WindowYSize = 120;
 
-         std::string sceneName;
-        char buffer[256] = {};
+        std::string _sceneName;
+        char _buffer[256] = {};
     };
 }

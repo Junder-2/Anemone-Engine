@@ -94,9 +94,9 @@ namespace Engine
                     {
                         auto& field = data.second;
                         bool editable = false;
-                        if(field.prop(EDITABLEHASH))
+                        if(field.prop(EDITABLE_HASH))
                         {
-                            editable = field.prop(EDITABLEHASH).value().cast<bool>();
+                            editable = field.prop(EDITABLE_HASH).value().cast<bool>();
                         }
                         if (editable)
                         {

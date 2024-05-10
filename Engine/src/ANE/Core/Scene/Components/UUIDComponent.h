@@ -5,10 +5,9 @@ namespace Engine
 {
     struct UUIDComponent : Component
     {
-
         ANE_COMPONENT_INIT(UUIDComponent)
-        std::string UUID{};
-        UUIDComponent(std::string uuid) : Component(typeid(*this).name()) , UUID(uuid) {}
+        UUIDComponent(const std::string& uuid) : Component(typeid(*this).name()), UUID(uuid) {}
+        std::string UUID {};
 
         static void RegisterComponentMetaData()
         {

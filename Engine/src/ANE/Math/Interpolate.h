@@ -1,5 +1,4 @@
 #pragma once
-
 #include "FInterpolate.h"
 #include "Types/Quaternion.h"
 #include "Types/Vector2.h"

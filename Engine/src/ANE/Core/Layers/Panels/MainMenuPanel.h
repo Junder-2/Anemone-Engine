@@ -11,8 +11,10 @@ namespace Engine
         MainMenuPanel(EditorLayer* editorLayer);
 
         UIUpdateWrapper OnPanelRender() override;
+
     private:
         ~MainMenuPanel() = default;
+
     private:
         EditorLayer* _editorLayer;
     };

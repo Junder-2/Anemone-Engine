@@ -3,11 +3,8 @@
 
 namespace Engine
 {
-    using namespace entt::literals;
     struct TagComponent : Component
     {
-    public:
-        //const char* Tag;
         std::string Value;
 
         ANE_COMPONENT_INIT(TagComponent)
@@ -20,7 +17,5 @@ namespace Engine
                 .data<&TagComponent::Value>("Tag"_hs).prop("display_name"_hs, "Tag")
                 .EDITABLE;
         }
-
-        //operator const char*&() { return Tag; }
     };
 }

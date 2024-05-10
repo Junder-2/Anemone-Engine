@@ -1,5 +1,4 @@
 ﻿#pragma once
-
 #include "ANE/Subsystem/SubSystem.h"
 
 namespace Engine

@@ -17,7 +17,7 @@ namespace Engine
         void OnUpdate(float timeStep);
 
         Entity Create(const char* name = "Untagged");
-        Entity Create(std::string = "Untagged");
+        Entity Create(const std::string& = "Untagged");
         Entity GetEntityWithUUID(std::string UUID);
 
         void SubmitDrawCommands();
@@ -25,12 +25,12 @@ namespace Engine
         entt::registry _registry;
 
         std::string Name;
-    private:
 
-        std::map<std::string, Entity> _entityMap;
+    private:
         void OnFixedUpdate(float timeStep);
 
     private:
+        std::map<std::string, Entity> _entityMap;
         float _accumulator = 0;
         float _timeStep = 1.f/50.f;
     };

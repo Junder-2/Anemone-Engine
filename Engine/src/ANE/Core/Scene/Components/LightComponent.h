@@ -11,13 +11,13 @@ namespace Engine
         Spotlight
     };
 
-    struct LightComponent
+    struct LightComponent : Component
     {
         ANE_COMPONENT_INIT(LightComponent)
 
     private:
-        float _intensity;
-        LightType _lightType;
-        Vector3 _color;
+        float _intensity = 1.f;
+        LightType _lightType = Directional;
+        Vector3 _color = 1.f;
     };
 }
