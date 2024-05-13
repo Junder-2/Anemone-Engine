@@ -1,6 +1,7 @@
 #pragma once
 #include "UILayerPanel.h"
 #include "ANE/Core/Editor/SelectionManager.h"
+#include "ANE/Core/Scene/Components/MetaTypes.h"
 
 namespace Engine
 {

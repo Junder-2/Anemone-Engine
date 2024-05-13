@@ -102,7 +102,7 @@ namespace Engine
                             selectedEntity.AddComponent<CameraComponent>();
                             break;
                         case Hash("RigidBodyComponent"):
-                            selectedEntity.AddComponent<RigidBodyComponent>(selectedEntity);
+                            selectedEntity.AddComponent<RigidBodyComponent>(selectedEntity, BodyType::Static);
                             break;
                         case Hash("NativeScriptComponent"):
                             //selectedEntity.AddComponent<NativeScriptComponent>().Bind<Entity>();
