@@ -244,10 +244,18 @@ namespace Engine
 
     void PhysicsSystem::DispatchCollisionCallback(Entity entity, const CollisionEventType type, const CollisionData& collisionData)
     {
+        if(entity.HasComponent<NativeScriptComponent>())
+        {
+            entity.GetComponent<NativeScriptComponent>().OnCollisionFunction(type, collisionData);
+        }
     }
 
     void PhysicsSystem::DispatchTriggerCallback(Entity entity, const CollisionEventType type, const TriggerData& triggerData)
     {
+        if(entity.HasComponent<NativeScriptComponent>())
+        {
+            entity.GetComponent<NativeScriptComponent>().OnTriggerFunction(type, triggerData);
+        }
     }
 
     #ifndef ANE_DIST

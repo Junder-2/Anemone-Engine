@@ -1,9 +1,12 @@
 ﻿#pragma once
 #include "ANE/Core/Entity/ScriptableEntity.h"
+#include "ANE/Physics/CollisionData.h"
 
 namespace Engine
 {
     class ScriptableEntity;
+
+    enum class CollisionEventType;
 
     struct NativeScriptComponent : Component
     {
@@ -21,6 +24,9 @@ namespace Engine
         std::function<void(float)> OnUpdateFunction;
         std::function<void(float)> OnFixedUpdateFunction;
         std::function<void()> OnDestroyFunction;
+
+        std::function<void(CollisionEventType, const CollisionData&)> OnCollisionFunction;
+        std::function<void(CollisionEventType, const TriggerData&)> OnTriggerFunction;
 
         template <typename T>
         void Bind()
@@ -60,6 +66,16 @@ namespace Engine
             OnDestroyFunction = [&]()
             {
                 static_cast<T*>(Instance)->OnDestroy();
+            };
+
+            OnCollisionFunction = [&](const CollisionEventType type, const CollisionData& collisionData)
+            {
+                static_cast<T*>(Instance)->OnCollision(type, collisionData);
+            };
+
+            OnTriggerFunction = [&](const CollisionEventType type, const TriggerData& collisionData)
+            {
+                static_cast<T*>(Instance)->OnTrigger(type, collisionData);
             };
         }
 
