@@ -25,7 +25,7 @@ Engine::UIUpdateWrapper Engine::ContentBrowserPanel::OnPanelRender()
 
         // Content Outliner
             ImGui::TableSetColumnIndex(0);
-            RenderDirectoryBrowserChild();
+            RenderDirectoryBrowserChild(AssetDirectory);
 
         // Directory Content
             ImGui::TableSetColumnIndex(1);
@@ -39,20 +39,35 @@ Engine::UIUpdateWrapper Engine::ContentBrowserPanel::OnPanelRender()
         return UILayerPanel::OnPanelRender();
 }
 
-void Engine::ContentBrowserPanel::RenderDirectoryBrowserChild()
+void Engine::ContentBrowserPanel::RenderDirectoryBrowserChild(std::filesystem::path DirectoryPath)
 {
+
     ImGui::BeginChild("##folders_common");
     {
-        //ImGui::BeginChild("##top_bar", ImVec2(0, height));
-        //ImGui::BeginHorizontal("##top_bar", ImGui::GetWindowSize());
+        for (auto const& dir_entry : std::filesystem::directory_iterator{DirectoryPath})
+        {
+            if(dir_entry.is_directory()){
+                /*if(ImGui::TreeNodeEx(dir_entry.path().filename().string().c_str()))
+                {
+                    ImGui::Indent();
+                    RenderDirectoryBrowserChild(dir_entry);
+                    ImGui::Unindent();
+                    ImGui::TreePop();
+                }*/
+            }
+            else
+            {
+                continue;
+            }
+        }
+
+
     }
+
     ImGui::EndChild();
 
 }
-void Engine::ContentBrowserPanel::RenderDirectoryContentsBrowserChildTopBar(float topBarHeight)
-{
 
-}
 
 void Engine::ContentBrowserPanel::RenderDirectoryContentsBrowserChild()
 {
@@ -80,6 +95,12 @@ void Engine::ContentBrowserPanel::RenderDirectoryContentsBrowserChild()
         ImGui::EndChild();
     }
     ImGui::EndChild();
+}
+void Engine::ContentBrowserPanel::RenderDirectoryContentsBrowserChildTopBar(float topBarHeight)
+{
+
+    //All support UI, like searching, navigation and menu's should be rendered in this function
+
 }
 
 

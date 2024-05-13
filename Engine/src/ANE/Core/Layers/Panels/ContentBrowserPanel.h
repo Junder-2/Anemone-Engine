@@ -18,7 +18,7 @@ namespace Engine
         void RenderDirectoryContentsBrowserChildTopBar(float topBarHeight);
         UIUpdateWrapper OnPanelRender() override;
 
-        void RenderDirectoryBrowserChild();
+        void RenderDirectoryBrowserChild(std::filesystem::path DirectoryPath);
         void RenderDirectoryContentsBrowserChildTopBar();
         void RenderDirectoryContentsBrowserChild();
 
