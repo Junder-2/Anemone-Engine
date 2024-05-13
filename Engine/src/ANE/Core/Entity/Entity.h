@@ -2,7 +2,6 @@
 
 #include "ANE/Core/Scene/Scene.h"
 #include "ANE/Core/Scene/Components/TagComponent.h"
-
 namespace Engine
 {
     struct Component;
@@ -48,6 +47,9 @@ namespace Engine
 
         template <typename T>
         std::enable_if_t<std::is_base_of_v<Component, T>, T&> GetComponent();
+
+
+        void AddComponentFromMetaType(const char* id);
     private:
 
         entt::entity _entityHandle = {entt::null};
