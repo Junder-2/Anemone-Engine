@@ -31,6 +31,6 @@ namespace Engine
         std::filesystem::path currentDirectory;
         //std::map<std::string,ImGui::> m_AssetIconMap;
 
-        inline static const std::filesystem::path AssetDirectory = std::filesystem::path("C:/NP-GameEngine/Assets");
+        inline static const std::filesystem::path AssetDirectory = std::filesystem::path("../Assets/");
     };
 }
