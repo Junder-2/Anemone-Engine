@@ -29,7 +29,23 @@ namespace Engine
         }
         return propertyWritten;
     }
-
+    inline bool InspectMutableTextureField(entt::meta_data& field, entt::meta_any& componentData)
+    {
+        auto v = field.get(componentData).cast<std::string>();
+        bool propertyWritten = false;
+        bool writable = field.prop(EDITABLE_HASH).value().cast<bool>();
+        char buffer[256] = {};
+        const auto error = strcpy_s(buffer, sizeof(buffer), v.c_str());
+        ImGui::AlignTextToFramePadding();
+        ImGui::Text("%s", field.prop("display_name"_hs).value().cast<const char*>());
+        ImGui::SameLine();
+        ImGui::AlignTextToFramePadding();
+        if (ImGui::InputText("##stringfield", buffer, sizeof(buffer)))
+        {
+            propertyWritten = field.set(componentData, std::string(buffer));
+        }
+        return propertyWritten;
+    }
     inline bool InspectMutableBoolField(entt::meta_data& field, entt::meta_any& componentData)
     {
         auto v = field.get(componentData).cast<bool>();
@@ -272,59 +288,66 @@ namespace Engine
         col[0] = v.Color.X;
         col[1] = v.Color.Y;
         col[2] = v.Color.Z;
-        if(ImGui::CollapsingHeader("Base Color"))
-        {
-            if(ImGui::ColorPicker3("##Color",col))
-            {
+        ImGui::Text("%s","Base Color");
+        ImGui::SameLine();
+        if(ImGui::ColorEdit4("##color", col, ImGuiColorEditFlags_AlphaBar)){
+
                 v.Color.X = col[0];
                 v.Color.Y = col[1];
                 v.Color.Z = col[2];
                 propertyWritten =  true;
             }
-        }
+
 
         float emissionCol[3];
         emissionCol[0] = v.Emission.X;
         emissionCol[1] = v.Emission.Y;
         emissionCol[2] = v.Emission.Z;
-        if(ImGui::CollapsingHeader("Emission Color"))
-        {
-            if(ImGui::ColorPicker3("##Emission",col))
+        ImGui::Text("%s","Emission Color");
+        ImGui::SameLine();
+        if(ImGui::ColorEdit4("##EmissionColor", emissionCol, ImGuiColorEditFlags_AlphaBar))
             {
                 v.Color.X = emissionCol[0];
                 v.Color.Y = emissionCol[1];
                 v.Color.Z = emissionCol[2];
                 propertyWritten =  true;
             }
+
+        ImGui::Text("%s","Height multiplier");
+        ImGui::SameLine();
+        if(ImGui::SliderFloat("##Height multiplier",&v.Height,0,1))
+        {
+            propertyWritten =  true;
         }
 
-        if(ImGui::DragFloat("Height multiplier",&v.Height,0.1f,0,1))
+        ImGui::Text("%s","Metallic multiplier");
+        ImGui::SameLine();
+        if(ImGui::SliderFloat("##Metallic",&v.Metallic,0,1))
         {
             propertyWritten =  true;
         }
 
-
-        if(ImGui::DragFloat("Metallic",&v.Metallic,0.1f,0,1))
+        ImGui::Text("%s","Normal multiplier");
+        ImGui::SameLine();
+        if(ImGui::SliderFloat("##Normal",&v.Normal,0,1))
         {
             propertyWritten =  true;
         }
-        if(ImGui::DragFloat("Height",&v.Height,0.1f,0,1))
+        ImGui::Text("%s","Occlusion multiplier");
+        ImGui::SameLine();
+        if(ImGui::SliderFloat("##Occlusion",&v.Occlusion,0,1))
         {
             propertyWritten =  true;
         }
-        if(ImGui::DragFloat("Normal",&v.Normal,0.1f,0,1))
+        ImGui::Text("%s","Reflectance multiplier");
+        ImGui::SameLine();
+        if(ImGui::SliderFloat("##Reflectance",&v.Reflectance,0,1))
         {
             propertyWritten =  true;
         }
-        if(ImGui::DragFloat("Occlusion",&v.Occlusion,0.1f,0,1))
-        {
-            propertyWritten =  true;
-        }
-        if(ImGui::DragFloat("Reflectance",&v.Reflectance,0.1f,0,1))
-        {
-            propertyWritten =  true;
-        }
-        if(ImGui::DragFloat("Roughness",&v.Roughness,0.1f,0,1))
+        ImGui::Text("%s","Roughness multiplier");
+        ImGui::SameLine();
+        if(ImGui::SliderFloat("##Roughness",&v.Roughness,0,1))
         {
             propertyWritten =  true;
         }

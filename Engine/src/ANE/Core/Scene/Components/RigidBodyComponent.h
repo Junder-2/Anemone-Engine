@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Component.h"
+#include "ANE/Physics/Types/RigidBody.h"
 
 namespace Engine
 {

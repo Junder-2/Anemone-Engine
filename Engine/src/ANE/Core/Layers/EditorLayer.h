@@ -46,6 +46,8 @@ namespace Engine
 
         std::string GetComponentNameFromEnttId(entt::id_type id);
 
+        std::map<entt::id_type, std::string> ComponentTypeMap;
+
     private:
         SceneSerializer* _sceneSerializer;
         std::vector<UIUpdateWrapper> _uiUpdates;

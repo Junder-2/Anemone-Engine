@@ -21,6 +21,7 @@
 #include "ANE/Math/Types/TransformMatrix.h"
 #include "ANE/Physics/Physics.h"
 #include "ANE/Utilities/SceneSerializer.h"
+#include "Panels/ContentBrowserPanel.h"
 #include "Panels/EditorLogPanel.h"
 #include "Panels/MainMenuPanel.h"
 #include "Panels/UIUpdateWrapper.h"
@@ -65,6 +66,7 @@ namespace Engine
 
         CreateTestScene(50);
         AttachUIPanel(new ViewportPanel(this));
+        AttachUIPanel(new ContentBrowserPanel(this));
         AttachUIPanel(new SceneHierarchyPanel(this));
         AttachUIPanel(new InspectorPanel(this));
         AttachUIPanel(new EditorLogPanel(this));

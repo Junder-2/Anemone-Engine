@@ -10,6 +10,7 @@ namespace Engine
             Global = 0,
             SceneViewport = 1,
             UI = 2,
+            AssetBrowser = 3,
         };
 
         static void RegisterSelect(SelectionContext clickContextOrigin, const std::string& uuid);
