@@ -7,6 +7,9 @@ namespace Engine
 {
     class Entity;
     struct Vector3;
+    class BoxCollider;
+    class SphereCollider;
+    class CapsuleCollider;
 
     struct ColliderComponent : Component
     {
@@ -17,10 +20,10 @@ namespace Engine
         ColliderComponent(Entity self, float radius);
         ColliderComponent(Entity self, float radius, float height);
 
-        void AddCollider(Collider* collider);
-        void AddBoxCollider(Entity self, Vector3 halfExtents);
-        void AddSphereCollider(Entity self, float radius);
-        void AddCapsuleCollider(Entity self, float radius, float height);
+        Collider* AddCollider(Collider* collider);
+        BoxCollider* AddBoxCollider(Entity self, Vector3 halfExtents);
+        SphereCollider* AddSphereCollider(Entity self, float radius);
+        CapsuleCollider* AddCapsuleCollider(Entity self, float radius, float height);
 
         void RemoveCollider(Entity self, const Collider* collider);
 
