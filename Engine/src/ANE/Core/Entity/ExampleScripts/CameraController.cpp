@@ -37,9 +37,8 @@ namespace Engine
         const ViewportProperties viewport = Application::Get().GetWindow().GetActiveViewportProperties();
         const float w = viewport.Width, h = viewport.Height;
 
-        _cameraComponent->SetPerspective(70.0f, w / h, 10000.f, 0.1f);
-        Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
-        Renderer::SetCameraPosition(_transformComponent->Transform.GetPosition());
+        _cameraComponent->SetPerspective(70.0f, w / h, 0.1f, 10000.f);
+        _cameraComponent->SetPriority(-1);
     }
 
     void CameraController::OnUpdate(float deltaTime)
@@ -60,12 +59,6 @@ namespace Engine
             const Vector3 forward = transform.GetForward() * _zInput;
             const Vector3 moveVector = (right + up + forward).GetNormalized();
             _transformComponent->Transform.AddPosition(moveVector* moveSpeed);
-
-            if (_cameraComponent)
-            {
-                Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
-            }
-            Renderer::SetCameraPosition(_transformComponent->Transform.GetPosition());
         }
     }
 
@@ -100,12 +93,6 @@ namespace Engine
         _pitchRadians = FMath::MirrorClamp(newPitch, FMath::Half_PI);
         _yawRadians += lookSpeed * delta.X;
         _transformComponent->Transform.SetRotation(Vector3{_pitchRadians, _yawRadians, 0});
-
-        if (_cameraComponent)
-        {
-            Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
-        }
-        Renderer::SetCameraPosition(_transformComponent->Transform.GetPosition());
     }
 
     void CameraController::OnScroll(Vector2 scrollDelta)
@@ -127,16 +114,6 @@ namespace Engine
         const float w = (float)resizeEvent.GetWidth(), h = (float)resizeEvent.GetHeight();
 
         _cameraComponent->SetAspectRatio(w / h);
-        Renderer::SetViewProjection(ComputeViewProjMatrix(*_cameraComponent));
-        Renderer::SetCameraPosition(_transformComponent->Transform.GetPosition());
-    }
-
-    Matrix4x4 CameraController::ComputeViewProjMatrix(const CameraComponent& camera)
-    {
-        Matrix4x4 transformMatrix = _transformComponent->Transform.GetWorldToLocal();
-        Matrix4x4 viewMatrix = transformMatrix;
-        Matrix4x4 projMatrix = camera.PerspectiveMatrix;
-        return projMatrix * viewMatrix;
     }
 }
 

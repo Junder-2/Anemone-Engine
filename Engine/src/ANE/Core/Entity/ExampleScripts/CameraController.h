@@ -40,8 +40,6 @@ namespace Engine
 
         void OnEditorEvent(Event& event);
 
-        Matrix4x4 ComputeViewProjMatrix(const CameraComponent& camera);
-
     private:
         TransformComponent* _transformComponent {};
         CameraComponent* _cameraComponent {};

@@ -3,6 +3,7 @@
 
 #include "ANE/Math/FMath.h"
 #include "ANE/Physics/Physics.h"
+#include "ANE/Renderer/Camera.h"
 #include "ANE/Utilities/API.h"
 #include "Components/Components.h"
 
@@ -72,6 +73,8 @@ namespace Engine
         }
 
         GetPhysicsSystem().UpdateRigidBodies(FMath::Saturate(_accumulator / physTimeStep), this);
+
+        Camera::UpdateCamera(this);
 
         SubmitDrawCommands();
     }
