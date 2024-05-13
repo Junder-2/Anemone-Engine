@@ -186,6 +186,8 @@ namespace Engine
             ent.TryGetComponent(tag);
             ANE_ELOG_WARN("We have a renderComponent with tag: {0} on entity: {1}", comp.ToString(), tag.Value);
         }
+
+        _sceneSerializer->Serialize(_activeScene);
     }
 
     void EditorLayer::CreateFloor()
