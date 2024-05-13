@@ -37,9 +37,10 @@ namespace Engine
     {
         if(!HasCamera()) return;
 
-        Renderer::SetCameraPosition(_currentCameraTransform->GetPosition());
         if(_currentCameraComponent->IsDirty() || _currentCameraTransform->IsDirty())
         {
+            Renderer::SetCameraPosition(_currentCameraTransform->GetPosition());
+            
             const Matrix4x4 viewMatrix = _currentCameraTransform->GetWorldToLocal();
             const Matrix4x4 projMatrix = _currentCameraComponent->GetPerspectiveMatrix();
             Renderer::SetViewProjection(projMatrix * viewMatrix);
