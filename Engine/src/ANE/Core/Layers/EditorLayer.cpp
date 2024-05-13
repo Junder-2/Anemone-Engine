@@ -127,9 +127,6 @@ namespace Engine
         }
 
         _uiUpdates.clear();
-
-        ImGui::Begin("Editor");
-        ImGui::End();
     }
 
     void EditorLayer::OnUpdate(float deltaTime)
@@ -159,25 +156,17 @@ namespace Engine
     {
         ANE_PROFILE_FUNCTION();
 
-        if(false)
-        {
-            if (!_sceneSerializer->HasFile("Game")) _activeScene = _sceneSerializer->CreateEmptySceneFile("Game");
-            else
-            {
-                _activeScene = _sceneSerializer->Deserialize("Game", this);
-                return;
-            }
-        }
+        if (!_sceneSerializer->HasFile("Game")) _activeScene = _sceneSerializer->CreateEmptySceneFile("Game");
         else
         {
-            _activeScene = _sceneSerializer->CreateEmptySceneFile("Game");
-            ANE_ELOG_WARN("Note SceneSerializer is not enabled");
+            _activeScene = _sceneSerializer->Deserialize("Game", this);
+            return;
         }
 
         //Create a Entity
         Entity ent = _activeScene->Create("Camera");
 
-        for (int i = 0; i < numEntitiesToTest; i++)
+        for (int i = 0; i < 10; i++)
         {
             std::string entityName = "Entity";
             entityName.append(std::to_string(i));

@@ -1,6 +1,7 @@
 ﻿#include "anepch.h"
 #include "SceneSerializer.h"
 
+#include "ANE/Core/Entity/ExampleScripts/CameraController.h"
 #include "ANE/Core/Layers/EditorLayer.h"
 #include "ANE/Core/Scene/Components/Components.h"
 #include "ANE/Physics/Physics.h"
@@ -14,32 +15,31 @@ namespace Engine
 
     toml::table SceneSerializer::EntitySerializer(Entity& entity)
     {
-        toml::table componentArray;
+        toml::table componentTable;
 
-        if (UUIDComponent uuidComponent; entity.TryGetComponent(uuidComponent))
+        if (TagComponent tagComp; entity.TryGetComponent(tagComp))
         {
-            componentArray.insert_or_assign("_uuid", uuidComponent.UUID);
+            auto table = toml::table{
+                {"_value", tagComp.Value}
+            };
+            componentTable.insert_or_assign("_tag", table);
         }
-        //
-        // if (TagComponent tagComp; entity.TryGetComponent(tagComp))
-        // {
-        //     componentArray.insert_or_assign("_tag", tagComp.Value);
-        // }
 
         if (TransformComponent transformComp; entity.TryGetComponent(transformComp))
         {
-            auto table = toml::table{{
+            auto table = toml::table{
+                {
                     "_position", toml::array{
                         transformComp.Transform.GetPosition().X,
-                            transformComp.Transform.GetPosition().Y,
-                            transformComp.Transform.GetPosition().Z
+                        transformComp.Transform.GetPosition().Y,
+                        transformComp.Transform.GetPosition().Z
                     }
                 },
                 {
                     "_rotation", toml::array{
                         transformComp.Transform.GetEulerAngles().X,
-                            transformComp.Transform.GetEulerAngles().Y,
-                            transformComp.Transform.GetEulerAngles().Z
+                        transformComp.Transform.GetEulerAngles().Y,
+                        transformComp.Transform.GetEulerAngles().Z
                     }
                 },
                 {
@@ -51,184 +51,150 @@ namespace Engine
                 }
             };
 
-            componentArray.insert_or_assign("_transformComponent", table);
+            componentTable.insert_or_assign("_transformComponent", table);
         }
 
         if (CameraComponent cameraComp; entity.TryGetComponent(cameraComp))
-         {
-             auto table = toml::table{
-                 {"_aspectRatio", cameraComp.GetAspectRatio()},
-                 {"_fieldOfView", cameraComp.GetFOV()},
-                 {"zNear", cameraComp.GetNearClip()},
-                 {"zFar", cameraComp.GetFarClip()}
-             };
-             componentArray.insert_or_assign("_cameraComponent", table);
-         }
+        {
+            auto table = toml::table{
+                {"_aspectRatio", cameraComp.GetAspectRatio()},
+                {"_fieldOfView", cameraComp.GetFOV()},
+                {"zNear", cameraComp.GetNearClip()},
+                {"zFar", cameraComp.GetFarClip()}
+            };
+            componentTable.insert_or_assign("_cameraComponent", table);
+        }
 
-
-         //Not completed
         if (ColliderComponent colliderComp; entity.TryGetComponent(colliderComp))
-         {
-             toml::array colliders;
-             for (auto collider : colliderComp.GetColliders())
-             {
-                 toml::array payload;
-                 switch (collider->GetShapeType())
-                 {
-                     case CollisionShapeType::Box:
-                     {
-                         auto castedBoxCollider = reinterpret_cast<BoxCollider*>(collider);
-                         payload.emplace_back<toml::array>("_boxCollider", toml::array{
-                                                               "_halfSize", toml::array{
-                                                                   castedBoxCollider->GetHalfSize().X,
-                                                                   castedBoxCollider->GetHalfSize().Y,
-                                                                   castedBoxCollider->GetHalfSize().Z
-                                                               }
-                                                           });
-                         break;
-                     }
-                     case CollisionShapeType::Sphere:
-                     {
-                         auto castedSphereCollider = reinterpret_cast<SphereCollider*>(collider);
-                         payload.emplace_back<toml::array>("_sphereCollider", toml::array{"_radius", castedSphereCollider->GetRadius()});
-                         break;
-                     }
-                     case CollisionShapeType::Capsule:
-                     {
-                         auto castedCapsuleCollider = reinterpret_cast<CapsuleCollider*>(collider);
-                         payload.emplace_back<toml::array>("_capsuleCollider", toml::array{toml::array{"_radius", castedCapsuleCollider->GetRadius()}},
-                                                           toml::array{"_height", castedCapsuleCollider->GetHeight()});
-                         break;
-                     }
-                 }
+        {
+            toml::array colliders;
+            for (auto collider : colliderComp.GetColliders())
+            {
+                toml::table payload;
+                switch (collider->GetShapeType())
+                {
+                    case CollisionShapeType::Box:
+                    {
+                        auto castedBoxCollider = reinterpret_cast<BoxCollider*>(collider);
+                        payload.insert_or_assign(
+                            "_halfSize", toml::array{
+                                castedBoxCollider->GetHalfSize().X,
+                                castedBoxCollider->GetHalfSize().Y,
+                                castedBoxCollider->GetHalfSize().Z
+                            }
+                        );
+                        break;
+                    }
+                    case CollisionShapeType::Sphere:
+                    {
+                        auto castedSphereCollider = reinterpret_cast<SphereCollider*>(collider);
+                        payload.insert_or_assign("_radius", castedSphereCollider->GetRadius());
+                        break;
+                    }
+                    case CollisionShapeType::Capsule:
+                    {
+                        auto castedCapsuleCollider = reinterpret_cast<CapsuleCollider*>(collider);
 
-                 auto table = toml::table{
-                     {
-                         "_colliderPosition", toml::array{
-                             collider->GetPosition().X,
-                             collider->GetPosition().Y,
-                             collider->GetPosition().Z
-                         }
-                     },
-                     {
-                         "_colliderRotation", toml::array{
-                             collider->GetEulerAngles().X,
-                             collider->GetEulerAngles().Y,
-                             collider->GetEulerAngles().Z
-                         }
-                     },
-                     {
-                         "_colliderMaterial",
-                         toml::array{
-                             collider->GetMaterial().getFrictionCoefficient(), // squared?
-                             collider->GetMaterial().getBounciness(),
-                             collider->GetMaterial().getMassDensity()
-                         }
-                     },
-                     {"_colliderCollisionMask", collider->GetCollisionMask()},
-                     {"_shapeType", collider->GetShapeType()},
-                     {"_colliderSpecificData", payload}
-                 };
+                        payload.insert_or_assign("_radius", castedCapsuleCollider->GetRadius());
+                        payload.insert_or_assign("_height", castedCapsuleCollider->GetHeight());
+                        break;
+                    }
+                }
 
-                 colliders.emplace_back(table);
-             }
+                auto table = toml::table{
+                    {
+                        "_colliderPosition", toml::array{
+                            collider->GetPosition().X,
+                            collider->GetPosition().Y,
+                            collider->GetPosition().Z
+                        }
+                    },
+                    {
+                        "_colliderRotation", toml::array{
+                            collider->GetEulerAngles().X,
+                            collider->GetEulerAngles().Y,
+                            collider->GetEulerAngles().Z
+                        }
+                    },
+                    {
+                        "_colliderMaterial",
+                        toml::array{
+                            collider->GetMaterial().getFrictionCoefficient(),
+                            collider->GetMaterial().getBounciness(),
+                            collider->GetMaterial().getMassDensity()
+                        }
+                    },
+                    {"_colliderCollisionMask", collider->GetCollisionMask()},
+                    {"_colliderCollisionCategories", collider->GetCollisionCategories()},
+                    {"_shapeType", collider->GetShapeType()},
+                    {"_colliderSpecificData", payload}
+                };
 
-             auto table = toml::table{
-                 {"_colliders", colliders}
-             };
-             componentArray.insert_or_assign("_colliderComponent", table);
-         }
+                colliders.emplace_back(table);
+            }
 
-         // difficult
-         // NativeScriptComponent scriptComp;
-         // if (entity.TryGetComponent(scriptComp))
-         // {
-         //     toml::table table{
-         //         {"_aspectRatio", cameraComp.GetAspectRatio()},
-         //         {"_fieldOfView", cameraComp.GetFOV()},
-         //         {"zNear", cameraComp.GetNearClip()},
-         //         {"zFar", cameraComp.GetFarClip()}
-         //     };
-         //     componentArray.emplace_back(table);
-         // }
+            auto table = toml::table{
+                {"_colliders", colliders}
+            };
+            componentTable.insert_or_assign("_colliderComponent", table);
+        }
 
         if (RenderComponent renderComp; entity.TryGetComponent(renderComp))
-         {
-             auto table = toml::table{
-                 {"_modelPath", renderComp.GetModelPath()}
-             };
+        {
+            auto table = toml::table{
+                {"_modelPath", renderComp.GetModelPath()}
+            };
 
-             componentArray.insert_or_assign("_renderComponent", table);
-         }
+            componentTable.insert_or_assign("_renderComponent", table);
+        }
 
         if (RigidBodyComponent rigidComp; entity.TryGetComponent(rigidComp))
-         {
-             auto table = toml::table{
-                 {"_bodyType", rigidComp.GetRigidBody()->GetBodyType()},
-                 {"_useGravity", rigidComp.GetRigidBody()->IsGravityEnabled()},
-                 {"_mass", rigidComp.GetRigidBody()->GetMass()},
-                 {"_active", rigidComp.GetRigidBody()->IsActive()}
-             };
-             componentArray.insert_or_assign("_rigidBodyComponent", table);
-         }
+        {
+            auto table = toml::table{
+                {"_bodyType", rigidComp.GetRigidBody()->GetBodyType()},
+                {"_useGravity", rigidComp.GetRigidBody()->IsGravityEnabled()},
+                {"_mass", rigidComp.GetRigidBody()->GetMass()},
+                {"_active", rigidComp.GetRigidBody()->IsActive()}
+            };
+            componentTable.insert_or_assign("_rigidBodyComponent", table);
+        }
 
+        // difficult
+        // NativeScriptComponent scriptComp;
+        // if (entity.TryGetComponent(scriptComp))
+        // {
+        //     toml::table table{
+        //         {"_aspectRatio", cameraComp.GetAspectRatio()},
+        //         {"_fieldOfView", cameraComp.GetFOV()},
+        //         {"zNear", cameraComp.GetNearClip()},
+        //         {"zFar", cameraComp.GetFarClip()}
+        //     };
+        //     componentArray.emplace_back(table);
+        // }
 
-         // UUIDComponent UUIDComp;
-         // if (entity.TryGetComponent(UUIDComp))
-         // {
-         //     toml::table table{
-         //         {"UUID", UUIDComp.UUID}
-         //     };
-         //     componentArray.emplace_back(table);
-         // }
-
-        return componentArray;
+        return componentTable;
     }
 
     void SceneSerializer::Serialize(const std::shared_ptr<Scene>& scene)
     {
-        toml::table arr;
-        // auto path = _filepath << _scene.
+        toml::array arr;
 
         for (auto entity : scene->_registry.view<TagComponent>())
         {
             Entity ent = {entity, scene.get()};
 
-            arr.insert_or_assign(ent.GetComponent<TagComponent>().Value, EntitySerializer(ent));
+            arr.emplace_back(EntitySerializer(ent));
         }
 
-        // toml::array tables;
-        // toml::array data1{3, 2
-        // };
-        // toml::array data2{3, 2
-        // };
-        // auto TestTable = toml::table{
-        //     {"ID", "value"},
-        //     {"ID2", data1}
-        // };
-        //
-        // auto TestTable2 = toml::table{
-        //     {"ID3", "value2"},
-        //     {"ID24", data2}
-        // };
-        //
-        // tables.push_back(TestTable);
-        // tables.push_back(TestTable2);
-
-
-         auto table = toml::table{
-             {"Scene", scene->Name},
-             {"Entities", arr}
-         };
+        auto table = toml::table{
+            {"Scene", scene->Name},
+            {"Entities", arr}
+        };
 
         std::string path = _filepath + scene->Name + ".toml";
 
         WriteToFile(path, table);
-
-
-        //ANE_ELOG(table);
     }
-
 
     void SceneSerializer::SerializeBinary()
     {
@@ -255,11 +221,12 @@ namespace Engine
         return scene;
     }
 
-    std::shared_ptr<Scene> SceneSerializer::Deserialize(const char* key, EditorLayer* layer) const // todo: create scene should be moved into layer maybe?
+    std::shared_ptr<Scene> SceneSerializer::Deserialize(const char* key, EditorLayer* layer) const
     {
         std::string filePath = _filepath + key + ".toml";
 
         toml::table table;
+
         try
         {
             table = toml::parse_file(filePath);
@@ -269,38 +236,117 @@ namespace Engine
             ANE_ELOG(err.description());
         }
 
-        const auto sceneName = table["Scene"].value_or("NoSceneFound"); // dont know if sv is correct here
-        ANE_ELOG(sceneName);
+        const auto sceneName = table["Scene"].value_or("NoSceneFound");
+
         auto scene = std::make_shared<Scene>(sceneName);
 
-        if (!table.empty())
+        if (table.empty()) return scene;
+
+        auto nodeView = table["Entities"];
+
+        if (toml::array* entityArray = nodeView.as_array())
         {
-            auto nodeView = table["Entities"];
-            if (toml::array* entityArray = nodeView.as_array())
+            for (auto& entity : *entityArray)
             {
-                for (auto& entity : *entityArray)
+                if (const auto& componentTable = entity.as_table())
                 {
-                    if constexpr (toml::is_array<decltype(entity)>)
+                    auto tagComponent = (*componentTable)["_tag"]["_value"].value<std::string>();
+
+                    auto entityRef = scene->Create(*tagComponent);
+
+                    if (auto transformComponent = (*componentTable)["_transformComponent"]; !!transformComponent)
                     {
-                        ANE_ELOG("We are an array");
-                    }
-                    else if constexpr (toml::is_table<decltype(entity)>)
-                    {
-                        ANE_ELOG("We are a table");
+                        auto& entityTransformComp = entityRef.AddComponent<TransformComponent>();
+                        auto position = transformComponent["_position"];
+                        entityTransformComp.Transform.SetPosition(Vector3(*position[0].value<float>(), *position[1].value<float>(), *position[2].value<float>()));
+
+                        auto rotation = transformComponent["_rotation"];
+                        entityTransformComp.Transform.SetRotation(Vector3(*rotation[0].value<float>(), *rotation[1].value<float>(), *rotation[2].value<float>()));
+
+                        auto scale = transformComponent["_scale"];
+                        entityTransformComp.Transform.SetScale(Vector3(*scale[0].value<float>(), *scale[1].value<float>(), *scale[2].value<float>()));
                     }
 
-                    //     ANE_ELOG("We have type of: {}", entity.type());
-                    // if (const auto& entityTable = entity.as_table())
-                    // {
-                    //
-                    //     if (auto tag = (*entityTable)["_tag"].value<std::string>())
-                    //     {
-                    //         scene->Create(*tag);
-                    //     }
-                    // }
+                    if (auto cameraComponent = (*componentTable)["_cameraComponent"]; !!cameraComponent)
+                    {
+                        auto& entityCameraComponent = entityRef.AddComponent<CameraComponent>();
+                        entityCameraComponent.SetPerspective(*cameraComponent["_fieldOfView"].value<float>(),
+                                                             *cameraComponent["_aspectRatio"].value<float>(),
+                                                             *cameraComponent["zNear"].value<float>(),
+                                                             *cameraComponent["zFar"].value<float>());
+
+                        entityRef.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+                    }
+
+                    if (auto rigidBodyComponent = (*componentTable)["_rigidBodyComponent"]; !!rigidBodyComponent)
+                    {
+                        auto& entityRigidBodyComponent = entityRef.AddComponent<RigidBodyComponent>(entityRef);
+                        entityRigidBodyComponent.GetRigidBody()->SetMass(*(*componentTable)["_rigidBodyComponent"]["_mass"].value<float>());
+                        entityRigidBodyComponent.GetRigidBody()->SetBodyType(static_cast<BodyType>(*(*componentTable)["_rigidBodyComponent"]["_bodyType"].value<int>()));
+                        entityRigidBodyComponent.GetRigidBody()->SetActive(*(*componentTable)["_rigidBodyComponent"]["_active"].value<bool>());
+                        entityRigidBodyComponent.GetRigidBody()->SetUseGravity(*(*componentTable)["_rigidBodyComponent"]["_useGravity"].value<bool>());
+                    }
+
+                    if (auto colliderComponent = (*componentTable)["_colliderComponent"]; !!colliderComponent)
+                    {
+                        auto& entityColliderComp = entityRef.AddComponent<ColliderComponent>();
+                        auto collidersView = colliderComponent["_colliders"];
+                        if (toml::array* colliders = collidersView.as_array())
+                        {
+                            for (auto& collider : *colliders)
+                            {
+                                if (toml::table* colliderTable = collider.as_table())
+                                {
+                                    Collider* col;
+
+                                    switch (*(*colliderTable)["_shapeType"].value<int>())
+                                    {
+                                        case 0:
+                                        {
+                                            auto radius = (*colliderTable)["_colliderSpecificData"]["_radius"].value<float>();
+                                            col = entityColliderComp.AddSphereCollider(entityRef, *radius);
+                                        }
+                                        break;
+                                        case 1:
+                                        {
+                                            Vector3 halfExtends = Vector3(*(*colliderTable)["_colliderSpecificData"]["_halfSize"][0].value<float>(), *(*colliderTable)["_colliderSpecificData"]["_halfSize"][1].value<float>(), *(*colliderTable)["_colliderSpecificData"]["_halfSize"][2].value<float>());
+                                            col = entityColliderComp.AddBoxCollider(entityRef, halfExtends);
+                                        }
+                                        break;
+                                        case 2:
+                                        {
+                                            auto radius = (*colliderTable)["_colliderSpecificData"]["_radius"].value<float>();
+                                            auto height = (*colliderTable)["_colliderSpecificData"]["_height"].value<float>();
+                                            col = entityColliderComp.AddCapsuleCollider(entityRef, *radius, *height);
+                                        }
+                                        break;
+                                        default: ;
+                                    }
+                                    if (col != nullptr)
+                                    {
+                                        col->SetCollisionMask(static_cast<CollisionLayerMask>(*(*colliderTable)["_colliderCollisionMask"].value<int>()));
+                                        col->SetCollisionCategories(static_cast<CollisionLayerMask>(*(*colliderTable)["_colliderCollisionCategories"].value<int>()));
+                                        col->GetMaterial().setFrictionCoefficient(*(*colliderTable)["_colliderMaterial"][0].value<float>());
+                                        col->GetMaterial().setBounciness(*(*colliderTable)["_colliderMaterial"][1].value<float>());
+                                        col->GetMaterial().setMassDensity(*(*colliderTable)["_colliderMaterial"][2].value<float>());
+                                        col->SetPosition(Vector3(*(*colliderTable)["_colliderPosition"][0].value<float>(), *(*colliderTable)["_colliderPosition"][1].value<float>(), *(*colliderTable)["_colliderPosition"][2].value<float>()));
+                                        col->SetRotation(Vector3(*(*colliderTable)["_colliderRotation"][0].value<float>(), *(*colliderTable)["_colliderRotation"][1].value<float>(), *(*colliderTable)["_colliderRotation"][2].value<float>()));
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (auto renderComponent = (*componentTable)["_renderComponent"]; !!renderComponent)
+                    {
+                        entityRef.AddComponent<RenderComponent>(*(*componentTable)["_renderComponent"]["_modelPath"].value<std::string>());
+                    }
+
+                    // ScriptComponent
                 }
             }
         }
+
 
         return scene;
     }

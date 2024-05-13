@@ -34,6 +34,7 @@ namespace Engine
         {
             return _zFar;
         }
+
         void OnValidate()
         {
             ANE_ELOG("Camera recalculating");
