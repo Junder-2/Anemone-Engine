@@ -41,31 +41,28 @@ Engine::UIUpdateWrapper Engine::ContentBrowserPanel::OnPanelRender()
 
 void Engine::ContentBrowserPanel::RenderDirectoryBrowserChild(std::filesystem::path DirectoryPath)
 {
-
-    ImGui::BeginChild("##folders_common");
+    bool open = false;
+    for (auto const& dir_entry : std::filesystem::directory_iterator{DirectoryPath})
     {
-        for (auto const& dir_entry : std::filesystem::directory_iterator{DirectoryPath})
+        if (dir_entry.is_directory())
         {
-            if(dir_entry.is_directory()){
-                /*if(ImGui::TreeNodeEx(dir_entry.path().filename().string().c_str()))
-                {
-                    ImGui::Indent();
-                    RenderDirectoryBrowserChild(dir_entry);
-                    ImGui::Unindent();
-                    ImGui::TreePop();
-                }*/
-            }
-            else
+            bool opened = ImGui::TreeNodeEx(dir_entry.path().filename().string().c_str());
+            if(ImGui::IsItemClicked())
             {
-                continue;
+                SelectionManager::DeSelect(context);
+                SelectionManager::RegisterSelect(context,dir_entry.path().string());
             }
+            if(opened)
+                {
+                RenderDirectoryBrowserChild(dir_entry);
+                ImGui::TreePop();
+                }
         }
-
-
+        else
+        {
+            continue;
+        }
     }
-
-    ImGui::EndChild();
-
 }
 
 
@@ -83,14 +80,25 @@ void Engine::ContentBrowserPanel::RenderDirectoryContentsBrowserChild()
 
         ImGui::BeginChild("Scrolling");
         {
-            /*
-            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.3f, 0.3f, 0.3f, 0.35f));
+            //technically should only ever be one folder selected I believe
+            std::vector<std::string>* listOfSelectedFilePathAsString = SelectionManager::GetSelection(context);
+            if(listOfSelectedFilePathAsString->size() > 0)
+            {
+                std::string selectedFilePathAsString = listOfSelectedFilePathAsString->at(0);
+                std::filesystem::path selectedDirectory = std::filesystem::path(selectedFilePathAsString);
+                for (auto const& dir_entry : std::filesystem::directory_iterator{selectedDirectory})
+                {
+                    if(dir_entry.is_directory())
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        ImGui::Text("%s",dir_entry.path().filename().string().c_str());
 
-            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4.0f, 4.0f));
-            if (ImGui::BeginPopupContextWindow(0, 1))
-            */
-
+                    }
+                }
+            }
         }
         ImGui::EndChild();
     }

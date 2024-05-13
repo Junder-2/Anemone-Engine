@@ -58,6 +58,8 @@ namespace Engine
         Entity Create(std::string = "Untagged");
         Entity GetEntityWithUUID(std::string UUID);
 
+        std::map<entt::id_type, std::string> ComponentTypeMap;
+
     private:
         SceneSerializer* _sceneSerializer;
         std::map<std::string, Entity> _entityMap;
@@ -71,7 +73,6 @@ namespace Engine
     private:
         std::unordered_map<const char*, std::shared_ptr<Scene>> _scenes;
         std::shared_ptr<Scene> _activeScene;
-        std::map<entt::id_type, std::string> ComponentTypeMap;
     };
 
     template <class TValue>

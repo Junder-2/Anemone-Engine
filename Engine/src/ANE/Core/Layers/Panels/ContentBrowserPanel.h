@@ -4,6 +4,7 @@
 #include <filesystem>
 
 #include "UILayerPanel.h"
+#include "ANE/Core/Editor/SelectionManager.h"
 
 
 namespace Engine
@@ -25,6 +26,7 @@ namespace Engine
 
     private:
         bool _initialized = false;
+        SelectionManager::SelectionContext context = SelectionManager::AssetBrowser;
         EditorLayer* _editorLayer;
         std::filesystem::path currentDirectory;
         //std::map<std::string,ImGui::> m_AssetIconMap;

@@ -4,6 +4,7 @@
 #include "UUIDGenerator.h"
 #include "ANE/Core/Scene/Components/TransformComponent.h"
 #include "ANE/Core/Scene/Components/UUIDComponent.h"
+#include "ANE/Core/Scene/Components/Components.h"
 
 Engine::Entity::Entity(Scene* scene, const char* name)
 {
@@ -15,3 +16,5 @@ Engine::Entity::Entity(Scene* scene, const char* name)
     this->AddComponent<TagComponent>(name);
     this->AddComponent<TransformComponent>();
 }
+
+

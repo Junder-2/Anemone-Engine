@@ -127,6 +127,7 @@ namespace Engine
         UUIDComponent::RegisterComponentMetaData();
         CameraComponent::RegisterComponentMetaData();
         NativeScriptComponent::RegisterComponentMetaData();
+
     }
 
     void EditorLayer::OnUpdate(float deltaTime)
