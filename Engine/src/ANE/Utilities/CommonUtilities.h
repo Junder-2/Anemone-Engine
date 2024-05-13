@@ -1,5 +1,4 @@
 #pragma once
-
 #include <type_traits> //for std::underlying_type
 
 #define BIT(x) (1 << (x))

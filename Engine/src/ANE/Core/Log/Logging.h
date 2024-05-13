@@ -1,5 +1,4 @@
 #pragma once
-
 #include "ANE/Core/Core.h"
 
 #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE

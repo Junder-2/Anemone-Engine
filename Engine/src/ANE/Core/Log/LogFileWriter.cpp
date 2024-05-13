@@ -1,6 +1,5 @@
 ﻿#include "anepch.h"
 #include "LogFileWriter.h"
-#include <iostream>
 #include <filesystem>
 #include <string>
 #include "ANE/Utilities/LoggingUtilities.h"
@@ -49,7 +48,7 @@ namespace Engine
 
     void LogFileWriter::WriteToFile(LogMessage& msg)
     {
-        if (msg.LevelCategory == LogLevelCategory::LevelDebug || msg.LevelCategory == LogLevelCategory::LevelNone || msg.LevelCategory == LogLevelCategory::LevelInfo) return;
+        if (msg.LevelCategory == LogLevelCategory::Debug || msg.LevelCategory == LogLevelCategory::None || msg.LevelCategory == LogLevelCategory::Info) return;
 
         if (!std::filesystem::is_directory(_path)) std::filesystem::create_directory(_path);
 

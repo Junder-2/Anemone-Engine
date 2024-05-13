@@ -8,9 +8,9 @@
 
 Engine::Entity::Entity(Scene* scene, const char* name)
 {
-    SceneHandle = scene;
+    _sceneHandle = scene;
 
-    EntityHandle = SceneHandle->_registry.create();
+    _entityHandle = _sceneHandle->_registry.create();
     //this->AddComponent<AttachmentsComponent>();
     this->AddComponent<UUIDComponent>(UUIDGenerator::GetUUID());
     this->AddComponent<TagComponent>(name);

@@ -16,7 +16,7 @@ namespace Engine
     {
         auto v = field.get(componentData).cast<std::string>();
         bool propertyWritten = false;
-        bool writable = field.prop(EDITABLEHASH).value().cast<bool>();
+        bool writable = field.prop(EDITABLE_HASH).value().cast<bool>();
         char buffer[256] = {};
         const auto error = strcpy_s(buffer, sizeof(buffer), v.c_str());
         ImGui::AlignTextToFramePadding();

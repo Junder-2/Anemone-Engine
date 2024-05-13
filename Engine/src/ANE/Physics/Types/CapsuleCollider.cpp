@@ -28,6 +28,8 @@ namespace Engine
         const auto capsuleCollider = reinterpret_cast<reactphysics3d::CapsuleShape*>(_reactCollider->getCollisionShape());
         const float scale = FMath::Max(_scale.X, _scale.Z);
         capsuleCollider->setRadius(FMath::Max(_radius*scale, MIN_SCALE));
+
+        ForceUpdateBody();
     }
 
     void CapsuleCollider::SetHeight(const float height)
@@ -37,6 +39,8 @@ namespace Engine
         WakeBody();
         const auto capsuleCollider = reinterpret_cast<reactphysics3d::CapsuleShape*>(_reactCollider->getCollisionShape());
         capsuleCollider->setHeight(FMath::Max(_height*_scale.Y, MIN_SCALE));
+
+        ForceUpdateBody();
     }
 
     float CapsuleCollider::GetRadius() const

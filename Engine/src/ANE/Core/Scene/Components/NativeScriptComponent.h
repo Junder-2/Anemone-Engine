@@ -1,5 +1,4 @@
 ﻿#pragma once
-
 #include "ANE/Core/Entity/ScriptableEntity.h"
 
 namespace Engine

@@ -1,6 +1,6 @@
 #include "anepch.h"
 #include "SceneHierarchyPanel.h"
-#include "imgui.h"
+#include <imgui.h>
 #include "InspectorPanel.h"
 #include "ANE/Core/Editor/SelectionManager.h"
 #include "UIUpdateWrapper.h"

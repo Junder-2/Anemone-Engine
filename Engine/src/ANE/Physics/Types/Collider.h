@@ -104,6 +104,7 @@ namespace Engine
         }
 
     protected:
+        void ForceUpdateBody() const;
         void WakeBody() const;
         virtual void OnUpdateScale() {}
 

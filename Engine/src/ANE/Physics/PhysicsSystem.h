@@ -1,5 +1,4 @@
 ﻿#pragma once
-
 #include "ANE/Subsystem/SubSystem.h"
 
 namespace Engine
@@ -35,6 +34,8 @@ namespace Engine
         rp3d::BoxShape* CreateBoxShape(const Vector3& halfExtents);
         rp3d::CapsuleShape* CreateCapsuleShape(float radius, float height);
 
+        void WakeBodies();
+
         void PhysicsUpdate(float timeStep, Scene* scene);
         void UpdateRigidBodies(float factor, Scene* scene);
 
@@ -61,6 +62,8 @@ namespace Engine
         rp3d::PhysicsCommon _physicsCommon {};
         rp3d::PhysicsWorld* _world;
         PhysicsLogger* _physicsLogger;
+
+        bool _hasAwokenBodies = false;
 
     };
 }

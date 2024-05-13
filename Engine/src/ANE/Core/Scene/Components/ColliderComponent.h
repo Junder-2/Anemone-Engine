@@ -10,18 +10,17 @@ namespace Engine
 
     struct ColliderComponent : Component
     {
-    public:
         ANE_COMPONENT_INIT(ColliderComponent)
 
         ColliderComponent(Collider* collider);
-
         ColliderComponent(Entity self, Vector3 halfExtents);
-
         ColliderComponent(Entity self, float radius);
-
         ColliderComponent(Entity self, float radius, float height);
 
         void AddCollider(Collider* collider);
+        void AddBoxCollider(Entity self, Vector3 halfExtents);
+        void AddSphereCollider(Entity self, float radius);
+        void AddCapsuleCollider(Entity self, float radius, float height);
 
         void RemoveCollider(Entity self, const Collider* collider);
 
@@ -38,6 +37,7 @@ namespace Engine
                 .data<&ColliderComponent::_colliders>("Colliders"_hs).prop("display_name"_hs, "Colliders")
                 .EDITABLE;
         }
+
     private:
         std::vector<Collider*> _colliders;
     };

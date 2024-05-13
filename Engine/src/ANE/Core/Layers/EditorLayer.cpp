@@ -19,12 +19,11 @@
 #include "ANE/Input/Input.h"
 #include "ANE/Input/InputAction.h"
 #include "ANE/Math/Types/TransformMatrix.h"
-#include "ANE/Physics/PhysicsTypes.h"
+#include "ANE/Physics/Physics.h"
 #include "ANE/Utilities/SceneSerializer.h"
 #include "Panels/ContentBrowserPanel.h"
 #include "Panels/EditorLogPanel.h"
 #include "Panels/MainMenuPanel.h"
-#include "Panels/CreateScenePanel.h"
 #include "Panels/UIUpdateWrapper.h"
 #include "Panels/ViewportPanel.h"
 
@@ -46,6 +45,21 @@ namespace Engine
 
     EditorLayer::~EditorLayer() = default;
 
+
+    void EditorLayer::Init()
+    {
+        TagComponent::RegisterComponentMetaData();
+        TransformComponent::RegisterComponentMetaData();
+        ColliderComponent::RegisterComponentMetaData();
+        RigidBodyComponent::RegisterComponentMetaData();
+        RenderComponent::RegisterComponentMetaData();
+        UUIDComponent::RegisterComponentMetaData();
+        CameraComponent::RegisterComponentMetaData();
+        NativeScriptComponent::RegisterComponentMetaData();
+
+        _sceneSerializer = new SceneSerializer();
+    }
+
     void EditorLayer::OnAttach()
     {
         // You would have a "Read from config files to find correct panel layout" method here
@@ -62,6 +76,7 @@ namespace Engine
 
         //Then you would load the scene from the file path listed from that project
 
+        GetEditorInputSystem().BindKeyboardInput(KeyCodeO, MakeDelegate(this, &EditorLayer::SaveScene));
         GetEditorInputSystem().BindMouseButton(MouseButtonRight, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
 
         //TEMP need to set the initial state should be elsewhere
@@ -84,7 +99,7 @@ namespace Engine
     {
         ImGuiIO& io = ImGui::GetIO();
         ImGui::ShowDemoWindow();
-        for (UILayerPanel* panel : _UIpanels)
+        for (UILayerPanel* panel : _uiPanels)
         {
             if (panel == nullptr) continue;
 
@@ -92,7 +107,7 @@ namespace Engine
             {
                 auto update = panel->OnPanelRender();
 
-                UIUpdates.emplace(UIUpdates.begin(), update);
+                _uiUpdates.emplace(_uiUpdates.begin(), update);
             }
 
             // if(panel->IsEnabled())
@@ -102,7 +117,7 @@ namespace Engine
         }
 
 
-        for (auto UIUpdate : UIUpdates)
+        for (auto UIUpdate : _uiUpdates)
         {
             if (UIUpdate.RemoveSelf != nullptr) DetachUIPanel(UIUpdate.RemoveSelf);
 
@@ -111,23 +126,10 @@ namespace Engine
             UIUpdate.Clean();
         }
 
-        UIUpdates.clear();
+        _uiUpdates.clear();
 
         ImGui::Begin("Editor");
         ImGui::End();
-    }
-
-    void EditorLayer::Init()
-    {
-        TagComponent::RegisterComponentMetaData();
-        TransformComponent::RegisterComponentMetaData();
-        ColliderComponent::RegisterComponentMetaData();
-        RigidBodyComponent::RegisterComponentMetaData();
-        RenderComponent::RegisterComponentMetaData();
-        UUIDComponent::RegisterComponentMetaData();
-        CameraComponent::RegisterComponentMetaData();
-        NativeScriptComponent::RegisterComponentMetaData();
-
     }
 
     void EditorLayer::OnUpdate(float deltaTime)
@@ -139,28 +141,47 @@ namespace Engine
 
     std::string EditorLayer::GetComponentNameFromEnttId(const entt::id_type id)
     {
-        return ComponentTypeMap[id];
+        return _componentTypeMap[id];
     }
 
-    void EditorLayer::CreateTestScene(int numEntitiesToTest)
+    void EditorLayer::SetActiveScene(const char* sceneName)
+    {
+        std::shared_ptr<Scene> scene = nullptr;
+        if (_activeScene == nullptr) scene = CreateScene(sceneName);
+        else scene = _sceneSerializer->Deserialize(sceneName, this);
+
+        ANE_ASSERT(scene == nullptr, "Scene with name: {} does not exist", sceneName);
+
+        _activeScene = scene;
+    }
+
+    void EditorLayer::CreateTestScene(int numEntitiesToTest) // this should be remade and be replaced with default scene
     {
         ANE_PROFILE_FUNCTION();
 
-        //Add scene to layer
-        AddScene<Scene>("Game");
+        if(false)
+        {
+            if (!_sceneSerializer->HasFile("Game")) _activeScene = _sceneSerializer->CreateEmptySceneFile("Game");
+            else
+            {
+                _activeScene = _sceneSerializer->Deserialize("Game", this);
+                return;
+            }
+        }
+        else
+        {
+            _activeScene = _sceneSerializer->CreateEmptySceneFile("Game");
+            ANE_ELOG_WARN("Note SceneSerializer is not enabled");
+        }
 
         //Create a Entity
-        Entity ent = Create("Camera");
-        std::stringstream oss;
+        Entity ent = _activeScene->Create("Camera");
 
         for (int i = 0; i < numEntitiesToTest; i++)
         {
-            //ANE_LOG_INFO(UUIDGenerator::GetUUID());
-
-            std::string string = "Entity";
-            string.append(std::to_string(i));
-            string.append("\n");
-            Create(string);
+            std::string entityName = "Entity";
+            entityName.append(std::to_string(i));
+            _activeScene->Create(entityName);
         }
         //Add component to entity
         //ent.AddComponent<RenderComponent>();
@@ -180,7 +201,7 @@ namespace Engine
 
     void EditorLayer::CreateFloor()
     {
-        Entity floor = Create("Floor");
+        Entity floor = _activeScene->Create("Floor");
         TransformMatrix& transformMatrix = floor.GetComponent<TransformComponent>().Transform;
         transformMatrix.SetPosition(Vector3(0, -5.f, 0));
         transformMatrix.Scale(Vector3(10.f, 1.f, 10.f));
@@ -190,19 +211,19 @@ namespace Engine
         floor.AddComponent<ColliderComponent>(floor, Vector3(1.f, .1f, 1.f));
     }
 
-    void EditorLayer::OnSwitchEditorFocus(InputValue inputValue)
+    void EditorLayer::OnSwitchEditorFocus(const InputValue inputValue)
     {
         bool blockingAppInputs = IsMouseVisible();
-        if(inputValue.GetDeviceType() != InputDeviceMouse) return;
+        if (inputValue.GetDeviceType() != InputDeviceMouse) return;
 
         const TriggerState triggerState = inputValue.GetTriggerState();
 
-        if(triggerState == TriggerStarted && blockingAppInputs && Application::Get().GetWindow().IsOverViewport())
+        if (triggerState == TriggerStarted && blockingAppInputs && Application::Get().GetWindow().IsOverViewport())
         {
             HideMouse();
             blockingAppInputs = false;
         }
-        else if(triggerState == TriggerStopped && !blockingAppInputs)
+        else if (triggerState == TriggerStopped && !blockingAppInputs)
         {
             ShowMouse();
             blockingAppInputs = true;
@@ -214,27 +235,18 @@ namespace Engine
     }
 
     template <class EntityType>
-    void EditorLayer::EntityWidget(EntityType& e, entt::basic_registry<EntityType>& reg, bool dropTarget)
+    void EditorLayer::EntityWidget(EntityType& e, entt::basic_registry<EntityType>& reg, const bool dropTarget)
     {
         ImGui::PushID(static_cast<int>(entt::to_integral(e)));
 
-        if (reg.valid(e))
-        {
-            ImGui::Text("ID: %d", entt::to_integral(e));
-        }
-        else
-        {
-            ImGui::Text("Invalid Entity");
-        }
+        if (reg.valid(e)) ImGui::Text("ID: %d", entt::to_integral(e));
+        else ImGui::Text("Invalid Entity");
 
-        if (reg.valid(e))
+        if (reg.valid(e) && ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
         {
-            if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
-            {
-                ImGui::SetDragDropPayload(MM_IEEE_IMGUI_PAYLOAD_TYPE_ENTITY, &e, sizeof(e));
-                ImGui::Text("ID: %d", entt::to_integral(e));
-                ImGui::EndDragDropSource();
-            }
+            ImGui::SetDragDropPayload(MM_IEEE_IMGUI_PAYLOAD_TYPE_ENTITY, &e, sizeof(e));
+            ImGui::Text("ID: %d", entt::to_integral(e));
+            ImGui::EndDragDropSource();
         }
 
         if (dropTarget && ImGui::BeginDragDropTarget())
@@ -250,29 +262,16 @@ namespace Engine
         ImGui::PopID();
     }
 
-
-    /**
-    * \brief Creates a Entity in the scene, adds a Transform and Tag
-    * \param name Name of Entity, if no name is given it will be tagged with: "Untagged"
-    * \return reference of the newly created Entity.
-    */
-    [[nodiscard("Entity never used")]] Entity EditorLayer::Create(const char* name)
+    std::shared_ptr<Scene> EditorLayer::CreateScene(const char* sceneName) const
     {
-        Entity ent{GetActiveScene().get(), name};
-        _entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent; // here
-        return ent;
+        return _sceneSerializer->CreateEmptySceneFile(sceneName);
     }
 
-    [[nodiscard("Entity never used")]] Entity EditorLayer::Create(std::string stringName)
+    void EditorLayer::SaveScene(const InputValue inputValue)
     {
-        Entity ent{GetActiveScene().get(), stringName.c_str()};
-        _entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent;
-        return ent;
-    }
+        if (inputValue.GetTriggerState() != TriggerStarted) return;
 
-    Entity EditorLayer::GetEntityWithUUID(std::string UUID)
-    {
-        return _entityMap[UUID];
-        return {};
+        ANE_ELOG("Saving Scene");
+        _sceneSerializer->Serialize(_activeScene);
     }
 }

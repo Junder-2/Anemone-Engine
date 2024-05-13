@@ -28,28 +28,34 @@ namespace Engine
         }
 
         VmaMeshAsset Model = {};
+
         void VerifyDefaultMaterialBlock()
         {
             //Could write a "compare to default values" check here and reassign to true
             _defaultMaterialValues = false;
-
         }
 
         void OnValidate()
         {
             VerifyDefaultMaterialBlock();
         }
+
         static void RegisterComponentMetaData()
         {
             entt::meta<RenderComponent>()
                 //.data<&RenderComponent::_modelPath>("Model File Location"_hs).prop("display_name"_hs, "Model File Location")
                 .data<&RenderComponent::Model>("Mesh Asset"_hs).prop("display_name"_hs, "Mesh Asset")
                 .EDITABLE
-                .data<&RenderComponent::_materialPropertyBlock>("Material Properties"_hs).prop("display_name"_hs,"Material Properties Block")
+                .data<&RenderComponent::_materialPropertyBlock>("Material Properties"_hs).prop("display_name"_hs, "Material Properties Block")
                 .EDITABLE
-                .func<&RenderComponent::OnValidate>("OnValidate"_hs);
-;
+                .func<&RenderComponent::OnValidate>("OnValidate"_hs);;
         }
+
+        std::string GetModelPath()
+        {
+            return _modelPath;
+        }
+
     private:
         FilamentMetallicRoughness::MaterialConstants _materialPropertyBlock;
         bool _defaultMaterialValues = true;

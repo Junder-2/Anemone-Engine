@@ -7,7 +7,6 @@ namespace Engine
 {
     class Event;
     struct DrawCommand;
-    struct DebugDrawCommand;
     struct DrawContext;
 
     class Renderer
@@ -20,16 +19,10 @@ namespace Engine
         static void OnEvent(const Event& e);
 
         static VmaMeshAsset LoadModel(const std::string& modelPath);
-        static VmaMeshBuffers UploadDebugMesh(std::span<uint32_t> indices, std::span<Vertex> vertices);
 
         static VmaImage LoadTexture(const std::string& texturePath);
 
         static void SubmitDrawCommand(const DrawCommand& command);
-        static void SubmitDebugDrawCommand(const DebugDrawCommand& command);
-
-        //Should these be here?
-        static void DebugDrawLine(const Vertex& vertex1, const Vertex& vertex2);
-        static void DebugDrawTriangle(const Vertex& vertex1, const Vertex& vertex2, const Vertex& vertex3);
 
         //These methods are sandwiched around the UI Layer render loops
         //ALL Imgui:: name space commands between these two methods will
@@ -48,8 +41,5 @@ namespace Engine
         static std::unique_ptr<VulkanRenderer> _vulkanRenderer;
 
         static DrawContext _drawCommands;
-        //Should these be here?
-        static std::vector<Vertex> _debugLineVertices;
-        static std::vector<Vertex> _debugTriangleVertices;
     };
 }

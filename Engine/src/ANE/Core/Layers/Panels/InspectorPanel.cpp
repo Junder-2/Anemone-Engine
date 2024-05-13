@@ -1,11 +1,6 @@
 #include "anepch.h"
 #include "InspectorPanel.h"
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <utility>
-#include <cstring>
-#include "imgui.h"
+#include <imgui.h>
 #include "ANE/Core/Editor/SelectionManager.h"
 #include "ANE/Core/Layers/EditorLayer.h"
 #include "ANE/Math/Random.h"
@@ -65,7 +60,7 @@ namespace Engine
         }
         else
         {
-            Entity selectedEntity = _editorLayer->GetEntityWithUUID(selectedEntityUUIDS->at(0));
+            Entity selectedEntity = _editorLayer->GetActiveScene()->GetEntityWithUUID(selectedEntityUUIDS->at(0));
             DrawEntityComponentList(selectedEntity);
             if (ImGui::Button("Add Component")) // For physics testing
             {
@@ -158,9 +153,9 @@ namespace Engine
                     {
                         auto& field = data.second;
                         bool editable = false;
-                        if(field.prop(EDITABLEHASH))
+                        if(field.prop(EDITABLE_HASH))
                         {
-                            editable = field.prop(EDITABLEHASH).value().cast<bool>();
+                            editable = field.prop(EDITABLE_HASH).value().cast<bool>();
                         }
                         if (editable)
                         {

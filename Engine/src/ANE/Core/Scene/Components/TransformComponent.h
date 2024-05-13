@@ -4,8 +4,6 @@
 
 namespace Engine
 {
-    using namespace entt::literals;
-
     struct TransformComponent : std::enable_shared_from_this<TransformComponent>, Component
     {
     public:
@@ -13,9 +11,6 @@ namespace Engine
 
         std::shared_ptr<TransformComponent> Parent;
         std::vector<std::shared_ptr<TransformComponent>> Children;
-
-       // ~TransformComponent() = default;
-
 
         ANE_COMPONENT_INIT(TransformComponent)
 
@@ -29,10 +24,12 @@ namespace Engine
         {
             Children.push_back(std::make_shared<TransformComponent>(child));
         }
-void OnValidate()
+
+        void OnValidate()
         {
 
         }
+
         TransformComponent(const TransformMatrix& transform, const std::shared_ptr<TransformComponent>& parent = nullptr) : Component(typeid(*this).name()), Transform(transform), Parent(parent)
         {
             ANE_ELOG("We are not getting in here");
@@ -47,7 +44,6 @@ void OnValidate()
                 .prop("Scale"_hs, "Scale")
                 .EDITABLE
                 .func<&TransformComponent::OnValidate>("OnValidate"_hs);
-;
         }
 
 

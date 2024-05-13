@@ -20,6 +20,8 @@ namespace Engine
         WakeBody();
         const auto boxCollider = reinterpret_cast<reactphysics3d::BoxShape*>(_reactCollider->getCollisionShape());
         boxCollider->setHalfExtents(Math::Max(_halfSize*_scale, MIN_SCALE));
+
+        ForceUpdateBody();
     }
 
     Vector3 BoxCollider::GetHalfSize() const
