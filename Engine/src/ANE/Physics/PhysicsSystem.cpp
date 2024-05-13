@@ -1,10 +1,15 @@
 ﻿#include "anepch.h"
 #include "PhysicsSystem.h"
 
+#include <ranges>
+
+#include "CollisionData.h"
+#include "CollisionListener.h"
 #include "PhysicsLogger.h"
 #include "PhysicsTypes.h"
 #include "ANE/Core/Entity/Entity.h"
 #include "ANE/Core/Scene/Components/ColliderComponent.h"
+#include "ANE/Core/Scene/Components/NativeScriptComponent.h"
 #include "ANE/Math/Types/TransformMatrix.h"
 #include "ANE/Core/Scene/Components/RigidBodyComponent.h"
 #include "ANE/Core/Scene/Components/TransformComponent.h"
@@ -28,6 +33,9 @@ namespace Engine
 
         _world = _physicsCommon.createPhysicsWorld(worldSettings);
 
+        _collisionListener = new CollisionListener();
+        _world->setEventListener(_collisionListener);
+
         #ifndef ANE_DIST
         _debugDisplayAlpha = .5f;
         _debugRenderer = &_world->getDebugRenderer();
@@ -39,6 +47,18 @@ namespace Engine
 
     void PhysicsSystem::Free()
     {
+        for (const auto& val : _reactCollider | std::views::values)
+        {
+            delete val;
+        }
+        _reactCollider.clear();
+
+        for (const auto& val : _reactRigidBody | std::views::values)
+        {
+            delete val;
+        }
+        _reactRigidBody.clear();
+
         // Because reactphysics auto destructs itself we cant call out destructor
     }
 
@@ -52,13 +72,17 @@ namespace Engine
         const TransformMatrix transform = entity.GetComponent<TransformComponent>().Transform;
         const rp3d::Transform reactTransform(transform.GetPosition(), transform.GetQuaternion());
 
-        const auto rigidBody = _world->createRigidBody(reactTransform);
+        const auto reactRigidBody = _world->createRigidBody(reactTransform);
+        _reactEntity.insert_or_assign(reactRigidBody->getEntity(), entity);
 
         #ifndef ANE_DIST
-        rigidBody->setIsDebugEnabled(IsDebugRendering());
+        reactRigidBody->setIsDebugEnabled(IsDebugRendering());
         #endif
 
-        return new RigidBody(rigidBody);
+        auto* rigidBody = new RigidBody(reactRigidBody);
+        _reactRigidBody.insert_or_assign(reactRigidBody->getEntity(), rigidBody);
+
+        return rigidBody;
     }
 
     SphereCollider* PhysicsSystem::CreateSphereCollider(Entity entity, const float radius)
@@ -71,8 +95,11 @@ namespace Engine
 
         const auto rigidBody = entity.GetComponent<RigidBodyComponent>();
         const auto collider = rigidBody.GetRigidBody()->GetReactRigidBody().addCollider(CreateSphereShape(radius), rp3d::Transform::identity());
+        auto* sphereCollider = new SphereCollider(collider);
 
-        return new SphereCollider(collider);
+        _reactCollider.insert_or_assign(collider->getEntity(), sphereCollider);
+
+        return sphereCollider;
     }
 
     BoxCollider* PhysicsSystem::CreateBoxCollider(Entity entity, const Vector3& halfExtents)
@@ -85,8 +112,11 @@ namespace Engine
 
         const auto rigidBody = entity.GetComponent<RigidBodyComponent>();
         const auto collider = rigidBody.GetRigidBody()->GetReactRigidBody().addCollider(CreateBoxShape(halfExtents), rp3d::Transform::identity());
+        auto* boxCollider = new BoxCollider(collider);
 
-        return new BoxCollider(collider);
+        _reactCollider.insert_or_assign(collider->getEntity(), boxCollider);
+
+        return boxCollider;
     }
 
     CapsuleCollider* PhysicsSystem::CreateCapsuleCollider(Entity entity, const float radius, const float height)
@@ -99,8 +129,11 @@ namespace Engine
 
         const auto rigidBody = entity.GetComponent<RigidBodyComponent>();
         const auto collider = rigidBody.GetRigidBody()->GetReactRigidBody().addCollider(CreateCapsuleShape(radius, height), rp3d::Transform::identity());
+        auto* capsuleCollider = new CapsuleCollider(collider);
 
-        return new CapsuleCollider(collider);
+        _reactCollider.insert_or_assign(collider->getEntity(), capsuleCollider);
+
+        return capsuleCollider;
     }
 
     void PhysicsSystem::RemoveCollider(Entity entity, const Collider* collider)
@@ -207,6 +240,14 @@ namespace Engine
         #ifndef ANE_DIST
         DebugDraw();
         #endif
+    }
+
+    void PhysicsSystem::DispatchCollisionCallback(Entity entity, const CollisionEventType type, const CollisionData& collisionData)
+    {
+    }
+
+    void PhysicsSystem::DispatchTriggerCallback(Entity entity, const CollisionEventType type, const TriggerData& triggerData)
+    {
     }
 
     #ifndef ANE_DIST

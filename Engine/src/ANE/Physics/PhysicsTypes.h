@@ -35,6 +35,13 @@ namespace Engine
         Default = CollisionLayer::Static | CollisionLayer::Dynamic | CollisionLayer::Player,
     };
 
+    enum class CollisionEventType
+    {
+        Enter,
+        Stay,
+        Exit
+    };
+
     enum class CollisionShapeType
     {
         Sphere,
