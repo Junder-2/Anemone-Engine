@@ -32,6 +32,5 @@ namespace Engine
     private:
         std::map<std::string, Entity> _entityMap;
         float _accumulator = 0;
-        float _timeStep = 1.f/50.f;
     };
 }
