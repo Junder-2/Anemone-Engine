@@ -31,7 +31,7 @@ namespace Vulkan
         VulkanUtils::LoadSlangShaders(shaderName.c_str(), _renderer->GetDevice(), _renderer->GetAllocator(), &vertShader, &fragShader);
 
         shader->AddStage(&vertShader, VK_SHADER_STAGE_VERTEX_BIT); //Is this redundant necessary?
-        shader->AddStage(&vertShader, VK_SHADER_STAGE_FRAGMENT_BIT);
+        shader->AddStage(&fragShader, VK_SHADER_STAGE_FRAGMENT_BIT);
 
         VulkanPipelineBuilder pipelineBuilder { _renderer->GetDevice(), shader->Layout };
         vkb::Result<PipelineWrapper> pipeline = pipelineBuilder
