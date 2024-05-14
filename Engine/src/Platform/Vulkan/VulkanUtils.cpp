@@ -3,6 +3,8 @@
 
 #include <fstream>
 
+#include "VulkanCommon.h"
+
 namespace VulkanUtils
 {
     void TransitionImage(const VkCommandBuffer cmd, const VkImage image, const VkImageLayout currentLayout, const VkImageLayout newLayout)
@@ -136,7 +138,7 @@ namespace VulkanUtils
         sessionDesc.targets = &targetDesc;
         sessionDesc.targetCount = 1;
         sessionDesc.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR;
-        const char* paths[] = { "../Assets/Shaders/" };
+        const char* paths[] = { ASSET_PATH_SHADERS };
         sessionDesc.searchPaths = paths;
         sessionDesc.searchPathCount = 1;
 

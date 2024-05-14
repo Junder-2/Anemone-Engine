@@ -91,7 +91,7 @@ namespace Vulkan
         sessionDesc.targets = &targetDesc;
         sessionDesc.targetCount = 1;
         sessionDesc.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR;
-        const char* paths[] = { "../Assets/Shaders/" };
+        const char* paths[] = { ASSET_PATH_SHADERS };
         sessionDesc.searchPaths = paths;
         sessionDesc.searchPathCount = 1;
 

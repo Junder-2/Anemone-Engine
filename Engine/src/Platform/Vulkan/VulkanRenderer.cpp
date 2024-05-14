@@ -120,7 +120,7 @@ namespace Vulkan
             return _loadedModelMap[modelPath];
         }
 
-        const std::string relativePath = std::string("../Assets/Meshes/").append(modelPath);
+        const std::string relativePath = std::string(ASSET_PATH_MESHES).append(modelPath);
 
         const MeshAsset meshAsset = MeshLoader::LoadMesh(relativePath.c_str());
         Mesh mesh = meshAsset.SubMeshes[0]; // Use first submesh for now.
@@ -152,7 +152,7 @@ namespace Vulkan
             return _loadedTextureMap[texturePath];
         }
 
-        const std::string assetPath = std::string("../Assets/Textures/").append(texturePath);
+        const std::string assetPath = std::string(ASSET_PATH_TEXTURES).append(texturePath);
 
         int width, height, channels;
         stbi_uc* pixels = stbi_load(assetPath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
@@ -184,7 +184,7 @@ namespace Vulkan
             return _loadedTextureMap[texturePath];
         }
 
-        const std::string assetPath = std::string("../Assets/Textures/").append(texturePath);
+        const std::string assetPath = std::string(ASSET_PATH_TEXTURES).append(texturePath);
 
         int width, height, channels;
         stbi_uc* pixels = stbi_load(assetPath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
@@ -716,7 +716,7 @@ namespace Vulkan
         sessionDesc.targets = &targetDesc;
         sessionDesc.targetCount = 1;
         sessionDesc.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR;
-        const char* paths[] = { "../Assets/Shaders/" };
+        const char* paths[] = { ASSET_PATH_SHADERS };
         sessionDesc.searchPaths = paths;
         sessionDesc.searchPathCount = 1;
 
