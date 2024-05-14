@@ -12,4 +12,6 @@ namespace VulkanUtils
     bool LoadShaderModule(const char* filePath, VkDevice device, const VkAllocationCallbacks* allocator, VkShaderModule* outShaderModule);
 
     bool LoadShaderModule(const Slang::ComPtr<slang::IBlob>& program, VkDevice device, const VkAllocationCallbacks* allocator, VkShaderModule* outShaderModule);
+
+    void LoadSlangShaders(const char* moduleName, VkDevice device, const VkAllocationCallbacks* allocator, VkShaderModule* vertShader, VkShaderModule* fragShader);
 }
