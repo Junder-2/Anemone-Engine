@@ -1200,8 +1200,18 @@ namespace Engine
 
         vkCmdSetScissor(cmd, 0, 1, &scissor);
 
+        MaterialInstance* lastMaterial = nullptr;
         for (DrawCommand drawCommand : drawCommands.Commands)
         {
+            //MaterialInstance* material = &_filamentInstance;
+            //if (material != lastMaterial)
+            //{
+            //    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->Pipeline->Pipeline);
+            //    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->Pipeline->Layout, 0, 1, &appDescriptor, 0, nullptr);
+            //    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->Pipeline->Layout, 1, 1, &sceneDescriptor, 0, nullptr);
+            //    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->Pipeline->Layout, 2, 1, &material->MaterialSet, 0, nullptr);
+            //}
+
             PushConstantBuffer pushConstants;
             pushConstants.MVPMatrix = ViewProjection * drawCommand.ModelMatrix; // VP * M
             pushConstants.ModelMatrix = drawCommand.ModelMatrix;
