@@ -136,6 +136,39 @@ namespace Engine
         return capsuleCollider;
     }
 
+    SphereCollider* PhysicsSystem::CreateSphereCollider(const rp3d::Entity reactEntity, const float radius)
+    {
+        if(!_reactEntity.contains(reactEntity))
+        {
+            ANE_ELOG_WARN("Invalid reactEntity");
+            return nullptr;
+        }
+
+        return CreateSphereCollider(_reactEntity[reactEntity], radius);
+    }
+
+    BoxCollider* PhysicsSystem::CreateBoxCollider(const rp3d::Entity reactEntity, const Vector3& halfExtents)
+    {
+        if(!_reactEntity.contains(reactEntity))
+        {
+            ANE_ELOG_WARN("Invalid reactEntity");
+            return nullptr;
+        }
+
+        return CreateBoxCollider(_reactEntity[reactEntity], halfExtents);
+    }
+
+    CapsuleCollider* PhysicsSystem::CreateCapsuleCollider(const rp3d::Entity reactEntity, const float radius, const float height)
+    {
+        if(!_reactEntity.contains(reactEntity))
+        {
+            ANE_ELOG_WARN("Invalid reactEntity");
+            return nullptr;
+        }
+
+        return CreateCapsuleCollider(_reactEntity[reactEntity], radius, height);
+    }
+
     void PhysicsSystem::RemoveCollider(Entity entity, const Collider* collider)
     {
         if(!entity.HasComponent<RigidBodyComponent>())
@@ -146,6 +179,17 @@ namespace Engine
 
         const auto rigidBody = entity.GetComponent<RigidBodyComponent>();
         rigidBody.GetRigidBody()->GetReactRigidBody().removeCollider(&collider->GetReactCollider());
+    }
+
+    void PhysicsSystem::RemoveCollider(const rp3d::Entity reactEntity, const Collider* collider)
+    {
+        if(!_reactEntity.contains(reactEntity))
+        {
+            ANE_ELOG_WARN("Invalid reactEntity");
+            return;
+        }
+
+        RemoveCollider(_reactEntity[reactEntity], collider);
     }
 
     rp3d::SphereShape* PhysicsSystem::CreateSphereShape(const float radius)
@@ -164,6 +208,28 @@ namespace Engine
     {
         const auto capsuleCollider = _physicsCommon.createCapsuleShape(radius, height);
         return capsuleCollider;
+    }
+
+    rp3d::Entity PhysicsSystem::GetBodyEntity(Entity entity)
+    {
+        if(!entity.HasComponent<RigidBodyComponent>())
+        {
+            ANE_ELOG_WARN("Entity has no RigidBodyComponent, adding one");
+            entity.AddComponent<RigidBodyComponent>(entity);
+        }
+
+        return entity.GetComponent<RigidBodyComponent>().GetRigidBody()->GetReactRigidBody().getEntity();
+    }
+
+    Entity PhysicsSystem::GetOwnerEntity(const rp3d::Entity reactEntity)
+    {
+        if(!_reactEntity.contains(reactEntity))
+        {
+            ANE_ELOG_WARN("Invalid reactEntity");
+            return {};
+        }
+
+        return _reactEntity[reactEntity];
     }
 
     void PhysicsSystem::WakeBodies()

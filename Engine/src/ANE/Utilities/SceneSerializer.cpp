@@ -289,7 +289,7 @@ namespace Engine
 
                     if (auto colliderComponent = (*componentTable)["_colliderComponent"]; !!colliderComponent)
                     {
-                        auto& entityColliderComp = entityRef.AddComponent<ColliderComponent>();
+                        auto& entityColliderComp = entityRef.AddComponent<ColliderComponent>(entityRef);
                         auto collidersView = colliderComponent["_colliders"];
                         if (toml::array* colliders = collidersView.as_array())
                         {
@@ -304,20 +304,20 @@ namespace Engine
                                         case 0:
                                         {
                                             auto radius = (*colliderTable)["_colliderSpecificData"]["_radius"].value<float>();
-                                            col = entityColliderComp.AddSphereCollider(entityRef, *radius);
+                                            col = entityColliderComp.AddSphereCollider(*radius);
                                         }
                                         break;
                                         case 1:
                                         {
                                             Vector3 halfExtends = Vector3(*(*colliderTable)["_colliderSpecificData"]["_halfSize"][0].value<float>(), *(*colliderTable)["_colliderSpecificData"]["_halfSize"][1].value<float>(), *(*colliderTable)["_colliderSpecificData"]["_halfSize"][2].value<float>());
-                                            col = entityColliderComp.AddBoxCollider(entityRef, halfExtends);
+                                            col = entityColliderComp.AddBoxCollider(halfExtends);
                                         }
                                         break;
                                         case 2:
                                         {
                                             auto radius = (*colliderTable)["_colliderSpecificData"]["_radius"].value<float>();
                                             auto height = (*colliderTable)["_colliderSpecificData"]["_height"].value<float>();
-                                            col = entityColliderComp.AddCapsuleCollider(entityRef, *radius, *height);
+                                            col = entityColliderComp.AddCapsuleCollider(*radius, *height);
                                         }
                                         break;
                                         default: ;

@@ -42,11 +42,19 @@ namespace Engine
         BoxCollider* CreateBoxCollider(Entity entity, const Vector3& halfExtents);
         CapsuleCollider* CreateCapsuleCollider(Entity entity, float radius = 1.f, float height = 2.f);
 
+        SphereCollider* CreateSphereCollider(rp3d::Entity reactEntity, float radius = 1.f);
+        BoxCollider* CreateBoxCollider(rp3d::Entity reactEntity, const Vector3& halfExtents);
+        CapsuleCollider* CreateCapsuleCollider(rp3d::Entity reactEntity, float radius = 1.f, float height = 2.f);
+
         void RemoveCollider(Entity entity, const Collider* collider);
+        void RemoveCollider(rp3d::Entity reactEntity, const Collider* collider);
 
         rp3d::SphereShape* CreateSphereShape(float radius);
         rp3d::BoxShape* CreateBoxShape(const Vector3& halfExtents);
         rp3d::CapsuleShape* CreateCapsuleShape(float radius, float height);
+
+        rp3d::Entity GetBodyEntity(Entity entity);
+        Entity GetOwnerEntity(rp3d::Entity reactEntity);
 
         void WakeBodies();
 

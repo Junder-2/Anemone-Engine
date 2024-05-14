@@ -3,6 +3,7 @@
 
 #include "imgui_internal.h"
 #include "PhysicsUtilities.h"
+#include "ANE/Physics/Physics.h"
 #include "ANE/Physics/Types/Collider.h"
 #include "ANE/Physics/Types/BoxCollider.h"
 #include "ANE/Physics/Types/SphereCollider.h"
@@ -118,12 +119,15 @@ namespace Engine
     inline bool InspectMutableColliders(entt::meta_data& field, entt::meta_any& componentData)
     {
         bool propertyWritten = false;
-        auto v = field.get(componentData).cast<std::vector<Collider*>>();
+        auto data = field.get(componentData).cast<ColliderComponentData>();
         ImGui::Text("%s", field.prop("display_name"_hs).value().cast<const char*>());
-        for (auto collider : v)
+        int index = 0;
+        for (const auto collider : data.Colliders)
         {
+            index++;
             constexpr ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-            if (ImGui::TreeNodeEx(PhysicsUtilities::ToString(collider->GetShapeType()).append(" Collider").c_str(), nodeFlags))
+            std::string label = PhysicsUtilities::ToString(collider->GetShapeType()).append(std::format("Collider {}", index));
+            if (ImGui::TreeNodeEx(label.c_str(), nodeFlags))
             {
                 Vector3 position = collider->GetPosition();
                 Vector3 rotation = collider->GetEulerAngles(true);
@@ -184,7 +188,30 @@ namespace Engine
                 ImGui::TreePop();
             }
         }
-        if (propertyWritten) field.set(componentData, v);
+
+        if(ImGui::Button("Add SphereCollider"))
+        {
+            if(Entity ownerEntity = GetPhysicsSystem().GetOwnerEntity(data.BodyId); ownerEntity)
+            {
+                ownerEntity.GetComponent<ColliderComponent>().AddSphereCollider(1.f);
+            }
+        }
+        if(ImGui::Button("Add BoxCollider"))
+        {
+            if(Entity ownerEntity = GetPhysicsSystem().GetOwnerEntity(data.BodyId); ownerEntity)
+            {
+                ownerEntity.GetComponent<ColliderComponent>().AddBoxCollider(1.f);
+            }
+        }
+        if(ImGui::Button("Add CapsuleCollider"))
+        {
+            if(Entity ownerEntity = GetPhysicsSystem().GetOwnerEntity(data.BodyId); ownerEntity)
+            {
+                ownerEntity.GetComponent<ColliderComponent>().AddCapsuleCollider(1.f, 2.f);
+            }
+        }
+
+        if (propertyWritten) field.set(componentData, data);
         return propertyWritten;
     }
 
@@ -398,7 +425,7 @@ namespace Engine
     {
         {entt::type_id<std::string>().hash(), InspectMutableStringField},
         {entt::type_id<TransformMatrix>().hash(), InspectMutableTransformMatrix},
-        {entt::type_id<std::vector<Collider*>>().hash(), InspectMutableColliders},
+        {entt::type_id<ColliderComponentData>().hash(), InspectMutableColliders},
         {entt::type_id<RigidBody*>().hash(), InspectMutableRigidBody},
         {entt::type_id<VmaMeshAsset>().hash(), InspectMutableMeshAsset},
         {entt::type_id<float>().hash(), InspectMutableFloat},

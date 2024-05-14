@@ -96,7 +96,7 @@ namespace Engine
                             selectedEntity.AddComponent<RenderComponent>("Suzanne.fbx");
                             break;
                         case Hash("ColliderComponent"):
-                            selectedEntity.AddComponent<ColliderComponent>(selectedEntity,1.f);
+                            selectedEntity.AddComponent<ColliderComponent>(selectedEntity);
                             break;
                         case Hash("CameraComponent"):
                             selectedEntity.AddComponent<CameraComponent>();
