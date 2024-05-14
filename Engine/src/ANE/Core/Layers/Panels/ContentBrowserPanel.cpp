@@ -95,7 +95,19 @@ void Engine::ContentBrowserPanel::RenderDirectoryContentsBrowserChild()
                     else
                     {
                         ImGui::Text("%s",dir_entry.path().filename().string().c_str());
-
+                        ImTextureID my_tex_id = io.Fonts->TexID;
+                        float my_tex_w = (float)io.Fonts->TexWidth;
+                        float my_tex_h = (float)io.Fonts->TexHeight;
+                        {
+                            static bool use_text_color_for_tint = false;
+                            ImGui::Checkbox("Use Text Color for Tint", &use_text_color_for_tint);
+                            ImGui::Text("%.0fx%.0f", my_tex_w, my_tex_h);
+                            ImVec2 pos = ImGui::GetCursorScreenPos();
+                            ImVec2 uv_min = ImVec2(0.0f, 0.0f);                 // Top-left
+                            ImVec2 uv_max = ImVec2(1.0f, 1.0f);                 // Lower-right
+                            ImVec4 tint_col = use_text_color_for_tint ? ImGui::GetStyleColorVec4(ImGuiCol_Text) : ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // No tint
+                            ImVec4 border_col = ImGui::GetStyleColorVec4(ImGuiCol_Border);
+                            ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
                     }
                 }
             }
