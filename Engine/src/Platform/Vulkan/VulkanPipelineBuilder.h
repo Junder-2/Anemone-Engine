@@ -6,6 +6,8 @@
 
 namespace Vulkan
 {
+    class Shader;
+
     enum BlendMode
     {
         None,

@@ -1,5 +1,6 @@
 #include "anepch.h"
 #include "VulkanPipelineBuilder.h"
+#include "Material/Shader.h"
 
 #include "VulkanInitializers.h"
 
