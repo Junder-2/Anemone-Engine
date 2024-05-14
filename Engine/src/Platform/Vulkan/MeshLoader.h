@@ -7,11 +7,13 @@
 
 namespace Vulkan
 {
+    using namespace Engine;
+
     struct BoundingBox
     {
-        glm::vec3 Min = glm::vec3(FLT_MAX);
-        glm::vec3 Max = glm::vec3(-FLT_MAX);
-        glm::vec3 Size;
+        Vector3 Min = Vector3(FLT_MAX);
+        Vector3 Max = Vector3(-FLT_MAX);
+        Vector3 Size;
     };
 
     class MeshLoader
