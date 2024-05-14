@@ -981,6 +981,7 @@ namespace Vulkan
         _colorTex = LoadTexture("MetalTiles03_1K_BaseColor.png");
         _normalTex = LoadTexture("MetalTiles03_1K_Normal.png");
         _ormTex = LoadTexture("MetalTiles03_1K_ORM.png");
+        _cubeMap = LoadCubeTexture("cyclorama_hard_light_linear_256.png");
     }
 
     void VulkanRenderer::CreateImGuiDescriptorPool()
