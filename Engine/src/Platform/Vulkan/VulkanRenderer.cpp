@@ -120,9 +120,9 @@ namespace Vulkan
             return _loadedModelMap[modelPath];
         }
 
-        const std::filesystem::path absolutePath = std::filesystem::current_path().append("..\\Assets\\Meshes\\").append(modelPath);
+        const std::string relativePath = std::string("../Assets/Meshes/").append(modelPath);
 
-        const MeshAsset meshAsset = MeshLoader::LoadMesh(absolutePath.string().c_str());
+        const MeshAsset meshAsset = MeshLoader::LoadMesh(relativePath.c_str());
         Mesh mesh = meshAsset.SubMeshes[0]; // Use first submesh for now.
 
         const VmaMeshBuffers meshBuffers = UploadMesh(mesh.Indices, mesh.Vertices);
