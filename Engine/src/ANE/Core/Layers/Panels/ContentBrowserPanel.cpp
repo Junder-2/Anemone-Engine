@@ -1,17 +1,28 @@
 #include "anepch.h"
 #include "ContentBrowserPanel.h"
+
+#include "ANE/Renderer/Renderer.h"
+#include "Platform/Vulkan/VulkanRenderer.h"
+
 Engine::ContentBrowserPanel::ContentBrowserPanel(EditorLayer* editorLayer)
 {
     _editorLayer = editorLayer;
     currentDirectory = AssetDirectory;
+    Init();
 }
 
+void Engine::ContentBrowserPanel::Init()
+{
+    auto image = Renderer::LoadTexture("UITextures/UIIcons/FolderIcon.png");
+    auto icon = ImGui_ImplVulkan_AddTexture(VulkanRenderer::_samplerNearest, image.ImageView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    m_AssetIconMap["folder"] = icon;
+    m_AssetIconMap["cpp"] = icon;
+}
 
 
 Engine::UIUpdateWrapper Engine::ContentBrowserPanel::OnPanelRender()
 {
     ImGui::Begin("Content Browser");
-
     ImGuiTableFlags tableFlags = ImGuiTableFlags_Resizable | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersInnerV;
     if (ImGui::BeginTable("##directoryBrowser", 2, tableFlags, ImVec2(0.0f, 0.0f)))
         {
@@ -46,6 +57,10 @@ void Engine::ContentBrowserPanel::RenderDirectoryBrowserChild(std::filesystem::p
     {
         if (dir_entry.is_directory())
         {
+            ImGui::BeginDisabled();
+            ImGui::ImageButton(m_AssetIconMap["folder"],_folderIconSize);
+            ImGui::EndDisabled();
+            ImGui::SameLine();
             bool opened = ImGui::TreeNodeEx(dir_entry.path().filename().string().c_str());
             if(ImGui::IsItemClicked())
             {
@@ -60,11 +75,21 @@ void Engine::ContentBrowserPanel::RenderDirectoryBrowserChild(std::filesystem::p
         }
         else
         {
-            continue;
+            //Only non folder entries in a directory will end up here. Can potentially do caching and stuff with them
         }
     }
 }
 
+
+bool Engine::ContentBrowserPanel::GetDirEntryIconFromStem(ImTextureID* stemIcon, const std::string& stem)
+{
+    bool iconPresent = m_AssetIconMap.contains(stem);
+    if(iconPresent)
+    {
+        stemIcon = &m_AssetIconMap[stem];
+    }
+    return iconPresent;
+}
 
 void Engine::ContentBrowserPanel::RenderDirectoryContentsBrowserChild()
 {
@@ -82,39 +107,44 @@ void Engine::ContentBrowserPanel::RenderDirectoryContentsBrowserChild()
         {
             //technically should only ever be one folder selected I believe
             std::vector<std::string>* listOfSelectedFilePathAsString = SelectionManager::GetSelection(context);
-            if(listOfSelectedFilePathAsString->size() > 0)
+            if (listOfSelectedFilePathAsString->size() > 0)
             {
                 std::string selectedFilePathAsString = listOfSelectedFilePathAsString->at(0);
                 std::filesystem::path selectedDirectory = std::filesystem::path(selectedFilePathAsString);
                 for (auto const& dir_entry : std::filesystem::directory_iterator{selectedDirectory})
                 {
-                    if(dir_entry.is_directory())
+                    if (dir_entry.is_directory())
                     {
                         continue;
                     }
                     else
                     {
-                        ImGui::Text("%s",dir_entry.path().filename().string().c_str());
-                        ImTextureID my_tex_id = io.Fonts->TexID;
-                        float my_tex_w = (float)io.Fonts->TexWidth;
-                        float my_tex_h = (float)io.Fonts->TexHeight;
+                        std::string filename = dir_entry.path().filename().string();
+                        ImTextureID stemIcon;
+
+                        std::string extension = dir_entry.path().extension().generic_string();
+                        if(!extension.empty())
                         {
-                            static bool use_text_color_for_tint = false;
-                            ImGui::Checkbox("Use Text Color for Tint", &use_text_color_for_tint);
-                            ImGui::Text("%.0fx%.0f", my_tex_w, my_tex_h);
-                            ImVec2 pos = ImGui::GetCursorScreenPos();
-                            ImVec2 uv_min = ImVec2(0.0f, 0.0f);                 // Top-left
-                            ImVec2 uv_max = ImVec2(1.0f, 1.0f);                 // Lower-right
-                            ImVec4 tint_col = use_text_color_for_tint ? ImGui::GetStyleColorVec4(ImGuiCol_Text) : ImVec4(1.0f, 1.0f, 1.0f, 1.0f); // No tint
-                            ImVec4 border_col = ImGui::GetStyleColorVec4(ImGuiCol_Border);
-                            ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
+                            extension = extension.substr(1,extension.size());
+                        }
+                        //ANE_ELOG(extension);
+                        if( m_AssetIconMap.contains(extension))
+                        {
+                            ImGui::BeginDisabled();
+                            ImGui::ImageButton(m_AssetIconMap[extension],_contentIconSize);
+                            ImGui::EndDisabled();
+                        }
+                        ImGui::TextWrapped("%s", dir_entry.path().filename().replace_extension("").string().c_str());
+
+
+                        // ImGui::Image(my_tex_id, ImVec2(my_tex_w, my_tex_h), uv_min, uv_max, tint_col, border_col);
                     }
                 }
             }
+            ImGui::EndChild();
         }
         ImGui::EndChild();
     }
-    ImGui::EndChild();
 }
 void Engine::ContentBrowserPanel::RenderDirectoryContentsBrowserChildTopBar(float topBarHeight)
 {
