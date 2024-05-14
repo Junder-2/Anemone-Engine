@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <vulkan/vulkan_core.h>
 
-namespace Engine
+namespace Vulkan
 {
     class DescriptorLayoutBuilder
     {

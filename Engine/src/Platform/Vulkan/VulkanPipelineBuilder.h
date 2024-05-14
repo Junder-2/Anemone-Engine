@@ -4,7 +4,7 @@
 
 #include "VkBootstrap.h"
 
-namespace Engine
+namespace Vulkan
 {
     enum BlendMode
     {

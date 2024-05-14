@@ -34,7 +34,7 @@ using Slang::ComPtr;
 #include "ANE/Utilities/ImGuiUtilities.h"
 #include "VulkanDescriptorLayoutBuilder.h"
 
-namespace Engine
+namespace Vulkan
 {
     VulkanRenderer::VulkanRenderer(SDL_Window* window)
     {

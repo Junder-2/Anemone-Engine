@@ -12,7 +12,7 @@ using Slang::ComPtr;
 #include "VulkanInitializers.h"
 #include "VulkanUtils.h"
 
-namespace Engine
+namespace Vulkan
 {
     void FilamentMetallicRoughness::BuildPipelines(const VulkanRenderer* renderer)
     {

@@ -4,7 +4,7 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
-namespace Engine
+namespace Vulkan
 {
     Assimp::Importer MeshLoader::Importer;
 

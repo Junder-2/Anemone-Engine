@@ -23,7 +23,7 @@ namespace vkb
     struct Swapchain;
 }
 
-namespace Engine
+namespace Vulkan
 {
     struct WindowProperties;
 

@@ -7,8 +7,9 @@
 #include "ANE/Math/Types/Vector3.h"
 #include "ANE/Math/Types/Vector4.h"
 
-namespace Engine
+namespace Vulkan
 {
+    using namespace Engine;
     class VulkanRenderer;
 
     enum class MaterialPass : uint8_t

@@ -1,7 +1,7 @@
 #include "anepch.h"
 #include "VulkanDeletionQueue.h"
 
-namespace Engine
+namespace Vulkan
 {
     void VulkanDeletionQueue::PushFunction(std::function<void()>&& function)
     {

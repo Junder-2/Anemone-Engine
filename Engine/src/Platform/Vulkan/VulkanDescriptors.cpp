@@ -1,7 +1,7 @@
 ﻿#include "anepch.h"
 #include "VulkanDescriptors.h"
 
-namespace Engine
+namespace Vulkan
 {
     void DescriptorAllocator::Init(const VkDevice logicalDevice, const uint32_t maxSets, const std::span<PoolSizeRatio> poolRatios, const VkAllocationCallbacks* callbacks)
     {

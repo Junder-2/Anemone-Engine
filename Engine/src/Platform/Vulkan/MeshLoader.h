@@ -5,7 +5,7 @@
 
 #include "ANE/Renderer/Mesh.h"
 
-namespace Engine
+namespace Vulkan
 {
     struct BoundingBox
     {
