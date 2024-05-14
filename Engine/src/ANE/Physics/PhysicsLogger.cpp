@@ -7,6 +7,8 @@ namespace Engine
     {
         if(message.find("Set transform") != std::string::npos) // filter out set transform log
             return;
+        if(message.find("Set localToBodyTransform") != std::string::npos) // filter out set transform log
+            return;
         if(message.find("Set isSleeping") != std::string::npos) // filter out set sleeping log
             return;
 

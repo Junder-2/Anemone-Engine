@@ -171,15 +171,14 @@ namespace Engine
                         const auto capsuleCollider = reinterpret_cast<CapsuleCollider*>(collider);
                         float radius = capsuleCollider->GetRadius();
                         float height = capsuleCollider->GetHeight();
-                        if (ImGui::DragFloat("Radius", &radius, 0.1f))
+                        if (ImGui::DragFloat("Radius", &radius, 0.1f, 0, FLT_MAX))
                         {
                             capsuleCollider->SetRadius(radius);
                             propertyWritten = true;
                         }
-                        ImGui::SameLine();
-                        if (ImGui::DragFloat("Height", &height, 0.1f))
+                        if (ImGui::DragFloat("Height", &height, 0.1f, 0, FLT_MAX))
                         {
-                            capsuleCollider->SetHeight(radius);
+                            capsuleCollider->SetHeight(height);
                             propertyWritten = true;
                         }
                     }
