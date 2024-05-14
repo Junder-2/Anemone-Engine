@@ -57,7 +57,7 @@ namespace Engine
         }
 
     private:
-        FilamentMetallicRoughness::MaterialConstants _materialPropertyBlock;
+        Vulkan::FilamentMetallicRoughness::MaterialConstants _materialPropertyBlock;
         bool _defaultMaterialValues = true;
         std::string _modelPath;
     };

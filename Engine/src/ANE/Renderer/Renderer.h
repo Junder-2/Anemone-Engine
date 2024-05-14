@@ -20,7 +20,7 @@ namespace Engine
 
         static VmaMeshAsset LoadModel(const std::string& modelPath);
 
-        static VmaImage LoadTexture(const std::string& texturePath);
+        static Vulkan::VmaImage LoadTexture(const std::string& texturePath);
 
         static void SubmitDrawCommand(const DrawCommand& command);
 
@@ -38,7 +38,7 @@ namespace Engine
         static void FlushDrawCommands();
 
     private:
-        static std::unique_ptr<VulkanRenderer> _vulkanRenderer;
+        static std::unique_ptr<Vulkan::VulkanRenderer> _vulkanRenderer;
 
         static DrawContext _drawCommands;
     };

@@ -282,7 +282,7 @@ namespace Engine
     }
     inline bool InspectMutableMaterialPropertyBlock(entt::meta_data& field, entt::meta_any& componentData)
     {
-        auto v = field.get(componentData).cast<FilamentMetallicRoughness::MaterialConstants>();
+        auto v = field.get(componentData).cast<Vulkan::FilamentMetallicRoughness::MaterialConstants>();
         bool propertyWritten = false;
         float col[3];
         col[0] = v.Color.X;
@@ -369,7 +369,7 @@ namespace Engine
         {entt::type_id<Vector3>().hash(), InspectMutableVector3Field},
         {entt::type_id<Vector4>().hash(), InspectMutableVector4Field},
         {entt::type_id<bool>().hash(), InspectMutableBoolField},
-        {entt::type_id<FilamentMetallicRoughness::MaterialConstants>().hash(), InspectMutableMaterialPropertyBlock}
+        {entt::type_id<Vulkan::FilamentMetallicRoughness::MaterialConstants>().hash(), InspectMutableMaterialPropertyBlock}
     };
 
     inline bool InspectImmutableStringField(entt::meta_data& field, entt::meta_any& componentData)

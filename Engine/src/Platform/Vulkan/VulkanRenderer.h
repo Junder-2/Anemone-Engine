@@ -15,6 +15,11 @@
 #include "ANE/Renderer/Draw.h"
 #include "ANE/Renderer/Mesh.h"
 
+namespace Engine
+{
+    struct WindowProperties;
+}
+
 namespace vkb
 {
     struct Instance;
@@ -25,8 +30,6 @@ namespace vkb
 
 namespace Vulkan
 {
-    struct WindowProperties;
-
     struct VulkanFrame
     {
         VkCommandPool CommandPool;

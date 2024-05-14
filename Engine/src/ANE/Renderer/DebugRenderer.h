@@ -4,8 +4,9 @@
 
 namespace Engine
 {
+    using namespace Vulkan;
+
     struct Matrix4x4;
-    class VulkanRenderer;
     struct Quaternion;
     struct DebugDrawCommand;
 

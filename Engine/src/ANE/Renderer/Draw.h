@@ -8,17 +8,17 @@ namespace Engine
     struct DrawCommand
     {
         // TODO: Add other necessary draw command information such as material...
-        MaterialInstance* Material;
+        Vulkan::MaterialInstance* Material;
         Matrix4x4 ModelMatrix;
         uint32_t VertexCount;
-        VmaMeshBuffers MeshBuffers;
+        Vulkan::VmaMeshBuffers MeshBuffers;
     };
 
     struct DebugDrawCommand
     {
         Matrix4x4 ModelMatrix;
         uint32_t VertexCount;
-        VmaMeshBuffers MeshBuffers;
+        Vulkan::VmaMeshBuffers MeshBuffers;
         bool LineList;
     };
 
