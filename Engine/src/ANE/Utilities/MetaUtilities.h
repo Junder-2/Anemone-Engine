@@ -190,35 +190,72 @@ namespace Engine
 
     inline bool InspectMutableRigidBody(entt::meta_data& field, entt::meta_any& componentData)
     {
-        auto v = field.get(componentData).cast<RigidBody*>();
+        auto rb = field.get(componentData).cast<RigidBody*>();
         bool propertyWritten = false;
+
+        bool isActive = rb->IsActive();
+        int bodyType = static_cast<int>(rb->GetBodyType());
+        bool isGravity = rb->IsGravityEnabled();
+        float mass = rb->GetMass();
+        float damping = rb->GetDamping();
+        float angularDamping = rb->GetAngularDamping();
+
+        const char* bodyTypes[3] {"Static", "Kinematic", "Dynamic"};
+
+        if (ImGui::Checkbox("Active", &isActive))
+        {
+            rb->SetActive(isActive);
+            propertyWritten = true;
+        }
+        if (ImGui::Combo("BodyType", &bodyType, bodyTypes, 3))
+        {
+            rb->SetBodyType(static_cast<BodyType>(bodyType));
+            propertyWritten = true;
+        }
+        if (ImGui::Checkbox("Use Gravity", &isGravity))
+        {
+            rb->SetUseGravity(isGravity);
+            propertyWritten = true;
+        }
+        if (ImGui::DragFloat("Mass", &mass, .1f, 0, FLT_MAX))
+        {
+            rb->SetMass(mass);
+            propertyWritten = true;
+        }
+        if (ImGui::DragFloat("Damping", &damping, .1f, 0, FLT_MAX))
+        {
+            rb->SetDamping(damping);
+            propertyWritten = true;
+        }
+        if (ImGui::DragFloat("Angular Damping", &angularDamping, .1f, 0, FLT_MAX))
+        {
+            rb->SetAngularDamping(angularDamping);
+            propertyWritten = true;
+        }
 
         constexpr ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
         if (ImGui::TreeNodeEx("Readonly", nodeFlags))
         {
-            Vector3 position = v->GetPosition();
-            Vector3 rotation = v->GetRotation().GetEulerAngles(true);
-            Vector3 velocity = v->GetVelocity();
-            Vector3 angularVelocity = v->GetAngularVelocity();
-            bool isSleeping = v->IsSleeping();
-            bool isActive = v->IsActive();
+            bool isSleeping = rb->IsSleeping();
+            Vector3 position = rb->GetPosition();
+            Vector3 rotation = rb->GetRotation().GetEulerAngles(true);
+            Vector3 velocity = rb->GetVelocity();
+            Vector3 angularVelocity = rb->GetAngularVelocity();
 
             ImGui::BeginDisabled();
+            ImGui::Checkbox("Sleeping", &isSleeping);
+            ImGui::Spacing();
             ImGui::DragFloat3("Position", &position.X);
             ImGui::DragFloat3("Rotation", &rotation.X);
             ImGui::Spacing();
             ImGui::DragFloat3("Velocity", &velocity.X);
             ImGui::DragFloat3("Angular Velocity", &angularVelocity.X);
-            ImGui::Spacing();
-            ImGui::Checkbox("Active", &isActive);
-            ImGui::SameLine();
-            ImGui::Checkbox("Sleeping", &isSleeping);
             ImGui::EndDisabled();
 
             ImGui::TreePop();
         }
 
-        if (propertyWritten) field.set(componentData, v);
+        if (propertyWritten) field.set(componentData, rb);
         return propertyWritten;
     }
 

@@ -1,6 +1,7 @@
 ﻿#include "anepch.h"
 #include "RigidBody.h"
 
+#include "ANE/Math/FMath.h"
 #include "ANE/Math/Types/Quaternion.h"
 #include "ANE/Physics/Physics.h"
 #include "ANE/Utilities/API.h"
@@ -135,7 +136,7 @@ namespace Engine
 
     void RigidBody::SetDamping(const float newDamping) const
     {
-        _reactRigidBody->setLinearDamping(newDamping);
+        _reactRigidBody->setLinearDamping(FMath::Max0(newDamping));
     }
 
     float RigidBody::GetDamping() const
@@ -145,7 +146,7 @@ namespace Engine
 
     void RigidBody::SetAngularDamping(const float newDamping) const
     {
-        _reactRigidBody->setAngularDamping(newDamping);
+        _reactRigidBody->setAngularDamping(FMath::Max0(newDamping));
     }
 
     float RigidBody::GetAngularDamping() const
@@ -155,7 +156,7 @@ namespace Engine
 
     void RigidBody::SetMass(const float mass) const
     {
-        _reactRigidBody->setMass(mass);
+        _reactRigidBody->setMass(FMath::Max0(mass));
     }
 
     float RigidBody::GetMass() const
@@ -166,6 +167,7 @@ namespace Engine
     void RigidBody::SetBodyType(BodyType type) const
     {
         _reactRigidBody->setType(static_cast<rp3d::BodyType>(type));
+        SetPosition(GetPosition());
     }
 
     BodyType RigidBody::GetBodyType() const
@@ -176,6 +178,7 @@ namespace Engine
     void RigidBody::SetActive(const bool enable) const
     {
         _reactRigidBody->setIsActive(enable);
+        SetPosition(GetPosition());
     }
 
     bool RigidBody::IsActive() const
