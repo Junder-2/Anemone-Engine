@@ -1,11 +1,6 @@
 #include "anepch.h"
 #include "InspectorPanel.h"
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <utility>
-#include <cstring>
-#include "imgui.h"
+#include <imgui.h>
 #include "ANE/Core/Editor/SelectionManager.h"
 #include "ANE/Core/Layers/EditorLayer.h"
 #include "ANE/Math/Random.h"
@@ -28,6 +23,19 @@ namespace Engine
     InspectorPanel::InspectorPanel(EditorLayer* editorLayer)
     {
         _editorLayer = editorLayer;
+        for(auto &&[id, type]: entt::resolve()) {
+            const std::string componentType{type.info().name()};
+            std::string fullString = TypePrefixRemoval(componentType);
+            typeMap[fullString] = id;
+            componentKeys.push_back(new std::string(fullString));
+
+        }
+        for(auto str: componentKeys)
+        {
+            ANE_ELOG(str->c_str());
+        }
+
+
     }
 
     void InspectorPanel::RegisterSelect(const UUIDComponent& selectedEntityID)
@@ -52,16 +60,63 @@ namespace Engine
         }
         else
         {
-            Entity selectedEntity = _editorLayer->GetEntityWithUUID(selectedEntityUUIDS->at(0));
+            Entity selectedEntity = _editorLayer->GetActiveScene()->GetEntityWithUUID(selectedEntityUUIDS->at(0));
             DrawEntityComponentList(selectedEntity);
-            if (ImGui::Button("Add Physics Suzanne")) // For physics testing
+            if (ImGui::Button("Add Component")) // For physics testing
+            {
+                ImGui::OpenPopup("my_select_popup");
+            }
+            {
+                static int selected = -1;
+
+                // Simple selection popup (if you want to show the current selection inside the Button itself,
+                // you may want to build a string using the "###" operator to preserve a constant ID with a variable label)
+                ImGui::SameLine();
+                if (ImGui::BeginPopup("my_select_popup"))
                 {
-                selectedEntity.GetComponent<TransformComponent>().Transform.AddPosition(Random::InSphere(.2f));
-                selectedEntity.AddComponent<RenderComponent>("Suzanne.fbx");
-                selectedEntity.AddComponent<RigidBodyComponent>(selectedEntity);
-                selectedEntity.AddComponent<ColliderComponent>(selectedEntity, 1.f);
+                    ImGui::SeparatorText("Components");
+                    for (int i = 0; i < componentKeys.size(); i++)
+                        if (ImGui::Selectable(componentKeys[i]->c_str()))
+                            selected = i;
+                    ImGui::EndPopup();
                 }
+                if(selected != -1)
+                {
+                    auto str = *componentKeys[selected];
+                    ANE_ELOG(str);
+                    switch(Hash(str.c_str()))
+                    {
+                        case Hash("TagComponent"):
+                            selectedEntity.AddComponent<TagComponent>();
+                            break;
+                        case Hash("TransformComponent"):
+                            selectedEntity.AddComponent<TransformComponent>();
+                            break;
+                        case Hash("RenderComponent"):
+                            selectedEntity.AddComponent<RenderComponent>("Suzanne.fbx");
+                            break;
+                        case Hash("ColliderComponent"):
+                            selectedEntity.AddComponent<ColliderComponent>(selectedEntity,1.f);
+                            break;
+                        case Hash("CameraComponent"):
+                            selectedEntity.AddComponent<CameraComponent>();
+                            break;
+                        case Hash("RigidBodyComponent"):
+                            selectedEntity.AddComponent<RigidBodyComponent>(selectedEntity, BodyType::Static);
+                            break;
+                        case Hash("NativeScriptComponent"):
+                            //selectedEntity.AddComponent<NativeScriptComponent>().Bind<Entity>();
+                            break;
+                        default:
+                            ANE_ELOG("No matching branch statement found that maps this components UI name to a suitable add component call. Try updating the switch statement");
+                            break;
+                    }
+                    selected = -1;
+
+                }
+            }
         }
+
 
         ImGui::End();
 
@@ -77,7 +132,6 @@ namespace Engine
         std::string result1 = fullComponentName.substr(prefix.length());
         return result1;
     }
-
     void InspectorPanel::DrawEntityComponentList(Entity& selectedEntity)
     {
         for (auto&& [fst, snd] : _editorLayer->GetActiveScene()->_registry.storage())
@@ -99,9 +153,9 @@ namespace Engine
                     {
                         auto& field = data.second;
                         bool editable = false;
-                        if(field.prop(EDITABLEHASH))
+                        if(field.prop(EDITABLE_HASH))
                         {
-                            editable = field.prop(EDITABLEHASH).value().cast<bool>();
+                            editable = field.prop(EDITABLE_HASH).value().cast<bool>();
                         }
                         if (editable)
                         {

@@ -6,7 +6,6 @@
 #include "ANE/Core/Application.h"
 #include "ANE/Core/Window.h"
 #include "ANE/Physics/Physics.h"
-#include "ANE/Physics/PhysicsTypes.h"
 #include "Platform/Vulkan/VulkanRenderer.h"
 
 namespace Engine

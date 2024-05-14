@@ -1,9 +1,10 @@
 #pragma once
 
-#include <entt.hpp>
-
-#include "imgui.h"
 #include "UILayerPanel.h"
+
+#include <entt.hpp>
+#include "ANE/Core/Log/LoggingTypes.h"
+#include "ANE/Math/Types/Vector4.h"
 
 namespace Engine
 {
@@ -11,7 +12,6 @@ namespace Engine
 
     class EditorLogPanel : public UILayerPanel
     {
-
     public:
         EditorLogPanel(EditorLayer* layer);
         ~EditorLogPanel() = default;
@@ -23,30 +23,35 @@ namespace Engine
         void DrawToolBar();
 
         void ShowLogFormatPopup();
-        void DrawLogMessage(const LogMessage& logMessage);
+        void DrawLogMessage(const LogMessage& logMessage, int index) const;
 
         static void Clear();
 
         void LoadSettings();
         void SaveSettings();
 
-        EditorLayer* _editorLayer;
+    private:
+        void OnScroll(Vector2 delta);
 
     private:
-        static const ImVec4 colorInfo;
-        static const ImVec4 colorWarn;
-        static const ImVec4 colorError;
+        static const Vector4 colorTrace;
+        static const Vector4 colorInfo;
+        static const Vector4 colorWarn;
+        static const Vector4 colorError;
 
-        int _levelFilter;
+        LogLevelCategories _levelFilter;
         entt::dense_map<std::string, bool> _loggerNameFilter;
 
         bool _wrap = true;
-        bool _autoScroll = false;
+        bool _autoScroll = true;
 
         bool _displayTime = true;
-        bool _displaySource = true;
+        bool _displaySource = false;
         bool _displayLevel = true;
         bool _displayLoggerName = true;
 
+        Vector4 _panelRect;
+
+        EditorLayer* _editorLayer;
     };
 }

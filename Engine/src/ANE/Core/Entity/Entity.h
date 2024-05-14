@@ -2,7 +2,6 @@
 
 #include "ANE/Core/Scene/Scene.h"
 #include "ANE/Core/Scene/Components/TagComponent.h"
-
 namespace Engine
 {
     struct Component;
@@ -12,7 +11,7 @@ namespace Engine
     public:
         Entity(Scene* scene, const char* name); // only access this during creation
 
-        Entity(entt::entity handle, Scene* scene) : EntityHandle(handle), SceneHandle(scene) {}
+        Entity(entt::entity handle, Scene* scene) : _entityHandle(handle), _sceneHandle(scene) {}
 
         Entity(const Entity& other) = default;
 
@@ -32,13 +31,13 @@ namespace Engine
         template <typename T>
         std::enable_if_t<std::is_base_of_v<Component, T>, bool> TryGetComponent(T& outComponent);
 
-        operator bool() const { return EntityHandle != entt::null; }
-        operator entt::entity() const { return EntityHandle; }
-        operator uint32_t() const { return static_cast<uint32_t>(EntityHandle); }
+        operator bool() const { return _entityHandle != entt::null; }
+        operator entt::entity() const { return _entityHandle; }
+        operator uint32_t() const { return static_cast<uint32_t>(_entityHandle); }
 
         bool operator==(const Entity& other) const
         {
-            return EntityHandle == other.EntityHandle && SceneHandle == other.SceneHandle;
+            return _entityHandle == other._entityHandle && _sceneHandle == other._sceneHandle;
         }
 
         bool operator!=(const Entity& other) const
@@ -48,10 +47,13 @@ namespace Engine
 
         template <typename T>
         std::enable_if_t<std::is_base_of_v<Component, T>, T&> GetComponent();
+
+
+        void AddComponentFromMetaType(const char* id);
     private:
 
-        entt::entity EntityHandle = {entt::null};
-        Scene* SceneHandle = nullptr;
+        entt::entity _entityHandle = {entt::null};
+        Scene* _sceneHandle = nullptr;
     };
 
     /**
@@ -68,7 +70,7 @@ namespace Engine
             return static_cast<std::optional<std::reference_wrapper<T>>>(GetComponent<T>()).value();
         }
 
-        return SceneHandle->_registry.emplace<T>(EntityHandle, std::forward<Args>(args)...);;
+        return _sceneHandle->_registry.emplace<T>(_entityHandle, std::forward<Args>(args)...);;
     }
 
     /**
@@ -81,7 +83,7 @@ namespace Engine
 
         if (HasComponent<T>())
         {
-            SceneHandle->_registry.remove<T>(EntityHandle);
+            _sceneHandle->_registry.remove<T>(_entityHandle);
             return;
         }
         ANE_ELOG_WARN("Attempted to remove component of type {} that doesn't exist", typeid(T).name());
@@ -94,7 +96,7 @@ namespace Engine
     template <typename T>
     std::enable_if_t<std::is_base_of_v<Component, T>, bool> Entity::HasComponent()
     {
-        auto component = SceneHandle->_registry.try_get<T>(EntityHandle);
+        auto component = _sceneHandle->_registry.try_get<T>(_entityHandle);
         return component == nullptr ? false : true;
     }
 
@@ -112,7 +114,7 @@ namespace Engine
             return true;
         }
 
-        ANE_ELOG_WARN("Attempted to try get component of type {} that doesn't exist", typeid(T).name());
+       // ANE_ELOG_WARN("Attempted to try get component of type {} that doesn't exist", typeid(T).name());
         return false;
     }
     template<typename Type>
@@ -136,7 +138,7 @@ namespace Engine
     template <typename T>
     std::enable_if_t<std::is_base_of_v<Component, T>, T&> Entity::GetComponent()
     {
-        return SceneHandle->_registry.get<T>(EntityHandle);
+        return _sceneHandle->_registry.get<T>(_entityHandle);
     }
 
 }

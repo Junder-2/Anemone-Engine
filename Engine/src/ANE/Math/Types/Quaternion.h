@@ -50,8 +50,6 @@ namespace Engine
 
         bool IsUnit() const;
 
-        std::string ToString() const;
-
         static Quaternion FromEulerAngles(const Vector3& eulerAngles, bool inDegrees = false);
 
         // Conversion to other quaternion types
@@ -142,6 +140,8 @@ namespace Engine
 
         friend Vector3 operator*(const Vector3& point, const Quaternion& quaternion);
         friend Vector4 operator*(const Vector4& point, const Quaternion& quaternion);
+
+        std::string ToString() const;
 
     private:
         void InitWithEulerAngles(float pitch, float yaw, float roll);

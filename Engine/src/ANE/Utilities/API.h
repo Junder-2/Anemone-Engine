@@ -3,6 +3,13 @@
 
 namespace Engine
 {
+    enum Platform
+    {
+        Windows,
+        Linux,
+        MacOS
+    };
+
     class API
     {
     public:
@@ -16,7 +23,8 @@ namespace Engine
         /** Returns viewport position Relative to window in pixels */
         inline static Vector2 VIEWPORT_POS = Vector2::ZeroVector();
 
+        inline static Platform PLATFORM = Platform::Windows;
+
+        inline static float PHYSICS_TIMESTEP = 1/50.f;
     };
-
-
-}
+};

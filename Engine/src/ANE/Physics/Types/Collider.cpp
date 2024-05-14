@@ -4,6 +4,7 @@
 #include "ANE/Math/VMath.h"
 #include "ANE/Math/Types/Quaternion.h"
 #include "ANE/Math/Types/Vector3.h"
+#include "ANE/Physics/Physics.h"
 #include "ANE/Physics/PhysicsTypes.h"
 
 namespace Engine
@@ -105,12 +106,14 @@ namespace Engine
         return _shapeType;
     }
 
+    void Collider::ForceUpdateBody() const
+    {
+        SetPosition(GetPosition());
+    }
+
     void Collider::WakeBody() const
     {
-        if(const auto rigidbody = dynamic_cast<rp3d::RigidBody*>(_reactCollider->getBody()))
-        {
-            rigidbody->setIsSleeping(false);
-        }
+        GetPhysicsSystem().WakeBodies();
     }
 }
 

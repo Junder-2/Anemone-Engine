@@ -3,6 +3,7 @@
 
 #include "ANE/Math/Types/Quaternion.h"
 #include "ANE/Physics/Physics.h"
+#include "ANE/Utilities/API.h"
 
 namespace Engine
 {
@@ -57,6 +58,11 @@ namespace Engine
         _reactRigidBody->setLinearVelocity(newVelocity);
     }
 
+    void RigidBody::AddVelocity(const Vector3& force) const
+    {
+        SetVelocity(GetVelocity() + force);
+    }
+
     Vector3 RigidBody::GetVelocity() const
     {
         return Vector3::Convert(_reactRigidBody->getLinearVelocity());
@@ -65,6 +71,11 @@ namespace Engine
     void RigidBody::SetAngularVelocity(const Vector3& newAngularVelocity) const
     {
         _reactRigidBody->setAngularVelocity(newAngularVelocity);
+    }
+
+    void RigidBody::AddAngularVelocity(const Vector3& force) const
+    {
+        SetAngularVelocity(GetAngularVelocity() + force);
     }
 
     Vector3 RigidBody::GetAngularVelocity() const
@@ -82,34 +93,64 @@ namespace Engine
         return _reactRigidBody->isGravityEnabled();
     }
 
-    void RigidBody::AddForce(const Vector3& force, const bool useMass) const
+    void RigidBody::AddForce(const Vector3& force, const bool useMass /*= true*/) const
     {
-        _reactRigidBody->applyWorldForceAtCenterOfMass(useMass ? force : force * _reactRigidBody->getMass());
+        Vector3 finalForce = force / API::PHYSICS_TIMESTEP;
+        if(!useMass) finalForce *= _reactRigidBody->getMass();
+        _reactRigidBody->applyWorldForceAtCenterOfMass(finalForce);
     }
 
-    void RigidBody::AddForceAtPoint(const Vector3& force, const Vector3& point, const bool useMass) const
+    void RigidBody::AddForceAtPoint(const Vector3& force, const Vector3& point, const bool useMass /*= true*/) const
     {
-        _reactRigidBody->applyWorldForceAtWorldPosition(useMass ? force : force * _reactRigidBody->getMass(), point);
+        Vector3 finalForce = force / API::PHYSICS_TIMESTEP;
+        if(!useMass) finalForce *= _reactRigidBody->getMass();
+        _reactRigidBody->applyWorldForceAtWorldPosition(finalForce, point);
     }
 
-    void RigidBody::AddLocalForce(const Vector3& force, const bool useMass) const
+    void RigidBody::AddLocalForce(const Vector3& force, const bool useMass /*= true*/) const
     {
-        _reactRigidBody->applyLocalForceAtCenterOfMass(useMass ? force : force * _reactRigidBody->getMass());
+        Vector3 finalForce = force / API::PHYSICS_TIMESTEP;
+        if(!useMass) finalForce *= _reactRigidBody->getMass();
+        _reactRigidBody->applyLocalForceAtCenterOfMass(finalForce);
     }
 
-    void RigidBody::AddLocalForceAtPoint(const Vector3& force, const Vector3& point, const bool useMass) const
+    void RigidBody::AddLocalForceAtPoint(const Vector3& force, const Vector3& point, const bool useMass /*= true*/) const
     {
-        _reactRigidBody->applyLocalForceAtLocalPosition(useMass ? force : force * _reactRigidBody->getMass(), point);
+        Vector3 finalForce = force / API::PHYSICS_TIMESTEP;
+        if(!useMass) finalForce *= _reactRigidBody->getMass();
+        _reactRigidBody->applyLocalForceAtLocalPosition(finalForce, point);
     }
 
     void RigidBody::AddTorque(const Vector3& torque) const
     {
-        _reactRigidBody->applyWorldTorque(torque);
+        const Vector3 finalTorque = torque / API::PHYSICS_TIMESTEP;
+        _reactRigidBody->applyWorldTorque(finalTorque);
     }
 
     void RigidBody::AddLocalTorque(const Vector3& torque) const
     {
-        _reactRigidBody->applyLocalTorque(torque);
+        const Vector3 finalTorque = torque / API::PHYSICS_TIMESTEP;
+        _reactRigidBody->applyLocalTorque(finalTorque);
+    }
+
+    void RigidBody::SetDamping(const float newDamping) const
+    {
+        _reactRigidBody->setLinearDamping(newDamping);
+    }
+
+    float RigidBody::GetDamping() const
+    {
+        return _reactRigidBody->getLinearDamping();
+    }
+
+    void RigidBody::SetAngularDamping(const float newDamping) const
+    {
+        _reactRigidBody->setAngularDamping(newDamping);
+    }
+
+    float RigidBody::GetAngularDamping() const
+    {
+        return _reactRigidBody->getAngularDamping();
     }
 
     void RigidBody::SetMass(const float mass) const
@@ -124,12 +165,12 @@ namespace Engine
 
     void RigidBody::SetBodyType(BodyType type) const
     {
-        _reactRigidBody->setType(static_cast<rp3d::BodyType>((int)type));
+        _reactRigidBody->setType(static_cast<rp3d::BodyType>(type));
     }
 
     BodyType RigidBody::GetBodyType() const
     {
-        return static_cast<BodyType>((int)_reactRigidBody->getType());
+        return static_cast<BodyType>(_reactRigidBody->getType());
     }
 
     void RigidBody::SetActive(const bool enable) const

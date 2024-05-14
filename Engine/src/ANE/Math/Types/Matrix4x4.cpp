@@ -235,6 +235,11 @@ namespace Engine
         return Vector3(_columns[2]).GetNormalized();
     }
 
+    Matrix4x4 Matrix4x4::Perspective(const float fovYRadians, const float aspect, const float zNear, const float zFar)
+    {
+        return Convert(glm::perspective(fovYRadians, aspect, zNear, zFar));
+    }
+
     Matrix4x4 Matrix4x4::Convert(const glm::mat4& mat4)
     {
         return {Vector4::Convert(mat4[0]), Vector4::Convert(mat4[1]), Vector4::Convert(mat4[2]), Vector4::Convert(mat4[3])};
@@ -265,5 +270,12 @@ namespace Engine
     Matrix4x4 operator*(const Matrix4x4& matrix1, const Matrix4x4& matrix2)
     {
         return Matrix4x4::Convert(glm::mat4(matrix1) * glm::mat4(matrix2));
+    }
+
+    Vector3 operator*(const Matrix4x4& matrix, const Vector3& vector)
+    {
+        return {matrix[0][0]*vector.X + matrix[0][1]*vector.Y + matrix[2][0]*vector.Z,
+            matrix[0][1]*vector.X + matrix[1][1]*vector.Y + matrix[2][1]*vector.Z,
+            matrix[0][2]*vector.X + matrix[1][2]*vector.Y + matrix[2][2]*vector.Z };
     }
 }

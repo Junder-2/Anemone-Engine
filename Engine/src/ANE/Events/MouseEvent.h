@@ -10,7 +10,7 @@ namespace Engine
     class MouseMovementEvent final : public Event
     {
     public:
-        MouseMovementEvent(const MouseMoveValue value) : _moveValue(value) {}
+        MouseMovementEvent(const MouseMoveValue& value) : _moveValue(value) {}
 
         EventType GetEventType() const override { return EventType::MouseMovement; }
         int GetEventCategories() const override { return (EventCategoryInput | EventCategoryMouse); }

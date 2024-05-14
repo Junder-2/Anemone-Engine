@@ -45,6 +45,11 @@ namespace Engine
         void SetVelocity(const Vector3& newVelocity) const;
 
         /**
+         * Adds an instant force to the rigidbody
+         */
+        void AddVelocity(const Vector3& force) const;
+
+        /**
          * Returns the linear velocity of the rigidbody
          */
         Vector3 GetVelocity() const;
@@ -53,6 +58,11 @@ namespace Engine
          * Sets the angular velocity of the rigidbody
          */
         void SetAngularVelocity(const Vector3& newAngularVelocity) const;
+
+        /**
+         * Adds an instant force to the rigidbody
+         */
+        void AddAngularVelocity(const Vector3& force) const;
 
         /**
          * Returns the angular velocity of the rigidbody
@@ -70,22 +80,22 @@ namespace Engine
         bool IsGravityEnabled() const;
 
         /**
-         * Adds a force in world space from the rigidbody's center
+         * Adds a force (newtons) in world space from the rigidbody's center
          */
         void AddForce(const Vector3& force, bool useMass = true) const;
 
         /**
-         * Adds a force in world space from the points location
+         * Adds a force (newtons) in world space from the points location
          */
         void AddForceAtPoint(const Vector3& force, const Vector3& point, bool useMass = true) const;
 
         /**
-         * Adds a force in local space from the rigidbody's center
+         * Adds a force (newtons) in local space from the rigidbody's center
          */
         void AddLocalForce(const Vector3& force, bool useMass = true) const;
 
         /**
-         * Adds a force in local space from the points location
+         * Adds a force (newtons) in local space from the points location
          */
         void AddLocalForceAtPoint(const Vector3& force, const Vector3& point, bool useMass = true) const;
 
@@ -98,6 +108,26 @@ namespace Engine
          * Adds a torque in local space to the rigidbody
          */
         void AddLocalTorque(const Vector3& torque) const;
+
+        /**
+         * Sets the damping factor of velocity
+         */
+        void SetDamping(float newDamping) const;
+
+        /**
+         * Returns the damping factor of velocity
+         */
+        float GetDamping() const;
+
+        /**
+         * Sets the damping factor of angular velocity
+         */
+        void SetAngularDamping(float newDamping) const;
+
+        /**
+         * Returns the damping factor of angular velocity
+         */
+        float GetAngularDamping() const;
 
         /**
          * Sets the mass of the rigidbody

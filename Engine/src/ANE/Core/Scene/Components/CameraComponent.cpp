@@ -1,6 +1,7 @@
 #include "anepch.h"
 #include "CameraComponent.h"
 
+#include "ANE/Renderer/Camera.h"
 #include "glm/ext/matrix_clip_space.hpp"
 
 namespace Engine
@@ -8,7 +9,24 @@ namespace Engine
     void CameraComponent::SetFOV(const float fov)
     {
         _fieldOfView = fov;
+        UpdateProjectionMatrix();
+    }
 
+    void CameraComponent::SetAspectRatio(const float aspect)
+    {
+        _aspectRatio = aspect;
+        UpdateProjectionMatrix();
+    }
+
+    void CameraComponent::SetNearClip(const float nearClip)
+    {
+        _zNear = nearClip;
+        UpdateProjectionMatrix();
+    }
+
+    void CameraComponent::SetFarClip(const float farClip)
+    {
+        _zFar = farClip;
         UpdateProjectionMatrix();
     }
 
@@ -22,19 +40,18 @@ namespace Engine
         UpdateProjectionMatrix();
     }
 
-    void CameraComponent::SetAspectRatio(const float aspect)
+    void CameraComponent::SetPriority(const int newValue)
     {
-        _aspectRatio = aspect;
-
-        UpdateProjectionMatrix();
+        _priority = newValue;
+        Camera::MarkPriorityDirty();
     }
 
     void CameraComponent::UpdateProjectionMatrix()
     {
-        PerspectiveMatrix = Matrix4x4::Convert(glm::perspective(glm::radians(_fieldOfView), _aspectRatio, _zNear, _zFar));
-        if (_flipY) {
-            //flip y axis
-            PerspectiveMatrix[1][1] *= -1.0f;
-        }
+
+        _perspectiveMatrix = Matrix4x4::Perspective(_fieldOfView * FMath::DEGREES_TO_RAD, _aspectRatio, _zFar, _zNear); //Reverse-Z
+        _perspectiveMatrix[1][1] *= -1.0f; //Flip Y to match render matrix layout
+
+        _dirty = true;
     }
 }

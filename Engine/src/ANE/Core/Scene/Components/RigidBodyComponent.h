@@ -1,21 +1,20 @@
 ﻿#pragma once
-
 #include "Component.h"
 #include "ANE/Physics/Types/RigidBody.h"
 
 namespace Engine
 {
     enum class BodyType;
+    class RigidBody;
     class Entity;
 
     struct RigidBodyComponent : Component
     {
-    public:
         ANE_COMPONENT_INIT(RigidBodyComponent)
 
-        RigidBodyComponent(const Entity self);
+        RigidBodyComponent(Entity self);
 
-        RigidBodyComponent(const Entity self, const BodyType bodyType);
+        RigidBodyComponent(Entity self, BodyType bodyType);
 
         RigidBody* GetRigidBody() const { return _rigidbody; }
 

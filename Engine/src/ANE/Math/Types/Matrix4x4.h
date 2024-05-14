@@ -91,6 +91,8 @@ namespace Engine
 
         static Matrix4x4 Zero() { return {0}; }
 
+        static Matrix4x4 Perspective(float fovYRadians, float aspect, float zNear, float zFar);
+
         // Conversion to other matrix types
         static Matrix4x4 Convert(const glm::mat4& mat4);
         operator const glm::mat4() const;
@@ -189,6 +191,8 @@ namespace Engine
                     matrix[0][2]*vector.X + matrix[1][2]*vector.Y + matrix[2][2]*vector.Z + matrix[3][2]*vector.W,
                     matrix[0][3]*vector.X + matrix[1][3]*vector.Y + matrix[2][3]*vector.Z + matrix[3][3]*vector.W};
         }
+
+        friend Vector3 operator*(const Matrix4x4& matrix, const Vector3& vector);
 
         std::string ToString() const;
 

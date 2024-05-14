@@ -1,94 +1,42 @@
 ﻿#include "anepch.h"
 #include "Scene.h"
 
-#include "ANE/Core/Entity/Entity.h"
 #include "ANE/Math/FMath.h"
 #include "ANE/Physics/Physics.h"
-#include "Components/NativeScriptComponent.h"
-#include "Components/RenderComponent.h"
-#include "Components/RigidBodyComponent.h"
-#include "Components/TransformComponent.h"
-#include "Components/UUIDComponent.h"
+#include "ANE/Renderer/Camera.h"
+#include "ANE/Utilities/API.h"
+#include "Components/Components.h"
 
 namespace Engine
 {
-    Scene::Scene()
+    Scene::Scene(std::string sceneName) : Name(sceneName)
     {
-        //create an entity
-        //entt::entity entity = Registry.create();
-        // entt::entity entit2 = _registry.create();
 
-        //Entity ent(this);
-
-        // auto component = ent.AddComponent<RenderComponent>();
-        // //auto Gety = ent.TryGetComponent<RenderComponent>(comp);
-        // if (RenderComponent comp; ent.TryGetComponent(comp))
-        // {
-        //     ANE_ELOG("WE have component: {}", comp.ToString());
-        // }
-        // else
-        // {
-        //     ANE_ELOG("We do not have component");
-        // }
-        // auto component = ent.GetComponent<TransformComponent>();
-        // if (ent.HasComponent<TransformComponent>())
-        // {
-        //
-        // }
-
-        // if (componentR nullptr)
-        // {
-        //     ANE_ELOG("We have component");
-        // }
-        // else
-        // {
-        //     ANE_ELOG("We don't have component");
-        // }
-        // auto component2 = _registry.emplace<TransformComponent>(entit2);
-        // add a component to an entity
-        //auto component = _registry.emplace<TransformComponent>(entity, TransformMatrix(), component2);
-        // component.SetParent(component2);
-        //
-        // // adds a component and calls the constructor
-        //auto componentChanged = Registry.emplace<TransformComponent>(entity, TransformMatrix());
-        //componentChanged.ToString();
-        //ANE_ELOG(componentChanged.ToString());
-
-        //
-        // // calls a method on the component
-        // UpdatePosition(component);
-        //
-        // // removes the a component
-        // //_registry.remove<TransformComponent>(entity);
-        //
-        // // removes all of the type of components
-        // // _registry.clear<TransformComponent>();
-        //
-        // // gets the component from the entity
-        // auto fetchedComponent = _registry.get<TransformComponent>(entity);
-
-        // gets all entity with attached component
-        // auto const view = _registry.view<TransformComponent>();
-        // for (auto entt : view)
-        // {
-        //     // we iterate over every entity with component and use view to get component
-        //     UpdatePosition(view.get<TransformComponent>(entt));
-        // }
-        //
-        // // used to fetch multiple components and group them.
-        // auto group = _registry.group<TransformComponent>(entt::get<RenderComponent>);
-        //
-        // // makes two handles that can be used
-        // for (auto entt : group)
-        // {
-        //     // miss interformaiotn
-        //     auto [transform, renderer] = group.get<TransformComponent, RenderComponent>(entt);
-        // }
-        //
-        // // Subscribes to events
-        // _registry.on_construct<TransformComponent>().connect<&OnTransformConstructed>();
     }
 
+    /**
+    * \brief Creates a Entity in the scene, adds a Transform and Tag
+    * \param name Name of Entity, if no name is given it will be tagged with: "Untagged"
+    * \return reference of the newly created Entity.
+    */
+    [[nodiscard("Entity never used")]] Entity Scene::Create(const char* name)
+    {
+        Entity ent{this, name};
+        _entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent; // here
+        return ent;
+    }
+
+    [[nodiscard("Entity never used")]] Entity Scene::Create(const std::string& stringName)
+    {
+        Entity ent{this, stringName.c_str()};
+        _entityMap[ent.GetComponent<UUIDComponent>().UUID] = ent;
+        return ent;
+    }
+
+    Entity Scene::GetEntityWithUUID(std::string UUID)
+    {
+        return _entityMap[UUID];
+    }
 
     void Scene::OnEvent(Event& e)
     {
@@ -114,15 +62,19 @@ namespace Engine
 
         _accumulator += timeStep;
 
-        // Fixed update
-        while (_accumulator >= _timeStep)
-        {
-            _accumulator = FMath::Max0(_accumulator - _timeStep);
+        const float physTimeStep = API::PHYSICS_TIMESTEP;
 
-            OnFixedUpdate(_timeStep);
+        // Fixed update
+        while (_accumulator >= physTimeStep)
+        {
+            _accumulator = FMath::Max0(_accumulator - physTimeStep);
+
+            OnFixedUpdate(physTimeStep);
         }
 
-        GetPhysicsSystem().UpdateRigidBodies(FMath::Saturate(_accumulator / _timeStep), this);
+        GetPhysicsSystem().UpdateRigidBodies(FMath::Saturate(_accumulator / physTimeStep), this);
+
+        Camera::UpdateCamera(this);
 
         SubmitDrawCommands();
     }
@@ -151,7 +103,7 @@ namespace Engine
 
         // TODO: Sort based on pivot or bounds.
         const auto view = _registry.view<TransformComponent, RenderComponent>();
-        for (entt::entity entity : view)
+        for (const auto entity : view)
         {
             auto [transform, renderer] = view.get<TransformComponent, RenderComponent>(entity);
 

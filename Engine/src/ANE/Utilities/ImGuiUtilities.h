@@ -1,4 +1,5 @@
 #pragma once
+#include "ANE/Math/Types/Vector4.h"
 
 struct ImGuiStyle;
 
@@ -7,8 +8,25 @@ namespace Engine
     class ImGuiUtilities
     {
     public:
-        static void StyleAnemoneDark(ImGuiStyle* dst = nullptr);
-        static void StyleAnemoneExperimental();
+        enum AnemoneStyleColors
+        {
+            AneWhite,
+            AneBlack,
+            AneDark,
+            AneDarkHover,
+            AneDarkActive,
+            AneColor,
+            AneColorHover,
+            AneColorActive,
+            AneHint,
+            AneHintHover,
+            AneHintActive,
+            AneFrame,
+            AneFrameHover,
+            AneFrameActive,
+
+            AneColorCount,
+        };
 
         // Flags for ImGui::DockSpace()
         enum ImGuiDockNodeFlags
@@ -47,5 +65,11 @@ namespace Engine
             ImGuiTabItemFlags_NoCloseWithMiddleMouseButton = 1 << 2, // Disable behavior of closing tabs (that are submitted with p_open != NULL) with middle mouse button. You can still repro this behavior on user's side with if (IsItemHovered() && IsMouseClicked(2)) *p_open = false.
             ImGuiTabItemFlags_NoPushId = 1 << 3 // Don't call PushID(tab->ID)/PopID() on BeginTabItem()/EndTabItem()
         };
+
+        static void StyleAnemoneDark(ImGuiStyle* dst = nullptr);
+        static Vector4 GetAneColor(AnemoneStyleColors index);
+
+    private:
+        static Vector4 _aneStyleColor[];
     };
 }

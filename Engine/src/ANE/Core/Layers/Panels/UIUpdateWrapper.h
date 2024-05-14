@@ -6,13 +6,10 @@ namespace Engine
 
     struct UIUpdateWrapper
     {
-    public:
         UILayerPanel* RemoveSelf;
         std::vector<UILayerPanel*> PanelsToAdd;
 
-        UIUpdateWrapper() : RemoveSelf(nullptr)
-        {
-        }
+        UIUpdateWrapper() : RemoveSelf(nullptr) {}
 
         UIUpdateWrapper(const UIUpdateWrapper& other) = default;
 

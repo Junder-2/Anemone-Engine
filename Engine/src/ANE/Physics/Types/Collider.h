@@ -9,7 +9,8 @@ namespace Engine
     class Collider
     {
     public:
-        Collider(rp3d::Collider* collider, const CollisionShapeType shapeType);
+        Collider(rp3d::Collider* collider, CollisionShapeType shapeType);
+        virtual ~Collider() = default;
 
         /**
          * Sets the local space transform of the collider
@@ -104,6 +105,7 @@ namespace Engine
         }
 
     protected:
+        void ForceUpdateBody() const;
         void WakeBody() const;
         virtual void OnUpdateScale() {}
 

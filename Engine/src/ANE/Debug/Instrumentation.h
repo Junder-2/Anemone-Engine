@@ -3,7 +3,6 @@
 #pragma once
 
 #ifdef ANE_DEBUG
-
 #include "ANE/Core/Log/Logging.h"
 #include <fstream>
 
@@ -94,10 +93,7 @@ namespace Engine
 			return instance;
 		}
 	private:
-		Instrumentor()
-			: _currentSession(nullptr)
-		{
-		}
+		Instrumentor() : _currentSession(nullptr) {}
 
 		~Instrumentor()
 		{

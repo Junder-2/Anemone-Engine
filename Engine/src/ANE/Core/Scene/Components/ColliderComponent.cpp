@@ -4,9 +4,6 @@
 #include "ANE/Core/Entity/Entity.h"
 #include "ANE/Math/Types/Vector3.h"
 #include "ANE/Physics/Physics.h"
-#include "ANE/Physics/Types/BoxCollider.h"
-#include "ANE/Physics/Types/CapsuleCollider.h"
-#include "ANE/Physics/Types/SphereCollider.h"
 
 namespace Engine
 {
@@ -17,22 +14,44 @@ namespace Engine
 
     ColliderComponent::ColliderComponent(const Entity self, const Vector3 halfExtents): Component(typeid(*this).name())
     {
-        _colliders.push_back(GetPhysicsSystem().CreateBoxCollider(self, halfExtents));
+        AddBoxCollider(self, halfExtents);
     }
 
     ColliderComponent::ColliderComponent(const Entity self, const float radius): Component(typeid(*this).name())
     {
-        _colliders.push_back(GetPhysicsSystem().CreateSphereCollider(self, radius));
+        AddSphereCollider(self, radius);
     }
 
     ColliderComponent::ColliderComponent(const Entity self, const float radius, const float height): Component(typeid(*this).name())
     {
-        _colliders.push_back(GetPhysicsSystem().CreateCapsuleCollider(self, radius, height));
+        AddCapsuleCollider(self, radius, height);
     }
 
-    void ColliderComponent::AddCollider(Collider* collider)
+    Collider* ColliderComponent::AddCollider(Collider* collider)
     {
         _colliders.push_back(collider);
+        return collider;
+    }
+
+    BoxCollider* ColliderComponent::AddBoxCollider(const Entity self, const Vector3 halfExtents)
+    {
+        BoxCollider* col = GetPhysicsSystem().CreateBoxCollider(self, halfExtents);
+        _colliders.push_back(col);
+        return col;
+    }
+
+    SphereCollider* ColliderComponent::AddSphereCollider(const Entity self, const float radius)
+    {
+        SphereCollider* col = GetPhysicsSystem().CreateSphereCollider(self, radius);
+        _colliders.push_back(col);
+        return col;
+    }
+
+    CapsuleCollider* ColliderComponent::AddCapsuleCollider(const Entity self, const float radius, const float height)
+    {
+        CapsuleCollider* col = GetPhysicsSystem().CreateCapsuleCollider(self, radius, height);
+        _colliders.push_back(col);
+        return col;
     }
 
     void ColliderComponent::RemoveCollider(const Entity self, const Collider* collider)

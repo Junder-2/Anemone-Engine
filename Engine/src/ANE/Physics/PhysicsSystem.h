@@ -1,9 +1,22 @@
 ﻿#pragma once
+#include <entt.hpp>
 
 #include "ANE/Subsystem/SubSystem.h"
 
 namespace Engine
 {
+    struct TriggerData;
+}
+
+namespace Engine
+{
+    class CollisionListener;
+}
+
+namespace Engine
+{
+    struct CollisionData;
+    enum class CollisionEventType;
     enum class PhysicsDebugDisplayFlag;
     class Scene;
     class Collider;
@@ -35,6 +48,8 @@ namespace Engine
         rp3d::BoxShape* CreateBoxShape(const Vector3& halfExtents);
         rp3d::CapsuleShape* CreateCapsuleShape(float radius, float height);
 
+        void WakeBodies();
+
         void PhysicsUpdate(float timeStep, Scene* scene);
         void UpdateRigidBodies(float factor, Scene* scene);
 
@@ -57,10 +72,22 @@ namespace Engine
         float _debugDisplayAlpha;
         #endif
 
+    protected:
+        void DispatchCollisionCallback(Entity entity, CollisionEventType type, const CollisionData& collisionData);
+        void DispatchTriggerCallback(Entity entity, CollisionEventType type, const TriggerData& triggerData);
+
     private:
         rp3d::PhysicsCommon _physicsCommon {};
         rp3d::PhysicsWorld* _world;
         PhysicsLogger* _physicsLogger;
+        CollisionListener* _collisionListener;
 
+        entt::dense_map<rp3d::Entity, Entity> _reactEntity {};
+        entt::dense_map<rp3d::Entity, RigidBody*> _reactRigidBody {};
+        entt::dense_map<rp3d::Entity, Collider*> _reactCollider {};
+
+        bool _hasAwokenBodies = false;
+
+        friend class CollisionListener;
     };
 }

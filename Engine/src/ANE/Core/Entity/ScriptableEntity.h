@@ -1,9 +1,11 @@
 ﻿#pragma once
-
 #include "Entity.h"
+#include "ANE/Physics/CollisionData.h"
 
 namespace Engine
 {
+    enum class CollisionEventType;
+
     class ScriptableEntity
     {
     public:
@@ -44,7 +46,7 @@ namespace Engine
             return _entity.HasComponent<T>();
         }
 
-    protected:
+    public:
         virtual void OnCreate()
         {
         }
@@ -58,6 +60,14 @@ namespace Engine
         }
 
         virtual void OnFixedUpdate(float timeStep)
+        {
+        }
+
+        virtual void OnCollision(CollisionEventType type, const CollisionData& collisionData)
+        {
+        }
+
+        virtual void OnTrigger(CollisionEventType type, const TriggerData& collisionData)
         {
         }
 

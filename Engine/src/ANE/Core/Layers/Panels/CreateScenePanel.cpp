@@ -23,14 +23,14 @@ namespace Engine
         bool open;
         ImGui::Begin("Create Scene", &open, flags);
 
-        if (ImGui::InputText("Scene name", buffer, sizeof(buffer))) sceneName = std::string(buffer);
+        if (ImGui::InputText("Scene name", _buffer, sizeof(_buffer))) _sceneName = std::string(_buffer);
 
         if (ImGui::Button("Create", Vector2(60, 20))) // clears the buffer...
         {
-            if (!sceneName.empty())
+            if (!_sceneName.empty())
             {
                 open = false;
-                CreateScene(sceneName.c_str());
+                CreateScene(_sceneName.c_str());
             }
         }
 
@@ -42,6 +42,6 @@ namespace Engine
 
     void CreateScenePanel::CreateScene(const char* name) const
     {
-        _editorLayer->AddScene<Scene>(name);
+        _editorLayer->CreateScene(name);
     }
 }
