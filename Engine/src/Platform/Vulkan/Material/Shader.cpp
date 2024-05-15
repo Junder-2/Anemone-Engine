@@ -20,7 +20,7 @@ namespace Vulkan
         std::vector<VkDescriptorSetLayoutBinding> Bindings;
     };
 
-    void Shader::ReflectLayout(VkDevice device, ReflectionOverrides* overrides, int overrideCount)
+    void Shader::ReflectLayout(VulkanRenderer* renderer, ReflectionOverrides* overrides, int overrideCount)
     {
         std::vector<DescriptorSetLayoutData> setLayouts;
 
@@ -48,9 +48,8 @@ namespace Vulkan
         meshPipelineLayoutInfo.setLayoutCount = s;
         meshPipelineLayoutInfo.pSetLayouts = compactedLayouts.data();
 
-
-        vkCreatePipelineLayout(device, &meshPipelineLayoutInfo, nullptr, &Layout);
-	}
+        vkCreatePipelineLayout(renderer->GetDevice(), &meshPipelineLayoutInfo, renderer->GetAllocator(), &Layout);
+    }
 
     void Shader::FillStages(std::vector<VkPipelineShaderStageCreateInfo>& pipelineStages)
     {

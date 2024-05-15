@@ -30,7 +30,7 @@ namespace Vulkan
     public:
         void AddStage(VkShaderModule* shaderModule, VkShaderStageFlagBits stage);
 
-        void ReflectLayout(VkDevice device, ReflectionOverrides* overrides, int overrideCount);
+        void ReflectLayout(VulkanRenderer* renderer, ReflectionOverrides* overrides, int overrideCount);
 
         void FillStages(std::vector<VkPipelineShaderStageCreateInfo>& pipelineStages);
 
