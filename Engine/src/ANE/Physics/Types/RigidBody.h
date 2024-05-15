@@ -6,23 +6,40 @@ namespace Engine
     struct Vector3;
     struct Quaternion;
 
+    typedef uint8_t RigidBodyFlags;
+    enum class RigidBodyFlag : uint8_t
+    {
+        None = 0,
+        AutoMass = BIT(0),
+        AutoCenterOfMass = BIT(1),
+        IsDirty = BIT(2),
+    };
+    ENUM_CLASS_OPERATORS(RigidBodyFlag)
+
     /**
      * Wrapper for react rigidbody
      */
     class RigidBody
     {
     public:
-        RigidBody(rp3d::RigidBody* rigidBody) : _reactRigidBody(rigidBody) {}
+        RigidBody(rp3d::RigidBody* rigidBody) : _reactRigidBody(rigidBody), _flags(0)
+        {
+            SetAutoMass(true);
+            SetAutoCenterOfMass(true);
+            SetActive(true);
+            _reactRigidBody->setIsActive(true);
+            ClearDirty();
+        }
 
         /**
          * Sets the transform of the rigidbody
          */
-        void SetTransform(Vector3 position, const Quaternion& rotation, bool teleport = false) const;
+        void SetTransform(Vector3 position, const Quaternion& rotation, bool teleport = false);
 
         /**
          * Sets the position of the rigidbody
          */
-        void SetPosition(Vector3 position, bool teleport = false) const;
+        void SetPosition(Vector3 position, bool teleport = false);
 
         /**
          * Returns the position of the rigidbody
@@ -32,7 +49,7 @@ namespace Engine
         /**
          * Sets the rotation of the rigidbody
          */
-        void SetRotation(const Quaternion& rotation, bool teleport = false) const;
+        void SetRotation(const Quaternion& rotation, bool teleport = false);
 
         /**
          * Returns the rotation of the rigidbody
@@ -130,6 +147,26 @@ namespace Engine
         float GetAngularDamping() const;
 
         /**
+         * Computes the center of mass from the colliders
+         */
+        void UpdateCenterOfMass() const;
+
+        /**
+         * Set the center of mass of the body in localspace
+         */
+        void SetLocalCenterOfMass(const Vector3& centerOfMass) const;
+
+        /**
+         * Return the center of mass of the body in localspace
+         */
+        Vector3 GetLocalCenterOfMass() const;
+
+        /**
+         * Computes the center of mass from the colliders
+         */
+        void UpdateMass() const;
+
+        /**
          * Sets the mass of the rigidbody
          */
         void SetMass(float mass) const;
@@ -142,7 +179,7 @@ namespace Engine
         /**
          * Sets the BodyMode of the rigidbody
          */
-        void SetBodyType(BodyType type) const;
+        void SetBodyType(BodyType type);
 
         /**
          * Returns the BodyMode of the rigidbody
@@ -170,6 +207,28 @@ namespace Engine
         bool IsSleeping() const;
 
         /**
+         * Sets if mass should be automatically computed from colliders
+         */
+        void SetAutoMass(bool enable);
+
+        /**
+         * Sets if mass should be automatically computed from colliders
+         */
+        bool IsAutoMass() const { return _flags & EnumCast(RigidBodyFlag::AutoMass); }
+
+        /**
+         * Sets if center of mass should be automatically computed from colliders
+         */
+        void SetAutoCenterOfMass(bool enable);
+
+        /**
+         * Sets if center of mass should be automatically computed from colliders
+         */
+        bool IsAutoCenterOfMass() const { return _flags & EnumCast(RigidBodyFlag::AutoCenterOfMass); }
+
+        bool IsDirty() const { return _flags & EnumCast(RigidBodyFlag::IsDirty); }
+
+        /**
          * Destroys the rigidbody and any connected joints
          */
         void Destroy();
@@ -180,6 +239,17 @@ namespace Engine
         }
 
     private:
+        void MarkDirty();
+        void ClearDirty();
+
+        void TryUpdate() const;
+
+    private:
         rp3d::RigidBody* _reactRigidBody;
+        RigidBodyFlags _flags;
+        BodyType _bodyType;
+
+        friend class PhysicsSystem;
+        friend class Collider;
     };
 }

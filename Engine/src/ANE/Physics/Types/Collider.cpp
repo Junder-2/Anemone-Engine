@@ -12,11 +12,12 @@ namespace Engine
     Collider::Collider(rp3d::Collider* collider, const CollisionShapeType shapeType): _reactCollider(collider), _shapeType(shapeType)
     {
         SetCollisionMask(EnumCast(CollisionLayerPreset::Default));
+        SetCollisionCategories(EnumCast(CollisionLayer::Dynamic));
     }
 
     void Collider::SetTransform(const Vector3 position, const Quaternion& rotation) const
     {
-        WakeBody();
+        NotifyDirty();
         _reactCollider->setLocalToBodyTransform(rp3d::Transform(position, rotation));
     }
 
@@ -106,14 +107,12 @@ namespace Engine
         return _shapeType;
     }
 
-    void Collider::ForceUpdateBody() const
+    void Collider::NotifyDirty() const
     {
-        SetPosition(GetPosition());
-    }
-
-    void Collider::WakeBody() const
-    {
-        GetPhysicsSystem().WakeBodies();
+        if(const auto rb = GetPhysicsSystem().ConvertRigidBody(_reactCollider->getBody()->getEntity()))
+        {
+            rb->MarkDirty();
+        }
     }
 }
 

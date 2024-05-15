@@ -222,6 +222,8 @@ namespace Engine
         bool isActive = rb->IsActive();
         int bodyType = static_cast<int>(rb->GetBodyType());
         bool isGravity = rb->IsGravityEnabled();
+        bool isAutoMass = rb->IsAutoMass();
+        bool isAutoCenterOfMass = rb->IsAutoCenterOfMass();
         float mass = rb->GetMass();
         float damping = rb->GetDamping();
         float angularDamping = rb->GetAngularDamping();
@@ -243,11 +245,23 @@ namespace Engine
             rb->SetUseGravity(isGravity);
             propertyWritten = true;
         }
+        if (ImGui::Checkbox("Use Auto Center of Mass", &isAutoCenterOfMass))
+        {
+            rb->SetAutoCenterOfMass(isAutoCenterOfMass);
+            propertyWritten = true;
+        }
+        if (ImGui::Checkbox("Use Auto Mass", &isAutoMass))
+        {
+            rb->SetAutoMass(isAutoMass);
+            propertyWritten = true;
+        }
+        ImGui::BeginDisabled(isAutoMass);
         if (ImGui::DragFloat("Mass", &mass, .1f, 0, FLT_MAX))
         {
             rb->SetMass(mass);
             propertyWritten = true;
         }
+        ImGui::EndDisabled();
         if (ImGui::DragFloat("Damping", &damping, .1f, 0, FLT_MAX))
         {
             rb->SetDamping(damping);

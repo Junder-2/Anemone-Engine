@@ -232,6 +232,28 @@ namespace Engine
         return _reactEntity[reactEntity];
     }
 
+    RigidBody* PhysicsSystem::ConvertRigidBody(const rp3d::Entity reactEntity)
+    {
+        if(!_reactRigidBody.contains(reactEntity))
+        {
+            ANE_ELOG_WARN("Invalid reactEntity");
+            return nullptr;
+        }
+
+        return _reactRigidBody[reactEntity];
+    }
+
+    Collider* PhysicsSystem::ConvertCollider(const rp3d::Entity reactEntity)
+    {
+        if(!_reactCollider.contains(reactEntity))
+        {
+            ANE_ELOG_WARN("Invalid reactEntity");
+            return nullptr;
+        }
+
+        return _reactCollider[reactEntity];
+    }
+
     void PhysicsSystem::WakeBodies()
     {
         if(_hasAwokenBodies) return;
@@ -247,33 +269,55 @@ namespace Engine
 
     void PhysicsSystem::PhysicsUpdate(const float timeStep, Scene* scene)
     {
+        std::vector<RigidBody*> oneFrameDisable; // Dirty fix for a bug that crashes for certain changes of rigidbody
+
         const auto group = scene->_registry.view<TransformComponent, RigidBodyComponent>();
         for (const auto entity : group) //We need to apply changes in our transform to the internal rigidbody
         {
             auto[transform, body] = group.get<TransformComponent, RigidBodyComponent>(entity);
 
             TransformMatrix& transformMatrix = transform.Transform;
+            RigidBody* rigidBody = body.GetRigidBody();
 
-            if(!transformMatrix.IsDirty()) continue;
-
-            WakeBodies();
-
-            if(transformMatrix.GetDirtyFlags() & DirtyScale)
+            if(transformMatrix.IsDirty())
             {
-                if(const auto colliderComp = scene->_registry.try_get<ColliderComponent>(entity))
+                WakeBodies();
+
+                if(transformMatrix.GetDirtyFlags() & DirtyScale)
                 {
-                    for (const auto collider : colliderComp->GetColliders())
+                    if(const auto colliderComp = scene->_registry.try_get<ColliderComponent>(entity))
                     {
-                        collider->SetScale(transformMatrix.GetScale());
+                        for (const auto collider : colliderComp->GetColliders())
+                        {
+                            collider->SetScale(transformMatrix.GetScale());
+                        }
                     }
                 }
-            }
-            body.GetRigidBody()->SetTransform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
+                body.GetRigidBody()->SetTransform(transformMatrix.GetPosition(), transformMatrix.GetQuaternion());
 
-            transformMatrix.ClearDirty();
+                transformMatrix.ClearDirty();
+            }
+            if(rigidBody->IsDirty())
+            {
+                WakeBodies();
+                rigidBody->TryUpdate();
+
+                if(rigidBody->IsActive())
+                {
+                    rigidBody->SetActive(false);
+                    oneFrameDisable.push_back(rigidBody);
+                }
+            }
         }
 
         _world->update(timeStep);
+
+        for (const auto rb : oneFrameDisable)
+        {
+            rb->SetActive(true);
+            rb->SetPosition(rb->GetPosition());
+            rb->ClearDirty();
+        }
 
         _hasAwokenBodies = false;
     }

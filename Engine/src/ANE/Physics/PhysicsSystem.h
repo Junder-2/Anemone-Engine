@@ -55,6 +55,8 @@ namespace Engine
 
         rp3d::Entity GetBodyEntity(Entity entity);
         Entity GetOwnerEntity(rp3d::Entity reactEntity);
+        RigidBody* ConvertRigidBody(rp3d::Entity reactEntity);
+        Collider* ConvertCollider(rp3d::Entity reactEntity);
 
         void WakeBodies();
 
