@@ -194,9 +194,9 @@ namespace Engine
 
     void Matrix4x4::Scale(const Vector3 scale)
     {
-        _columns[0] *= FMath::MaxOrMin(scale.X, MIN_SCALE);
-        _columns[1] *= FMath::MaxOrMin(scale.Y, MIN_SCALE);
-        _columns[2] *= FMath::MaxOrMin(scale.Z, MIN_SCALE);
+        _columns[0] *= FMath::MaxOrMin(scale.X, FMath::EPSILON);
+        _columns[1] *= FMath::MaxOrMin(scale.Y, FMath::EPSILON);
+        _columns[2] *= FMath::MaxOrMin(scale.Z, FMath::EPSILON);
     }
 
     Vector3 Matrix4x4::GetAbsoluteScale() const

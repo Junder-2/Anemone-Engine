@@ -148,7 +148,7 @@ namespace Engine
                     {
                         const auto sphereCollider = reinterpret_cast<SphereCollider*>(collider);
                         float radius = sphereCollider->GetRadius();
-                        if (ImGui::DragFloat("Radius", &radius, 0.1f))
+                        if (ImGui::DragFloat("Radius", &radius, 0.1f, FLT_MIN, FLT_MAX))
                         {
                             sphereCollider->SetRadius(radius);
                             propertyWritten = true;
@@ -159,7 +159,7 @@ namespace Engine
                     {
                         const auto boxCollider = reinterpret_cast<BoxCollider*>(collider);
                         Vector3 halfSize = boxCollider->GetHalfSize();
-                        if (ImGui::DragFloat3("Half Size", &halfSize.X, 0.1f))
+                        if (ImGui::DragFloat3("Half Size", &halfSize.X, 0.1f, FLT_MIN, FLT_MAX))
                         {
                             boxCollider->SetHalfSize(halfSize);
                             propertyWritten = true;
@@ -171,12 +171,12 @@ namespace Engine
                         const auto capsuleCollider = reinterpret_cast<CapsuleCollider*>(collider);
                         float radius = capsuleCollider->GetRadius();
                         float height = capsuleCollider->GetHeight();
-                        if (ImGui::DragFloat("Radius", &radius, 0.1f, 0, FLT_MAX))
+                        if (ImGui::DragFloat("Radius", &radius, 0.1f, FLT_MIN, FLT_MAX))
                         {
                             capsuleCollider->SetRadius(radius);
                             propertyWritten = true;
                         }
-                        if (ImGui::DragFloat("Height", &height, 0.1f, 0, FLT_MAX))
+                        if (ImGui::DragFloat("Height", &height, 0.1f, FLT_MIN, FLT_MAX))
                         {
                             capsuleCollider->SetHeight(height);
                             propertyWritten = true;

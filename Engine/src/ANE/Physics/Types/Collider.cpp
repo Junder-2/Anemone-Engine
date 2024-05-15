@@ -52,7 +52,7 @@ namespace Engine
 
     void Collider::SetScale(const Vector3 scale)
     {
-        _scale = Math::Max(Math::Abs(scale), MIN_SCALE);
+        _scale = Math::Max(Math::Abs(scale), MIN_PHYS);
         OnUpdateScale();
     }
 

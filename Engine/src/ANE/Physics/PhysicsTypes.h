@@ -3,7 +3,7 @@
 
 namespace Engine
 {
-    const float MIN_SCALE = FMath::EPSILON;
+    const float MIN_PHYS = FMath::EPSILON;
 
     typedef uint16_t CollisionLayerMask;
 
