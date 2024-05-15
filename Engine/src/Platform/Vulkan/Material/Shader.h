@@ -1,5 +1,8 @@
 ﻿#pragma once
 #include <entt.hpp>
+#include <slang-com-ptr.h>
+
+using namespace Slang;
 
 #include "Platform/Vulkan/VmaTypes.h"
 
@@ -13,22 +16,35 @@ namespace Vulkan
         VkDescriptorType OverridenType;
     };
 
-    struct ShaderStage
+    struct ReflectedBinding
     {
-        VkShaderModule* ShaderModule;
-        VkShaderStageFlagBits Stage;
-    };
-
-    struct ReflectedBinding {
         uint32_t Set;
         uint32_t Bindings;
         VkDescriptorType Type;
     };
 
+    struct ShaderParameters
+    {
+        VkPushConstantRange PushConstant;
+        std::vector<ReflectedBinding> Bindings;
+    };
+
+    struct ShaderModule
+    {
+        VkShaderModule Module;
+        ShaderParameters Parameters;
+    };
+
+    struct ShaderStage
+    {
+        ShaderModule ShaderModule;
+        VkShaderStageFlagBits Stage;
+    };
+
     class Shader
     {
     public:
-        void AddStage(VkShaderModule* shaderModule, VkShaderStageFlagBits stage);
+        void AddStage(const ShaderModule& shaderModule, VkShaderStageFlagBits stage);
 
         void ReflectLayout(VulkanRenderer* renderer, ReflectionOverrides* overrides, int overrideCount);
 
@@ -50,6 +66,13 @@ namespace Vulkan
         void Init(VulkanRenderer* owner) { _renderer = owner; }
 
         Shader* GetShader(const std::string& shaderName);
+
+    private:
+        void LoadShaderModules(const VulkanRenderer* renderer, const char* shaderName, ShaderModule& vertModule, ShaderModule& fragModule);
+        ComPtr<slang::IComponentType> LoadSlangEntry(const ComPtr<slang::ISession>& session, slang::IModule* slangModule, char const* entryName);
+        ShaderParameters GetShaderParameters(const ComPtr<slang::IComponentType>& program);
+        ComPtr<slang::IBlob> LoadSpirVProgram(const ComPtr<slang::IComponentType>& slangEntry);
+        ShaderModule LoadShaderModule(const VulkanRenderer* renderer, const ComPtr<slang::ISession>& session, slang::IModule* slangModule, char const* entryName);
 
     private:
         VulkanRenderer* _renderer = {};
