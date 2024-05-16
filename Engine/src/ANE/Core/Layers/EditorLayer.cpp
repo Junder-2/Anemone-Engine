@@ -76,7 +76,7 @@ namespace Engine
 
         //Then you would load the scene from the file path listed from that project
 
-        GetEditorInputSystem().BindKeyboardInput(KeyCodeO, MakeDelegate(this, &EditorLayer::SaveScene));
+        //GetEditorInputSystem().BindKeyboardInput(KeyCodeO, MakeDelegate(this, &EditorLayer::SaveScene));
         GetEditorInputSystem().BindMouseButton(MouseButtonRight, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
 
         //TEMP need to set the initial state should be elsewhere
@@ -127,6 +127,11 @@ namespace Engine
         }
 
         _uiUpdates.clear();
+    }
+
+    void EditorLayer::CreateEmptyEntity()
+    {
+        _activeScene->Create();
     }
 
     void EditorLayer::OnUpdate(float deltaTime)
@@ -262,7 +267,13 @@ namespace Engine
     {
         if (inputValue.GetTriggerState() != TriggerStarted) return;
 
-        ANE_ELOG("Saving Scene");
+        ANE_ELOG("Scene has been saved");
+        _sceneSerializer->Serialize(_activeScene);
+    }
+
+    void EditorLayer::SaveScene()
+    {
+        ANE_ELOG("Scene has been saved");
         _sceneSerializer->Serialize(_activeScene);
     }
 }
