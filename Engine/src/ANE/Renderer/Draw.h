@@ -7,7 +7,6 @@ namespace Engine
 {
     struct DrawCommand
     {
-        // TODO: Add other necessary draw command information such as material...
         Vulkan::MaterialInstance* Material;
         Matrix4x4 ModelMatrix;
         uint32_t VertexCount;

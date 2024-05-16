@@ -1211,7 +1211,8 @@ namespace Vulkan
         MaterialInstance* lastMaterial = nullptr;
         for (DrawCommand drawCommand : drawCommands.Commands)
         {
-            MaterialInstance* material = &_filamentInstance;
+            // Use Filament in case material reference is null.
+            MaterialInstance* material = drawCommand.Material != nullptr ? drawCommand.Material : &_filamentInstance;
             if (material != lastMaterial)
             {
                 lastMaterial = material;
