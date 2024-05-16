@@ -880,8 +880,6 @@ namespace Vulkan
 
     void VulkanRenderer::CreateDefaultResources()
     {
-        Renderer::LoadModel("Suzanne.fbx");
-
         constexpr VkExtent3D defaultImageExtent = VkExtent3D{ 16, 16, 1 };
         constexpr VkFormat defaultImageFormat = VK_FORMAT_R8G8B8A8_UNORM;
 
