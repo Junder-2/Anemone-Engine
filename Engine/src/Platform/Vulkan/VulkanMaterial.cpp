@@ -57,7 +57,7 @@ namespace Vulkan
         const VkAllocationCallbacks* allocator = renderer->GetAllocator();
 
         MaterialInstance materialData;
-        materialData.Pipeline = &Pipeline;
+        materialData.ShaderPipeline = &Pipeline;
         materialData.MaterialSet = descriptorAllocator.Allocate(device, MaterialLayout, allocator);
         materialData.PassType = type;
 

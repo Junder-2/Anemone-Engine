@@ -27,7 +27,7 @@ namespace Vulkan
 
     struct MaterialInstance
     {
-        ShaderPipeline* Pipeline;
+        ShaderPipeline* ShaderPipeline;
         VkDescriptorSet MaterialSet;
         MaterialPass PassType;
     };

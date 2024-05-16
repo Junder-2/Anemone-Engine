@@ -1186,10 +1186,10 @@ namespace Vulkan
         VkRenderingInfo renderInfo = VulkanInitializers::RenderingInfo(_drawExtent, &colorAttachment, &depthAttachment);
         vkCmdBeginRendering(cmd, &renderInfo);
 
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _filamentInstance.Pipeline->Pipeline);
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _filamentInstance.ShaderPipeline->Pipeline);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 0, 1, &appDescriptor, 0, nullptr);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 1, 1, &sceneDescriptor, 0, nullptr);
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _filamentInstance.Pipeline->Layout, 2, 1, &imageDescriptor, 0, nullptr);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _filamentInstance.ShaderPipeline->Layout, 2, 1, &imageDescriptor, 0, nullptr);
 
         VkViewport viewport;
         viewport.x = 0;
@@ -1217,18 +1217,18 @@ namespace Vulkan
             if (material != lastMaterial)
             {
                 lastMaterial = material;
-                if (material->Pipeline != lastPipeline)
+                if (material->ShaderPipeline != lastPipeline)
                 {
-                    lastPipeline = material->Pipeline;
+                    lastPipeline = material->ShaderPipeline;
 
                     // Per-shader.
-                    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->Pipeline->Pipeline);
-                    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->Pipeline->Layout, 0, 1, &appDescriptor, 0, nullptr);
-                    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->Pipeline->Layout, 1, 1, &sceneDescriptor, 0, nullptr);
+                    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->ShaderPipeline->Pipeline);
+                    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->ShaderPipeline->Layout, 0, 1, &appDescriptor, 0, nullptr);
+                    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->ShaderPipeline->Layout, 1, 1, &sceneDescriptor, 0, nullptr);
                 }
 
                 // Per-material.
-                vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->Pipeline->Layout, 2, 1, &material->MaterialSet, 0, nullptr);
+                vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->ShaderPipeline->Layout, 2, 1, &material->MaterialSet, 0, nullptr);
             }
 
             PushConstantBuffer pushConstants;
