@@ -35,7 +35,7 @@ namespace Engine
         _cameraComponent = &GetComponent<CameraComponent>();
 
         const ViewportProperties viewport = Application::Get().GetWindow().GetActiveViewportProperties();
-        const float w = viewport.Width, h = viewport.Height;
+        const float w = static_cast<float>(viewport.Width), h = static_cast<float>(viewport.Height);
 
         _cameraComponent->SetPerspective(70.0f, w / h, 0.1f, 10000.f);
         _cameraComponent->SetPriority(-1);

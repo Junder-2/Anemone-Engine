@@ -40,9 +40,9 @@ namespace Engine
                 },
                 {
                     "_rotation", toml::array{
-                        transformComp.Transform.GetEulerAngles().X,
-                        transformComp.Transform.GetEulerAngles().Y,
-                        transformComp.Transform.GetEulerAngles().Z
+                        transformComp.Transform.GetEulerAngles(true).X,
+                        transformComp.Transform.GetEulerAngles(true).Y,
+                        transformComp.Transform.GetEulerAngles(true).Z
                     }
                 },
                 {
@@ -114,9 +114,9 @@ namespace Engine
                     },
                     {
                         "_colliderRotation", toml::array{
-                            collider->GetEulerAngles().X,
-                            collider->GetEulerAngles().Y,
-                            collider->GetEulerAngles().Z
+                            collider->GetEulerAngles(true).X,
+                            collider->GetEulerAngles(true).Y,
+                            collider->GetEulerAngles(true).Z
                         }
                     },
                     {
@@ -283,7 +283,7 @@ namespace Engine
                         else WARN_NO_VALUE("TransformComp: _position doesnt exist for entity: {}", *tagComponent);
 
                         if(auto rotation = transformComp["_rotation"])
-                            entityTransform.SetRotation(Vector3(*rotation[0].value<float>(), *rotation[1].value<float>(), *rotation[2].value<float>()));
+                            entityTransform.SetRotation(Vector3(*rotation[0].value<float>(), *rotation[1].value<float>(), *rotation[2].value<float>()), true);
                         else WARN_NO_VALUE("TransformComp: _rotation doesnt exist for entity: {}", *tagComponent);
 
                         if(auto scale = transformComp["_scale"])
@@ -384,7 +384,7 @@ namespace Engine
                                         col->SetPosition(Vector3(*colPos[0].value<float>(), *colPos[1].value<float>(), *colPos[2].value<float>()));
                                     else WARN_NO_VALUE("Collider: _colliderPosition doesnt exist for entity {}", *tagComponent);
                                     if(auto colRot = (*colliderTable)["_colliderRotation"])
-                                        col->SetRotation(Vector3(*colRot[0].value<float>(), *colRot[1].value<float>(), *colRot[2].value<float>()));
+                                        col->SetRotation(Vector3(*colRot[0].value<float>(), *colRot[1].value<float>(), *colRot[2].value<float>()), true);
                                     else WARN_NO_VALUE("Collider: _colliderRotation doesnt exist for entity {}", *tagComponent);
 
                                     if(auto colMask = (*colliderTable)["_colliderCollisionMask"].value<int>())

@@ -42,7 +42,7 @@ namespace Engine
 
         Vector2 GetCenter() const { return {(float)Width * 0.5f + (float)XPos, (float)Height * 0.5f + (float)YPos}; }
 
-        ViewportProperties operator=(const WindowProperties& props)
+        ViewportProperties& operator=(const WindowProperties& props)
         {
             Id = props.Id;
             Width = props.Width;

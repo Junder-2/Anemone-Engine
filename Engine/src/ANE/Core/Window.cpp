@@ -36,14 +36,14 @@ namespace Engine
 
         ANE_ELOG_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
-        // SDL
         if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER))
         {
             ANE_ELOG_ERROR("Could not initialize SDL.");
         }
 
-        const SDL_WindowFlags windowFlags = (SDL_WindowFlags)(SDL_WINDOW_VULKAN | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-        _windowContext = SDL_CreateWindow(props.Title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, _windowData.Width, _windowData.Height, windowFlags);
+        constexpr SDL_WindowFlags windowFlags = static_cast<SDL_WindowFlags>(SDL_WINDOW_VULKAN | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+        const int width = static_cast<int>(_windowData.Width), height = static_cast<int>(_windowData.Height);
+        _windowContext = SDL_CreateWindow(props.Title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, windowFlags);
         _windowData.Id = SDL_GetWindowID(_windowContext);
 
         // Set minimum size to prevent errors
@@ -124,16 +124,16 @@ namespace Engine
                 {
                     const ViewportProperties viewport = GetActiveViewportProperties();
 
-                    const float viewportWidth = viewport.Width;
-                    const float viewportHeight = viewport.Height;
+                    const float viewportWidth = static_cast<float>(viewport.Width);
+                    const float viewportHeight = static_cast<float>(viewport.Height);
 
                     const Vector2 absolutePos = GetAbsoluteMousePos();
 
                     // Convert mouse coord to relative
-                    const float relX = std::clamp((float)event.motion.x/viewportWidth, 0.f, 1.f);
-                    const float relY = std::clamp((float)event.motion.y/viewportHeight, 0.f, 1.f);
-                    const float relDeltaX = ((float)event.motion.xrel/viewportWidth) * 60.f * deltaTime;
-                    const float relDeltaY = ((float)event.motion.yrel/viewportHeight) * 60.f * deltaTime;
+                    const float relX = FMath::Saturate(static_cast<float>(event.motion.x) / viewportWidth);
+                    const float relY = FMath::Saturate(static_cast<float>(event.motion.y) / viewportHeight);
+                    const float relDeltaX = (static_cast<float>(event.motion.xrel) / viewportWidth) * 60.f * deltaTime;
+                    const float relDeltaY = (static_cast<float>(event.motion.yrel) / viewportHeight) * 60.f * deltaTime;
 
                     inputHandler->ProcessAbsoluteMouseMovement(absolutePos);
                     inputHandler->ProcessMouseMovement(Vector2(relX, relY), Vector2(relDeltaX, relDeltaY));
@@ -167,8 +167,8 @@ namespace Engine
             int newX, newY;
             SDL_GetMouseState(&newX, &newY);
 
-            const float x = std::clamp((float)newX/(float)viewport.Width, 0.f, 1.f);
-            const float y = std::clamp((float)newY/(float)viewport.Height, 0.f, 1.f);
+            const float x = FMath::Saturate(static_cast<float>(newX) / static_cast<float>(viewport.Width));
+            const float y = FMath::Saturate(static_cast<float>(newY) / static_cast<float>(viewport.Height));
 
             inputHandler->ProcessAbsoluteMouseMovement(absolutePos);
             inputHandler->ProcessMouseMovement(Vector2(x, y), 0);
@@ -197,8 +197,8 @@ namespace Engine
             {
                 if(!isMainWindow) return;
 
-                const uint32_t newX = (uint32_t)windowEvent.data1;
-                const uint32_t newY = (uint32_t)windowEvent.data2;
+                const uint32_t newX = static_cast<uint32_t>(windowEvent.data1);
+                const uint32_t newY = static_cast<uint32_t>(windowEvent.data2);
                 if(_windowData.Width == newX && _windowData.Height == newY) break;
 
                 _windowData.Width = newX;
@@ -225,8 +225,8 @@ namespace Engine
             {
                 if(!isMainWindow) return;
 
-                uint32_t newX = (uint32_t)windowEvent.data1;
-                uint32_t newY = (uint32_t)windowEvent.data2;
+                const uint32_t newX = static_cast<uint32_t>(windowEvent.data1);
+                const uint32_t newY = static_cast<uint32_t>(windowEvent.data2);
                 if(_windowData.XPos == newX && _windowData.YPos == newY) break;
 
                 _windowData.XPos = newX;
@@ -272,10 +272,10 @@ namespace Engine
 
         int newX, newY;
         SDL_GetMouseState(&newX, &newY);
-        newX += _windowData.XPos;
-        newY += _windowData.YPos;
-        const float x = std::clamp((float)newX/(float)_windowData.Width, 0.f, 1.f);
-        const float y = std::clamp((float)newY/(float)_windowData.Height, 0.f, 1.f);
+        newX += static_cast<int>(_windowData.XPos);
+        newY += static_cast<int>(_windowData.YPos);
+        const float x = FMath::Saturate(static_cast<float>(newX) / static_cast<float>(_windowData.Width));
+        const float y = FMath::Saturate(static_cast<float>(newY) / static_cast<float>(_windowData.Height));
 
         return {x, y};
     }
@@ -295,9 +295,9 @@ namespace Engine
         SDL_Quit();
     }
 
+    // Not implemented.
     void Window::SetVSync(const bool enabled)
     {
-        //todo
         _windowData.VSync = enabled;
     }
 
@@ -311,7 +311,9 @@ namespace Engine
         }
 
         const ImGuiWindow* imGuiWindow = ImGui::FindWindowByID(_activeViewportId);
-        return ViewportProperties(_activeViewportId, FMath::Max(imGuiWindow->ContentSize.x, 1.f), FMath::Max(imGuiWindow->ContentSize.y, 1.f), imGuiWindow->Pos.x, imGuiWindow->Pos.y);
+        const uint32_t width = static_cast<uint32_t>(FMath::Max(imGuiWindow->ContentSize.x, 1.f)), height = static_cast<uint32_t>(FMath::Max(imGuiWindow->ContentSize.y, 1.f));
+        const uint32_t xPos = static_cast<uint32_t>(imGuiWindow->Pos.x), yPos = static_cast<uint32_t>(imGuiWindow->Pos.y);
+        return ViewportProperties(_activeViewportId, width, height, xPos, yPos);
     }
 
     void Window::SetActiveViewport(const uint32_t id)
