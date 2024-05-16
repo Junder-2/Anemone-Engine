@@ -25,6 +25,7 @@ namespace Engine
         void OnEvent(Event& e) override;
         void OnUpdate(float deltaTime) override;
         void OnUIRender() override;
+        void CreateEmptyEntity();
 
         template <class EntityType>
         void EntityWidget(EntityType& e, entt::basic_registry<EntityType>& reg, bool dropTarget = false);
@@ -40,6 +41,7 @@ namespace Engine
 
         std::shared_ptr<Scene> CreateScene(const char* sceneName) const;
         void SaveScene(InputValue inputValue);
+        void SaveScene();
         void SetActiveScene(const char* sceneName);
 
         std::shared_ptr<Scene> GetActiveScene() { return _activeScene; }

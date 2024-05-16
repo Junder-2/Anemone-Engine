@@ -191,7 +191,7 @@ namespace Engine
             {"Entities", arr}
         };
 
-        std::string path = _filepath + scene->Name + ".toml";
+        std::string path = _filepath + scene->Name + ".anem";
 
         WriteToFile(path, table);
     }
@@ -202,13 +202,13 @@ namespace Engine
 
     bool SceneSerializer::HasFile(const char* fileName)
     {
-        std::string filePath = _filepath + fileName + ".toml";
+        std::string filePath = _filepath + fileName + ".anem";
         return std::filesystem::is_regular_file(filePath);
     }
 
     std::shared_ptr<Scene> SceneSerializer::CreateEmptySceneFile(const char* sceneName)
     {
-        std::string filePath = _filepath + sceneName + ".toml";
+        std::string filePath = _filepath + sceneName + ".anem";
 
         std::shared_ptr<Scene> scene = std::make_shared<Scene>(sceneName);
         auto table = toml::table{
@@ -223,7 +223,7 @@ namespace Engine
 
     std::shared_ptr<Scene> SceneSerializer::Deserialize(const char* key, EditorLayer* layer) const
     {
-        std::string filePath = _filepath + key + ".toml";
+        std::string filePath = _filepath + key + ".anem";
 
         toml::table table;
 
