@@ -30,7 +30,6 @@ using Slang::ComPtr;
 #include "ANE/Math/Types/Quaternion.h"
 #include "ANE/Renderer/Draw.h"
 #include "ANE/Renderer/Mesh.h"
-#include "ANE/Renderer/Renderer.h"
 #include "ANE/Utilities/ImGuiUtilities.h"
 #include "VulkanDescriptorLayoutBuilder.h"
 
