@@ -62,6 +62,9 @@ namespace Vulkan
             VmaImage ORMImage;
             VkSampler ORMSampler;
 
+            VmaImage DFGImage;
+            VkSampler DFGSampler;
+
             VmaImage CubeMap;
             VkSampler CubeMapSampler;
 
