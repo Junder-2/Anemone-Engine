@@ -1,0 +1,296 @@
+Scene = 'Game'
+
+[[Entities]]
+
+    [[Entities._colliderComponent._colliders]]
+    _colliderCollisionCategories = 2
+    _colliderCollisionMask = 7
+    _colliderMaterial = [ 0.30000001192092896, 0.5, 1.0 ]
+    _colliderPosition = [ 0.0, 0.0, 0.0 ]
+    _colliderRotation = [ 0.0, -0.0, 0.0 ]
+    _shapeType = 1
+
+        [Entities._colliderComponent._colliders._colliderSpecificData]
+        _halfSize = [ 1.0, 0.10000000149011612, 1.0 ]
+
+    [Entities._renderComponent]
+    _modelPath = 'Plane.obj'
+
+    [Entities._rigidBodyComponent]
+    _active = true
+    _angularDamping = 0.0
+    _bodyType = 0
+    _damping = 0.0
+    _mass = 80.0
+    _useAutoCenterOfMass = true
+    _useAutoMass = true
+    _useGravity = true
+
+    [Entities._tag]
+    _value = 'Floor'
+
+    [Entities._transformComponent]
+    _position = [ 0.0, -5.0, 0.0 ]
+    _rotation = [ -0.0, 0.0, 0.0 ]
+    _scale = [ 10.0, 1.0, 10.0 ]
+
+[[Entities]]
+
+    [[Entities._colliderComponent._colliders]]
+    _colliderCollisionCategories = 2
+    _colliderCollisionMask = 7
+    _colliderMaterial = [ 0.30000001192092896, 0.5, 1.0 ]
+    _colliderPosition = [ 0.0, 0.0, 0.0 ]
+    _colliderRotation = [ 0.0, -0.0, 0.0 ]
+    _shapeType = 0
+
+        [Entities._colliderComponent._colliders._colliderSpecificData]
+        _radius = 1.0
+
+    [Entities._renderComponent]
+    _modelPath = 'Suzanne.fbx'
+
+    [Entities._rigidBodyComponent]
+    _active = true
+    _angularDamping = 0.0
+    _bodyType = 0
+    _damping = 0.0
+    _mass = 4.188790321350098
+    _useAutoCenterOfMass = true
+    _useAutoMass = true
+    _useGravity = true
+
+    [Entities._tag]
+    _value = 'Entity9'
+
+    [Entities._transformComponent]
+    _position = [ -3.700000047683716, 0.6000000238418579, -6.300000190734863 ]
+    _rotation = [ -0.0, 0.0, 0.0 ]
+    _scale = [ 1.0, 1.0, 1.0 ]
+
+[[Entities]]
+
+    [[Entities._colliderComponent._colliders]]
+    _colliderCollisionCategories = 2
+    _colliderCollisionMask = 7
+    _colliderMaterial = [ 0.30000001192092896, 0.5, 1.0 ]
+    _colliderPosition = [ 0.0, 0.0, 0.0 ]
+    _colliderRotation = [ 0.0, -0.0, 0.0 ]
+    _shapeType = 0
+
+        [Entities._colliderComponent._colliders._colliderSpecificData]
+        _radius = 1.0
+
+    [Entities._renderComponent]
+    _modelPath = 'Suzanne.fbx'
+
+    [Entities._rigidBodyComponent]
+    _active = true
+    _angularDamping = 0.0
+    _bodyType = 0
+    _damping = 0.0
+    _mass = 33.51032257080078
+    _useAutoCenterOfMass = true
+    _useAutoMass = true
+    _useGravity = true
+
+    [Entities._tag]
+    _value = 'Entity8'
+
+    [Entities._transformComponent]
+    _position = [ 2.799999952316284, 1.100000023841858, -1.100000023841858 ]
+    _rotation = [ -0.0, 0.0, 0.0 ]
+    _scale = [ 2.0, 2.0, 2.0 ]
+
+[[Entities]]
+
+    [[Entities._colliderComponent._colliders]]
+    _colliderCollisionCategories = 2
+    _colliderCollisionMask = 7
+    _colliderMaterial = [ 0.30000001192092896, 0.5, 1.0 ]
+    _colliderPosition = [ 0.0, 0.0, 0.0 ]
+    _colliderRotation = [ 0.0, -0.0, 0.0 ]
+    _shapeType = 0
+
+        [Entities._colliderComponent._colliders._colliderSpecificData]
+        _radius = 1.0
+
+    [Entities._renderComponent]
+    _modelPath = 'Suzanne.fbx'
+
+    [Entities._rigidBodyComponent]
+    _active = true
+    _angularDamping = 0.0
+    _bodyType = 0
+    _damping = 0.0
+    _mass = 0.904778778553009
+    _useAutoCenterOfMass = true
+    _useAutoMass = true
+    _useGravity = true
+
+    [Entities._tag]
+    _value = 'Entity7'
+
+    [Entities._transformComponent]
+    _position = [ 6.0, -2.4000000953674316, 1.100000023841858 ]
+    _rotation = [ -0.0, 33.09999465942383, -122.19998931884766 ]
+    _scale = [ 0.6000000238418579, 0.6000000238418579, 0.6000000238418579 ]
+
+[[Entities]]
+
+    [[Entities._colliderComponent._colliders]]
+    _colliderCollisionCategories = 2
+    _colliderCollisionMask = 7
+    _colliderMaterial = [ 0.30000001192092896, 0.5, 1.0 ]
+    _colliderPosition = [ 0.0, 0.0, 0.0 ]
+    _colliderRotation = [ 0.0, -0.0, 0.0 ]
+    _shapeType = 1
+
+        [Entities._colliderComponent._colliders._colliderSpecificData]
+        _halfSize = [ 1.0, 1.0, 1.0 ]
+
+    [Entities._renderComponent]
+    _modelPath = 'Suzanne.fbx'
+
+    [Entities._rigidBodyComponent]
+    _active = true
+    _angularDamping = 0.0
+    _bodyType = 0
+    _damping = 0.0
+    _mass = 8.0
+    _useAutoCenterOfMass = true
+    _useAutoMass = true
+    _useGravity = true
+
+    [Entities._tag]
+    _value = 'Entity6'
+
+    [Entities._transformComponent]
+    _position = [ 0.800000011920929, -1.7999999523162842, -7.5 ]
+    _rotation = [ -2.0999999046325684, 9.599994659423828, 12.19999885559082 ]
+    _scale = [ 1.0, 1.0, 1.0 ]
+
+[[Entities]]
+
+    [[Entities._colliderComponent._colliders]]
+    _colliderCollisionCategories = 2
+    _colliderCollisionMask = 7
+    _colliderMaterial = [ 0.30000001192092896, 0.5, 1.0 ]
+    _colliderPosition = [ 0.0, 0.0, 0.0 ]
+    _colliderRotation = [ 0.0, -0.0, 0.0 ]
+    _shapeType = 1
+
+        [Entities._colliderComponent._colliders._colliderSpecificData]
+        _halfSize = [ 1.0, 1.0, 1.0 ]
+
+    [Entities._renderComponent]
+    _modelPath = 'Suzanne.fbx'
+
+    [Entities._rigidBodyComponent]
+    _active = true
+    _angularDamping = 0.0
+    _bodyType = 0
+    _damping = 0.0
+    _mass = 14.399999618530273
+    _useAutoCenterOfMass = true
+    _useAutoMass = true
+    _useGravity = true
+
+    [Entities._tag]
+    _value = 'Entity5'
+
+    [Entities._transformComponent]
+    _position = [ -7.0, -2.799999952316284, 2.5999999046325684 ]
+    _rotation = [ -0.0, 0.0, 0.0 ]
+    _scale = [ 1.7999999523162842, 0.5, 2.0 ]
+
+[[Entities]]
+
+    [[Entities._colliderComponent._colliders]]
+    _colliderCollisionCategories = 2
+    _colliderCollisionMask = 7
+    _colliderMaterial = [ 0.30000001192092896, 0.5, 1.0 ]
+    _colliderPosition = [ 0.0, 0.0, 0.0 ]
+    _colliderRotation = [ 0.0, -0.0, 0.0 ]
+    _shapeType = 0
+
+        [Entities._colliderComponent._colliders._colliderSpecificData]
+        _radius = 1.0
+
+    [Entities._renderComponent]
+    _modelPath = 'Suzanne.fbx'
+
+    [Entities._rigidBodyComponent]
+    _active = true
+    _angularDamping = 0.0
+    _bodyType = 0
+    _damping = 0.0
+    _mass = 14.137166976928711
+    _useAutoCenterOfMass = true
+    _useAutoMass = true
+    _useGravity = true
+
+    [Entities._tag]
+    _value = 'Entity4'
+
+    [Entities._transformComponent]
+    _position = [ 1.7999999523162842, -3.4000000953674316, 5.5 ]
+    _rotation = [ 30.399999618530273, 0.0, -39.0 ]
+    _scale = [ 1.5, 1.5, 1.5 ]
+
+[[Entities]]
+
+    [Entities._tag]
+    _value = 'Entity3'
+
+    [Entities._transformComponent]
+    _position = [ 0.0, 0.0, 0.0 ]
+    _rotation = [ -0.0, 0.0, 0.0 ]
+    _scale = [ 1.0, 1.0, 1.0 ]
+
+[[Entities]]
+
+    [Entities._tag]
+    _value = 'Entity2'
+
+    [Entities._transformComponent]
+    _position = [ 0.0, 0.0, 0.0 ]
+    _rotation = [ -0.0, 0.0, 0.0 ]
+    _scale = [ 1.0, 1.0, 1.0 ]
+
+[[Entities]]
+
+    [Entities._tag]
+    _value = 'Entity1'
+
+    [Entities._transformComponent]
+    _position = [ 0.0, 0.0, 0.0 ]
+    _rotation = [ -0.0, 0.0, 0.0 ]
+    _scale = [ 1.0, 1.0, 1.0 ]
+
+[[Entities]]
+
+    [Entities._tag]
+    _value = 'Entity0'
+
+    [Entities._transformComponent]
+    _position = [ 0.0, 0.0, 0.0 ]
+    _rotation = [ -0.0, 0.0, 0.0 ]
+    _scale = [ 1.0, 1.0, 1.0 ]
+
+[[Entities]]
+
+    [Entities._cameraComponent]
+    _aspectRatio = 1.8384710550308228
+    _fieldOfView = 70.0
+    zFar = 10000.0
+    zNear = 0.10000000149011612
+
+    [Entities._tag]
+    _value = 'Camera'
+
+    [Entities._transformComponent]
+    _position = [ -6.4339094161987305, 14.815673828125, -17.770475387573242 ]
+    _rotation = [ 44.09459686279297, 15.649213790893555, 0.0 ]
+    _scale = [ 1.0, 1.0, 1.0 ]
+
