@@ -1209,6 +1209,7 @@ namespace Vulkan
 
         vkCmdSetScissor(cmd, 0, 1, &scissor);
 
+        ShaderPipeline* lastPipeline = nullptr;
         MaterialInstance* lastMaterial = nullptr;
         for (DrawCommand drawCommand : drawCommands.Commands)
         {
