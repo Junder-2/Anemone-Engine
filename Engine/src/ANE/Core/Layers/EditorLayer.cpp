@@ -131,7 +131,7 @@ namespace Engine
 
     void EditorLayer::CreateEmptyEntity()
     {
-        _activeScene->Create();
+        _activeScene->Create("");
     }
 
     void EditorLayer::OnUpdate(float deltaTime)
