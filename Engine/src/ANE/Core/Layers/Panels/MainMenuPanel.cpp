@@ -11,6 +11,7 @@
 
 #include "ANE/Core/Layers/EditorLayer.h"
 #include "ANE/Input/InputAction.h"
+#include "ANE/Utilities/API.h"
 
 namespace Engine
 {
@@ -61,6 +62,20 @@ namespace Engine
                     // Todo: menu
                     // ToggleFlag("ShowDebugOverlay");
                 }
+                if(ImGui::BeginMenu("Time Analysis"))
+                {
+                    ImGui::DragFloat("TimeScale", &API::TIME_SCALE, .1f, 0.f, 3.f, "%.3f", ImGuiSliderFlags_AlwaysClamp);
+                    ImGui::Spacing();
+                    ImGui::BeginDisabled(true);
+                    ImGui::Text("Unscaled Time %.3f", API::TIME_UNSCALED);
+                    ImGui::Text("Scaled Time %.3f", API::TIME);
+                    ImGui::Spacing();
+                    ImGui::Text("Unscaled DeltaTime %.3f ms", API::DELTA_TIME_UNSCALED * 1000.f);
+                    ImGui::Text("Scaled DeltaTime %.3f ms", API::DELTA_TIME * 1000.f);
+                    ImGui::EndDisabled();
+
+                    ImGui::EndMenu();
+                }
 
                 ImGui::EndMenu();
             }
@@ -77,6 +92,9 @@ namespace Engine
             if (ImGui::BeginMenu("Entity"))
             {
                 if (ImGui::MenuItem("Create Entity"))
+                {
+
+                }
                 ImGui::EndMenu();
             }
 
