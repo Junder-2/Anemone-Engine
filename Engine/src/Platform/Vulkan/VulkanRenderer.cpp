@@ -693,9 +693,15 @@ namespace Vulkan
 
             _frameData[i].Descriptors = DescriptorAllocator{};
             _frameData[i].Descriptors.Init(_device, 1000, frameSizes, _allocator);
+            _frameData[i].AppDataBuffer = CreateBuffer(sizeof(ApplicationData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+            _frameData[i].SceneDataBuffer = CreateBuffer(sizeof(SceneData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+            _frameData[i].FilamentDataBuffer = CreateBuffer(sizeof(FilamentMetallicRoughness::MaterialConstants), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
             _mainDeletionQueue.PushFunction([&, i]
             {
+                DestroyBuffer(_frameData[i].AppDataBuffer);
+                DestroyBuffer(_frameData[i].SceneDataBuffer);
+                DestroyBuffer(_frameData[i].FilamentDataBuffer);
                 _frameData[i].Descriptors.Destroy(_device, _allocator);
             });
         }
@@ -1109,17 +1115,7 @@ namespace Vulkan
     {
         ANE_DEEP_PROFILE_FUNCTION();
 
-        VmaBuffer appDataBuffer = CreateBuffer(sizeof(ApplicationData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
-        VmaBuffer sceneDataBuffer = CreateBuffer(sizeof(SceneData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
-        VmaBuffer filamentDataBuffer = CreateBuffer(sizeof(FilamentMetallicRoughness::MaterialConstants), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
-
         VulkanFrame& frame = GetFrame();
-        frame.DeletionQueue.PushFunction([=]
-        {
-            DestroyBuffer(appDataBuffer);
-            DestroyBuffer(sceneDataBuffer);
-            DestroyBuffer(filamentDataBuffer);
-        });
 
         // Fixed data for now.
         float time = static_cast<float>(SDL_GetTicks64()) / 1000.0f;
@@ -1144,32 +1140,34 @@ namespace Vulkan
         frame.FilamentData.Height = 0.0f;
         frame.FilamentData.Occlusion = 1.0f;
 
-        auto* appUniformData = (ApplicationData*)appDataBuffer.Allocation->GetMappedData();
+        auto* appUniformData = (ApplicationData*)frame.AppDataBuffer.Allocation->GetMappedData();
         *appUniformData = frame.AppData;
 
-        auto* sceneUniformData = (SceneData*)sceneDataBuffer.Allocation->GetMappedData();
+        auto* sceneUniformData = (SceneData*)frame.SceneDataBuffer.Allocation->GetMappedData();
         *sceneUniformData = frame.SceneData;
 
-        auto* filamentData = (FilamentMetallicRoughness::MaterialConstants*)filamentDataBuffer.Allocation->GetMappedData();
+        auto* filamentData = (FilamentMetallicRoughness::MaterialConstants*)frame.FilamentDataBuffer.Allocation->GetMappedData();
         *filamentData = frame.FilamentData;
 
         VkDescriptorSet appDescriptor = frame.Descriptors.Allocate(_device, _appDataLayout, _allocator);
         VkDescriptorSet sceneDescriptor = frame.Descriptors.Allocate(_device, _geometryDataLayout, _allocator);
         VkDescriptorSet imageDescriptor = frame.Descriptors.Allocate(_device, _filamentMaterial.MaterialLayout, _allocator);
 
+        // Global descriptor set 1.
         {
             DescriptorWriter writer;
-            writer.WriteBuffer(0, appDataBuffer.Buffer, sizeof(ApplicationData), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+            writer.WriteBuffer(0, frame.AppDataBuffer.Buffer, sizeof(ApplicationData), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
             writer.UpdateSet(_device, appDescriptor);
         }
+        // Global descriptor set 2.
         {
             DescriptorWriter writer;
-            writer.WriteBuffer(0, sceneDataBuffer.Buffer, sizeof(SceneData), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+            writer.WriteBuffer(0, frame.SceneDataBuffer.Buffer, sizeof(SceneData), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
             writer.UpdateSet(_device, sceneDescriptor);
         }
         {
             DescriptorWriter writer;
-            writer.WriteBuffer(0, filamentDataBuffer.Buffer, sizeof(FilamentMetallicRoughness::MaterialConstants), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+            writer.WriteBuffer(0, frame.FilamentDataBuffer.Buffer, sizeof(FilamentMetallicRoughness::MaterialConstants), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
             writer.WriteImage(1, _colorTex.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
             writer.WriteImage(2, _normalTex.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
             writer.WriteImage(3, _ormTex.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);

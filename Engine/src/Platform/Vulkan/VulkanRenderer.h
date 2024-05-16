@@ -47,6 +47,10 @@ namespace Vulkan
         ApplicationData AppData;
         SceneData SceneData;
         FilamentMetallicRoughness::MaterialConstants FilamentData;
+
+        VmaBuffer AppDataBuffer;
+        VmaBuffer SceneDataBuffer;
+        VmaBuffer FilamentDataBuffer;
     };
 
     struct VulkanImmediateBuffer
