@@ -943,6 +943,11 @@ namespace Vulkan
         _dfgTex = LoadTexture("dfg.png");
         _cubeMap = LoadCubeTexture("cyclorama_hard_light_linear_256.png");
 
+        CreateDefaultMaterial();
+    }
+
+    void VulkanRenderer::CreateDefaultMaterial()
+    {
         // Filament material instance.
         _filamentMaterial.BuildPipelines(this);
         _mainDeletionQueue.PushFunction([&]
