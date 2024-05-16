@@ -97,6 +97,8 @@ namespace Vulkan
         float GetFramerate();
         static ImGuiIO* GetImGuiIO() { return _io; }
 
+        static MaterialInstance* GetDefaultMaterial() { return &_filamentInstance; }
+
         // Vulkan
         static VkDevice GetDevice() { return _device; }
         static VkAllocationCallbacks* GetAllocator() { return _allocator; }

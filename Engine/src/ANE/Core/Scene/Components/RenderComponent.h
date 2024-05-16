@@ -25,9 +25,9 @@ namespace Engine
             _materialPropertyBlock.Roughness = 0;
 
             Model = Renderer::LoadModel(_modelPath);
+            Material = Vulkan::VulkanRenderer::GetDefaultMaterial();
         }
 
-        VmaMeshAsset Model = {};
 
         void VerifyDefaultMaterialBlock()
         {
@@ -55,6 +55,10 @@ namespace Engine
         {
             return _modelPath;
         }
+
+    public:
+        VmaMeshAsset Model = {};
+        Vulkan::MaterialInstance* Material;
 
     private:
         Vulkan::FilamentMetallicRoughness::MaterialConstants _materialPropertyBlock;
