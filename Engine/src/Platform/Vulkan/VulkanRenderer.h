@@ -98,6 +98,7 @@ namespace Vulkan
         static ImGuiIO* GetImGuiIO() { return _io; }
 
         static MaterialInstance* GetDefaultMaterial() { return &_filamentInstance; }
+        MaterialInstance* GetDefaultMaterialClone();
 
         // Vulkan
         static VkDevice GetDevice() { return _device; }
@@ -262,6 +263,8 @@ namespace Vulkan
 
         inline static MaterialInstance _filamentInstance;
         inline static FilamentMetallicRoughness _filamentMaterial;
+
+        inline static std::vector<MaterialInstance*> _materialInstances;
 
         // ImGui
         inline static ImGui_ImplVulkanH_Window _mainWindowData;

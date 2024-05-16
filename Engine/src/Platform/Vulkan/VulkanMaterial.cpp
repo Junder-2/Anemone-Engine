@@ -51,7 +51,7 @@ namespace Vulkan
         vkDestroyPipeline(device, Pipeline.Pipeline, allocator);
     }
 
-    MaterialInstance FilamentMetallicRoughness::WriteMaterial(const VulkanRenderer* renderer, const MaterialPass type, const MaterialResources& resources, DescriptorAllocator& descriptorAllocator)
+    MaterialInstance FilamentMetallicRoughness::WriteMaterial(const VulkanRenderer* renderer, const MaterialPass type, const MaterialResources& resources, MaterialConstants* uniforms, DescriptorAllocator& descriptorAllocator)
     {
         const VkDevice device = renderer->GetDevice();
         const VkAllocationCallbacks* allocator = renderer->GetAllocator();
@@ -60,11 +60,13 @@ namespace Vulkan
         materialData.ShaderPipeline = &Pipeline;
         materialData.MaterialSet = descriptorAllocator.Allocate(device, MaterialLayout, allocator);
         materialData.PassType = type;
+        materialData.Uniforms = uniforms;
+        materialData.Resources = resources;
 
         constexpr VkImageLayout readOnly = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         constexpr VkDescriptorType combinedSampler = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
         Writer.Clear();
-        Writer.WriteBuffer(0, resources.DataBuffer, sizeof(MaterialConstants), resources.DataBufferOffset, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+        Writer.WriteBuffer(0, resources.Data.Buffer, sizeof(MaterialConstants), resources.DataBufferOffset, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
         Writer.WriteImage(1, resources.ColorImage.ImageView, resources.ColorSampler, readOnly, combinedSampler);
         Writer.WriteImage(2, resources.NormalImage.ImageView, resources.NormalSampler, readOnly, combinedSampler);
         Writer.WriteImage(3, resources.ORMImage.ImageView, resources.ORMSampler, readOnly, combinedSampler);

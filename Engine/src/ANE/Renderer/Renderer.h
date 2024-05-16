@@ -22,6 +22,9 @@ namespace Engine
 
         static Vulkan::VmaImage LoadTexture(const std::string& texturePath);
 
+        static Vulkan::MaterialInstance* GetDefaultMaterial();
+        static Vulkan::MaterialInstance* GetDefaultMaterialClone();
+
         static void SubmitDrawCommand(const DrawCommand& command);
 
         //These methods are sandwiched around the UI Layer render loops

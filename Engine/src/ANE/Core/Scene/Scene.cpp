@@ -112,7 +112,7 @@ namespace Engine
             draw.VertexCount = renderer.Model.NumVertices;
             draw.MeshBuffers = renderer.Model.MeshBuffers;
 
-            draw.Material = renderer.Material;
+            draw.Material = renderer.GetMaterial();
 
             Renderer::SubmitDrawCommand(draw);
         }

@@ -214,6 +214,29 @@ namespace Vulkan
         return _io->Framerate;
     }
 
+    MaterialInstance* VulkanRenderer::GetDefaultMaterialClone()
+    {
+        VmaBuffer materialConstants = CreateBuffer(sizeof(FilamentMetallicRoughness::MaterialConstants), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+
+        // Use uniforms from original material.
+        auto* uniforms = (FilamentMetallicRoughness::MaterialConstants*)materialConstants.Allocation->GetMappedData();
+        *uniforms = *_filamentInstance.Uniforms;
+
+        auto resources = _filamentInstance.Resources;
+        resources.Data = materialConstants;
+        resources.DataBufferOffset = 0;
+
+        _mainDeletionQueue.PushFunction([=]
+        {
+            DestroyBuffer(materialConstants);
+        });
+
+        MaterialInstance* material = new MaterialInstance();
+        *material = _filamentMaterial.WriteMaterial(this, MaterialPass::Opaque, resources, uniforms, _mainDescriptors);
+        _materialInstances.push_back(material);
+        return _materialInstances.back();
+    }
+
     void VulkanRenderer::SetupVulkan(SDL_Window* window)
     {
         const std::vector<const char*> extensions = GetAvailableExtensions(window);
@@ -989,19 +1012,12 @@ namespace Vulkan
         VmaBuffer materialConstants = CreateBuffer(sizeof(FilamentMetallicRoughness::MaterialConstants), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
         auto* sceneUniformData = (FilamentMetallicRoughness::MaterialConstants*)materialConstants.Allocation->GetMappedData();
-        sceneUniformData->Color = Vector3::OneVector();
-        sceneUniformData->Normal = 1.0f;
-        sceneUniformData->Emission = Vector3::ZeroVector();
-        sceneUniformData->Metallic = 0.0f;
-        sceneUniformData->Roughness = 1.0f;
-        sceneUniformData->Reflectance = 0.0f;
-        sceneUniformData->Height = 0.0f;
-        sceneUniformData->Occlusion = 0.0f;
+        *sceneUniformData = { }; // Initialize using defaults values defined in the struct.
 
-        materialResources.DataBuffer = materialConstants.Buffer;
+        materialResources.Data = materialConstants;
         materialResources.DataBufferOffset = 0;
 
-        _filamentInstance = _filamentMaterial.WriteMaterial(this, MaterialPass::Opaque, materialResources, _mainDescriptors);
+        _filamentInstance = _filamentMaterial.WriteMaterial(this, MaterialPass::Opaque, materialResources, sceneUniformData, _mainDescriptors);
 
         _mainDeletionQueue.PushFunction([=]
         {

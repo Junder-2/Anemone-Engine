@@ -3,6 +3,7 @@
 
 #include "imgui_internal.h"
 #include "PhysicsUtilities.h"
+#include "ANE/Core/Scene/Components/RenderComponent.h"
 #include "ANE/Physics/Physics.h"
 #include "ANE/Physics/Types/Collider.h"
 #include "ANE/Physics/Types/BoxCollider.h"
@@ -357,78 +358,88 @@ namespace Engine
         }
         return propertyWritten;
     }
-    inline bool InspectMutableMaterialPropertyBlock(entt::meta_data& field, entt::meta_any& componentData)
+    inline bool InspectMutableMaterialData(entt::meta_data& field, entt::meta_any& componentData)
     {
-        auto v = field.get(componentData).cast<Vulkan::FilamentMetallicRoughness::MaterialConstants>();
+        MaterialData matData = field.get(componentData).cast<MaterialData>();
+        auto& mpb = *matData.Material->Uniforms;
         bool propertyWritten = false;
         float col[3];
-        col[0] = v.Color.X;
-        col[1] = v.Color.Y;
-        col[2] = v.Color.Z;
+        col[0] = mpb.Color.X;
+        col[1] = mpb.Color.Y;
+        col[2] = mpb.Color.Z;
         ImGui::Text("%s","Base Color");
         ImGui::SameLine();
         if(ImGui::ColorEdit4("##color", col, ImGuiColorEditFlags_AlphaBar)){
 
-                v.Color.X = col[0];
-                v.Color.Y = col[1];
-                v.Color.Z = col[2];
+                mpb.Color.X = col[0];
+                mpb.Color.Y = col[1];
+                mpb.Color.Z = col[2];
                 propertyWritten =  true;
             }
 
 
         float emissionCol[3];
-        emissionCol[0] = v.Emission.X;
-        emissionCol[1] = v.Emission.Y;
-        emissionCol[2] = v.Emission.Z;
+        emissionCol[0] = mpb.Emission.X;
+        emissionCol[1] = mpb.Emission.Y;
+        emissionCol[2] = mpb.Emission.Z;
         ImGui::Text("%s","Emission Color");
         ImGui::SameLine();
         if(ImGui::ColorEdit4("##EmissionColor", emissionCol, ImGuiColorEditFlags_AlphaBar))
             {
-                v.Color.X = emissionCol[0];
-                v.Color.Y = emissionCol[1];
-                v.Color.Z = emissionCol[2];
+                mpb.Color.X = emissionCol[0];
+                mpb.Color.Y = emissionCol[1];
+                mpb.Color.Z = emissionCol[2];
                 propertyWritten =  true;
             }
 
         ImGui::Text("%s","Height multiplier");
         ImGui::SameLine();
-        if(ImGui::SliderFloat("##Height multiplier",&v.Height,0,1))
+        if(ImGui::SliderFloat("##Height multiplier",&mpb.Height,0,1))
         {
             propertyWritten =  true;
         }
 
         ImGui::Text("%s","Metallic multiplier");
         ImGui::SameLine();
-        if(ImGui::SliderFloat("##Metallic",&v.Metallic,0,1))
+        if(ImGui::SliderFloat("##Metallic",&mpb.Metallic,0,1))
         {
             propertyWritten =  true;
         }
 
         ImGui::Text("%s","Normal multiplier");
         ImGui::SameLine();
-        if(ImGui::SliderFloat("##Normal",&v.Normal,0,1))
+        if(ImGui::SliderFloat("##Normal",&mpb.Normal,0,1))
         {
             propertyWritten =  true;
         }
         ImGui::Text("%s","Occlusion multiplier");
         ImGui::SameLine();
-        if(ImGui::SliderFloat("##Occlusion",&v.Occlusion,0,1))
+        if(ImGui::SliderFloat("##Occlusion",&mpb.Occlusion,0,1))
         {
             propertyWritten =  true;
         }
         ImGui::Text("%s","Reflectance multiplier");
         ImGui::SameLine();
-        if(ImGui::SliderFloat("##Reflectance",&v.Reflectance,0,1))
+        if(ImGui::SliderFloat("##Reflectance",&mpb.Reflectance,0,1))
         {
             propertyWritten =  true;
         }
         ImGui::Text("%s","Roughness multiplier");
         ImGui::SameLine();
-        if(ImGui::SliderFloat("##Roughness",&v.Roughness,0,1))
+        if(ImGui::SliderFloat("##Roughness",&mpb.Roughness,0,1))
         {
             propertyWritten =  true;
         }
-        field.set(componentData,v);
+
+        ImGui::BeginDisabled(matData.HasUniqueMaterial);
+        if (ImGui::Button("Create Unique Material"))
+        {
+            matData.Material = Renderer::GetDefaultMaterialClone();
+            matData.HasUniqueMaterial = true;
+        }
+        ImGui::EndDisabled();
+
+        field.set(componentData, matData);
         return propertyWritten;
     }
 
@@ -446,7 +457,7 @@ namespace Engine
         {entt::type_id<Vector3>().hash(), InspectMutableVector3Field},
         {entt::type_id<Vector4>().hash(), InspectMutableVector4Field},
         {entt::type_id<bool>().hash(), InspectMutableBoolField},
-        {entt::type_id<Vulkan::FilamentMetallicRoughness::MaterialConstants>().hash(), InspectMutableMaterialPropertyBlock}
+        {entt::type_id<MaterialData>().hash(), InspectMutableMaterialData}
     };
 
     inline bool InspectImmutableStringField(entt::meta_data& field, entt::meta_any& componentData)

@@ -11,6 +11,7 @@ namespace Vulkan
 {
     using namespace Engine;
     class VulkanRenderer;
+    struct MaterialInstance;
 
     enum class MaterialPass : uint8_t
     {
@@ -25,26 +26,19 @@ namespace Vulkan
         VkPipelineLayout Layout;
     };
 
-    struct MaterialInstance
-    {
-        ShaderPipeline* ShaderPipeline;
-        VkDescriptorSet MaterialSet;
-        MaterialPass PassType;
-    };
-
     struct FilamentMetallicRoughness
     {
     public:
         struct MaterialConstants
         {
-            Vector3 Color; // = 1,1,1
-            float Normal; // = 1
-            Vector3 Emission; // = 0,0,0
-            float Metallic; // = 1
-            float Roughness; // = 0
-            float Reflectance; // = 1
-            float Height; // = 1
-            float Occlusion; // = 1
+            Vector3 Color = 1; // = 1,1,1
+            float Normal = 1; // = 1
+            Vector3 Emission = 0; // = 0,0,0
+            float Metallic = 1; // = 1
+            float Roughness = 0; // = 0
+            float Reflectance = 1; // = 1
+            float Height = 1; // = 1
+            float Occlusion = 1; // = 1
 
             // Padding so we meet 256 byte alignment.
             Vector4 Extra[13];
@@ -68,7 +62,8 @@ namespace Vulkan
             VmaImage CubeMap;
             VkSampler CubeMapSampler;
 
-            VkBuffer DataBuffer;
+            VmaBuffer Data;
+            //VkBuffer DataBuffer;
             uint32_t DataBufferOffset;
         };
 
@@ -77,7 +72,7 @@ namespace Vulkan
 
         void ClearResources(const VulkanRenderer* renderer);
 
-        MaterialInstance WriteMaterial(const VulkanRenderer* renderer, MaterialPass type, const MaterialResources& resources, DescriptorAllocator& descriptorAllocator);
+        MaterialInstance WriteMaterial(const VulkanRenderer* renderer, MaterialPass type, const MaterialResources& resources, MaterialConstants* uniforms, DescriptorAllocator& descriptorAllocator);
 
     private:
         void LoadShaders(const VulkanRenderer* renderer, VkShaderModule& vertexShader, VkShaderModule& fragmentShader);
@@ -89,5 +84,14 @@ namespace Vulkan
         VkDescriptorSetLayout MaterialLayout;
 
         DescriptorWriter Writer;
+    };
+
+    struct MaterialInstance
+    {
+        ShaderPipeline* ShaderPipeline;
+        VkDescriptorSet MaterialSet;
+        MaterialPass PassType;
+        FilamentMetallicRoughness::MaterialConstants* Uniforms;
+        FilamentMetallicRoughness::MaterialResources Resources;
     };
 }
