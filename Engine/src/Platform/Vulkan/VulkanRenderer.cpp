@@ -19,6 +19,7 @@
 
 #include "ANE/Core/Application.h"
 #include "ANE/Math/FMath.h"
+#include "ANE/Utilities/API.h"
 
 using Slang::ComPtr;
 
@@ -1146,8 +1147,7 @@ namespace Vulkan
 
         VulkanFrame& frame = GetFrame();
 
-        // Fixed data for now.
-        float time = static_cast<float>(SDL_GetTicks64()) / 1000.0f;
+        float time = API::TIME;
         frame.AppData.Time = time;
 
         Vector3 ambientColor = Vector3(0.05f, 0.08f, 0.11f);
