@@ -981,9 +981,9 @@ namespace Vulkan
         materialResources.NormalSampler = _samplerLinear;
         materialResources.ORMImage = _blackImage;
         materialResources.ORMSampler = _samplerLinear;
-        materialResources.CubeMap = _blackImage;
         materialResources.DFGImage = _dfgTex;
         materialResources.DFGSampler = _samplerLinear;
+        materialResources.CubeMap = _blackCubeImage;
         materialResources.CubeMapSampler = _samplerLinear;
 
         VmaBuffer materialConstants = CreateBuffer(sizeof(FilamentMetallicRoughness::MaterialConstants), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
