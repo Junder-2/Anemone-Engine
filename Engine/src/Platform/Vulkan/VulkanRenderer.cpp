@@ -937,6 +937,12 @@ namespace Vulkan
             vkDestroySampler(_device, _samplerNearest, _allocator);
         });
 
+        _colorTex = LoadTexture("MetalTiles03_1K_BaseColor.png");
+        _normalTex = LoadTexture("MetalTiles03_1K_Normal.png");
+        _ormTex = LoadTexture("MetalTiles03_1K_ORM.png");
+        _dfgTex = LoadTexture("dfg.png");
+        _cubeMap = LoadCubeTexture("cyclorama_hard_light_linear_256.png");
+
         // Filament material instance.
         _filamentMaterial.BuildPipelines(this);
         _mainDeletionQueue.PushFunction([&]
@@ -975,11 +981,6 @@ namespace Vulkan
         {
             DestroyBuffer(materialConstants);
         });
-
-        _colorTex = LoadTexture("MetalTiles03_1K_BaseColor.png");
-        _normalTex = LoadTexture("MetalTiles03_1K_Normal.png");
-        _ormTex = LoadTexture("MetalTiles03_1K_ORM.png");
-        _cubeMap = LoadCubeTexture("cyclorama_hard_light_linear_256.png");
     }
 
     void VulkanRenderer::CreateImGuiDescriptorPool()
