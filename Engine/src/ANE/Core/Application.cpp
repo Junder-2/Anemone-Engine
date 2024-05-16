@@ -48,7 +48,7 @@ namespace Engine
         _imGuiLayer = ImGuiLayer::Create("ImGuiLayer");
         PushLayer(_imGuiLayer);
 
-        API::WINDOW_SIZE = Vector2(_window->GetWindowWidth(), _window->GetWindowHeight());
+        API::WINDOW_SIZE = Vector2((float)_window->GetWindowWidth(), (float)_window->GetWindowHeight());
     }
 
     void Application::Run()
@@ -143,11 +143,11 @@ namespace Engine
     {
         if(e.IsMainWindow())
         {
-            API::WINDOW_SIZE = Vector2(e.GetWidth(), e.GetHeight());
+            API::WINDOW_SIZE = Vector2((float)e.GetWidth(), (float)e.GetHeight());
         }
         else if(e.IsActiveViewport())
         {
-            API::VIEWPORT_SIZE = Vector2(e.GetWidth(), e.GetHeight());
+            API::VIEWPORT_SIZE = Vector2((float)e.GetWidth(), (float)e.GetHeight());
         }
         //ANE_ELOG_DEBUG("new size {0} ({1}, {2})", e.GetWindowIndex(), e.GetWidth(), e.GetHeight());
     }
@@ -156,11 +156,11 @@ namespace Engine
     {
         if(e.IsMainWindow())
         {
-            API::WINDOW_POS = Vector2(e.GetX(), e.GetY());
+            API::WINDOW_POS = Vector2((float)e.GetX(), (float)e.GetY());
         }
         else if(e.IsActiveViewport())
         {
-            API::VIEWPORT_POS = Vector2(e.GetX(), e.GetY());
+            API::VIEWPORT_POS = Vector2((float)e.GetX(), (float)e.GetY());
         }
         //ANE_ELOG_DEBUG("new pos {0} ({1}, {2})",e.GetWindowIndex(), e.GetX(), e.GetY());
     }
