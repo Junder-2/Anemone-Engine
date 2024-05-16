@@ -48,7 +48,8 @@ namespace Engine
         _imGuiLayer = ImGuiLayer::Create("ImGuiLayer");
         PushLayer(_imGuiLayer);
 
-        API::WINDOW_SIZE = Vector2((float)_window->GetWindowWidth(), (float)_window->GetWindowHeight());
+        const float width = static_cast<float>(_window->GetWindowWidth()), height = static_cast<float>(_window->GetWindowHeight());
+        API::WINDOW_SIZE = Vector2(width, height);
     }
 
     void Application::Run()
@@ -141,11 +142,13 @@ namespace Engine
     {
         if(e.IsMainWindow())
         {
-            API::WINDOW_SIZE = Vector2((float)e.GetWidth(), (float)e.GetHeight());
+            const float width = static_cast<float>(e.GetWidth()), height = static_cast<float>(e.GetHeight());
+            API::WINDOW_SIZE = Vector2(width, height);
         }
         else if(e.IsActiveViewport())
         {
-            API::VIEWPORT_SIZE = Vector2((float)e.GetWidth(), (float)e.GetHeight());
+            const float width = static_cast<float>(e.GetWidth()), height = static_cast<float>(e.GetHeight());
+            API::VIEWPORT_SIZE = Vector2(width, height);
         }
         //ANE_ELOG_DEBUG("new size {0} ({1}, {2})", e.GetWindowIndex(), e.GetWidth(), e.GetHeight());
     }
@@ -154,11 +157,13 @@ namespace Engine
     {
         if(e.IsMainWindow())
         {
-            API::WINDOW_POS = Vector2((float)e.GetX(), (float)e.GetY());
+            const float xPos = static_cast<float>(e.GetX()), yPos = static_cast<float>(e.GetY());
+            API::WINDOW_POS = Vector2(xPos, yPos);
         }
         else if(e.IsActiveViewport())
         {
-            API::VIEWPORT_POS = Vector2((float)e.GetX(), (float)e.GetY());
+            const float xPos = static_cast<float>(e.GetX()), yPos = static_cast<float>(e.GetY());
+            API::VIEWPORT_POS = Vector2(xPos, yPos);
         }
         //ANE_ELOG_DEBUG("new pos {0} ({1}, {2})",e.GetWindowIndex(), e.GetX(), e.GetY());
     }
