@@ -15,7 +15,7 @@ Engine::ContentBrowserPanel::ContentBrowserPanel(EditorLayer* editorLayer)
 void Engine::ContentBrowserPanel::Init()
 {
     auto image = Renderer::LoadTexture("UITextures/UIIcons/FolderIcon.png");
-    auto icon = ImGui_ImplVulkan_AddTexture(VulkanRenderer::_samplerNearest, image.ImageView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    auto icon = ImGui_ImplVulkan_AddTexture(Vulkan::VulkanRenderer::_samplerNearest, image.ImageView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     m_AssetIconMap["folder"] = icon;
     m_AssetIconMap["cpp"] = icon;
 }
