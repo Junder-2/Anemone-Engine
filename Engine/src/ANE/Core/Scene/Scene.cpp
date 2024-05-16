@@ -3,6 +3,8 @@
 
 #include "ANE/Math/FMath.h"
 #include "ANE/Physics/Physics.h"
+#include "ANE/Renderer/Camera.h"
+#include "ANE/Utilities/API.h"
 #include "Components/Components.h"
 
 namespace Engine
@@ -60,15 +62,19 @@ namespace Engine
 
         _accumulator += timeStep;
 
-        // Fixed update
-        while (_accumulator >= _timeStep)
-        {
-            _accumulator = FMath::Max0(_accumulator - _timeStep);
+        const float physTimeStep = API::PHYSICS_TIMESTEP;
 
-            OnFixedUpdate(_timeStep);
+        // Fixed update
+        while (_accumulator >= physTimeStep)
+        {
+            _accumulator = FMath::Max0(_accumulator - physTimeStep);
+
+            OnFixedUpdate(physTimeStep);
         }
 
-        GetPhysicsSystem().UpdateRigidBodies(FMath::Saturate(_accumulator / _timeStep), this);
+        GetPhysicsSystem().UpdateRigidBodies(FMath::Saturate(_accumulator / physTimeStep), this);
+
+        Camera::UpdateCamera(this);
 
         SubmitDrawCommands();
     }

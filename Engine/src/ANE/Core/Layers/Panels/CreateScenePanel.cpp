@@ -14,6 +14,8 @@ namespace Engine
 
     UIUpdateWrapper CreateScenePanel::OnPanelRender()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         UIUpdateWrapper UIUpdate;
 
         //ImGui::SetNextWindowPos(_windowLocation);

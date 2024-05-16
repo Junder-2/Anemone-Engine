@@ -48,7 +48,8 @@ namespace Engine
         _imGuiLayer = ImGuiLayer::Create("ImGuiLayer");
         PushLayer(_imGuiLayer);
 
-        API::WINDOW_SIZE = Vector2(_window->GetWindowWidth(), _window->GetWindowHeight());
+        const float width = static_cast<float>(_window->GetWindowWidth()), height = static_cast<float>(_window->GetWindowHeight());
+        API::WINDOW_SIZE = Vector2(width, height);
     }
 
     void Application::Run()
@@ -68,14 +69,13 @@ namespace Engine
             _window->OnUpdate(deltaTime);
 
             //Renderer
-            for (Layer* layer : _layerStack) // raw pointers
+            for (Layer* layer : _layerStack)
             {
                 layer->OnUpdate(deltaTime);
             }
-            //todo frame yap
 
-            Renderer::BeginUiDataBuffer();
-            for (Layer* layer : _layerStack) // raw pointers
+            Renderer::BeginUIDataBuffer();
+            for (Layer* layer : _layerStack)
             {
                 layer->OnUIRender();
             }
@@ -84,7 +84,6 @@ namespace Engine
             Renderer::Render(_window->GetWindowProperties());
         }
 
-        // TODO: Figure out where this function should go.
         Renderer::Shutdown();
     }
 
@@ -143,11 +142,13 @@ namespace Engine
     {
         if(e.IsMainWindow())
         {
-            API::WINDOW_SIZE = Vector2(e.GetWidth(), e.GetHeight());
+            const float width = static_cast<float>(e.GetWidth()), height = static_cast<float>(e.GetHeight());
+            API::WINDOW_SIZE = Vector2(width, height);
         }
         else if(e.IsActiveViewport())
         {
-            API::VIEWPORT_SIZE = Vector2(e.GetWidth(), e.GetHeight());
+            const float width = static_cast<float>(e.GetWidth()), height = static_cast<float>(e.GetHeight());
+            API::VIEWPORT_SIZE = Vector2(width, height);
         }
         //ANE_ELOG_DEBUG("new size {0} ({1}, {2})", e.GetWindowIndex(), e.GetWidth(), e.GetHeight());
     }
@@ -156,11 +157,13 @@ namespace Engine
     {
         if(e.IsMainWindow())
         {
-            API::WINDOW_POS = Vector2(e.GetX(), e.GetY());
+            const float xPos = static_cast<float>(e.GetX()), yPos = static_cast<float>(e.GetY());
+            API::WINDOW_POS = Vector2(xPos, yPos);
         }
         else if(e.IsActiveViewport())
         {
-            API::VIEWPORT_POS = Vector2(e.GetX(), e.GetY());
+            const float xPos = static_cast<float>(e.GetX()), yPos = static_cast<float>(e.GetY());
+            API::VIEWPORT_POS = Vector2(xPos, yPos);
         }
         //ANE_ELOG_DEBUG("new pos {0} ({1}, {2})",e.GetWindowIndex(), e.GetX(), e.GetY());
     }

@@ -91,6 +91,8 @@ namespace Engine
 
         static Matrix4x4 Zero() { return {0}; }
 
+        static Matrix4x4 Perspective(float fovYRadians, float aspect, float zNear, float zFar);
+
         // Conversion to other matrix types
         static Matrix4x4 Convert(const glm::mat4& mat4);
         operator const glm::mat4() const;

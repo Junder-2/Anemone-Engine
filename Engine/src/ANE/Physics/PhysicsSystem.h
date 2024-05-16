@@ -1,8 +1,22 @@
 ﻿#pragma once
+#include <entt.hpp>
+
 #include "ANE/Subsystem/SubSystem.h"
 
 namespace Engine
 {
+    struct TriggerData;
+}
+
+namespace Engine
+{
+    class CollisionListener;
+}
+
+namespace Engine
+{
+    struct CollisionData;
+    enum class CollisionEventType;
     enum class PhysicsDebugDisplayFlag;
     class Scene;
     class Collider;
@@ -28,11 +42,21 @@ namespace Engine
         BoxCollider* CreateBoxCollider(Entity entity, const Vector3& halfExtents);
         CapsuleCollider* CreateCapsuleCollider(Entity entity, float radius = 1.f, float height = 2.f);
 
+        SphereCollider* CreateSphereCollider(rp3d::Entity reactEntity, float radius = 1.f);
+        BoxCollider* CreateBoxCollider(rp3d::Entity reactEntity, const Vector3& halfExtents);
+        CapsuleCollider* CreateCapsuleCollider(rp3d::Entity reactEntity, float radius = 1.f, float height = 2.f);
+
         void RemoveCollider(Entity entity, const Collider* collider);
+        void RemoveCollider(rp3d::Entity reactEntity, const Collider* collider);
 
         rp3d::SphereShape* CreateSphereShape(float radius);
         rp3d::BoxShape* CreateBoxShape(const Vector3& halfExtents);
         rp3d::CapsuleShape* CreateCapsuleShape(float radius, float height);
+
+        rp3d::Entity GetBodyEntity(Entity entity);
+        Entity GetOwnerEntity(rp3d::Entity reactEntity);
+        RigidBody* ConvertRigidBody(rp3d::Entity reactEntity);
+        Collider* ConvertCollider(rp3d::Entity reactEntity);
 
         void WakeBodies();
 
@@ -58,12 +82,22 @@ namespace Engine
         float _debugDisplayAlpha;
         #endif
 
+    protected:
+        void DispatchCollisionCallback(Entity entity, CollisionEventType type, const CollisionData& collisionData);
+        void DispatchTriggerCallback(Entity entity, CollisionEventType type, const TriggerData& triggerData);
+
     private:
         rp3d::PhysicsCommon _physicsCommon {};
         rp3d::PhysicsWorld* _world;
         PhysicsLogger* _physicsLogger;
+        CollisionListener* _collisionListener;
+
+        entt::dense_map<rp3d::Entity, Entity> _reactEntity {};
+        entt::dense_map<rp3d::Entity, RigidBody*> _reactRigidBody {};
+        entt::dense_map<rp3d::Entity, Collider*> _reactCollider {};
 
         bool _hasAwokenBodies = false;
 
+        friend class CollisionListener;
     };
 }

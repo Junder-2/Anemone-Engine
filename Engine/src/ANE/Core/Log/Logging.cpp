@@ -23,6 +23,8 @@ namespace Engine
 
     void Logging::Init(const std::string& appName)
     {
+        ANE_PROFILE_FUNCTION();
+
         spdlog::set_pattern(DEFAULT_PATTERN);
         spdlog::set_level(spdlog::level::trace);
 
@@ -34,6 +36,8 @@ namespace Engine
 
     std::shared_ptr<spdlog::logger> Logging::CreateLogger(const std::string& loggerName)
     {
+        ANE_PROFILE_FUNCTION();
+
         auto defaultSink = std::make_shared<spdlog::sinks::wincolor_stdout_sink_mt>();
         auto newLogger = std::make_shared<spdlog::logger>(loggerName, std::move(defaultSink));
         auto loggerSink = std::make_shared<LogSink>();

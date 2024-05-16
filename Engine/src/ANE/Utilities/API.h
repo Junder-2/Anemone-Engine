@@ -24,5 +24,7 @@ namespace Engine
         inline static Vector2 VIEWPORT_POS = Vector2::ZeroVector();
 
         inline static Platform PLATFORM = Platform::Windows;
+
+        inline static float PHYSICS_TIMESTEP = 1/50.f;
     };
 };

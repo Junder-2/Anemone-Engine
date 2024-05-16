@@ -25,7 +25,7 @@ namespace Engine
 
     private:
         //map?
-        std::string _filepath; // path + key
+        std::string _filepath = "../Assets/Scenes/";
         std::string _binaryFilepath;
     };
 }

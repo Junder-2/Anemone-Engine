@@ -7,51 +7,67 @@
 
 namespace Engine
 {
-    ColliderComponent::ColliderComponent(Collider* collider)
+    ColliderComponent::ColliderComponent(Collider* collider) : Component(typeid(*this).name())
     {
-        _colliders.push_back(collider);
+        _data.BodyId = collider->GetReactCollider().getBody()->getEntity();
+        _data.Colliders.push_back(collider);
     }
 
-    ColliderComponent::ColliderComponent(const Entity self, const Vector3 halfExtents): Component(typeid(*this).name())
+    ColliderComponent::ColliderComponent(const Entity self) : Component(typeid(*this).name())
     {
-        AddBoxCollider(self, halfExtents);
+        Init(self);
     }
 
-    ColliderComponent::ColliderComponent(const Entity self, const float radius): Component(typeid(*this).name())
+    ColliderComponent::ColliderComponent(const Entity self, const Vector3 halfExtents) : Component(typeid(*this).name())
     {
-        AddSphereCollider(self, radius);
+        Init(self);
+        AddBoxCollider(halfExtents);
     }
 
-    ColliderComponent::ColliderComponent(const Entity self, const float radius, const float height): Component(typeid(*this).name())
+    ColliderComponent::ColliderComponent(const Entity self, const float radius) : Component(typeid(*this).name())
     {
-        AddCapsuleCollider(self, radius, height);
+        Init(self);
+        AddSphereCollider(radius);
     }
 
-    void ColliderComponent::AddCollider(Collider* collider)
+    ColliderComponent::ColliderComponent(const Entity self, const float radius, const float height) : Component(typeid(*this).name())
     {
-        _colliders.push_back(collider);
+        Init(self);
+        AddCapsuleCollider(radius, height);
     }
 
-    void ColliderComponent::AddBoxCollider(const Entity self, const Vector3 halfExtents)
+    Collider* ColliderComponent::AddCollider(Collider* collider)
     {
-        _colliders.push_back(GetPhysicsSystem().CreateBoxCollider(self, halfExtents));
+        _data.Colliders.push_back(collider);
+        return collider;
     }
 
-    void ColliderComponent::AddSphereCollider(const Entity self, const float radius)
+    BoxCollider* ColliderComponent::AddBoxCollider(const Vector3 halfExtents)
     {
-        _colliders.push_back(GetPhysicsSystem().CreateSphereCollider(self, radius));
+        BoxCollider* col = GetPhysicsSystem().CreateBoxCollider(_data.BodyId, halfExtents);
+        _data.Colliders.push_back(col);
+        return col;
     }
 
-    void ColliderComponent::AddCapsuleCollider(const Entity self, const float radius, const float height)
+    SphereCollider* ColliderComponent::AddSphereCollider(const float radius)
     {
-        _colliders.push_back(GetPhysicsSystem().CreateCapsuleCollider(self, radius, height));
+        SphereCollider* col = GetPhysicsSystem().CreateSphereCollider(_data.BodyId, radius);
+        _data.Colliders.push_back(col);
+        return col;
     }
 
-    void ColliderComponent::RemoveCollider(const Entity self, const Collider* collider)
+    CapsuleCollider* ColliderComponent::AddCapsuleCollider(const float radius, const float height)
     {
-        if(const auto element = std::ranges::find(_colliders, collider); element != _colliders.end())
+        CapsuleCollider* col = GetPhysicsSystem().CreateCapsuleCollider(_data.BodyId, radius, height);
+        _data.Colliders.push_back(col);
+        return col;
+    }
+
+    void ColliderComponent::RemoveCollider(const Collider* collider)
+    {
+        if(const auto element = std::ranges::find(_data.Colliders, collider); element != _data.Colliders.end())
         {
-            _colliders.erase(element);
+            _data.Colliders.erase(element);
         }
         else
         {
@@ -59,17 +75,22 @@ namespace Engine
             return;
         }
 
-        GetPhysicsSystem().RemoveCollider(self, collider);
+        GetPhysicsSystem().RemoveCollider(_data.BodyId, collider);
     }
 
     Collider* ColliderComponent::GetCollider(const int index) const
     {
-        if(_colliders.size() < index)
+        if(_data.Colliders.size() < index)
         {
             ANE_ELOG_WARN("Trying to access collider at invalid index {0}", index);
             return nullptr;
         }
-        return _colliders[index];
+        return _data.Colliders[index];
+    }
+
+    void ColliderComponent::Init(const Entity self)
+    {
+        _data.BodyId = GetPhysicsSystem().GetBodyEntity(self);
     }
 }
 

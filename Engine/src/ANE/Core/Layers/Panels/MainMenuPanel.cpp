@@ -9,6 +9,9 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 
+#include "ANE/Core/Layers/EditorLayer.h"
+#include "ANE/Input/InputAction.h"
+
 namespace Engine
 {
     MainMenuPanel::MainMenuPanel(EditorLayer* editorLayer)
@@ -18,6 +21,8 @@ namespace Engine
 
     UIUpdateWrapper MainMenuPanel::OnPanelRender()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         UIUpdateWrapper UIUpdate;
 
         constexpr auto imBlack = ImVec4(0, 0, 0, 1);
@@ -37,12 +42,12 @@ namespace Engine
             if (ImGui::BeginMenu("File"))
             {
                 if (ImGui::MenuItem("Create Scene")) UIUpdate.AddPanel(new CreateScenePanel(_editorLayer));
-                if (ImGui::MenuItem("Save Scene"))
-                {
-                } //EnableFlag("CreateSceneWindow");
-                if (ImGui::MenuItem("Load Scene"))
-                {
-                } //EnableFlag("CreateSceneWindow");
+                if (ImGui::MenuItem("Save Scene")) _editorLayer->SaveScene();
+
+                // if (ImGui::MenuItem("Load Scene"))
+                // {
+                //
+                // } //EnableFlag("CreateSceneWindow");
 
                 ImGui::EndMenu();
             }
@@ -66,6 +71,12 @@ namespace Engine
                 if (ImGui::MenuItem("Hierarchy Window"))  UIUpdate.AddPanel(new SceneHierarchyPanel(_editorLayer));
                 if (ImGui::MenuItem("Inspector Window"))  UIUpdate.AddPanel(new InspectorPanel(_editorLayer));
 
+                ImGui::EndMenu();
+            }
+
+            if (ImGui::BeginMenu("Entity"))
+            {
+                if (ImGui::MenuItem("Create Entity"))
                 ImGui::EndMenu();
             }
 

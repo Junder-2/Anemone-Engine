@@ -14,14 +14,12 @@ namespace Engine
 
     void SphereCollider::SetRadius(const float radius)
     {
-        _radius = FMath::Max(radius, MIN_SCALE);
+        _radius = FMath::Max(radius, MIN_PHYS);
 
-        WakeBody();
+        NotifyDirty();
         const auto sphereCollider = reinterpret_cast<reactphysics3d::SphereShape*>(_reactCollider->getCollisionShape());
         const float scale = FMath::Max(FMath::Max(_scale.X, _scale.Y), _scale.Z);
-        sphereCollider->setRadius(FMath::Max(_radius*scale, MIN_SCALE));
-
-        ForceUpdateBody();
+        sphereCollider->setRadius(FMath::Max(_radius*scale, MIN_PHYS));
     }
 
     float SphereCollider::GetRadius() const

@@ -3,7 +3,7 @@
 
 namespace Engine
 {
-    const float MIN_SCALE = FMath::EPSILON;
+    const float MIN_PHYS = FMath::EPSILON;
 
     typedef uint16_t CollisionLayerMask;
 
@@ -33,6 +33,13 @@ namespace Engine
     {
         All = CollisionLayer::All,
         Default = CollisionLayer::Static | CollisionLayer::Dynamic | CollisionLayer::Player,
+    };
+
+    enum class CollisionEventType
+    {
+        Enter,
+        Stay,
+        Exit
     };
 
     enum class CollisionShapeType

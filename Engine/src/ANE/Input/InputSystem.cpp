@@ -73,7 +73,7 @@ namespace Engine
             break;
         }
 
-        int size = _bindingToAxisBinding.size();
+        int size = static_cast<int>(_bindingToAxisBinding.size());
         if(size != 0 && size % 2 != 0)
         {
             ANE_ELOG_WARN("axis binding size is not multiple of 2: {}", size);
@@ -182,7 +182,7 @@ namespace Engine
 
                 if(_actionMappingDelegates.contains(bindingPair))
                 {
-                    const InputValue buttonValue(mouseButtonValues.GetTriggerState(), InputTypeTrigger, InputDeviceMouse, buttonId);
+                    const InputValue buttonValue(static_cast<float>(mouseButtonValues.GetTriggerState()), InputTypeTrigger, InputDeviceMouse, buttonId);
 
                     _actionMappingDelegates[bindingPair](buttonValue);
                 }
@@ -203,7 +203,7 @@ namespace Engine
         {
             val(inputFlush);
         }
-        
+
         _mouseButtonValueDelegate(MouseButtonValues());
     }
 

@@ -59,7 +59,7 @@ namespace Engine
         _drawCommands.Commands.push_back(command);
     }
 
-    void Renderer::BeginUiDataBuffer()
+    void Renderer::BeginUIDataBuffer()
     {
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplSDL2_NewFrame();

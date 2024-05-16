@@ -22,6 +22,8 @@ namespace Engine
 
     InspectorPanel::InspectorPanel(EditorLayer* editorLayer)
     {
+        ANE_PROFILE_FUNCTION();
+
         _editorLayer = editorLayer;
         for(auto &&[id, type]: entt::resolve()) {
             const std::string componentType{type.info().name()};
@@ -96,7 +98,7 @@ namespace Engine
                             selectedEntity.AddComponent<RenderComponent>("Suzanne.fbx");
                             break;
                         case Hash("ColliderComponent"):
-                            selectedEntity.AddComponent<ColliderComponent>(selectedEntity,1.f);
+                            selectedEntity.AddComponent<ColliderComponent>(selectedEntity);
                             break;
                         case Hash("CameraComponent"):
                             selectedEntity.AddComponent<CameraComponent>();
@@ -134,6 +136,8 @@ namespace Engine
     }
     void InspectorPanel::DrawEntityComponentList(Entity& selectedEntity)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         for (auto&& [fst, snd] : _editorLayer->GetActiveScene()->_registry.storage())
         {
             if (!snd.contains(selectedEntity)) continue;

@@ -4,43 +4,36 @@
 
 namespace Engine
 {
-    struct CameraComponent : Component // this might need to be remade..
+    struct CameraComponent : Component
     {
         ANE_COMPONENT_INIT(CameraComponent)
 
-        Matrix4x4 PerspectiveMatrix = {};
-
         void SetFOV(float fov);
         void SetAspectRatio(float aspect);
+        void SetNearClip(float nearClip);
+        void SetFarClip(float farClip);
 
         void SetPerspective(float fov, float aspect, float zNear, float zFar);
 
-        float GetFOV() const
-        {
-            return _fieldOfView;
-        }
+        Matrix4x4 GetPerspectiveMatrix() const { return _perspectiveMatrix; }
+        float GetFOV() const { return _fieldOfView; }
+        float GetAspectRatio() const { return _aspectRatio; }
+        float GetNearClip() const { return _zNear; }
+        float GetFarClip() const { return _zFar; }
 
-        float GetAspectRatio() const
-        {
-            return _aspectRatio;
-        }
 
-        float GetNearClip() const
-        {
-            return _zNear;
-        }
+        bool IsDirty() const { return _dirty; }
 
-        float GetFarClip() const
-        {
-            return _zFar;
-        }
+        void SetPriority(const int newValue);
+        int GetPriority() const { return _priority; }
+
         void OnValidate()
         {
-            ANE_ELOG("Camera recalculating");
+            //ANE_ELOG("Camera recalculating");
             UpdateProjectionMatrix();
         }
 
-        static void RegisterComponentMetaData()
+        static void RegisterComponentMetaData() //TODO: add min max meta data?
         {
             entt::meta<CameraComponent>()
                 .data<&CameraComponent::_zNear>("Z_Near"_hs).prop("display_name"_hs, "Z Near")
@@ -56,14 +49,20 @@ namespace Engine
 
     private:
         void UpdateProjectionMatrix();
+        void ClearDirty() { _dirty = false; }
 
     private:
+        Matrix4x4 _perspectiveMatrix = {};
+
         float _aspectRatio = 1;
         float _fieldOfView = 60;
         float _zNear = 1;
         float _zFar = 1000;
 
-        bool _updated = true;
-        bool _flipY = true;
+        int _priority = 100;
+
+        bool _dirty = true;
+
+        friend class Camera;
     };
 }

@@ -8,6 +8,6 @@ namespace Engine
 {
     void TransformMatrix::MakeScaleSafe()
     {
-        _scale = Math::MaxOrMin(_scale, MIN_SCALE);
+        _scale = Math::MaxOrMin(_scale, FMath::EPSILON);
     }
 }

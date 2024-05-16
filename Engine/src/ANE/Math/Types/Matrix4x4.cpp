@@ -194,9 +194,9 @@ namespace Engine
 
     void Matrix4x4::Scale(const Vector3 scale)
     {
-        _columns[0] *= FMath::MaxOrMin(scale.X, MIN_SCALE);
-        _columns[1] *= FMath::MaxOrMin(scale.Y, MIN_SCALE);
-        _columns[2] *= FMath::MaxOrMin(scale.Z, MIN_SCALE);
+        _columns[0] *= FMath::MaxOrMin(scale.X, FMath::EPSILON);
+        _columns[1] *= FMath::MaxOrMin(scale.Y, FMath::EPSILON);
+        _columns[2] *= FMath::MaxOrMin(scale.Z, FMath::EPSILON);
     }
 
     Vector3 Matrix4x4::GetAbsoluteScale() const
@@ -233,6 +233,11 @@ namespace Engine
     Vector3 Matrix4x4::GetForward() const
     {
         return Vector3(_columns[2]).GetNormalized();
+    }
+
+    Matrix4x4 Matrix4x4::Perspective(const float fovYRadians, const float aspect, const float zNear, const float zFar)
+    {
+        return Convert(glm::perspective(fovYRadians, aspect, zNear, zFar));
     }
 
     Matrix4x4 Matrix4x4::Convert(const glm::mat4& mat4)

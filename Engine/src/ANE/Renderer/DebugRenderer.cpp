@@ -45,6 +45,8 @@ namespace Engine
 
     void DebugRenderer::DrawLine(Vector3 start, Vector3 end)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         #ifndef ANE_DIST
         Vertex vert1;
         Vertex vert2;
@@ -67,6 +69,8 @@ namespace Engine
 
     void DebugRenderer::DrawTriangle(Vector3 point1, Vector3 point2, Vector3 point3)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         #ifndef ANE_DIST
         Vertex vert1;
         Vertex vert2;
@@ -115,19 +119,21 @@ namespace Engine
 
     void DebugRenderer::FetchDrawCommands(std::vector<DebugDrawCommand>& commands)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         #ifndef ANE_DIST
         if(!_debugLineVertices.empty())
         {
             std::vector<uint32_t> indices;
             indices.resize(_debugLineVertices.size());
-            for (int i = 0; i < indices.size(); ++i)
+            for (int i = 0; i < static_cast<int>(indices.size()); ++i)
             {
                 indices[i] = i;
             }
 
             DebugDrawCommand draw;
             draw.ModelMatrix = Matrix4x4::Identity();
-            draw.VertexCount = _debugLineVertices.size();
+            draw.VertexCount = static_cast<uint32_t>(_debugLineVertices.size());
             draw.MeshBuffers = UploadDebugMesh(indices, _debugLineVertices);
             draw.LineList = true;
 
@@ -139,14 +145,14 @@ namespace Engine
         {
             std::vector<uint32_t> indices;
             indices.resize(_debugTriangleVertices.size());
-            for (int i = 0; i < indices.size(); ++i)
+            for (int i = 0; i < static_cast<int>(indices.size()); ++i)
             {
                 indices[i] = i;
             }
 
             DebugDrawCommand draw;
             draw.ModelMatrix = Matrix4x4::Identity();
-            draw.VertexCount = _debugTriangleVertices.size();
+            draw.VertexCount = static_cast<uint32_t>(_debugTriangleVertices.size());
             draw.MeshBuffers = UploadDebugMesh(indices, _debugTriangleVertices);
             draw.LineList = false;
 

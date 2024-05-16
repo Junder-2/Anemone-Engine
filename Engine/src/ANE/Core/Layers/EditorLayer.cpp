@@ -40,6 +40,8 @@ namespace Engine
 
     EditorLayer::EditorLayer(const std::string& name) : Layer(name)
     {
+        ANE_PROFILE_FUNCTION();
+
         Init();
     }
 
@@ -62,6 +64,8 @@ namespace Engine
 
     void EditorLayer::OnAttach()
     {
+        ANE_PROFILE_FUNCTION();
+
         // You would have a "Read from config files to find correct panel layout" method here
 
         CreateTestScene(50);
@@ -76,7 +80,7 @@ namespace Engine
 
         //Then you would load the scene from the file path listed from that project
 
-        GetEditorInputSystem().BindKeyboardInput(KeyCodeO, MakeDelegate(this, &EditorLayer::SaveScene));
+        //GetEditorInputSystem().BindKeyboardInput(KeyCodeO, MakeDelegate(this, &EditorLayer::SaveScene));
         GetEditorInputSystem().BindMouseButton(MouseButtonRight, MakeDelegate(this, &EditorLayer::OnSwitchEditorFocus));
 
         //TEMP need to set the initial state should be elsewhere
@@ -89,7 +93,7 @@ namespace Engine
 
     void EditorLayer::OnEvent(Event& e)
     {
-        Layer::OnEvent(e);
+        ANE_DEEP_PROFILE_FUNCTION();
 
         EventHandler::DispatchEditorEvents();
         EventHandler::DispatchAppEvents();
@@ -97,6 +101,8 @@ namespace Engine
 
     void EditorLayer::OnUIRender()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         ImGuiIO& io = ImGui::GetIO();
         ImGui::ShowDemoWindow();
         for (UILayerPanel* panel : _uiPanels)
@@ -127,14 +133,16 @@ namespace Engine
         }
 
         _uiUpdates.clear();
+    }
 
-        ImGui::Begin("Editor");
-        ImGui::End();
+    void EditorLayer::CreateEmptyEntity()
+    {
+        _activeScene->Create("");
     }
 
     void EditorLayer::OnUpdate(float deltaTime)
     {
-        Layer::OnUpdate(deltaTime);
+        ANE_DEEP_PROFILE_FUNCTION();
 
         if (_activeScene) _activeScene->OnUpdate(deltaTime);
     }
@@ -159,25 +167,17 @@ namespace Engine
     {
         ANE_PROFILE_FUNCTION();
 
-        if(false)
-        {
-            if (!_sceneSerializer->HasFile("Game")) _activeScene = _sceneSerializer->CreateEmptySceneFile("Game");
-            else
-            {
-                _activeScene = _sceneSerializer->Deserialize("Game", this);
-                return;
-            }
-        }
+        if (!_sceneSerializer->HasFile("Game")) _activeScene = _sceneSerializer->CreateEmptySceneFile("Game");
         else
         {
-            _activeScene = _sceneSerializer->CreateEmptySceneFile("Game");
-            ANE_ELOG_WARN("Note SceneSerializer is not enabled");
+            _activeScene = _sceneSerializer->Deserialize("Game", this);
+            return;
         }
 
         //Create a Entity
         Entity ent = _activeScene->Create("Camera");
 
-        for (int i = 0; i < numEntitiesToTest; i++)
+        for (int i = 0; i < 10; i++)
         {
             std::string entityName = "Entity";
             entityName.append(std::to_string(i));
@@ -197,10 +197,14 @@ namespace Engine
             ent.TryGetComponent(tag);
             ANE_ELOG_WARN("We have a renderComponent with tag: {0} on entity: {1}", comp.ToString(), tag.Value);
         }
+
+        _sceneSerializer->Serialize(_activeScene);
     }
 
     void EditorLayer::CreateFloor()
     {
+        ANE_PROFILE_FUNCTION();
+
         Entity floor = _activeScene->Create("Floor");
         TransformMatrix& transformMatrix = floor.GetComponent<TransformComponent>().Transform;
         transformMatrix.SetPosition(Vector3(0, -5.f, 0));
@@ -271,7 +275,13 @@ namespace Engine
     {
         if (inputValue.GetTriggerState() != TriggerStarted) return;
 
-        ANE_ELOG("Saving Scene");
+        ANE_ELOG("Scene has been saved");
+        _sceneSerializer->Serialize(_activeScene);
+    }
+
+    void EditorLayer::SaveScene()
+    {
+        ANE_ELOG("Scene has been saved");
         _sceneSerializer->Serialize(_activeScene);
     }
 }
