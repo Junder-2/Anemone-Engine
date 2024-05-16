@@ -362,73 +362,63 @@ namespace Engine
     {
         MaterialData matData = field.get(componentData).cast<MaterialData>();
         auto& mpb = *matData.Material->Uniforms;
-        bool propertyWritten = false;
-        float col[3];
-        col[0] = mpb.Color.X;
-        col[1] = mpb.Color.Y;
-        col[2] = mpb.Color.Z;
+
+        bool isDirty = false;
+
         ImGui::Text("%s","Base Color");
         ImGui::SameLine();
-        if(ImGui::ColorEdit4("##color", col, ImGuiColorEditFlags_AlphaBar)){
+        if (ImGui::ColorEdit3("##color", &mpb.Color.R))
+        {
+            isDirty =  true;
+        }
 
-                mpb.Color.X = col[0];
-                mpb.Color.Y = col[1];
-                mpb.Color.Z = col[2];
-                propertyWritten =  true;
-            }
-
-
-        float emissionCol[3];
-        emissionCol[0] = mpb.Emission.X;
-        emissionCol[1] = mpb.Emission.Y;
-        emissionCol[2] = mpb.Emission.Z;
         ImGui::Text("%s","Emission Color");
         ImGui::SameLine();
-        if(ImGui::ColorEdit4("##EmissionColor", emissionCol, ImGuiColorEditFlags_AlphaBar))
-            {
-                mpb.Color.X = emissionCol[0];
-                mpb.Color.Y = emissionCol[1];
-                mpb.Color.Z = emissionCol[2];
-                propertyWritten =  true;
-            }
+        if (ImGui::ColorEdit3("##EmissionColor", &mpb.Emission.R))
+        {
+            isDirty =  true;
+        }
 
         ImGui::Text("%s","Height multiplier");
         ImGui::SameLine();
-        if(ImGui::SliderFloat("##Height multiplier",&mpb.Height,0,1))
+        if (ImGui::SliderFloat("##Height multiplier", &mpb.Height, 0, 1))
         {
-            propertyWritten =  true;
+            isDirty =  true;
         }
 
         ImGui::Text("%s","Metallic multiplier");
         ImGui::SameLine();
-        if(ImGui::SliderFloat("##Metallic",&mpb.Metallic,0,1))
+        if (ImGui::SliderFloat("##Metallic", &mpb.Metallic, 0, 1))
         {
-            propertyWritten =  true;
+            isDirty =  true;
         }
 
         ImGui::Text("%s","Normal multiplier");
         ImGui::SameLine();
-        if(ImGui::SliderFloat("##Normal",&mpb.Normal,0,1))
+        if (ImGui::SliderFloat("##Normal", &mpb.Normal, 0, 1))
         {
-            propertyWritten =  true;
+            isDirty =  true;
         }
+
         ImGui::Text("%s","Occlusion multiplier");
         ImGui::SameLine();
-        if(ImGui::SliderFloat("##Occlusion",&mpb.Occlusion,0,1))
+        if (ImGui::SliderFloat("##Occlusion", &mpb.Occlusion, 0, 1))
         {
-            propertyWritten =  true;
+            isDirty =  true;
         }
+
         ImGui::Text("%s","Reflectance multiplier");
         ImGui::SameLine();
-        if(ImGui::SliderFloat("##Reflectance",&mpb.Reflectance,0,1))
+        if (ImGui::SliderFloat("##Reflectance", &mpb.Reflectance, 0, 1))
         {
-            propertyWritten =  true;
+            isDirty =  true;
         }
+
         ImGui::Text("%s","Roughness multiplier");
         ImGui::SameLine();
-        if(ImGui::SliderFloat("##Roughness",&mpb.Roughness,0,1))
+        if (ImGui::SliderFloat("##Roughness", &mpb.Roughness, 0, 1))
         {
-            propertyWritten =  true;
+            isDirty =  true;
         }
 
         ImGui::BeginDisabled(matData.HasUniqueMaterial);
@@ -440,7 +430,7 @@ namespace Engine
         ImGui::EndDisabled();
 
         field.set(componentData, matData);
-        return propertyWritten;
+        return isDirty;
     }
 
     using FieldInspectorFn = bool (*)(entt::meta_data& field, entt::meta_any& component_data);
