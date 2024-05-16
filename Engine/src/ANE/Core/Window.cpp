@@ -36,7 +36,6 @@ namespace Engine
 
         ANE_ELOG_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
-        // SDL
         if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER))
         {
             ANE_ELOG_ERROR("Could not initialize SDL.");
@@ -274,8 +273,8 @@ namespace Engine
         SDL_GetMouseState(&newX, &newY);
         newX += _windowData.XPos;
         newY += _windowData.YPos;
-        const float x = std::clamp((float)newX/(float)_windowData.Width, 0.f, 1.f);
-        const float y = std::clamp((float)newY/(float)_windowData.Height, 0.f, 1.f);
+        const float x = std::clamp((float)newX / (float)_windowData.Width, 0.f, 1.f);
+        const float y = std::clamp((float)newY / (float)_windowData.Height, 0.f, 1.f);
 
         return {x, y};
     }
@@ -295,9 +294,9 @@ namespace Engine
         SDL_Quit();
     }
 
+    // Not implemented.
     void Window::SetVSync(const bool enabled)
     {
-        //todo
         _windowData.VSync = enabled;
     }
 

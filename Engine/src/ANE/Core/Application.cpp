@@ -68,14 +68,13 @@ namespace Engine
             _window->OnUpdate(deltaTime);
 
             //Renderer
-            for (Layer* layer : _layerStack) // raw pointers
+            for (Layer* layer : _layerStack)
             {
                 layer->OnUpdate(deltaTime);
             }
-            //todo frame yap
 
-            Renderer::BeginUiDataBuffer();
-            for (Layer* layer : _layerStack) // raw pointers
+            Renderer::BeginUIDataBuffer();
+            for (Layer* layer : _layerStack)
             {
                 layer->OnUIRender();
             }
@@ -84,7 +83,6 @@ namespace Engine
             Renderer::Render(_window->GetWindowProperties());
         }
 
-        // TODO: Figure out where this function should go.
         Renderer::Shutdown();
     }
 

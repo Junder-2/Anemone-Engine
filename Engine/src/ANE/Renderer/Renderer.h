@@ -27,7 +27,7 @@ namespace Engine
         //These methods are sandwiched around the UI Layer render loops
         //ALL Imgui:: name space commands between these two methods will
         //contribute to the next UI command buffer
-        static void BeginUiDataBuffer();
+        static void BeginUIDataBuffer();
         static void EndUIDataBuffer();
 
         static void SetViewProjection(const Matrix4x4& matrix);
