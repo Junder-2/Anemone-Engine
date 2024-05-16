@@ -1213,20 +1213,30 @@ namespace Vulkan
         MaterialInstance* lastMaterial = nullptr;
         for (DrawCommand drawCommand : drawCommands.Commands)
         {
-            //MaterialInstance* material = &_filamentInstance;
-            //if (material != lastMaterial)
-            //{
-            //    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->Pipeline->Pipeline);
-            //    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->Pipeline->Layout, 0, 1, &appDescriptor, 0, nullptr);
-            //    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->Pipeline->Layout, 1, 1, &sceneDescriptor, 0, nullptr);
-            //    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->Pipeline->Layout, 2, 1, &material->MaterialSet, 0, nullptr);
-            //}
+            MaterialInstance* material = &_filamentInstance;
+            if (material != lastMaterial)
+            {
+                lastMaterial = material;
+                if (material->Pipeline != lastPipeline)
+                {
+                    lastPipeline = material->Pipeline;
+
+                    // Per-shader.
+                    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->Pipeline->Pipeline);
+                    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->Pipeline->Layout, 0, 1, &appDescriptor, 0, nullptr);
+                    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->Pipeline->Layout, 1, 1, &sceneDescriptor, 0, nullptr);
+                }
+
+                // Per-material.
+                vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->Pipeline->Layout, 2, 1, &material->MaterialSet, 0, nullptr);
+            }
 
             PushConstantBuffer pushConstants;
             pushConstants.MVPMatrix = ViewProjection * drawCommand.ModelMatrix; // VP * M
             pushConstants.ModelMatrix = drawCommand.ModelMatrix;
             pushConstants.VertexBuffer = drawCommand.MeshBuffers.VertexBufferAddress;
 
+            // Per-object.
             vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstantBuffer), &pushConstants);
             vkCmdBindIndexBuffer(cmd, drawCommand.MeshBuffers.IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
 
