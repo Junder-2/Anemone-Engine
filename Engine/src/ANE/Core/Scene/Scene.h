@@ -14,7 +14,7 @@ namespace Engine
         ~Scene() = default;
 
         void OnEvent(Event& e);
-        void OnUpdate(float timeStep);
+        void OnUpdate(float deltaTime);
 
         Entity Create(const char* name = "Untagged");
         Entity Create(const std::string& = "Untagged");

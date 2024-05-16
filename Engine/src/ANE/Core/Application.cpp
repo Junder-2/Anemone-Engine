@@ -55,6 +55,8 @@ namespace Engine
     void Application::Run()
     {
         _lastTimeStamp = SDL_GetPerformanceCounter();
+        float currTime = .0f;
+        float currUnscaledTime = .0f;
 
         while (_isRunning)
         {
@@ -64,7 +66,13 @@ namespace Engine
             const Uint64 timeStep = timeStamp - _lastTimeStamp;
             _lastTimeStamp = timeStamp;
 
-            float deltaTime = timeStep / static_cast<float>(SDL_GetPerformanceFrequency());
+            const float unscaledDeltaTime = static_cast<float>(timeStep) / static_cast<float>(SDL_GetPerformanceFrequency());
+            const float deltaTime = unscaledDeltaTime * API::TIME_SCALE;
+
+            API::TIME_UNSCALED = currUnscaledTime += unscaledDeltaTime;
+            API::DELTA_TIME_UNSCALED = unscaledDeltaTime;
+            API::TIME = currTime += deltaTime;
+            API::DELTA_TIME = deltaTime;
 
             _window->OnUpdate(deltaTime);
 

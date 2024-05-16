@@ -132,8 +132,8 @@ namespace Engine
                     // Convert mouse coord to relative
                     const float relX = FMath::Saturate(static_cast<float>(event.motion.x) / viewportWidth);
                     const float relY = FMath::Saturate(static_cast<float>(event.motion.y) / viewportHeight);
-                    const float relDeltaX = (static_cast<float>(event.motion.xrel) / viewportWidth) * 60.f * deltaTime;
-                    const float relDeltaY = (static_cast<float>(event.motion.yrel) / viewportHeight) * 60.f * deltaTime;
+                    const float relDeltaX = (static_cast<float>(event.motion.xrel) / viewportWidth);
+                    const float relDeltaY = (static_cast<float>(event.motion.yrel) / viewportHeight);
 
                     inputHandler->ProcessAbsoluteMouseMovement(absolutePos);
                     inputHandler->ProcessMouseMovement(Vector2(relX, relY), Vector2(relDeltaX, relDeltaY));
