@@ -929,6 +929,13 @@ namespace Vulkan
         }
         _errorImage = CreateImage((void*)&pixels, defaultImageExtent, defaultImageFormat, VK_IMAGE_USAGE_SAMPLED_BIT);
 
+        constexpr VkExtent3D defaultCubeImageExtent = VkExtent3D{ 16, 16, 1 };
+        constexpr VkFormat defaultCubeImageFormat = VK_FORMAT_R8G8B8A8_UNORM;
+
+        uint32_t pixelsCube[16 * 16 * 6];
+        for (uint32_t& pixel : pixelsCube) { pixel = black; }
+        _blackCubeImage = CreateCubeImage((void*)&pixelsCube, defaultCubeImageExtent, defaultCubeImageFormat, VK_IMAGE_USAGE_SAMPLED_BIT);
+
         VkSamplerCreateInfo samplerInfo = { .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO, .pNext = nullptr };
         samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
         samplerInfo.minLod = 0.0f;
@@ -950,6 +957,8 @@ namespace Vulkan
             DestroyImage(_greyImage);
             DestroyImage(_normalImage);
             DestroyImage(_errorImage);
+
+            DestroyImage(_blackCubeImage);
 
             vkDestroySampler(_device, _samplerLinear, _allocator);
             vkDestroySampler(_device, _samplerNearest, _allocator);

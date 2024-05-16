@@ -249,6 +249,7 @@ namespace Vulkan
         inline static VmaImage _greyImage;
         inline static VmaImage _normalImage;
         inline static VmaImage _errorImage;
+        inline static VmaImage _blackCubeImage;
 
         inline static VmaImage _colorTex;
         inline static VmaImage _normalTex;
