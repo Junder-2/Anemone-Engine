@@ -164,7 +164,7 @@ namespace Vulkan
 
         static VmaImage CreateImage(VkExtent3D size, VkFormat format, VkImageUsageFlags usage, VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D, bool mipmaps = false);
         static VmaImage CreateImage(const void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D, bool mipmaps = false);
-        static VmaImage CreateCubeImage(const void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D, bool mipmaps = false);
+        static VmaImage CreateCubeImage(const void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_CUBE, bool mipmaps = false);
         static void DestroyImage(const VmaImage& image);
         static void GenerateMipMaps(const VmaImage& image, VkExtent3D size, uint32_t mipLevels, bool cubemap = false);
 
