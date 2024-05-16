@@ -6,15 +6,18 @@
 #include "ANE/Core/Scene/Components/Components.h"
 #include "ANE/Physics/Physics.h"
 
-
 namespace Engine
 {
+    #define WARN_NO_VALUE(message, ...) ANE_ELOG_WARN(message ", possible file corruption", (__VA_ARGS__))
+
     SceneSerializer::SceneSerializer()
     {
     }
 
     toml::table SceneSerializer::EntitySerializer(Entity& entity)
     {
+        ANE_PROFILE_FUNCTION();
+
         toml::table componentTable;
 
         if (TagComponent tagComp; entity.TryGetComponent(tagComp))
@@ -154,6 +157,10 @@ namespace Engine
                 {"_bodyType", rigidComp.GetRigidBody()->GetBodyType()},
                 {"_useGravity", rigidComp.GetRigidBody()->IsGravityEnabled()},
                 {"_mass", rigidComp.GetRigidBody()->GetMass()},
+                {"_damping", rigidComp.GetRigidBody()->GetDamping()},
+                {"_angularDamping", rigidComp.GetRigidBody()->GetAngularDamping()},
+                {"_useAutoMass", rigidComp.GetRigidBody()->IsAutoMass()},
+                {"_useAutoCenterOfMass", rigidComp.GetRigidBody()->IsAutoCenterOfMass()},
                 {"_active", rigidComp.GetRigidBody()->IsActive()}
             };
             componentTable.insert_or_assign("_rigidBodyComponent", table);
@@ -177,6 +184,8 @@ namespace Engine
 
     void SceneSerializer::Serialize(const std::shared_ptr<Scene>& scene)
     {
+        ANE_PROFILE_FUNCTION();
+
         toml::array arr;
 
         for (auto entity : scene->_registry.view<TagComponent>())
@@ -191,7 +200,7 @@ namespace Engine
             {"Entities", arr}
         };
 
-        std::string path = _filepath + scene->Name + ".toml";
+        std::string path = _filepath + scene->Name + ".anem";
 
         WriteToFile(path, table);
     }
@@ -202,13 +211,17 @@ namespace Engine
 
     bool SceneSerializer::HasFile(const char* fileName)
     {
-        std::string filePath = _filepath + fileName + ".toml";
+        ANE_PROFILE_FUNCTION();
+
+        std::string filePath = _filepath + fileName + ".anem";
         return std::filesystem::is_regular_file(filePath);
     }
 
     std::shared_ptr<Scene> SceneSerializer::CreateEmptySceneFile(const char* sceneName)
     {
-        std::string filePath = _filepath + sceneName + ".toml";
+        ANE_PROFILE_FUNCTION();
+
+        std::string filePath = _filepath + sceneName + ".anem";
 
         std::shared_ptr<Scene> scene = std::make_shared<Scene>(sceneName);
         auto table = toml::table{
@@ -223,7 +236,8 @@ namespace Engine
 
     std::shared_ptr<Scene> SceneSerializer::Deserialize(const char* key, EditorLayer* layer) const
     {
-        std::string filePath = _filepath + key + ".toml";
+        ANE_PROFILE_FUNCTION();
+        std::string filePath = _filepath + key + ".anem";
 
         toml::table table;
 
@@ -235,6 +249,8 @@ namespace Engine
         {
             ANE_ELOG(err.description());
         }
+
+        ANE_ELOG_INFO("Begin deserializing file: {}", key);
 
         const auto sceneName = table["Scene"].value_or("NoSceneFound");
 
@@ -251,95 +267,150 @@ namespace Engine
                 if (const auto& componentTable = entity.as_table())
                 {
                     auto tagComponent = (*componentTable)["_tag"]["_value"].value<std::string>();
+                    if(!tagComponent)
+                    {
+                        WARN_NO_VALUE("Missing tagcomponent for entity skipping", 0);
+                        continue;
+                    }
 
                     auto entityRef = scene->Create(*tagComponent);
 
-                    if (auto transformComponent = (*componentTable)["_transformComponent"]; !!transformComponent)
+                    if (auto transformComp = (*componentTable)["_transformComponent"])
                     {
-                        auto& entityTransformComp = entityRef.AddComponent<TransformComponent>();
-                        auto position = transformComponent["_position"];
-                        entityTransformComp.Transform.SetPosition(Vector3(*position[0].value<float>(), *position[1].value<float>(), *position[2].value<float>()));
+                        auto& entityTransform = entityRef.GetComponent<TransformComponent>().Transform;
+                        if(auto position = transformComp["_position"])
+                            entityTransform.SetPosition(Vector3(*position[0].value<float>(), *position[1].value<float>(), *position[2].value<float>()));
+                        else WARN_NO_VALUE("TransformComp: _position doesnt exist for entity: {}", *tagComponent);
 
-                        auto rotation = transformComponent["_rotation"];
-                        entityTransformComp.Transform.SetRotation(Vector3(*rotation[0].value<float>(), *rotation[1].value<float>(), *rotation[2].value<float>()));
+                        if(auto rotation = transformComp["_rotation"])
+                            entityTransform.SetRotation(Vector3(*rotation[0].value<float>(), *rotation[1].value<float>(), *rotation[2].value<float>()));
+                        else WARN_NO_VALUE("TransformComp: _rotation doesnt exist for entity: {}", *tagComponent);
 
-                        auto scale = transformComponent["_scale"];
-                        entityTransformComp.Transform.SetScale(Vector3(*scale[0].value<float>(), *scale[1].value<float>(), *scale[2].value<float>()));
+                        if(auto scale = transformComp["_scale"])
+                            entityTransform.SetScale(Vector3(*scale[0].value<float>(), *scale[1].value<float>(), *scale[2].value<float>()));
+                        else WARN_NO_VALUE("TransformComp: _scale doesnt exist for entity: {}", *tagComponent);
                     }
 
-                    if (auto cameraComponent = (*componentTable)["_cameraComponent"]; !!cameraComponent)
+                    if (auto camComp = (*componentTable)["_cameraComponent"])
                     {
                         auto& entityCameraComponent = entityRef.AddComponent<CameraComponent>();
-                        entityCameraComponent.SetPerspective(*cameraComponent["_fieldOfView"].value<float>(),
-                                                             *cameraComponent["_aspectRatio"].value<float>(),
-                                                             *cameraComponent["zNear"].value<float>(),
-                                                             *cameraComponent["zFar"].value<float>());
+                        entityCameraComponent.SetPerspective(*camComp["_fieldOfView"].value<float>(),
+                                                             *camComp["_aspectRatio"].value<float>(),
+                                                             *camComp["zNear"].value<float>(),
+                                                             *camComp["zFar"].value<float>());
 
                         entityRef.AddComponent<NativeScriptComponent>().Bind<CameraController>();
                     }
 
-                    if (auto rigidBodyComponent = (*componentTable)["_rigidBodyComponent"]; !!rigidBodyComponent)
+                    if (auto rbComp = (*componentTable)["_rigidBodyComponent"])
                     {
-                        auto& entityRigidBodyComponent = entityRef.AddComponent<RigidBodyComponent>(entityRef);
-                        entityRigidBodyComponent.GetRigidBody()->SetMass(*(*componentTable)["_rigidBodyComponent"]["_mass"].value<float>());
-                        entityRigidBodyComponent.GetRigidBody()->SetBodyType(static_cast<BodyType>(*(*componentTable)["_rigidBodyComponent"]["_bodyType"].value<int>()));
-                        entityRigidBodyComponent.GetRigidBody()->SetActive(*(*componentTable)["_rigidBodyComponent"]["_active"].value<bool>());
-                        entityRigidBodyComponent.GetRigidBody()->SetUseGravity(*(*componentTable)["_rigidBodyComponent"]["_useGravity"].value<bool>());
+                        auto entityRb = entityRef.AddComponent<RigidBodyComponent>(entityRef).GetRigidBody();
+
+                        if(auto mass = rbComp["_mass"].value<float>())
+                            entityRb->SetMass(*mass);
+                        else WARN_NO_VALUE("RigidBodyComp: _mass doesnt exist for entity: {}", *tagComponent);
+                        if(auto damping = rbComp["_damping"].value<float>())
+                            entityRb->SetDamping(*damping);
+                        else WARN_NO_VALUE("RigidBodyComp: _damping doesnt exist for entity: {}", *tagComponent);
+                        if(auto angularDamping = rbComp["_angularDamping"].value<float>())
+                            entityRb->SetAngularDamping(*angularDamping);
+                        else WARN_NO_VALUE("RigidBodyComp: _angularDamping doesnt exist for entity: {}", *tagComponent);
+
+                        if(auto bodyType = rbComp["_bodyType"].value<int>())
+                            entityRb->SetBodyType(static_cast<BodyType>(*bodyType));
+                        else WARN_NO_VALUE("RigidBodyComp: _bodyType doesnt exist for entity: {}", *tagComponent);
+                        if(auto active = rbComp["_active"].value<bool>())
+                            entityRb->SetActive(*active);
+                        else WARN_NO_VALUE("RigidBodyComp: _active doesnt exist for entity: {}", *tagComponent);
+                        if(auto useAutoMass = rbComp["_useAutoMass"].value<bool>())
+                            entityRb->SetAutoMass(*useAutoMass);
+                        else WARN_NO_VALUE("RigidBodyComp: _useAutoMass doesnt exist for entity: {}", *tagComponent);
+                        if(auto useAutoCenterOfMass = rbComp["_useAutoCenterOfMass"].value<bool>())
+                            entityRb->SetAutoCenterOfMass(*useAutoCenterOfMass);
+                        else WARN_NO_VALUE("RigidBodyComp: _useAutoCenterOfMass doesnt exist for entity: {}", *tagComponent);
+                        if(auto useGravity = rbComp["_useGravity"].value<bool>())
+                            entityRb->SetUseGravity(*useGravity);
+                        else WARN_NO_VALUE("RigidBodyComp: _useGravity doesnt exist for entity: {}", *tagComponent);
                     }
 
-                    if (auto colliderComponent = (*componentTable)["_colliderComponent"]; !!colliderComponent)
+                    if (auto colliderComp = (*componentTable)["_colliderComponent"])
                     {
-                        auto& entityColliderComp = entityRef.AddComponent<ColliderComponent>();
-                        auto collidersView = colliderComponent["_colliders"];
+                        auto& entityColliderComp = entityRef.AddComponent<ColliderComponent>(entityRef);
+                        auto collidersView = colliderComp["_colliders"];
                         if (toml::array* colliders = collidersView.as_array())
                         {
                             for (auto& collider : *colliders)
                             {
-                                if (toml::table* colliderTable = collider.as_table())
-                                {
-                                    Collider* col;
+                                toml::table* colliderTable = collider.as_table();
+                                if (!colliderTable) continue;
 
-                                    switch (*(*colliderTable)["_shapeType"].value<int>())
+                                Collider* col = nullptr;
+                                auto specificData = (*colliderTable)["_colliderSpecificData"];
+
+                                switch ((*colliderTable)["_shapeType"].value_or<int>(-1)) //If no value exists fall outside of case range
+                                {
+                                    case 0:
                                     {
-                                        case 0:
-                                        {
-                                            auto radius = (*colliderTable)["_colliderSpecificData"]["_radius"].value<float>();
-                                            col = entityColliderComp.AddSphereCollider(entityRef, *radius);
-                                        }
-                                        break;
-                                        case 1:
-                                        {
-                                            Vector3 halfExtends = Vector3(*(*colliderTable)["_colliderSpecificData"]["_halfSize"][0].value<float>(), *(*colliderTable)["_colliderSpecificData"]["_halfSize"][1].value<float>(), *(*colliderTable)["_colliderSpecificData"]["_halfSize"][2].value<float>());
-                                            col = entityColliderComp.AddBoxCollider(entityRef, halfExtends);
-                                        }
-                                        break;
-                                        case 2:
-                                        {
-                                            auto radius = (*colliderTable)["_colliderSpecificData"]["_radius"].value<float>();
-                                            auto height = (*colliderTable)["_colliderSpecificData"]["_height"].value<float>();
-                                            col = entityColliderComp.AddCapsuleCollider(entityRef, *radius, *height);
-                                        }
-                                        break;
-                                        default: ;
+                                        if(auto radius = specificData["_radius"].value<float>())
+                                            col = entityColliderComp.AddSphereCollider(*radius);
+                                        else WARN_NO_VALUE("SphereCollider: _radius of doesnt exist for entity: {}", *tagComponent);
                                     }
-                                    if (col != nullptr)
+                                    break;
+                                    case 1:
                                     {
-                                        col->SetCollisionMask(static_cast<CollisionLayerMask>(*(*colliderTable)["_colliderCollisionMask"].value<int>()));
-                                        col->SetCollisionCategories(static_cast<CollisionLayerMask>(*(*colliderTable)["_colliderCollisionCategories"].value<int>()));
-                                        col->GetMaterial().setFrictionCoefficient(*(*colliderTable)["_colliderMaterial"][0].value<float>());
-                                        col->GetMaterial().setBounciness(*(*colliderTable)["_colliderMaterial"][1].value<float>());
-                                        col->GetMaterial().setMassDensity(*(*colliderTable)["_colliderMaterial"][2].value<float>());
-                                        col->SetPosition(Vector3(*(*colliderTable)["_colliderPosition"][0].value<float>(), *(*colliderTable)["_colliderPosition"][1].value<float>(), *(*colliderTable)["_colliderPosition"][2].value<float>()));
-                                        col->SetRotation(Vector3(*(*colliderTable)["_colliderRotation"][0].value<float>(), *(*colliderTable)["_colliderRotation"][1].value<float>(), *(*colliderTable)["_colliderRotation"][2].value<float>()));
+                                        if(auto halfSize = specificData["_halfSize"])
+                                        {
+                                            Vector3 halfExtends = Vector3(
+                                            *halfSize[0].value<float>(),
+                                            *halfSize[1].value<float>(),
+                                            *halfSize[2].value<float>());
+                                            col = entityColliderComp.AddBoxCollider(halfExtends);
+                                        }
+                                        else WARN_NO_VALUE("BoxCollider: _halfSize doesnt exist for entity: {}", *tagComponent);
                                     }
+                                    break;
+                                    case 2:
+                                    {
+                                        if(auto radius = specificData["_radius"].value<float>(); auto height = specificData["_height"].value<float>())
+                                            col = entityColliderComp.AddCapsuleCollider(*radius, *height);
+                                        else WARN_NO_VALUE("CapsuleCollider: _radius or _height for CapsuleCollider doesnt exist for entity: {}", *tagComponent);
+                                    }
+                                    break;
+                                    default: WARN_NO_VALUE("Collider: _shapeType out of range for entity {}", *tagComponent);
+                                }
+                                if (col != nullptr)
+                                {
+                                    if(auto colPos = (*colliderTable)["_colliderPosition"])
+                                        col->SetPosition(Vector3(*colPos[0].value<float>(), *colPos[1].value<float>(), *colPos[2].value<float>()));
+                                    else WARN_NO_VALUE("Collider: _colliderPosition doesnt exist for entity {}", *tagComponent);
+                                    if(auto colRot = (*colliderTable)["_colliderRotation"])
+                                        col->SetRotation(Vector3(*colRot[0].value<float>(), *colRot[1].value<float>(), *colRot[2].value<float>()));
+                                    else WARN_NO_VALUE("Collider: _colliderRotation doesnt exist for entity {}", *tagComponent);
+
+                                    if(auto colMask = (*colliderTable)["_colliderCollisionMask"].value<int>())
+                                        col->SetCollisionMask(*colMask);
+                                    else WARN_NO_VALUE("Collider: _colliderCollisionMask doesnt exist for entity {}", *tagComponent);
+                                    if(auto colCategories = (*colliderTable)["_colliderCollisionCategories"].value<int>())
+                                        col->SetCollisionCategories(*colCategories);
+                                    else WARN_NO_VALUE("Collider: _colliderCollisionCategories doesnt exist for entity {}", *tagComponent);
+
+                                    if(auto colMaterial = (*colliderTable)["_colliderMaterial"])
+                                    {
+                                        col->GetMaterial().setFrictionCoefficient(*colMaterial[0].value<float>());
+                                        col->GetMaterial().setBounciness(*colMaterial[1].value<float>());
+                                        col->GetMaterial().setMassDensity(*colMaterial[2].value<float>());
+                                    }
+                                    else WARN_NO_VALUE("Collider: _colliderMaterial doesnt exist for entity {}", *tagComponent);
                                 }
                             }
                         }
                     }
 
-                    if (auto renderComponent = (*componentTable)["_renderComponent"]; !!renderComponent)
+                    if (auto renderComponent = (*componentTable)["_renderComponent"]; renderComponent)
                     {
-                        entityRef.AddComponent<RenderComponent>(*(*componentTable)["_renderComponent"]["_modelPath"].value<std::string>());
+                        if(auto modelPath = renderComponent["_modelPath"].value<std::string>())
+                            entityRef.AddComponent<RenderComponent>(*modelPath);
+                        else WARN_NO_VALUE("RenderComp: _colliderMaterial doesnt exist for entity {}", *tagComponent);
                     }
 
                     // ScriptComponent
@@ -347,12 +418,15 @@ namespace Engine
             }
         }
 
+        ANE_ELOG_INFO("End Deserializing file: {}", key);
 
         return scene;
     }
 
     std::shared_ptr<Scene> SceneSerializer::DeserializeBinary()
     {
+        ANE_PROFILE_FUNCTION();
+
         // not implemented
         ANE_ASSERT(false);
 
@@ -363,6 +437,8 @@ namespace Engine
 
     void SceneSerializer::WriteToFile(std::string filepath, const toml::table& content)
     {
+        ANE_PROFILE_FUNCTION();
+
         std::ofstream output(filepath, std::ios::trunc);
 
         if (!output.is_open()) output.open(filepath);
@@ -374,6 +450,8 @@ namespace Engine
 
     void SceneSerializer::WriteToFile(std::string filepath)
     {
+        ANE_PROFILE_FUNCTION();
+
         std::ofstream output(filepath, std::ios::app);
 
         if (!output.is_open()) output.open(filepath);

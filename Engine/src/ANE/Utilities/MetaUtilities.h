@@ -3,6 +3,7 @@
 
 #include "imgui_internal.h"
 #include "PhysicsUtilities.h"
+#include "ANE/Physics/Physics.h"
 #include "ANE/Physics/Types/Collider.h"
 #include "ANE/Physics/Types/BoxCollider.h"
 #include "ANE/Physics/Types/SphereCollider.h"
@@ -118,12 +119,15 @@ namespace Engine
     inline bool InspectMutableColliders(entt::meta_data& field, entt::meta_any& componentData)
     {
         bool propertyWritten = false;
-        auto v = field.get(componentData).cast<std::vector<Collider*>>();
+        auto data = field.get(componentData).cast<ColliderComponentData>();
         ImGui::Text("%s", field.prop("display_name"_hs).value().cast<const char*>());
-        for (auto collider : v)
+        int index = 0;
+        for (const auto collider : data.Colliders)
         {
+            index++;
             constexpr ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-            if (ImGui::TreeNodeEx(PhysicsUtilities::ToString(collider->GetShapeType()).append(" Collider").c_str(), nodeFlags))
+            std::string label = PhysicsUtilities::ToString(collider->GetShapeType()).append(std::format("Collider {}", index));
+            if (ImGui::TreeNodeEx(label.c_str(), nodeFlags))
             {
                 Vector3 position = collider->GetPosition();
                 Vector3 rotation = collider->GetEulerAngles(true);
@@ -144,7 +148,7 @@ namespace Engine
                     {
                         const auto sphereCollider = reinterpret_cast<SphereCollider*>(collider);
                         float radius = sphereCollider->GetRadius();
-                        if (ImGui::DragFloat("Radius", &radius, 0.1f))
+                        if (ImGui::DragFloat("Radius", &radius, 0.1f, FLT_MIN, FLT_MAX))
                         {
                             sphereCollider->SetRadius(radius);
                             propertyWritten = true;
@@ -155,7 +159,7 @@ namespace Engine
                     {
                         const auto boxCollider = reinterpret_cast<BoxCollider*>(collider);
                         Vector3 halfSize = boxCollider->GetHalfSize();
-                        if (ImGui::DragFloat3("Half Size", &halfSize.X, 0.1f))
+                        if (ImGui::DragFloat3("Half Size", &halfSize.X, 0.1f, FLT_MIN, FLT_MAX))
                         {
                             boxCollider->SetHalfSize(halfSize);
                             propertyWritten = true;
@@ -167,15 +171,14 @@ namespace Engine
                         const auto capsuleCollider = reinterpret_cast<CapsuleCollider*>(collider);
                         float radius = capsuleCollider->GetRadius();
                         float height = capsuleCollider->GetHeight();
-                        if (ImGui::DragFloat("Radius", &radius, 0.1f))
+                        if (ImGui::DragFloat("Radius", &radius, 0.1f, FLT_MIN, FLT_MAX))
                         {
                             capsuleCollider->SetRadius(radius);
                             propertyWritten = true;
                         }
-                        ImGui::SameLine();
-                        if (ImGui::DragFloat("Height", &height, 0.1f))
+                        if (ImGui::DragFloat("Height", &height, 0.1f, FLT_MIN, FLT_MAX))
                         {
-                            capsuleCollider->SetHeight(radius);
+                            capsuleCollider->SetHeight(height);
                             propertyWritten = true;
                         }
                     }
@@ -184,41 +187,115 @@ namespace Engine
                 ImGui::TreePop();
             }
         }
-        if (propertyWritten) field.set(componentData, v);
+
+        if(ImGui::Button("Add SphereCollider"))
+        {
+            if(Entity ownerEntity = GetPhysicsSystem().GetOwnerEntity(data.BodyId); ownerEntity)
+            {
+                ownerEntity.GetComponent<ColliderComponent>().AddSphereCollider(1.f);
+            }
+        }
+        if(ImGui::Button("Add BoxCollider"))
+        {
+            if(Entity ownerEntity = GetPhysicsSystem().GetOwnerEntity(data.BodyId); ownerEntity)
+            {
+                ownerEntity.GetComponent<ColliderComponent>().AddBoxCollider(1.f);
+            }
+        }
+        if(ImGui::Button("Add CapsuleCollider"))
+        {
+            if(Entity ownerEntity = GetPhysicsSystem().GetOwnerEntity(data.BodyId); ownerEntity)
+            {
+                ownerEntity.GetComponent<ColliderComponent>().AddCapsuleCollider(1.f, 2.f);
+            }
+        }
+
+        if (propertyWritten) field.set(componentData, data);
         return propertyWritten;
     }
 
     inline bool InspectMutableRigidBody(entt::meta_data& field, entt::meta_any& componentData)
     {
-        auto v = field.get(componentData).cast<RigidBody*>();
+        auto rb = field.get(componentData).cast<RigidBody*>();
         bool propertyWritten = false;
+
+        bool isActive = rb->IsActive();
+        int bodyType = static_cast<int>(rb->GetBodyType());
+        bool isGravity = rb->IsGravityEnabled();
+        bool isAutoMass = rb->IsAutoMass();
+        bool isAutoCenterOfMass = rb->IsAutoCenterOfMass();
+        float mass = rb->GetMass();
+        float damping = rb->GetDamping();
+        float angularDamping = rb->GetAngularDamping();
+
+        const char* bodyTypes[3] {"Static", "Kinematic", "Dynamic"};
+
+        if (ImGui::Checkbox("Active", &isActive))
+        {
+            rb->SetActive(isActive);
+            propertyWritten = true;
+        }
+        if (ImGui::Combo("BodyType", &bodyType, bodyTypes, 3))
+        {
+            rb->SetBodyType(static_cast<BodyType>(bodyType));
+            propertyWritten = true;
+        }
+        if (ImGui::Checkbox("Use Gravity", &isGravity))
+        {
+            rb->SetUseGravity(isGravity);
+            propertyWritten = true;
+        }
+        if (ImGui::Checkbox("Use Auto Center of Mass", &isAutoCenterOfMass))
+        {
+            rb->SetAutoCenterOfMass(isAutoCenterOfMass);
+            propertyWritten = true;
+        }
+        if (ImGui::Checkbox("Use Auto Mass", &isAutoMass))
+        {
+            rb->SetAutoMass(isAutoMass);
+            propertyWritten = true;
+        }
+        ImGui::BeginDisabled(isAutoMass);
+        if (ImGui::DragFloat("Mass", &mass, .1f, 0, FLT_MAX))
+        {
+            rb->SetMass(mass);
+            propertyWritten = true;
+        }
+        ImGui::EndDisabled();
+        if (ImGui::DragFloat("Damping", &damping, .1f, 0, FLT_MAX))
+        {
+            rb->SetDamping(damping);
+            propertyWritten = true;
+        }
+        if (ImGui::DragFloat("Angular Damping", &angularDamping, .1f, 0, FLT_MAX))
+        {
+            rb->SetAngularDamping(angularDamping);
+            propertyWritten = true;
+        }
 
         constexpr ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
         if (ImGui::TreeNodeEx("Readonly", nodeFlags))
         {
-            Vector3 position = v->GetPosition();
-            Vector3 rotation = v->GetRotation().GetEulerAngles(true);
-            Vector3 velocity = v->GetVelocity();
-            Vector3 angularVelocity = v->GetAngularVelocity();
-            bool isSleeping = v->IsSleeping();
-            bool isActive = v->IsActive();
+            bool isSleeping = rb->IsSleeping();
+            Vector3 position = rb->GetPosition();
+            Vector3 rotation = rb->GetRotation().GetEulerAngles(true);
+            Vector3 velocity = rb->GetVelocity();
+            Vector3 angularVelocity = rb->GetAngularVelocity();
 
             ImGui::BeginDisabled();
+            ImGui::Checkbox("Sleeping", &isSleeping);
+            ImGui::Spacing();
             ImGui::DragFloat3("Position", &position.X);
             ImGui::DragFloat3("Rotation", &rotation.X);
             ImGui::Spacing();
             ImGui::DragFloat3("Velocity", &velocity.X);
             ImGui::DragFloat3("Angular Velocity", &angularVelocity.X);
-            ImGui::Spacing();
-            ImGui::Checkbox("Active", &isActive);
-            ImGui::SameLine();
-            ImGui::Checkbox("Sleeping", &isSleeping);
             ImGui::EndDisabled();
 
             ImGui::TreePop();
         }
 
-        if (propertyWritten) field.set(componentData, v);
+        if (propertyWritten) field.set(componentData, rb);
         return propertyWritten;
     }
 
@@ -361,7 +438,7 @@ namespace Engine
     {
         {entt::type_id<std::string>().hash(), InspectMutableStringField},
         {entt::type_id<TransformMatrix>().hash(), InspectMutableTransformMatrix},
-        {entt::type_id<std::vector<Collider*>>().hash(), InspectMutableColliders},
+        {entt::type_id<ColliderComponentData>().hash(), InspectMutableColliders},
         {entt::type_id<RigidBody*>().hash(), InspectMutableRigidBody},
         {entt::type_id<VmaMeshAsset>().hash(), InspectMutableMeshAsset},
         {entt::type_id<float>().hash(), InspectMutableFloat},

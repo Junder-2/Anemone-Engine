@@ -5,23 +5,10 @@
 
 namespace Engine
 {
-    void Layer::OnUpdate(float deltaTime)
-    {
-        ANE_DEEP_PROFILE_FUNCTION();
-    }
-
-    void Layer::OnEvent(Event& e)
-    {
-        ANE_DEEP_PROFILE_FUNCTION();
-    }
-
-    void Layer::OnUIRender()
-    {
-        ANE_DEEP_PROFILE_FUNCTION();
-    }
-
     void Layer::AttachUIPanel(UILayerPanel* newPanel)
     {
+        ANE_PROFILE_FUNCTION();
+
         auto it = std::ranges::find_if(_uiPanels, [newPanel](const UILayerPanel* panel)
         {
             return typeid(*panel) == typeid(*newPanel);
@@ -32,6 +19,8 @@ namespace Engine
 
     void Layer::DetachUIPanel(UILayerPanel* panelToRemove)
     {
+        ANE_PROFILE_FUNCTION();
+
         auto it = std::ranges::find(_uiPanels, panelToRemove);
         if (it != _uiPanels.end()) _uiPanels.erase(it);
     }

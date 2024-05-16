@@ -6,6 +6,8 @@ namespace Engine
 {
     void UIUpdateWrapper::AddPanel(UILayerPanel* panelToAdd)
     {
+        ANE_PROFILE_FUNCTION();
+
         auto it = std::ranges::find_if(PanelsToAdd, [panelToAdd](const UILayerPanel* panel)
         {
             return typeid(*panel) == typeid(*panelToAdd);

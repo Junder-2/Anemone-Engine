@@ -268,6 +268,8 @@ namespace Engine
 
     Vector2 Window::GetAbsoluteMousePos() const
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         int newX, newY;
         SDL_GetMouseState(&newX, &newY);
         newX += _windowData.XPos;
@@ -280,11 +282,15 @@ namespace Engine
 
     void Window::DispatchEvent(Event& e)
     {
+        ANE_PROFILE_FUNCTION();
+
         if(_eventDelegate) _eventDelegate(e);
     }
 
     void Window::Shutdown()
     {
+        ANE_PROFILE_FUNCTION();
+
         SDL_DestroyWindow(_windowContext);
         SDL_Quit();
     }
@@ -297,6 +303,8 @@ namespace Engine
 
     ViewportProperties Window::GetActiveViewportProperties() const
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         if(IsViewportMainWindow())
         {
             return ViewportProperties(_windowData.Id, _windowData.Width, _windowData.Height);
@@ -308,6 +316,8 @@ namespace Engine
 
     void Window::SetActiveViewport(const uint32_t id)
     {
+        ANE_PROFILE_FUNCTION();
+
         if(_activeViewportId == id) return;
         AddViewport(id);
         _previousViewportId = _activeViewportId;
@@ -318,6 +328,8 @@ namespace Engine
 
     void Window::AddViewport(uint32_t id)
     {
+        ANE_PROFILE_FUNCTION();
+
         if(_viewports.contains(id)) return;
 
         _viewports.emplace(id);
@@ -325,6 +337,8 @@ namespace Engine
 
     void Window::RemoveViewport(const uint32_t id)
     {
+        ANE_PROFILE_FUNCTION();
+
         if(!_viewports.contains(id)) return;
 
         _viewports.erase(id);
@@ -334,6 +348,8 @@ namespace Engine
 
     bool Window::IsOverViewport() const
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         if(_activeViewportId == _windowData.Id) return !ImGui::GetIO().WantCaptureMouse;
         const auto& rect = ImGui::FindWindowByID(_activeViewportId)->InnerRect;
 
@@ -342,6 +358,8 @@ namespace Engine
 
     void Window::SetMouseVisibility(const bool enable)
     {
+        ANE_PROFILE_FUNCTION();
+
         // TODO: This seems to unfocus out of the window
         SDL_SetRelativeMouseMode(enable ? SDL_FALSE : SDL_TRUE);
         SDL_ShowCursor(enable);

@@ -8,6 +8,8 @@ namespace Engine
 {
     int LogFileWriter::DirectoryCount() const
     {
+        ANE_PROFILE_FUNCTION();
+
         int fileCount = 0;
 
         for (const auto& entry : std::filesystem::directory_iterator(_path))
@@ -18,6 +20,8 @@ namespace Engine
 
     void LogFileWriter::GetOldestFile(std::filesystem::path& oldestFile) const
     {
+        ANE_PROFILE_FUNCTION();
+
         std::filesystem::file_time_type oldestTime = std::filesystem::file_time_type::max();
         for (const auto& entry : std::filesystem::directory_iterator(_path))
         {
@@ -32,6 +36,8 @@ namespace Engine
 
     std::string LogFileWriter::ConstructMessage(LogMessage& msg)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         std::string messageBuilder;
         const std::string levelName = LoggingUtilities::ToString(msg.LevelCategory);
 
@@ -48,6 +54,8 @@ namespace Engine
 
     void LogFileWriter::WriteToFile(LogMessage& msg)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         if (msg.LevelCategory == LogLevelCategory::Debug || msg.LevelCategory == LogLevelCategory::None || msg.LevelCategory == LogLevelCategory::Info) return;
 
         if (!std::filesystem::is_directory(_path)) std::filesystem::create_directory(_path);

@@ -18,6 +18,8 @@ namespace Engine
 
     UIUpdateWrapper SceneHierarchyPanel::OnPanelRender()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         _activeScene = _editorLayer->GetActiveScene();
         UIUpdateWrapper UIUpdate;
 

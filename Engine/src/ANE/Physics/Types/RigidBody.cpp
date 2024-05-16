@@ -1,6 +1,7 @@
 ﻿#include "anepch.h"
 #include "RigidBody.h"
 
+#include "ANE/Math/FMath.h"
 #include "ANE/Math/Types/Quaternion.h"
 #include "ANE/Physics/Physics.h"
 #include "ANE/Utilities/API.h"
@@ -13,8 +14,15 @@ namespace Engine
         _reactRigidBody = nullptr;
     }
 
-    void RigidBody::SetTransform(const Vector3 position, const Quaternion& rotation, const bool teleport /*= false*/) const
+    void RigidBody::TryUpdate() const
     {
+        if(IsAutoMass()) UpdateMass();
+        if(IsAutoCenterOfMass()) UpdateCenterOfMass();
+    }
+
+    void RigidBody::SetTransform(const Vector3 position, const Quaternion& rotation, const bool teleport /*= false*/)
+    {
+        MarkDirty();
         _reactRigidBody->setTransform(rp3d::Transform(position, rotation));
         if(teleport)
         {
@@ -23,14 +31,9 @@ namespace Engine
         }
     }
 
-    void RigidBody::SetPosition(const Vector3 position, const bool teleport /*= false*/) const
+    void RigidBody::SetPosition(const Vector3 position, const bool teleport /*= false*/)
     {
-        _reactRigidBody->setTransform(rp3d::Transform(position, _reactRigidBody->getTransform().getOrientation()));
-        if(teleport)
-        {
-            SetVelocity(0);
-            SetAngularVelocity(0);
-        }
+        SetTransform(position, GetRotation(), teleport);
     }
 
     Vector3 RigidBody::GetPosition() const
@@ -38,14 +41,9 @@ namespace Engine
         return Vector3::Convert(_reactRigidBody->getTransform().getPosition());
     }
 
-    void RigidBody::SetRotation(const Quaternion& rotation, const bool teleport /*= false*/) const
+    void RigidBody::SetRotation(const Quaternion& rotation, const bool teleport /*= false*/)
     {
-        _reactRigidBody->setTransform(rp3d::Transform(_reactRigidBody->getTransform().getPosition(), rotation));
-        if(teleport)
-        {
-            SetVelocity(0);
-            SetAngularVelocity(0);
-        }
+        SetTransform(GetPosition(), rotation, teleport);
     }
 
     Quaternion RigidBody::GetRotation() const
@@ -135,7 +133,7 @@ namespace Engine
 
     void RigidBody::SetDamping(const float newDamping) const
     {
-        _reactRigidBody->setLinearDamping(newDamping);
+        _reactRigidBody->setLinearDamping(FMath::Max0(newDamping));
     }
 
     float RigidBody::GetDamping() const
@@ -145,7 +143,7 @@ namespace Engine
 
     void RigidBody::SetAngularDamping(const float newDamping) const
     {
-        _reactRigidBody->setAngularDamping(newDamping);
+        _reactRigidBody->setAngularDamping(FMath::Max0(newDamping));
     }
 
     float RigidBody::GetAngularDamping() const
@@ -153,9 +151,29 @@ namespace Engine
         return _reactRigidBody->getAngularDamping();
     }
 
+    void RigidBody::UpdateCenterOfMass() const
+    {
+        _reactRigidBody->updateLocalCenterOfMassFromColliders();
+    }
+
+    void RigidBody::SetLocalCenterOfMass(const Vector3& centerOfMass) const
+    {
+        _reactRigidBody->setLocalCenterOfMass(centerOfMass);
+    }
+
+    Vector3 RigidBody::GetLocalCenterOfMass() const
+    {
+        return Vector3::Convert(_reactRigidBody->getLocalCenterOfMass());
+    }
+
+    void RigidBody::UpdateMass() const
+    {
+        _reactRigidBody->updateMassFromColliders();
+    }
+
     void RigidBody::SetMass(const float mass) const
     {
-        _reactRigidBody->setMass(mass);
+        _reactRigidBody->setMass(FMath::Max(mass, MIN_PHYS));
     }
 
     float RigidBody::GetMass() const
@@ -163,8 +181,11 @@ namespace Engine
         return _reactRigidBody->getMass();
     }
 
-    void RigidBody::SetBodyType(BodyType type) const
+    void RigidBody::SetBodyType(BodyType type)
     {
+        if(type == GetBodyType()) return;
+        MarkDirty();
+        _bodyType = type;
         _reactRigidBody->setType(static_cast<rp3d::BodyType>(type));
     }
 
@@ -191,5 +212,37 @@ namespace Engine
     bool RigidBody::IsSleeping() const
     {
         return _reactRigidBody->isSleeping();
+    }
+
+    void RigidBody::SetAutoMass(const bool enable)
+    {
+        if(enable == IsAutoMass()) return;
+
+        _flags ^= EnumCast(RigidBodyFlag::AutoMass);
+
+        MarkDirty();
+    }
+
+    void RigidBody::SetAutoCenterOfMass(const bool enable)
+    {
+        if(enable == IsAutoCenterOfMass()) return;
+
+        _flags ^= EnumCast(RigidBodyFlag::AutoCenterOfMass);
+
+        MarkDirty();
+    }
+
+    void RigidBody::MarkDirty()
+    {
+        if(IsDirty()) return;
+
+        _reactRigidBody->setType(rp3d::BodyType::KINEMATIC);
+        _flags |= EnumCast(RigidBodyFlag::IsDirty);
+    }
+
+    void RigidBody::ClearDirty()
+    {
+        _reactRigidBody->setType(static_cast<rp3d::BodyType>(_bodyType));
+        _flags &= ~EnumCast(RigidBodyFlag::IsDirty);
     }
 }

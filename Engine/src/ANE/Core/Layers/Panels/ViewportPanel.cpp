@@ -22,6 +22,8 @@ namespace Engine
 
     UIUpdateWrapper ViewportPanel::OnPanelRender()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         UIUpdateWrapper uiUpdate;
 
         const ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_MenuBar;
@@ -62,6 +64,8 @@ namespace Engine
 
     void ViewportPanel::ViewPhysicsDebugMenu()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         #ifndef ANE_DIST
         if (ImGui::BeginMenu("Debug Rendering"))
         {

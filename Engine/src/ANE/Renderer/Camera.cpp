@@ -11,8 +11,12 @@ namespace Engine
 {
     void Camera::UpdateCamera(Scene* scene)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         if(IsPriorityDirty() || !HasCamera())
         {
+            ANE_DEEP_PROFILE_SCOPE("Camera sort priority");
+
             int currPriority = 10000;
             _currentCameraComponent = nullptr;
             _currentCameraTransform = nullptr;
@@ -35,12 +39,14 @@ namespace Engine
 
     void Camera::SubmitCamera()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         if(!HasCamera()) return;
 
         if(_currentCameraComponent->IsDirty() || _currentCameraTransform->IsDirty())
         {
             Renderer::SetCameraPosition(_currentCameraTransform->GetPosition());
-            
+
             const Matrix4x4 viewMatrix = _currentCameraTransform->GetWorldToLocal();
             const Matrix4x4 projMatrix = _currentCameraComponent->GetPerspectiveMatrix();
             Renderer::SetViewProjection(projMatrix * viewMatrix);

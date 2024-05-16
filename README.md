@@ -17,6 +17,7 @@ The main goals with the Anemone Engine is to use Vulkan for rendering and to cre
 * [VkBootstrap](https://github.com/charles-lunarg/vk-bootstrap) [![License: MIT][MIT Badge]](https://github.com/charles-lunarg/vk-bootstrap/blob/main/LICENSE.txt)
 * [Vulkan Memory Allocator](https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator) [![License: MIT][MIT Badge]](https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator/blob/master/LICENSE.txt)
 * [EnTT](https://github.com/skypjack/entt) [![License: MIT][MIT Badge]](https://github.com/skypjack/entt/blob/master/LICENSE)
+* [meta](https://github.com/skypjack/meta) [![License: MIT][MIT Badge]](https://github.com/skypjack/meta/blob/master/LICENSE)
 * [Assimp](https://github.com/assimp/assimp) [![License: Modified BSD 3-Clause][Modified BSD 3-Clause Badge]](https://github.com/assimp/assimp/blob/master/LICENSE)
 * [Slang](https://github.com/shader-slang/slang) [![License: MIT][MIT Badge]](https://github.com/shader-slang/slang/blob/master/LICENSE)
 * [toml++](https://marzer.github.io/tomlplusplus/) [![License: MIT][MIT Badge]](https://github.com/marzer/tomlplusplus/blob/master/LICENSE)

@@ -22,25 +22,21 @@ namespace Engine
 
     void CapsuleCollider::SetRadius(const float radius)
     {
-        _radius = FMath::Max(radius, MIN_SCALE);
+        _radius = FMath::Max(radius, MIN_PHYS);
 
-        WakeBody();
+        NotifyDirty();
         const auto capsuleCollider = reinterpret_cast<reactphysics3d::CapsuleShape*>(_reactCollider->getCollisionShape());
         const float scale = FMath::Max(_scale.X, _scale.Z);
-        capsuleCollider->setRadius(FMath::Max(_radius*scale, MIN_SCALE));
-
-        ForceUpdateBody();
+        capsuleCollider->setRadius(FMath::Max(_radius*scale, MIN_PHYS));
     }
 
     void CapsuleCollider::SetHeight(const float height)
     {
-        _height = FMath::Max(height, MIN_SCALE);
+        _height = FMath::Max(height, MIN_PHYS);
 
-        WakeBody();
+        NotifyDirty();
         const auto capsuleCollider = reinterpret_cast<reactphysics3d::CapsuleShape*>(_reactCollider->getCollisionShape());
-        capsuleCollider->setHeight(FMath::Max(_height*_scale.Y, MIN_SCALE));
-
-        ForceUpdateBody();
+        capsuleCollider->setHeight(FMath::Max(_height*_scale.Y, MIN_PHYS));
     }
 
     float CapsuleCollider::GetRadius() const

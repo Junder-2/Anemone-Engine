@@ -201,11 +201,11 @@ namespace Engine
 #define PROFILE_LEVEL_DEEP 2
 
 #if ANE_ACTIVE_PROFILE_LEVEL <= PROFILE_LEVEL_OFF
-#define ANE_PROFILE_BEGIN_SESSION(name, filepath)
-#define ANE_PROFILE_END_SESSION()
+#define ANE_PROFILE_BEGIN_SESSION(name, filepath) ((void)0)
+#define ANE_PROFILE_END_SESSION() ((void)0)
 
-#define ANE_PROFILE_SCOPE(name)
-#define ANE_PROFILE_FUNCTION()
+#define ANE_PROFILE_SCOPE(name) ((void)0)
+#define ANE_PROFILE_FUNCTION() ((void)0)
 #endif
 
 #if ANE_ACTIVE_PROFILE_LEVEL >= PROFILE_LEVEL_SHALLOW
@@ -243,8 +243,8 @@ namespace Engine
     #define ANE_DEEP_PROFILE_SCOPE(name) ANE_PROFILE_SCOPE_LINE(name, __LINE__)
     #define ANE_DEEP_PROFILE_FUNCTION() ANE_PROFILE_SCOPE(ANE_FUNC_SIG)
 #else
-    #define ANE_DEEP_PROFILE_SCOPE(name)
-    #define ANE_DEEP_PROFILE_FUNCTION()
+    #define ANE_DEEP_PROFILE_SCOPE(name) ((void)0)
+    #define ANE_DEEP_PROFILE_FUNCTION() ((void)0)
 #endif
 
 #ifndef ANE_DEBUG
