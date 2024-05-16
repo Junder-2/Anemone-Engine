@@ -885,6 +885,19 @@ namespace Vulkan
 
     void VulkanRenderer::CreateDefaultResources()
     {
+        CreateDefaultTextures();
+
+        _colorTex = LoadTexture("MetalTiles03_1K_BaseColor.png");
+        _normalTex = LoadTexture("MetalTiles03_1K_Normal.png");
+        _ormTex = LoadTexture("MetalTiles03_1K_ORM.png");
+        _dfgTex = LoadTexture("dfg.png");
+        _cubeMap = LoadCubeTexture("cyclorama_hard_light_linear_256.png");
+
+        CreateDefaultMaterial();
+    }
+
+    void VulkanRenderer::CreateDefaultTextures()
+    {
         constexpr VkExtent3D defaultImageExtent = VkExtent3D{ 16, 16, 1 };
         constexpr VkFormat defaultImageFormat = VK_FORMAT_R8G8B8A8_UNORM;
 
@@ -941,14 +954,6 @@ namespace Vulkan
             vkDestroySampler(_device, _samplerLinear, _allocator);
             vkDestroySampler(_device, _samplerNearest, _allocator);
         });
-
-        _colorTex = LoadTexture("MetalTiles03_1K_BaseColor.png");
-        _normalTex = LoadTexture("MetalTiles03_1K_Normal.png");
-        _ormTex = LoadTexture("MetalTiles03_1K_ORM.png");
-        _dfgTex = LoadTexture("dfg.png");
-        _cubeMap = LoadCubeTexture("cyclorama_hard_light_linear_256.png");
-
-        CreateDefaultMaterial();
     }
 
     void VulkanRenderer::CreateDefaultMaterial()

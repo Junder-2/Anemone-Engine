@@ -140,6 +140,7 @@ namespace Vulkan
         static PipelineWrapper CreatePipeline(const vkb::Device& logicalDevice);
 
         void CreateDefaultResources();
+        void CreateDefaultTextures();
         void CreateDefaultMaterial();
 
         static void CreateImGuiDescriptorPool();
