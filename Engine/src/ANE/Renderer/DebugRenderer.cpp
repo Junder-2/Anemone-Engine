@@ -45,6 +45,8 @@ namespace Engine
 
     void DebugRenderer::DrawLine(Vector3 start, Vector3 end)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         #ifndef ANE_DIST
         Vertex vert1;
         Vertex vert2;
@@ -67,6 +69,8 @@ namespace Engine
 
     void DebugRenderer::DrawTriangle(Vector3 point1, Vector3 point2, Vector3 point3)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         #ifndef ANE_DIST
         Vertex vert1;
         Vertex vert2;
@@ -115,6 +119,8 @@ namespace Engine
 
     void DebugRenderer::FetchDrawCommands(std::vector<DebugDrawCommand>& commands)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         #ifndef ANE_DIST
         if(!_debugLineVertices.empty())
         {

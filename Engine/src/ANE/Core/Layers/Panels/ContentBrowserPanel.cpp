@@ -10,6 +10,8 @@ Engine::ContentBrowserPanel::ContentBrowserPanel(EditorLayer* editorLayer)
 
 Engine::UIUpdateWrapper Engine::ContentBrowserPanel::OnPanelRender()
 {
+    ANE_DEEP_PROFILE_FUNCTION();
+
     ImGui::Begin("Content Browser");
 
     ImGuiTableFlags tableFlags = ImGuiTableFlags_Resizable | ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_BordersInnerV;
@@ -41,6 +43,8 @@ Engine::UIUpdateWrapper Engine::ContentBrowserPanel::OnPanelRender()
 
 void Engine::ContentBrowserPanel::RenderDirectoryBrowserChild(std::filesystem::path DirectoryPath)
 {
+    ANE_DEEP_PROFILE_FUNCTION();
+
     bool open = false;
     for (auto const& dir_entry : std::filesystem::directory_iterator{DirectoryPath})
     {
@@ -68,6 +72,8 @@ void Engine::ContentBrowserPanel::RenderDirectoryBrowserChild(std::filesystem::p
 
 void Engine::ContentBrowserPanel::RenderDirectoryContentsBrowserChild()
 {
+    ANE_DEEP_PROFILE_FUNCTION();
+
     const float topBarHeight = 26.0f;
     const float bottomBarHeight = 32.0f;
     ImGui::BeginChild("##directory_structure", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetWindowHeight() - topBarHeight - bottomBarHeight));

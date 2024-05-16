@@ -21,6 +21,8 @@ namespace Engine
 
     UIUpdateWrapper MainMenuPanel::OnPanelRender()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         UIUpdateWrapper UIUpdate;
 
         constexpr auto imBlack = ImVec4(0, 0, 0, 1);

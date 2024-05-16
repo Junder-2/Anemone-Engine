@@ -16,7 +16,6 @@ namespace Engine
     {
         _layers.emplace(_layers.begin() + _layerInsertIndex, layer);
         _layerInsertIndex++;
-
     }
 
     void LayerStack::PopLayer(Layer* layer)

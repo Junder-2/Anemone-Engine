@@ -10,6 +10,8 @@ namespace Engine
 
     void LogSink::sink_it_(const spdlog::details::log_msg& msg)
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         if(_sinkDelegate) _sinkDelegate(msg);
     }
 

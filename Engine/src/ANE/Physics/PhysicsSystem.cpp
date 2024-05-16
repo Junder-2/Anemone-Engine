@@ -392,6 +392,8 @@ namespace Engine
 
     void PhysicsSystem::DebugDraw()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         if(!_isDebugRendering) return;
 
         if(_debugRenderer->getNbTriangles() > 0)

@@ -29,13 +29,13 @@ namespace Engine
 
     void ImGuiLayer::OnUpdate(float deltaTime)
     {
-        Layer::OnUpdate(deltaTime);
+        ANE_DEEP_PROFILE_FUNCTION();
         // AddDebugMessage();
     }
 
     void ImGuiLayer::OnEvent(Event& e)
     {
-        Layer::OnEvent(e);
+        ANE_DEEP_PROFILE_FUNCTION();
     }
 
 
@@ -47,7 +47,7 @@ namespace Engine
 
     void ImGuiLayer::OnUIRender()
     {
-        Layer::OnUIRender();
+        ANE_DEEP_PROFILE_FUNCTION();
 
         bool open = true;
         DockSpace(&open);

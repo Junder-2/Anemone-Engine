@@ -40,6 +40,8 @@ namespace Engine
 
     EditorLayer::EditorLayer(const std::string& name) : Layer(name)
     {
+        ANE_PROFILE_FUNCTION();
+
         Init();
     }
 
@@ -62,6 +64,8 @@ namespace Engine
 
     void EditorLayer::OnAttach()
     {
+        ANE_PROFILE_FUNCTION();
+
         // You would have a "Read from config files to find correct panel layout" method here
 
         CreateTestScene(50);
@@ -89,7 +93,7 @@ namespace Engine
 
     void EditorLayer::OnEvent(Event& e)
     {
-        Layer::OnEvent(e);
+        ANE_DEEP_PROFILE_FUNCTION();
 
         EventHandler::DispatchEditorEvents();
         EventHandler::DispatchAppEvents();
@@ -97,6 +101,8 @@ namespace Engine
 
     void EditorLayer::OnUIRender()
     {
+        ANE_DEEP_PROFILE_FUNCTION();
+
         ImGuiIO& io = ImGui::GetIO();
         ImGui::ShowDemoWindow();
         for (UILayerPanel* panel : _uiPanels)
@@ -136,7 +142,7 @@ namespace Engine
 
     void EditorLayer::OnUpdate(float deltaTime)
     {
-        Layer::OnUpdate(deltaTime);
+        ANE_DEEP_PROFILE_FUNCTION();
 
         if (_activeScene) _activeScene->OnUpdate(deltaTime);
     }
@@ -197,6 +203,8 @@ namespace Engine
 
     void EditorLayer::CreateFloor()
     {
+        ANE_PROFILE_FUNCTION();
+
         Entity floor = _activeScene->Create("Floor");
         TransformMatrix& transformMatrix = floor.GetComponent<TransformComponent>().Transform;
         transformMatrix.SetPosition(Vector3(0, -5.f, 0));

@@ -6,7 +6,6 @@
 #include "ANE/Core/Scene/Components/Components.h"
 #include "ANE/Physics/Physics.h"
 
-
 namespace Engine
 {
     SceneSerializer::SceneSerializer()
@@ -15,6 +14,8 @@ namespace Engine
 
     toml::table SceneSerializer::EntitySerializer(Entity& entity)
     {
+        ANE_PROFILE_FUNCTION();
+
         toml::table componentTable;
 
         if (TagComponent tagComp; entity.TryGetComponent(tagComp))
@@ -177,6 +178,8 @@ namespace Engine
 
     void SceneSerializer::Serialize(const std::shared_ptr<Scene>& scene)
     {
+        ANE_PROFILE_FUNCTION();
+
         toml::array arr;
 
         for (auto entity : scene->_registry.view<TagComponent>())
@@ -202,12 +205,16 @@ namespace Engine
 
     bool SceneSerializer::HasFile(const char* fileName)
     {
+        ANE_PROFILE_FUNCTION();
+
         std::string filePath = _filepath + fileName + ".anem";
         return std::filesystem::is_regular_file(filePath);
     }
 
     std::shared_ptr<Scene> SceneSerializer::CreateEmptySceneFile(const char* sceneName)
     {
+        ANE_PROFILE_FUNCTION();
+
         std::string filePath = _filepath + sceneName + ".anem";
 
         std::shared_ptr<Scene> scene = std::make_shared<Scene>(sceneName);
@@ -223,6 +230,7 @@ namespace Engine
 
     std::shared_ptr<Scene> SceneSerializer::Deserialize(const char* key, EditorLayer* layer) const
     {
+        ANE_PROFILE_FUNCTION();
         std::string filePath = _filepath + key + ".anem";
 
         toml::table table;
@@ -353,6 +361,8 @@ namespace Engine
 
     std::shared_ptr<Scene> SceneSerializer::DeserializeBinary()
     {
+        ANE_PROFILE_FUNCTION();
+
         // not implemented
         ANE_ASSERT(false);
 
@@ -363,6 +373,8 @@ namespace Engine
 
     void SceneSerializer::WriteToFile(std::string filepath, const toml::table& content)
     {
+        ANE_PROFILE_FUNCTION();
+
         std::ofstream output(filepath, std::ios::trunc);
 
         if (!output.is_open()) output.open(filepath);
@@ -374,6 +386,8 @@ namespace Engine
 
     void SceneSerializer::WriteToFile(std::string filepath)
     {
+        ANE_PROFILE_FUNCTION();
+
         std::ofstream output(filepath, std::ios::app);
 
         if (!output.is_open()) output.open(filepath);
