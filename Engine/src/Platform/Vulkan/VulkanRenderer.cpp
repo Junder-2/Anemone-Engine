@@ -846,6 +846,7 @@ namespace Vulkan
             .SetBlendMode(None)
             .SetDepthTestOperator(VK_COMPARE_OP_ALWAYS) // Reverse Z for more precision
             .SetDepthWrite(false)
+            .SetCullMode(VK_CULL_MODE_FRONT_BIT)
 
             .SetColorFormat(_colorImage.ImageFormat)
             .SetDepthFormat(_depthImage.ImageFormat)
@@ -868,6 +869,7 @@ namespace Vulkan
             .SetBlendMode(Alpha)
             .SetDepthTestOperator(VK_COMPARE_OP_ALWAYS) // Reverse Z for more precision
             .SetDepthWrite(false)
+            .SetCullMode(VK_CULL_MODE_NONE)
 
             .SetColorFormat(_colorImage.ImageFormat)
             .SetDepthFormat(_depthImage.ImageFormat)
@@ -883,6 +885,7 @@ namespace Vulkan
             .SetBlendMode(None) //Alpha doesnt work with lines?
             .SetDepthTestOperator(VK_COMPARE_OP_ALWAYS) // Reverse Z for more precision
             .SetDepthWrite(false)
+            .SetCullMode(VK_CULL_MODE_NONE)
 
             .SetColorFormat(_colorImage.ImageFormat)
             .SetDepthFormat(_depthImage.ImageFormat)
