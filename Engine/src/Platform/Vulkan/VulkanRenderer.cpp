@@ -1182,7 +1182,6 @@ namespace Vulkan
         VkRenderingInfo renderInfo = VulkanInitializers::RenderingInfo(_drawExtent, &colorAttachment, &depthAttachment);
         vkCmdBeginRendering(cmd, &renderInfo);
 
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _filamentInstance.ShaderPipeline->Pipeline);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 0, 1, &appDescriptor, 0, nullptr);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 1, 1, &sceneDescriptor, 0, nullptr);
 
