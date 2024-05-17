@@ -564,7 +564,6 @@ namespace Engine::AneImGui
 
             ImGui::TableSetColumnIndex(0);
             ImGui::AlignTextToFramePadding();
-            ImGui::PushItemWidth(labelWidth);
             ImGui::Text(label);
 
             ImGui::TableSetColumnIndex(1);
