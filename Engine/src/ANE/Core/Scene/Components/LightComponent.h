@@ -20,6 +20,11 @@ namespace Engine
             entt::meta<LightComponent>()
                 .EDITABLE;
         }
+
+    public:
+        float GetIntensity() const { return _intensity; }
+        Vector3 GetColor() const { return _color; }
+
     private:
         float _intensity = 1.f;
         LightType _lightType = Directional;
