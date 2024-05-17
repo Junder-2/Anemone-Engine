@@ -151,6 +151,20 @@ namespace Engine
             componentTable.insert_or_assign("_renderComponent", table);
         }
 
+        if (LightComponent lightComp; entity.TryGetComponent(lightComp))
+        {
+            auto table = toml::table{
+                {"_lightType", lightComp.GetLightType()},
+                {"_intensity", lightComp.GetIntensity()},
+                {"_color", toml::array{
+                    lightComp.GetColor().R,
+                    lightComp.GetColor().G,
+                    lightComp.GetColor().B}}
+            };
+
+            componentTable.insert_or_assign("_lightComponent", table);
+        }
+
         if (RigidBodyComponent rigidComp; entity.TryGetComponent(rigidComp))
         {
             auto table = toml::table{
@@ -411,6 +425,28 @@ namespace Engine
                         if(auto modelPath = renderComponent["_modelPath"].value<std::string>())
                             entityRef.AddComponent<RenderComponent>(*modelPath);
                         else WARN_NO_VALUE("RenderComp: _colliderMaterial doesnt exist for entity {}", *tagComponent);
+                    }
+
+                    if(auto lightComp = (*componentTable)["_lightComponent"]; lightComp)
+                    {
+                        auto& entityLightComponent = entityRef.AddComponent<LightComponent>();
+                        if(auto colorView = lightComp["_color"])
+                        {
+                            Vector3 color = Vector3(
+                            *colorView[0].value<float>(),
+                            *colorView[1].value<float>(),
+                            *colorView[2].value<float>());
+
+                            entityLightComponent.SetColor(color);
+                        }
+                        else WARN_NO_VALUE("LightComp: _color doesnt exist for entity: {}", *tagComponent);
+
+                        if(auto intensity = lightComp["_intensity"].value<float>())
+                            entityLightComponent.SetIntensity(*intensity);
+                        else WARN_NO_VALUE("LightComp: _intensity doesnt exist for entity {}", *tagComponent);
+                        if(auto lightType = lightComp["_lightType"].value<int>())
+                            entityLightComponent.SetLightType(static_cast<LightType>(*lightType));
+                        else WARN_NO_VALUE("LightComp: _lightType doesnt exist for entity {}", *tagComponent);
                     }
 
                     // ScriptComponent
