@@ -141,19 +141,39 @@ float3 GetReflectedVector(Material mat, Fragment frag, float3 n)
 // ----------------------------------------------------------------
 // IBL evaluation.
 // ----------------------------------------------------------------
+float3 EvaluateSpecularIBL(float3 r, float perceptualRoughness)
+{
+    // This assumes a 256x256 cubemap, with 9 mip levels
+    float lod = 8.0 * perceptualRoughness;
+    // decodeEnvironmentMap() either decodes RGBM or is a no-op if the
+    // cubemap is stored in a float texture
+    return props.SpecularIBL.SampleLevel(r, lod).rgb;
+}
 
 float3 EvaluateIBL(Material mat, Fragment frag)
 {
+    float NoV = max(dot(frag.normal, frag.viewDir), 0.0);
+    float f90 = saturate(dot(mat.f0, float3(50.0 * 0.33)));
+    float perceptualRoughness = sqrt(mat.roughness);
+
+    float3 r = GetReflectedVector(mat, frag, frag.normal);
+    float3 indirectSpecular = EvaluateSpecularIBL(r, perceptualRoughness);
+    float2 env = PrefilteredDFG(perceptualRoughness, NoV).rg;
+    float3 specularColor = mat.f0 * env.x + f90 * env.y;
+
+    float3 indirectDiffuse = Irradiance_SphericalHarmonics(frag.normal) * Fd_Lambert();
+
+    return (mat.diffuseColor * indirectDiffuse + indirectSpecular * specularColor) * mat.occlusion;
+
+    // TODO: Figure out why this implementation is wrong.
     // Specular
     float3 Fr = 0;
-
     float3 E = SpecularDFG(mat);
-    float3 r = GetReflectedVector(mat, frag, frag.normal);
-    Fr = E * PrefilteredRadiance(r, sqrt(mat.roughness));
+    Fr = E * PrefilteredRadiance(r, perceptualRoughness);
 
     // Diffuse
     float3 diffuseIrradiance = DiffuseIrradiance(frag.normal);
-    
+
     float3 Fd = mat.diffuseColor * diffuseIrradiance * (1.0 - E) * mat.occlusion;
 
     //Fr *= frameUniforms.iblLuminance;
