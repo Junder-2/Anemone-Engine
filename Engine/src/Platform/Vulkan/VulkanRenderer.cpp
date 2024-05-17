@@ -839,7 +839,7 @@ namespace Vulkan
         VulkanPipelineBuilder builder{ logicalDevice, _pipelineLayout };
 
         VkShaderModule meshVertShader, meshFragShader;
-        LoadSlangShader("Mesh_Diffuse", &meshVertShader, &meshFragShader);
+        LoadSlangShader("Mesh_Sky", &meshVertShader, &meshFragShader);
 
         vkb::Result<PipelineWrapper> skyPipeline = builder
             .SetShaders(meshVertShader, meshFragShader)
