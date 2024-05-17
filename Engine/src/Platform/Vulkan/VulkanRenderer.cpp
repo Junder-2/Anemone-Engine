@@ -1154,7 +1154,16 @@ namespace Vulkan
 
         VulkanFrame& frame = GetFrame();
 
+        VkDescriptorSet skyDescriptor = frame.Descriptors.Allocate(_device, _singleImageDataLayout, _allocator);
+        {
+            DescriptorWriter writer;
+            writer.WriteImage(0, _cubeMap.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+            writer.UpdateSet(_device, skyDescriptor);
+        }
+
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _skyPipeline);
+
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 2, 1, &skyDescriptor, 0, nullptr);
 
         PushConstantBuffer pushConstants;
         Matrix4x4 modelMat = Matrix4x4::Identity();
