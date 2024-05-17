@@ -48,7 +48,7 @@ namespace Engine
             }
 
             ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
-            ImGui::Image(VulkanRenderer::GetImGuiViewportSet(), ImGui::GetContentRegionAvail());
+            ImGui::Image(Vulkan::VulkanRenderer::GetImGuiViewportSet(), ImGui::GetContentRegionAvail());
             ImGui::PopStyleVar();
         }
         if(!open) ImGui::PopStyleVar();

@@ -8,6 +8,12 @@
 //todo: finish, this is just a demo
 namespace Engine
 {
+    struct MaterialData
+    {
+        Vulkan::MaterialInstance* Material = nullptr;
+        bool HasUniqueMaterial = false;
+    };
+
     struct RenderComponent : Component
     {
         //copy constructor
@@ -15,24 +21,14 @@ namespace Engine
 
         RenderComponent(std::string modelPath) : Component(typeid(*this).name()), _modelPath(std::move(modelPath))
         {
-            _materialPropertyBlock.Color = Vector3::OneVector();
-            _materialPropertyBlock.Emission = Vector3::ZeroVector();
-            _materialPropertyBlock.Metallic = 1;
-            _materialPropertyBlock.Normal = 1;
-            _materialPropertyBlock.Height = 1;
-            _materialPropertyBlock.Occlusion = 1;
-            _materialPropertyBlock.Reflectance = 1;
-            _materialPropertyBlock.Roughness = 0;
-
             Model = Renderer::LoadModel(_modelPath);
+            SetMaterial(Renderer::GetDefaultMaterial());
         }
 
-        VmaMeshAsset Model = {};
 
         void VerifyDefaultMaterialBlock()
         {
-            //Could write a "compare to default values" check here and reassign to true
-            _defaultMaterialValues = false;
+
         }
 
         void OnValidate()
@@ -46,9 +42,9 @@ namespace Engine
                 //.data<&RenderComponent::_modelPath>("Model File Location"_hs).prop("display_name"_hs, "Model File Location")
                 .data<&RenderComponent::Model>("Mesh Asset"_hs).prop("display_name"_hs, "Mesh Asset")
                 .EDITABLE
-                .data<&RenderComponent::_materialPropertyBlock>("Material Properties"_hs).prop("display_name"_hs, "Material Properties Block")
+                .data<&RenderComponent::_materialData>("Material Properties"_hs).prop("display_name"_hs, "Material Properties")
                 .EDITABLE
-                .func<&RenderComponent::OnValidate>("OnValidate"_hs);;
+                .func<&RenderComponent::OnValidate>("OnValidate"_hs);
         }
 
         std::string GetModelPath()
@@ -56,9 +52,17 @@ namespace Engine
             return _modelPath;
         }
 
+        Vulkan::MaterialInstance* GetMaterial() const { return _materialData.Material; }
+        void SetMaterial(Vulkan::MaterialInstance* material)
+        {
+            _materialData.Material = material;
+        }
+
+    public:
+        VmaMeshAsset Model = {};
+
     private:
-        FilamentMetallicRoughness::MaterialConstants _materialPropertyBlock;
-        bool _defaultMaterialValues = true;
+        MaterialData _materialData;
         std::string _modelPath;
     };
 }

@@ -77,6 +77,7 @@ float4 GetColor(float2 uv)
 float4 GetColor(MaterialProperties props, float2 uv)
 {
     float4 colorMap = props.ColorMap.Sample(uv);
+    colorMap.rgb *= props.Color;
     return colorMap;
 }
 
@@ -88,7 +89,7 @@ float3 GetTangentSpaceNormal(float2 uv)
 float3 GetTangentSpaceNormal(MaterialProperties props, float2 uv)
 {
     float3 normalMap = props.NormalMap.Sample(uv).rgb;
-    return UnpackNormalMap(normalMap, .5);
+    return UnpackNormalMap(normalMap, props.Normal);
 }
 
 float3 GetORM(float2 uv)
@@ -100,13 +101,9 @@ float3 GetORM(MaterialProperties props, float2 uv)
 {
     float3 ormMap = props.ORMMap.Sample(uv).rgb;
     float3 orm;
-    //orm.x = lerp(1, ormMap.x, props.Occlusion);
-    //orm.y = lerp(ormMap.y, 1, props.Roughness);
-    //orm.z = lerp(0, ormMap.z, props.Metallic);
-
-    orm.x = lerp(1, ormMap.x, 1);
-    orm.y = lerp(ormMap.y, 1, 0);
-    orm.z = lerp(0, ormMap.z, 1);
+    orm.x = lerp(1, ormMap.x, props.Occlusion);
+    orm.y = lerp(ormMap.y, 1, props.Roughness);
+    orm.z = lerp(0, ormMap.z, props.Metallic);
 
     return orm;
 }

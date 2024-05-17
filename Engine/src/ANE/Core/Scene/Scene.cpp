@@ -43,7 +43,7 @@ namespace Engine
         ANE_DEEP_PROFILE_FUNCTION();
     }
 
-    void Scene::OnUpdate(float timeStep)
+    void Scene::OnUpdate(float deltaTime)
     {
         ANE_DEEP_PROFILE_FUNCTION();
 
@@ -56,11 +56,11 @@ namespace Engine
                     scriptComponent.Instance->_entity = { entity, this };
                     scriptComponent.OnCreateFunction();
                 }
-                scriptComponent.OnUpdateFunction(timeStep);
+                scriptComponent.OnUpdateFunction(deltaTime);
             });
         }
 
-        _accumulator += timeStep;
+        _accumulator += deltaTime;
 
         const float physTimeStep = API::PHYSICS_TIMESTEP;
 
@@ -111,6 +111,8 @@ namespace Engine
             draw.ModelMatrix = transform.Transform.GetLocalToWorld();
             draw.VertexCount = renderer.Model.NumVertices;
             draw.MeshBuffers = renderer.Model.MeshBuffers;
+
+            draw.Material = renderer.GetMaterial();
 
             Renderer::SubmitDrawCommand(draw);
         }

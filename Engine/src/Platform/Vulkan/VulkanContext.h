@@ -4,9 +4,9 @@
 
 typedef struct SDL_Window SDL_Window;
 
-namespace Engine
+namespace Vulkan
 {
-    class VulkanContext : public RenderingContext
+    class VulkanContext : public Engine::RenderingContext
     {
     public:
         VulkanContext(SDL_Window* windowHandle);

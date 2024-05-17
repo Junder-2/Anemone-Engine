@@ -1,22 +1,23 @@
 ﻿#pragma once
 #include "Mesh.h"
 #include "ANE/Math/Types/Matrix4x4.h"
+#include "Platform/Vulkan/VulkanMaterial.h"
 
 namespace Engine
 {
     struct DrawCommand
     {
-        // TODO: Add other necessary draw command information such as material...
+        Vulkan::MaterialInstance* Material;
         Matrix4x4 ModelMatrix;
         uint32_t VertexCount;
-        VmaMeshBuffers MeshBuffers;
+        Vulkan::VmaMeshBuffers MeshBuffers;
     };
 
     struct DebugDrawCommand
     {
         Matrix4x4 ModelMatrix;
         uint32_t VertexCount;
-        VmaMeshBuffers MeshBuffers;
+        Vulkan::VmaMeshBuffers MeshBuffers;
         bool LineList;
     };
 

@@ -15,6 +15,11 @@
 #include "ANE/Renderer/Draw.h"
 #include "ANE/Renderer/Mesh.h"
 
+namespace Engine
+{
+    struct WindowProperties;
+}
+
 namespace vkb
 {
     struct Instance;
@@ -23,10 +28,8 @@ namespace vkb
     struct Swapchain;
 }
 
-namespace Engine
+namespace Vulkan
 {
-    struct WindowProperties;
-
     struct VulkanFrame
     {
         VkCommandPool CommandPool;
@@ -43,7 +46,9 @@ namespace Engine
         DescriptorAllocator Descriptors;
         ApplicationData AppData;
         SceneData SceneData;
-        FilamentMetallicRoughness::MaterialConstants FilamentData;
+
+        VmaBuffer AppDataBuffer;
+        VmaBuffer SceneDataBuffer;
     };
 
     struct VulkanImmediateBuffer
@@ -85,9 +90,17 @@ namespace Engine
         static VmaMeshBuffers UploadRawMesh(std::span<uint32_t> indices, std::span<Vertex> vertices);
 
         VmaImage LoadTexture(const std::string& texturePath);
+        VmaImage LoadCubeTexture(const std::string& texturePath);
 
         float GetFramerate();
         static ImGuiIO* GetImGuiIO() { return _io; }
+
+        // Engine defaults.
+        static MaterialInstance* GetDefaultMaterial() { return &_filamentInstance; }
+        MaterialInstance* GetDefaultMaterialClone();
+
+        static VkSampler GetLinearSampler() { return _samplerLinear; }
+        static VkSampler GetNearestSampler() { return _samplerNearest; }
 
         // Vulkan
         static VkDevice GetDevice() { return _device; }
@@ -127,16 +140,21 @@ namespace Engine
         static void SetupDescriptors();
         static void LoadSlangShader(const char* moduleName, VkShaderModule* vertShader, VkShaderModule* fragShader);
 
-        static PipelineWrapper CreatePipeline(const vkb::Device& logicalDevice);
+        static void CreatePipeline(const vkb::Device& logicalDevice);
 
         void CreateDefaultResources();
+        void CreateDefaultTextures();
+        void CreateDefaultMaterial();
 
         static void CreateImGuiDescriptorPool();
 
         inline static void Draw(const WindowProperties& props, const DrawContext& drawCommands);
+        inline static void DrawSky(VkCommandBuffer cmd);
         inline static void DrawGeometry(VkCommandBuffer cmd, const DrawContext& drawCommands);
         inline static void DrawDebugGeometry(VkCommandBuffer cmd, const DrawContext& drawCommands);
         inline static void DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView);
+
+        inline static void UpdateGlobalUniforms();
 
         static void CleanupVulkan();
         static void CleanupImGui();
@@ -150,10 +168,11 @@ namespace Engine
         static VmaBuffer CreateBuffer(size_t allocSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage);
         static void DestroyBuffer(const VmaBuffer& buffer);
 
-        static VmaImage CreateImage(VkExtent3D size, VkFormat format, VkImageUsageFlags usage, bool mipmaps = false);
-        static VmaImage CreateImage(const void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, bool mipmaps = false);
+        static VmaImage CreateImage(VkExtent3D size, VkFormat format, VkImageUsageFlags usage, VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D, bool mipmaps = false);
+        static VmaImage CreateImage(const void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D, bool mipmaps = false);
+        static VmaImage CreateCubeImage(const void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_CUBE, bool mipmaps = false);
         static void DestroyImage(const VmaImage& image);
-        static void GenerateMipMaps(const VmaImage& image, VkExtent3D size, uint32_t mipLevels);
+        static void GenerateMipMaps(const VmaImage& image, VkExtent3D size, uint32_t mipLevels, bool cubemap = false);
 
         static void ImmediateSubmit(std::function<void(VkCommandBuffer cmd)>&& function);
 
@@ -168,7 +187,6 @@ namespace Engine
 
     public:
         inline static ImVec4 ClearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-        inline static VkSampler _samplerNearest;
 
         inline static Vector3 CameraPosition;
         inline static Matrix4x4 ViewProjection;
@@ -200,7 +218,7 @@ namespace Engine
         inline static QueueFamilyIndices _queueFamily = (QueueFamilyIndices)-1;
         inline static VkQueue _queue = VK_NULL_HANDLE;
         inline static VkPipelineCache _pipelineCache = VK_NULL_HANDLE;
-        inline static VkPipeline _meshPipeline = VK_NULL_HANDLE;
+        inline static VkPipeline _skyPipeline = VK_NULL_HANDLE;
         inline static VkPipeline _debugTrianglePipeline = VK_NULL_HANDLE;
         inline static VkPipeline _debugLinePipeline = VK_NULL_HANDLE;
         inline static VkPipelineLayout _pipelineLayout;
@@ -237,15 +255,23 @@ namespace Engine
         inline static VmaImage _greyImage;
         inline static VmaImage _normalImage;
         inline static VmaImage _errorImage;
+        inline static VmaImage _blackCubeImage;
 
         inline static VmaImage _colorTex;
         inline static VmaImage _normalTex;
         inline static VmaImage _ormTex;
+        inline static VmaImage _dfgTex;
+        inline static VmaImage _cubeMap;
+
+        inline static VmaMeshAsset _skyMesh;
 
         inline static VkSampler _samplerLinear;
+        inline static VkSampler _samplerNearest;
 
         inline static MaterialInstance _filamentInstance;
         inline static FilamentMetallicRoughness _filamentMaterial;
+
+        inline static std::vector<MaterialInstance*> _materialInstances;
 
         // ImGui
         inline static ImGui_ImplVulkanH_Window _mainWindowData;

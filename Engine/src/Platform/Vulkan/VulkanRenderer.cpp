@@ -19,6 +19,8 @@
 
 #include "ANE/Core/Application.h"
 #include "ANE/Math/FMath.h"
+#include "ANE/Utilities/API.h"
+#include "..\..\ANE\Utilities\AneImGui.h"
 
 using Slang::ComPtr;
 
@@ -30,11 +32,10 @@ using Slang::ComPtr;
 #include "ANE/Math/Types/Quaternion.h"
 #include "ANE/Renderer/Draw.h"
 #include "ANE/Renderer/Mesh.h"
-#include "ANE/Renderer/Renderer.h"
 #include "ANE/Utilities/ImGuiUtilities.h"
 #include "VulkanDescriptorLayoutBuilder.h"
 
-namespace Engine
+namespace Vulkan
 {
     VulkanRenderer::VulkanRenderer(SDL_Window* window)
     {
@@ -120,9 +121,9 @@ namespace Engine
             return _loadedModelMap[modelPath];
         }
 
-        const std::filesystem::path absolutePath = std::filesystem::current_path().append("..\\Assets\\Meshes\\").append(modelPath);
+        const std::string relativePath = std::string(ASSET_PATH_MESHES).append(modelPath);
 
-        const MeshAsset meshAsset = MeshLoader::LoadMesh(absolutePath.string().c_str());
+        const MeshAsset meshAsset = MeshLoader::LoadMesh(relativePath.c_str());
         Mesh mesh = meshAsset.SubMeshes[0]; // Use first submesh for now.
 
         const VmaMeshBuffers meshBuffers = UploadMesh(mesh.Indices, mesh.Vertices);
@@ -152,7 +153,7 @@ namespace Engine
             return _loadedTextureMap[texturePath];
         }
 
-        const std::string assetPath = std::string("../Assets/Textures/").append(texturePath);
+        const std::string assetPath = std::string(ASSET_PATH_TEXTURES).append(texturePath);
 
         int width, height, channels;
         stbi_uc* pixels = stbi_load(assetPath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
@@ -163,7 +164,40 @@ namespace Engine
         }
 
         const VkExtent3D imageExtent = VkExtent3D{ (uint32_t)width, (uint32_t)height, 1 };
-        const VmaImage imageBuffers = CreateImage(pixels, imageExtent, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, true);
+        const VmaImage imageBuffers = CreateImage(pixels, imageExtent, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, VK_IMAGE_VIEW_TYPE_2D, true);
+
+        stbi_image_free(pixels);
+
+        _mainDeletionQueue.PushFunction([=]
+        {
+            DestroyImage(imageBuffers);
+        });
+
+        _loadedTextureMap[texturePath] = imageBuffers;
+
+        return imageBuffers;
+    }
+
+    VmaImage VulkanRenderer::LoadCubeTexture(const std::string& texturePath)
+    {
+        if (_loadedTextureMap.contains(texturePath))
+        {
+            return _loadedTextureMap[texturePath];
+        }
+
+        const std::string assetPath = std::string(ASSET_PATH_TEXTURES).append(texturePath);
+
+        int width, height, channels;
+        stbi_uc* pixels = stbi_load(assetPath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
+        if (!pixels)
+        {
+            ANE_ELOG_ERROR("Unable to load texture at path: {}", assetPath);
+            return _errorImage;
+        }
+
+        //const VkExtent3D imageExtent = VkExtent3D{ (uint32_t)width / 4, (uint32_t)height / 3, 1 }; // Horizontal flag layout
+        const VkExtent3D imageExtent = VkExtent3D{ (uint32_t)width, (uint32_t)height / 6, 1 }; // Vertical layout
+        const VmaImage imageBuffers = CreateCubeImage(pixels, imageExtent, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, VK_IMAGE_VIEW_TYPE_CUBE, true);
 
         stbi_image_free(pixels);
 
@@ -180,6 +214,29 @@ namespace Engine
     float VulkanRenderer::GetFramerate()
     {
         return _io->Framerate;
+    }
+
+    MaterialInstance* VulkanRenderer::GetDefaultMaterialClone()
+    {
+        VmaBuffer materialConstants = CreateBuffer(sizeof(FilamentMetallicRoughness::MaterialConstants), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+
+        // Use uniforms from original material.
+        auto* uniforms = (FilamentMetallicRoughness::MaterialConstants*)materialConstants.Allocation->GetMappedData();
+        *uniforms = *_filamentInstance.Uniforms;
+
+        auto resources = _filamentInstance.Resources;
+        resources.Data = materialConstants;
+        resources.DataBufferOffset = 0;
+
+        _mainDeletionQueue.PushFunction([=]
+        {
+            DestroyBuffer(materialConstants);
+        });
+
+        MaterialInstance* material = new MaterialInstance();
+        *material = _filamentMaterial.WriteMaterial(this, MaterialPass::Opaque, resources, uniforms, _mainDescriptors);
+        _materialInstances.push_back(material);
+        return _materialInstances.back();
     }
 
     void VulkanRenderer::SetupVulkan(SDL_Window* window)
@@ -225,7 +282,7 @@ namespace Engine
     {
         IMGUI_CHECKVERSION();
         CreateImGuiDescriptorPool();
-        ImGui::CreateContext();
+        AneImGui::Initialize();
 
         _io = &ImGui::GetIO(); (void)_io;
         _io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
@@ -660,15 +717,18 @@ namespace Engine
 
             _frameData[i].Descriptors = DescriptorAllocator{};
             _frameData[i].Descriptors.Init(_device, 1000, frameSizes, _allocator);
+            _frameData[i].AppDataBuffer = CreateBuffer(sizeof(ApplicationData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+            _frameData[i].SceneDataBuffer = CreateBuffer(sizeof(SceneData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
             _mainDeletionQueue.PushFunction([&, i]
             {
+                DestroyBuffer(_frameData[i].AppDataBuffer);
+                DestroyBuffer(_frameData[i].SceneDataBuffer);
                 _frameData[i].Descriptors.Destroy(_device, _allocator);
             });
         }
     }
 
-    // todo: Nestor is this okay?!?
     void VulkanRenderer::LoadSlangShader(const char* moduleName, VkShaderModule* vertShader, VkShaderModule* fragShader)
     {
         ComPtr<slang::IGlobalSession> slangGlobalSession;
@@ -683,7 +743,7 @@ namespace Engine
         sessionDesc.targets = &targetDesc;
         sessionDesc.targetCount = 1;
         sessionDesc.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR;
-        const char* paths[] = { "../Assets/Shaders/" };
+        const char* paths[] = { ASSET_PATH_SHADERS };
         sessionDesc.searchPaths = paths;
         sessionDesc.searchPathCount = 1;
 
@@ -760,7 +820,7 @@ namespace Engine
         }
     }
 
-    PipelineWrapper VulkanRenderer::CreatePipeline(const vkb::Device& logicalDevice)
+    void VulkanRenderer::CreatePipeline(const vkb::Device& logicalDevice)
     {
         VkPushConstantRange bufferRange;
         bufferRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
@@ -777,21 +837,25 @@ namespace Engine
 
         CHECK_RESULT(vkCreatePipelineLayout(_device, &pipelineLayoutInfo, _allocator, &_pipelineLayout));
 
-        VkShaderModule meshVertShader, meshFragShader;
-        LoadSlangShader("Mesh_Diffuse", &meshVertShader, &meshFragShader);
-
         VulkanPipelineBuilder builder{ logicalDevice, _pipelineLayout };
-        vkb::Result<PipelineWrapper> pipeline = builder
+
+        VkShaderModule meshVertShader, meshFragShader;
+        LoadSlangShader("Mesh_Sky", &meshVertShader, &meshFragShader);
+
+        vkb::Result<PipelineWrapper> skyPipeline = builder
             .SetShaders(meshVertShader, meshFragShader)
             .SetBlendMode(None)
-            .SetDepthTestOperator(VK_COMPARE_OP_GREATER_OR_EQUAL) // Reverse Z for more precision
+            .SetDepthTestOperator(VK_COMPARE_OP_ALWAYS) // Reverse Z for more precision
+            .SetDepthWrite(false)
+            .SetCullMode(VK_CULL_MODE_FRONT_BIT)
 
             .SetColorFormat(_colorImage.ImageFormat)
             .SetDepthFormat(_depthImage.ImageFormat)
 
             .SetAllocationCallbacks(_allocator)
             .Build();
-        _meshPipeline = pipeline->Pipeline;
+
+        _skyPipeline = skyPipeline->Pipeline;
 
         // Cleanup.
         vkDestroyShaderModule(_device, meshFragShader, _allocator);
@@ -806,8 +870,10 @@ namespace Engine
             .SetBlendMode(Alpha)
             .SetDepthTestOperator(VK_COMPARE_OP_ALWAYS) // Reverse Z for more precision
             .SetDepthWrite(false)
+            .SetCullMode(VK_CULL_MODE_NONE)
 
             .SetColorFormat(_colorImage.ImageFormat)
+            .SetDepthFormat(_depthImage.ImageFormat)
             .SetPolygonMode(VK_POLYGON_MODE_LINE)
             .SetTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
 
@@ -820,8 +886,10 @@ namespace Engine
             .SetBlendMode(None) //Alpha doesnt work with lines?
             .SetDepthTestOperator(VK_COMPARE_OP_ALWAYS) // Reverse Z for more precision
             .SetDepthWrite(false)
+            .SetCullMode(VK_CULL_MODE_NONE)
 
             .SetColorFormat(_colorImage.ImageFormat)
+            .SetDepthFormat(_depthImage.ImageFormat)
             .SetPolygonMode(VK_POLYGON_MODE_LINE)
             .SetTopology(VK_PRIMITIVE_TOPOLOGY_LINE_LIST)
 
@@ -837,18 +905,29 @@ namespace Engine
         _mainDeletionQueue.PushFunction([&]
         {
             vkDestroyPipelineLayout(_device, _pipelineLayout, _allocator);
-            vkDestroyPipeline(_device, _meshPipeline, _allocator);
+            vkDestroyPipeline(_device, _skyPipeline, _allocator);
             vkDestroyPipeline(_device, _debugTrianglePipeline, _allocator);
             vkDestroyPipeline(_device, _debugLinePipeline, _allocator);
         });
-
-        return pipeline.value();
     }
 
     void VulkanRenderer::CreateDefaultResources()
     {
-        Renderer::LoadModel("Suzanne.fbx");
+        CreateDefaultTextures();
 
+        _colorTex = LoadTexture("MetalTiles03_1K_BaseColor.png");
+        _normalTex = LoadTexture("MetalTiles03_1K_Normal.png");
+        _ormTex = LoadTexture("MetalTiles03_1K_ORM.png");
+        _dfgTex = LoadTexture("dfg.png");
+        _cubeMap = LoadCubeTexture("cyclorama_hard_light_linear_256.png");
+
+        _skyMesh = LoadModel("Sphere.fbx");
+
+        CreateDefaultMaterial();
+    }
+
+    void VulkanRenderer::CreateDefaultTextures()
+    {
         constexpr VkExtent3D defaultImageExtent = VkExtent3D{ 16, 16, 1 };
         constexpr VkFormat defaultImageFormat = VK_FORMAT_R8G8B8A8_UNORM;
 
@@ -880,6 +959,13 @@ namespace Engine
         }
         _errorImage = CreateImage((void*)&pixels, defaultImageExtent, defaultImageFormat, VK_IMAGE_USAGE_SAMPLED_BIT);
 
+        constexpr VkExtent3D defaultCubeImageExtent = VkExtent3D{ 16, 16, 1 };
+        constexpr VkFormat defaultCubeImageFormat = VK_FORMAT_R8G8B8A8_UNORM;
+
+        uint32_t pixelsCube[16 * 16 * 6];
+        for (uint32_t& pixel : pixelsCube) { pixel = black; }
+        _blackCubeImage = CreateCubeImage((void*)&pixelsCube, defaultCubeImageExtent, defaultCubeImageFormat, VK_IMAGE_USAGE_SAMPLED_BIT);
+
         VkSamplerCreateInfo samplerInfo = { .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO, .pNext = nullptr };
         samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
         samplerInfo.minLod = 0.0f;
@@ -902,10 +988,15 @@ namespace Engine
             DestroyImage(_normalImage);
             DestroyImage(_errorImage);
 
+            DestroyImage(_blackCubeImage);
+
             vkDestroySampler(_device, _samplerLinear, _allocator);
             vkDestroySampler(_device, _samplerNearest, _allocator);
         });
+    }
 
+    void VulkanRenderer::CreateDefaultMaterial()
+    {
         // Filament material instance.
         _filamentMaterial.BuildPipelines(this);
         _mainDeletionQueue.PushFunction([&]
@@ -914,38 +1005,31 @@ namespace Engine
         });
 
         FilamentMetallicRoughness::MaterialResources materialResources;
-        materialResources.ColorImage = _whiteImage;
+        materialResources.ColorImage = _colorTex;
         materialResources.ColorSampler = _samplerLinear;
-        materialResources.NormalImage = _normalImage;
+        materialResources.NormalImage = _normalTex;
         materialResources.NormalSampler = _samplerLinear;
-        materialResources.ORMImage = _blackImage;
+        materialResources.ORMImage = _ormTex;
         materialResources.ORMSampler = _samplerLinear;
+        materialResources.DFGImage = _dfgTex;
+        materialResources.DFGSampler = _samplerLinear;
+        materialResources.CubeMap = _cubeMap;
+        materialResources.CubeMapSampler = _samplerLinear;
 
         VmaBuffer materialConstants = CreateBuffer(sizeof(FilamentMetallicRoughness::MaterialConstants), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
         auto* sceneUniformData = (FilamentMetallicRoughness::MaterialConstants*)materialConstants.Allocation->GetMappedData();
-        sceneUniformData->Color = Vector3::OneVector();
-        sceneUniformData->Normal = 1.0f;
-        sceneUniformData->Emission = Vector3::ZeroVector();
-        sceneUniformData->Metallic = 0.0f;
-        sceneUniformData->Roughness = 1.0f;
-        sceneUniformData->Reflectance = 0.0f;
-        sceneUniformData->Height = 0.0f;
-        sceneUniformData->Occlusion = 0.0f;
+        *sceneUniformData = { }; // Initialize using defaults values defined in the struct.
 
-        materialResources.DataBuffer = materialConstants.Buffer;
+        materialResources.Data = materialConstants;
         materialResources.DataBufferOffset = 0;
 
-        _filamentInstance = _filamentMaterial.WriteMaterial(this, MaterialPass::Opaque, materialResources, _mainDescriptors);
+        _filamentInstance = _filamentMaterial.WriteMaterial(this, MaterialPass::Opaque, materialResources, sceneUniformData, _mainDescriptors);
 
         _mainDeletionQueue.PushFunction([=]
         {
             DestroyBuffer(materialConstants);
         });
-
-        _colorTex = LoadTexture("MetalTiles03_1K_BaseColor.png");
-        _normalTex = LoadTexture("MetalTiles03_1K_Normal.png");
-        _ormTex = LoadTexture("MetalTiles03_1K_ORM.png");
     }
 
     void VulkanRenderer::CreateImGuiDescriptorPool()
@@ -968,7 +1052,7 @@ namespace Engine
         VkDescriptorPoolCreateInfo poolInfo = { };
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-        poolInfo.maxSets = 1000 * IM_ARRAYSIZE(poolSizes);;
+        poolInfo.maxSets = 1000 * IM_ARRAYSIZE(poolSizes);
         poolInfo.poolSizeCount = (uint32_t)IM_ARRAYSIZE(poolSizes);
         poolInfo.pPoolSizes = poolSizes;
 
@@ -999,6 +1083,8 @@ namespace Engine
 
         frame.DeletionQueue.Flush();
         frame.Descriptors.Clear(_device);
+
+        UpdateGlobalUniforms();
 
         CHECK_RESULT(vkResetFences(_device, 1, &frame.Fence));
 
@@ -1063,75 +1149,56 @@ namespace Engine
         _frameIndex++;
     }
 
+    void VulkanRenderer::DrawSky(VkCommandBuffer cmd)
+    {
+        ANE_DEEP_PROFILE_FUNCTION();
+
+        VulkanFrame& frame = GetFrame();
+
+        VkDescriptorSet skyDescriptor = frame.Descriptors.Allocate(_device, _singleImageDataLayout, _allocator);
+        {
+            DescriptorWriter writer;
+            writer.WriteImage(0, _cubeMap.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+            writer.UpdateSet(_device, skyDescriptor);
+        }
+
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _skyPipeline);
+
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 2, 1, &skyDescriptor, 0, nullptr);
+
+        PushConstantBuffer pushConstants;
+        Matrix4x4 modelMat = Matrix4x4::Identity();
+        modelMat.SetPosition(CameraPosition);
+        pushConstants.MVPMatrix = ViewProjection * modelMat; // VP
+        pushConstants.ModelMatrix = Matrix4x4::Identity();
+        pushConstants.VertexBuffer = _skyMesh.MeshBuffers.VertexBufferAddress;
+
+        vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstantBuffer), &pushConstants);
+        vkCmdBindIndexBuffer(cmd, _skyMesh.MeshBuffers.IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
+
+        vkCmdDrawIndexed(cmd, _skyMesh.NumVertices, 1, 0, 0, 0);
+    }
+
     void VulkanRenderer::DrawGeometry(VkCommandBuffer cmd, const DrawContext& drawCommands)
     {
         ANE_DEEP_PROFILE_FUNCTION();
 
-        VmaBuffer appDataBuffer = CreateBuffer(sizeof(ApplicationData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
-        VmaBuffer sceneDataBuffer = CreateBuffer(sizeof(SceneData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
-        VmaBuffer filamentDataBuffer = CreateBuffer(sizeof(FilamentMetallicRoughness::MaterialConstants), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
-
         VulkanFrame& frame = GetFrame();
-        frame.DeletionQueue.PushFunction([=]
-        {
-            DestroyBuffer(appDataBuffer);
-            DestroyBuffer(sceneDataBuffer);
-            DestroyBuffer(filamentDataBuffer);
-        });
-
-        // Fixed data for now.
-        float time = static_cast<float>(SDL_GetTicks64()) / 1000.0f;
-        frame.AppData.Time = time;
-
-        Vector3 ambientColor = Vector3(0.05f, 0.08f, 0.11f);
-        Vector3 sunAngle = Vector3(50 * FMath::DEGREES_TO_RAD, -30 * FMath::DEGREES_TO_RAD, 0);
-        Vector3 sunDirection = Quaternion::FromEulerAngles(sunAngle) * Vector3::ForwardVector();
-        Vector3 sunColor = Vector3(1.0f, 0.9f, 0.67f);
-
-        frame.SceneData.CameraPosition = Vector4(CameraPosition);
-        frame.SceneData.AmbientColor = Vector4(ambientColor, 0);
-        frame.SceneData.SunlightDirection = Vector4(sunDirection, 0);
-        frame.SceneData.SunlightColor = Vector4(sunColor, 0);
-
-        frame.FilamentData.Color = Vector3::OneVector();
-        frame.FilamentData.Normal = 1.0f;
-        frame.FilamentData.Emission = Vector3::ZeroVector();
-        frame.FilamentData.Metallic = 0.0f;
-        frame.FilamentData.Roughness = 1.0f;
-        frame.FilamentData.Reflectance = 0.0f;
-        frame.FilamentData.Height = 0.0f;
-        frame.FilamentData.Occlusion = 1.0f;
-
-        auto* appUniformData = (ApplicationData*)appDataBuffer.Allocation->GetMappedData();
-        *appUniformData = frame.AppData;
-
-        auto* sceneUniformData = (SceneData*)sceneDataBuffer.Allocation->GetMappedData();
-        *sceneUniformData = frame.SceneData;
-
-        auto* filamentData = (FilamentMetallicRoughness::MaterialConstants*)filamentDataBuffer.Allocation->GetMappedData();
-        *filamentData = frame.FilamentData;
 
         VkDescriptorSet appDescriptor = frame.Descriptors.Allocate(_device, _appDataLayout, _allocator);
         VkDescriptorSet sceneDescriptor = frame.Descriptors.Allocate(_device, _geometryDataLayout, _allocator);
-        VkDescriptorSet imageDescriptor = frame.Descriptors.Allocate(_device, _filamentMaterial.MaterialLayout, _allocator);
 
+        // Global descriptor set 1.
         {
             DescriptorWriter writer;
-            writer.WriteBuffer(0, appDataBuffer.Buffer, sizeof(ApplicationData), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+            writer.WriteBuffer(0, frame.AppDataBuffer.Buffer, sizeof(ApplicationData), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
             writer.UpdateSet(_device, appDescriptor);
         }
+        // Global descriptor set 2.
         {
             DescriptorWriter writer;
-            writer.WriteBuffer(0, sceneDataBuffer.Buffer, sizeof(SceneData), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+            writer.WriteBuffer(0, frame.SceneDataBuffer.Buffer, sizeof(SceneData), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
             writer.UpdateSet(_device, sceneDescriptor);
-        }
-        {
-            DescriptorWriter writer;
-            writer.WriteBuffer(0, filamentDataBuffer.Buffer, sizeof(FilamentMetallicRoughness::MaterialConstants), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-            writer.WriteImage(1, _colorTex.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-            writer.WriteImage(2, _normalTex.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-            writer.WriteImage(3, _ormTex.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-            writer.UpdateSet(_device, imageDescriptor);
         }
 
         _drawExtent.height = std::min(_swapchainExtent.height, _colorImage.ImageExtent.height);
@@ -1142,10 +1209,8 @@ namespace Engine
         VkRenderingInfo renderInfo = VulkanInitializers::RenderingInfo(_drawExtent, &colorAttachment, &depthAttachment);
         vkCmdBeginRendering(cmd, &renderInfo);
 
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _filamentInstance.Pipeline->Pipeline);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 0, 1, &appDescriptor, 0, nullptr);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 1, 1, &sceneDescriptor, 0, nullptr);
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _filamentInstance.Pipeline->Layout, 2, 1, &imageDescriptor, 0, nullptr);
 
         VkViewport viewport;
         viewport.x = 0;
@@ -1165,13 +1230,37 @@ namespace Engine
 
         vkCmdSetScissor(cmd, 0, 1, &scissor);
 
+        DrawSky(cmd);
+
+        ShaderPipeline* lastPipeline = nullptr;
+        MaterialInstance* lastMaterial = nullptr;
         for (DrawCommand drawCommand : drawCommands.Commands)
         {
+            // Use Filament in case material reference is null.
+            MaterialInstance* material = drawCommand.Material != nullptr ? drawCommand.Material : &_filamentInstance;
+            if (material != lastMaterial)
+            {
+                lastMaterial = material;
+                if (material->ShaderPipeline != lastPipeline)
+                {
+                    lastPipeline = material->ShaderPipeline;
+
+                    // Per-shader.
+                    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->ShaderPipeline->Pipeline);
+                    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->ShaderPipeline->Layout, 0, 1, &appDescriptor, 0, nullptr);
+                    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->ShaderPipeline->Layout, 1, 1, &sceneDescriptor, 0, nullptr);
+                }
+
+                // Per-material.
+                vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material->ShaderPipeline->Layout, 2, 1, &material->MaterialSet, 0, nullptr);
+            }
+
             PushConstantBuffer pushConstants;
             pushConstants.MVPMatrix = ViewProjection * drawCommand.ModelMatrix; // VP * M
             pushConstants.ModelMatrix = drawCommand.ModelMatrix;
             pushConstants.VertexBuffer = drawCommand.MeshBuffers.VertexBufferAddress;
 
+            // Per-object.
             vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstantBuffer), &pushConstants);
             vkCmdBindIndexBuffer(cmd, drawCommand.MeshBuffers.IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
 
@@ -1228,6 +1317,29 @@ namespace Engine
         vkCmdEndRendering(cmd);
     }
 
+    void VulkanRenderer::UpdateGlobalUniforms()
+    {
+        VulkanFrame& frame = GetFrame();
+
+        frame.AppData.Time = API::TIME;
+
+        auto* appUniformData = (ApplicationData*)frame.AppDataBuffer.Allocation->GetMappedData();
+        *appUniformData = frame.AppData;
+
+        Vector3 ambientColor = Vector3(0.05f, 0.08f, 0.11f);
+        Vector3 sunAngle = Vector3(50 * FMath::DEGREES_TO_RAD, -30 * FMath::DEGREES_TO_RAD, 0);
+        Vector3 sunDirection = Quaternion::FromEulerAngles(sunAngle) * Vector3::ForwardVector();
+        Vector3 sunColor = Vector3(1.0f, 0.9f, 0.67f);
+
+        frame.SceneData.CameraPosition = Vector4(CameraPosition);
+        frame.SceneData.AmbientColor = Vector4(ambientColor, 0);
+        frame.SceneData.SunlightDirection = Vector4(sunDirection, 0);
+        frame.SceneData.SunlightColor = Vector4(sunColor, 0);
+
+        auto* sceneUniformData = (SceneData*)frame.SceneDataBuffer.Allocation->GetMappedData();
+        *sceneUniformData = frame.SceneData;
+    }
+
     void VulkanRenderer::CleanupVulkan()
     {
         // Calls vkDestroyPipeline, vkDestroyRenderPass, vkDestroySwapchainKHR and vkDestroySurfaceKHR.
@@ -1258,7 +1370,7 @@ namespace Engine
     {
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplSDL2_Shutdown();
-        ImGui::DestroyContext();
+        AneImGui::Cleanup();
     }
 
     VulkanFrame& VulkanRenderer::GetFrame()
@@ -1299,7 +1411,7 @@ namespace Engine
         vmaDestroyBuffer(_vmaAllocator, buffer.Buffer, buffer.Allocation);
     }
 
-    VmaImage VulkanRenderer::CreateImage(const VkExtent3D size, const VkFormat format, const VkImageUsageFlags usage, const bool mipmaps)
+    VmaImage VulkanRenderer::CreateImage(const VkExtent3D size, const VkFormat format, const VkImageUsageFlags usage, const VkImageViewType viewType, const bool mipmaps)
     {
         VmaImage newImage;
         newImage.ImageFormat = format;
@@ -1309,6 +1421,13 @@ namespace Engine
         if (mipmaps)
         {
             imgInfo.mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(size.width, size.height)))) + 1;
+        }
+
+        const bool isCubeMap = viewType == VK_IMAGE_VIEW_TYPE_CUBE;
+        if (isCubeMap)
+        {
+            imgInfo.flags |= VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
+            imgInfo.arrayLayers = 6;
         }
 
         // Always allocate images on dedicated GPU memory.
@@ -1327,21 +1446,27 @@ namespace Engine
 
         // Build a image-view for the image.
         VkImageViewCreateInfo viewInfo = VulkanInitializers::ImageViewCreateInfo(format, newImage.Image, aspectFlag);
+        viewInfo.viewType = viewType;
         viewInfo.subresourceRange.levelCount = imgInfo.mipLevels;
+
+        if (isCubeMap)
+        {
+            viewInfo.subresourceRange.layerCount = 6;
+        }
 
         CHECK_RESULT(vkCreateImageView(_device, &viewInfo, _allocator, &newImage.ImageView));
 
         return newImage;
     }
 
-    VmaImage VulkanRenderer::CreateImage(const void* data, const VkExtent3D size, const VkFormat format, const VkImageUsageFlags usage, const bool mipmaps)
+    VmaImage VulkanRenderer::CreateImage(const void* data, const VkExtent3D size, const VkFormat format, const VkImageUsageFlags usage, const VkImageViewType viewType, const bool mipmaps)
     {
         const size_t dataSize = (size_t)(size.depth * size.width * size.height * 4);
         const VmaBuffer uploadBuffer = CreateBuffer(dataSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
         memcpy(uploadBuffer.Info.pMappedData, data, dataSize);
 
-        const VmaImage newImage = CreateImage(size, format, usage | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, mipmaps);
+        const VmaImage newImage = CreateImage(size, format, usage | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, viewType, mipmaps);
 
         ImmediateSubmit([&](const VkCommandBuffer cmd)
         {
@@ -1376,66 +1501,138 @@ namespace Engine
         return newImage;
     }
 
+    VmaImage VulkanRenderer::CreateCubeImage(const void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, VkImageViewType viewType, bool mipmaps)
+    {
+        const VkDeviceSize layerSize = (VkDeviceSize)size.depth * size.width * size.height * 4;
+        const VkDeviceSize imageSize = layerSize * 6;
+
+        const VmaBuffer uploadBuffer = CreateBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
+
+        memcpy(uploadBuffer.Info.pMappedData, data, imageSize);
+
+        const VmaImage newImage = CreateImage(size, format, usage | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT, viewType, mipmaps);
+
+        ImmediateSubmit([&](const VkCommandBuffer cmd)
+        {
+            VulkanUtils::TransitionImage(cmd, newImage.Image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+            std::vector<VkBufferImageCopy> copyRegions;
+            copyRegions.reserve(6);
+            for (uint32_t layer = 0; layer < 6; layer++)
+            {
+                VkBufferImageCopy region = {};
+                region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+                region.imageSubresource.mipLevel = 0;
+                region.imageSubresource.baseArrayLayer = layer;
+                region.imageSubresource.layerCount = 1;
+                region.imageExtent.width = size.width;
+                region.imageExtent.height = size.height;
+                region.imageExtent.depth = size.depth;
+                region.bufferOffset = layerSize * layer;
+
+                copyRegions.push_back(region);
+            }
+
+            // Copy the buffer into the image.
+            vkCmdCopyBufferToImage(cmd, uploadBuffer.Buffer, newImage.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, static_cast<uint32_t>(copyRegions.size()), copyRegions.data());
+
+            //VulkanUtils::TransitionImage(cmd, newImage.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        });
+
+        DestroyBuffer(uploadBuffer);
+
+        uint32_t mipLevels = 1;
+        if (mipmaps)
+        {
+            mipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(size.width, size.height)))) + 1;
+        }
+        GenerateMipMaps(newImage, size, mipLevels, true);
+
+        return newImage;
+    }
+
     void VulkanRenderer::DestroyImage(const VmaImage& image)
     {
         vkDestroyImageView(_device, image.ImageView, _allocator);
         vmaDestroyImage(_vmaAllocator, image.Image, image.Allocation);
     }
 
-    void VulkanRenderer::GenerateMipMaps(const VmaImage& image, const VkExtent3D size, const uint32_t mipLevels)
+    void VulkanRenderer::GenerateMipMaps(const VmaImage& image, const VkExtent3D size, const uint32_t mipLevels, const bool cubemap)
     {
         ImmediateSubmit([&](const VkCommandBuffer cmd)
         {
+            const uint32_t layerCount = cubemap ? 6 : 1;
+
             VkImageMemoryBarrier barrier = { };
             barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
             barrier.image = image.Image;
             barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
             barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
             barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-            barrier.subresourceRange.baseArrayLayer = 0;
             barrier.subresourceRange.layerCount = 1;
             barrier.subresourceRange.levelCount = 1;
 
-            int32_t mipWidth = (int32_t)size.width;
-            int32_t mipHeight = (int32_t)size.height;
-
-            for (uint32_t i = 1; i < mipLevels; i++)
+            for (uint32_t layerIndex = 0; layerIndex < layerCount; layerIndex++)
             {
-                barrier.subresourceRange.baseMipLevel = i - 1;
+                barrier.subresourceRange.baseArrayLayer = layerIndex;
+
+                int32_t mipWidth = (int32_t)size.width;
+                int32_t mipHeight = (int32_t)size.height;
+
+                for (uint32_t i = 1; i < mipLevels; i++)
+                {
+                    barrier.subresourceRange.baseMipLevel = i - 1;
+
+                    barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+                    barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+                    barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+                    barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+
+                    vkCmdPipelineBarrier(cmd,
+                        VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0,
+                        0, nullptr,
+                        0, nullptr,
+                        1, &barrier);
+
+                    VkImageBlit blit{};
+                    blit.srcOffsets[0] = { 0, 0, 0 };
+                    blit.srcOffsets[1] = { mipWidth, mipHeight, 1 };
+                    blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+                    blit.srcSubresource.mipLevel = i - 1;
+                    blit.srcSubresource.baseArrayLayer = layerIndex;
+                    blit.srcSubresource.layerCount = 1;
+                    blit.dstOffsets[0] = { 0, 0, 0 };
+                    blit.dstOffsets[1] = { mipWidth > 1 ? mipWidth / 2 : 1, mipHeight > 1 ? mipHeight / 2 : 1, 1 };
+                    blit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+                    blit.dstSubresource.mipLevel = i;
+                    blit.dstSubresource.baseArrayLayer = layerIndex;
+                    blit.dstSubresource.layerCount = 1;
+
+                    vkCmdBlitImage(cmd,
+                        image.Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                        image.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                        1, &blit,
+                        VK_FILTER_LINEAR);
+
+                    barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+                    barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+                    barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+                    barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+                    vkCmdPipelineBarrier(cmd,
+                        VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0,
+                        0, nullptr,
+                        0, nullptr,
+                        1, &barrier);
+
+                    if (mipWidth > 1) mipWidth /= 2;
+                    if (mipHeight > 1) mipHeight /= 2;
+                }
+
+                barrier.subresourceRange.baseMipLevel = mipLevels - 1;
                 barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-                barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
-                barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-                barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
-
-                vkCmdPipelineBarrier(cmd,
-                    VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0,
-                    0, nullptr,
-                    0, nullptr,
-                    1, &barrier);
-
-                VkImageBlit blit{};
-                blit.srcOffsets[0] = { 0, 0, 0 };
-                blit.srcOffsets[1] = { mipWidth, mipHeight, 1 };
-                blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-                blit.srcSubresource.mipLevel = i - 1;
-                blit.srcSubresource.baseArrayLayer = 0;
-                blit.srcSubresource.layerCount = 1;
-                blit.dstOffsets[0] = { 0, 0, 0 };
-                blit.dstOffsets[1] = { mipWidth > 1 ? mipWidth / 2 : 1, mipHeight > 1 ? mipHeight / 2 : 1, 1 };
-                blit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-                blit.dstSubresource.mipLevel = i;
-                blit.dstSubresource.baseArrayLayer = 0;
-                blit.dstSubresource.layerCount = 1;
-
-                vkCmdBlitImage(cmd,
-                    image.Image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-                    image.Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                    1, &blit,
-                    VK_FILTER_LINEAR);
-
-                barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
                 barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-                barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+                barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
                 barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
                 vkCmdPipelineBarrier(cmd,
@@ -1443,22 +1640,7 @@ namespace Engine
                     0, nullptr,
                     0, nullptr,
                     1, &barrier);
-
-                if (mipWidth > 1) mipWidth /= 2;
-                if (mipHeight > 1) mipHeight /= 2;
             }
-
-            barrier.subresourceRange.baseMipLevel = mipLevels - 1;
-            barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-            barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-            barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-            barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-            vkCmdPipelineBarrier(cmd,
-                VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0,
-                0, nullptr,
-                0, nullptr,
-                1, &barrier);
         });
     }
 

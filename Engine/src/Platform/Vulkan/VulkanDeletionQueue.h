@@ -2,7 +2,7 @@
 
 #include <deque>
 
-namespace Engine
+namespace Vulkan
 {
     struct VulkanDeletionQueue
     {
