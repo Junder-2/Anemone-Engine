@@ -1078,6 +1078,8 @@ namespace Vulkan
         frame.DeletionQueue.Flush();
         frame.Descriptors.Clear(_device);
 
+        UpdateGlobalUniforms();
+
         CHECK_RESULT(vkResetFences(_device, 1, &frame.Fence));
 
         const VkCommandBuffer cmd = frame.CommandBuffer;
@@ -1155,8 +1157,6 @@ namespace Vulkan
         ANE_DEEP_PROFILE_FUNCTION();
 
         VulkanFrame& frame = GetFrame();
-
-        UpdateGlobalUniforms();
 
         VkDescriptorSet appDescriptor = frame.Descriptors.Allocate(_device, _appDataLayout, _allocator);
         VkDescriptorSet sceneDescriptor = frame.Descriptors.Allocate(_device, _geometryDataLayout, _allocator);
