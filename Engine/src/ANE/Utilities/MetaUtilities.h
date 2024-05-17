@@ -1,9 +1,9 @@
 #pragma once
 #include <imgui.h>
 
-#include "imgui_internal.h"
 #include "PhysicsUtilities.h"
 #include "ANE/Core/Scene/Components/RenderComponent.h"
+#include "ANE/Math/FMath.h"
 #include "ANE/Physics/Physics.h"
 #include "ANE/Physics/Types/Collider.h"
 #include "ANE/Physics/Types/BoxCollider.h"
@@ -365,61 +365,214 @@ namespace Engine
 
         bool isDirty = false;
 
-        ImGui::Text("%s","Base Color");
-        ImGui::SameLine();
-        if (ImGui::ColorEdit3("##color", &mpb.Color.R))
+        constexpr float fieldWidthRatio = 0.61803398875f; // 1 / Phi.
+        constexpr float fieldMinWidth = 100, fieldMaxWidth = 400;
+        constexpr bool removeTablePadding = true;
+        constexpr bool displayTableBorders = false;
+        if (removeTablePadding) ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
+        constexpr int decoratorFlags = (displayTableBorders ? ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersH : 0) | ImGuiTableFlags_NoPadOuterX;
+
         {
-            isDirty =  true;
+            const float width = ImGui::GetColumnWidth();
+            const float fieldWidth = FMath::Clamp(width * fieldWidthRatio, fieldMinWidth, fieldMaxWidth);
+
+            if (ImGui::BeginTable("Table", 2, ImGuiTableFlags_SizingFixedSame | decoratorFlags))
+            {
+                ImGui::TableSetupColumn("Table Label", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableSetupColumn("Table Field");
+                ImGui::TableNextRow(ImGuiTableRowFlags_None);
+
+                ImGui::TableSetColumnIndex(0);
+                ImGui::AlignTextToFramePadding();
+                ImGui::Text("Base Color");
+
+                ImGui::TableSetColumnIndex(1);
+                ImGui::PushItemWidth(fieldWidth);
+                if (ImGui::ColorEdit3("##BaseColor", &mpb.Emission.R))
+                {
+                    isDirty =  true;
+                }
+
+                ImGui::EndTable();
+            }
         }
 
-        ImGui::Text("%s","Emission Color");
-        ImGui::SameLine();
-        if (ImGui::ColorEdit3("##EmissionColor", &mpb.Emission.R))
         {
-            isDirty =  true;
+            const float width = ImGui::GetColumnWidth();
+            const float fieldWidth = FMath::Clamp(width * fieldWidthRatio, fieldMinWidth, fieldMaxWidth);
+
+            if (ImGui::BeginTable("Table", 2, ImGuiTableFlags_SizingFixedSame | decoratorFlags))
+            {
+                ImGui::TableSetupColumn("Table Label", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableSetupColumn("Table Field");
+                ImGui::TableNextRow(ImGuiTableRowFlags_None);
+
+                ImGui::TableSetColumnIndex(0);
+                ImGui::AlignTextToFramePadding();
+                ImGui::Text("Emission Color");
+
+                ImGui::TableSetColumnIndex(1);
+                ImGui::PushItemWidth(fieldWidth);
+                if (ImGui::ColorEdit3("##EmissionColor", &mpb.Emission.R))
+                {
+                    isDirty =  true;
+                }
+
+                ImGui::EndTable();
+            }
         }
 
-        ImGui::Text("%s","Height multiplier");
-        ImGui::SameLine();
-        if (ImGui::SliderFloat("##Height multiplier", &mpb.Height, 0, 1))
         {
-            isDirty =  true;
+            const float width = ImGui::GetColumnWidth();
+            const float fieldWidth = FMath::Clamp(width * fieldWidthRatio, fieldMinWidth, fieldMaxWidth);
+
+            if (ImGui::BeginTable("Table", 2, ImGuiTableFlags_SizingFixedSame | decoratorFlags))
+            {
+                ImGui::TableSetupColumn("Table Label", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableSetupColumn("Table Field");
+                ImGui::TableNextRow(ImGuiTableRowFlags_None);
+
+                ImGui::TableSetColumnIndex(0);
+                ImGui::AlignTextToFramePadding();
+                ImGui::Text("Height");
+
+                ImGui::TableSetColumnIndex(1);
+                ImGui::PushItemWidth(fieldWidth);
+                if (ImGui::SliderFloat("##Height", &mpb.Height, 0, 1))
+                {
+                    isDirty =  true;
+                }
+
+                ImGui::EndTable();
+            }
         }
 
-        ImGui::Text("%s","Metallic multiplier");
-        ImGui::SameLine();
-        if (ImGui::SliderFloat("##Metallic", &mpb.Metallic, 0, 1))
         {
-            isDirty =  true;
+            const float width = ImGui::GetColumnWidth();
+            const float fieldWidth = FMath::Clamp(width * fieldWidthRatio, fieldMinWidth, fieldMaxWidth);
+
+            if (ImGui::BeginTable("Table", 2, ImGuiTableFlags_SizingFixedSame | decoratorFlags))
+            {
+                ImGui::TableSetupColumn("Table Label", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableSetupColumn("Table Field");
+                ImGui::TableNextRow(ImGuiTableRowFlags_None);
+
+                ImGui::TableSetColumnIndex(0);
+                ImGui::AlignTextToFramePadding();
+                ImGui::Text("Metallic");
+
+                ImGui::TableSetColumnIndex(1);
+                ImGui::PushItemWidth(fieldWidth);
+                if (ImGui::SliderFloat("##Metallic", &mpb.Metallic, 0, 1))
+                {
+                    isDirty =  true;
+                }
+
+                ImGui::EndTable();
+            }
         }
 
-        ImGui::Text("%s","Normal multiplier");
-        ImGui::SameLine();
-        if (ImGui::SliderFloat("##Normal", &mpb.Normal, 0, 1))
         {
-            isDirty =  true;
+            const float width = ImGui::GetColumnWidth();
+            const float fieldWidth = FMath::Clamp(width * fieldWidthRatio, fieldMinWidth, fieldMaxWidth);
+
+            if (ImGui::BeginTable("Table", 2, ImGuiTableFlags_SizingFixedSame | decoratorFlags))
+            {
+                ImGui::TableSetupColumn("Table Label", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableSetupColumn("Table Field");
+                ImGui::TableNextRow(ImGuiTableRowFlags_None);
+
+                ImGui::TableSetColumnIndex(0);
+                ImGui::AlignTextToFramePadding();
+                ImGui::Text("Normal");
+
+                ImGui::TableSetColumnIndex(1);
+                ImGui::PushItemWidth(fieldWidth);
+                if (ImGui::SliderFloat("##Normal", &mpb.Normal, 0, 1))
+                {
+                    isDirty =  true;
+                }
+
+                ImGui::EndTable();
+            }
         }
 
-        ImGui::Text("%s","Occlusion multiplier");
-        ImGui::SameLine();
-        if (ImGui::SliderFloat("##Occlusion", &mpb.Occlusion, 0, 1))
         {
-            isDirty =  true;
+            const float width = ImGui::GetColumnWidth();
+            const float fieldWidth = FMath::Clamp(width * fieldWidthRatio, fieldMinWidth, fieldMaxWidth);
+
+            if (ImGui::BeginTable("Table", 2, ImGuiTableFlags_SizingFixedSame | decoratorFlags))
+            {
+                ImGui::TableSetupColumn("Table Label", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableSetupColumn("Table Field");
+                ImGui::TableNextRow(ImGuiTableRowFlags_None);
+
+                ImGui::TableSetColumnIndex(0);
+                ImGui::AlignTextToFramePadding();
+                ImGui::Text("Occlusion");
+
+                ImGui::TableSetColumnIndex(1);
+                ImGui::PushItemWidth(fieldWidth);
+                if (ImGui::SliderFloat("##Occlusion", &mpb.Occlusion, 0, 1))
+                {
+                    isDirty =  true;
+                }
+
+                ImGui::EndTable();
+            }
         }
 
-        ImGui::Text("%s","Reflectance multiplier");
-        ImGui::SameLine();
-        if (ImGui::SliderFloat("##Reflectance", &mpb.Reflectance, 0, 1))
         {
-            isDirty =  true;
+            const float width = ImGui::GetColumnWidth();
+            const float fieldWidth = FMath::Clamp(width * fieldWidthRatio, fieldMinWidth, fieldMaxWidth);
+
+            if (ImGui::BeginTable("Table", 2, ImGuiTableFlags_SizingFixedSame | decoratorFlags))
+            {
+                ImGui::TableSetupColumn("Table Label", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableSetupColumn("Table Field");
+                ImGui::TableNextRow(ImGuiTableRowFlags_None);
+
+                ImGui::TableSetColumnIndex(0);
+                ImGui::AlignTextToFramePadding();
+                ImGui::Text("Reflectance");
+
+                ImGui::TableSetColumnIndex(1);
+                ImGui::PushItemWidth(fieldWidth);
+                if (ImGui::SliderFloat("##Reflectance", &mpb.Reflectance, 0, 1))
+                {
+                    isDirty =  true;
+                }
+
+                ImGui::EndTable();
+            }
         }
 
-        ImGui::Text("%s","Roughness multiplier");
-        ImGui::SameLine();
-        if (ImGui::SliderFloat("##Roughness", &mpb.Roughness, 0, 1))
         {
-            isDirty =  true;
+            const float width = ImGui::GetColumnWidth();
+            const float fieldWidth = FMath::Clamp(width * fieldWidthRatio, fieldMinWidth, fieldMaxWidth);
+
+            if (ImGui::BeginTable("Table", 2, ImGuiTableFlags_SizingFixedSame | decoratorFlags))
+            {
+                ImGui::TableSetupColumn("Table Label", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableSetupColumn("Table Field");
+                ImGui::TableNextRow(ImGuiTableRowFlags_None);
+
+                ImGui::TableSetColumnIndex(0);
+                ImGui::AlignTextToFramePadding();
+                ImGui::Text("Roughness");
+
+                ImGui::TableSetColumnIndex(1);
+                ImGui::PushItemWidth(fieldWidth);
+                if (ImGui::SliderFloat("##Roughness", &mpb.Roughness, 0, 1))
+                {
+                    isDirty =  true;
+                }
+
+                ImGui::EndTable();
+            }
         }
+
+        if (removeTablePadding) ImGui::PopStyleVar();
 
         ImGui::BeginDisabled(matData.HasUniqueMaterial);
         if (ImGui::Button("Create Unique Material"))
