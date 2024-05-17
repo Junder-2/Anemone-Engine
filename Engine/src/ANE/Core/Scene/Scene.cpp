@@ -101,20 +101,31 @@ namespace Engine
     {
         ANE_DEEP_PROFILE_FUNCTION();
 
-        // TODO: Sort based on pivot or bounds.
-        const auto view = _registry.view<TransformComponent, RenderComponent>();
-        for (const auto entity : view)
         {
-            auto [transform, renderer] = view.get<TransformComponent, RenderComponent>(entity);
+            // Sort based on Transform square distance.
+            const Vector3 camPos = Camera::GetCameraTransform().GetPosition();
+            _registry.sort<TransformComponent>([&](const TransformComponent& lhs, const TransformComponent& rhs)
+            {
+                const float sqrDstA = (camPos - lhs.Transform.GetPosition()).LengthSquare();
+                const float sqrDstB = (camPos - rhs.Transform.GetPosition()).LengthSquare();
+                return sqrDstA < sqrDstB;
+            });
 
-            DrawCommand draw = {};
-            draw.ModelMatrix = transform.Transform.GetLocalToWorld();
-            draw.VertexCount = renderer.Model.NumVertices;
-            draw.MeshBuffers = renderer.Model.MeshBuffers;
+            auto view = _registry.view<TransformComponent, RenderComponent>();
+            view.use<TransformComponent>(); // Use iteration order of TransformComponent.
+            for (const auto entity : view)
+            {
+                auto [transform, renderer] = view.get<TransformComponent, RenderComponent>(entity);
 
-            draw.Material = renderer.GetMaterial();
+                DrawCommand draw = {};
+                draw.ModelMatrix = transform.Transform.GetLocalToWorld();
+                draw.VertexCount = renderer.Model.NumVertices;
+                draw.MeshBuffers = renderer.Model.MeshBuffers;
 
-            Renderer::SubmitDrawCommand(draw);
+                draw.Material = renderer.GetMaterial();
+
+                Renderer::SubmitDrawCommand(draw);
+            }
         }
     }
 }
