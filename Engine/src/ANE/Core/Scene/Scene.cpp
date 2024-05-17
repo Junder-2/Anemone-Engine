@@ -104,16 +104,24 @@ namespace Engine
 
         // TODO: Gather more lights for rendering.
         {
+            Vector3 dirLightColor = 0.f;
+            Vector3 dirLightDir = -Vector3::UpVector();
+
             const auto view = _registry.view<TransformComponent, LightComponent>();
             for (const auto entity : view)
             {
                 auto [transform, light] = view.get<TransformComponent, LightComponent>(entity);
 
-                Renderer::SetSunColor(light.GetColor());
-                Renderer::SetSunDirection(transform.Transform.GetForward());
+                if(light.GetLightType() != LightType::Directional) continue;
+
+                dirLightColor = light.GetColor() * light.GetIntensity();
+                dirLightDir = transform.Transform.GetForward();
 
                 break; // We only care about the first dir light.
             }
+
+            Renderer::SetSunColor(dirLightColor);
+            Renderer::SetSunDirection(dirLightDir);
         }
 
         {

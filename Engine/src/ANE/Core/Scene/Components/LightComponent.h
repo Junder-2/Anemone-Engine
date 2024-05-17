@@ -4,11 +4,18 @@
 
 namespace Engine
 {
-    enum LightType : uint8_t
+    enum class LightType
     {
         Directional,
         Point,
         Spotlight
+    };
+
+    struct LightData //Todo add Range etc.
+    {
+        LightType LightType = LightType::Directional;
+        float Intensity = 1.f;
+        Vector3 Color = 1.f;
     };
 
     struct LightComponent : Component
@@ -18,16 +25,20 @@ namespace Engine
         static void RegisterComponentMetaData()
         {
             entt::meta<LightComponent>()
+                .data<&LightComponent::_lightData>("LightData"_hs).prop("display_name"_hs, "Light Data")
                 .EDITABLE;
         }
 
-    public:
-        float GetIntensity() const { return _intensity; }
-        Vector3 GetColor() const { return _color; }
+        void SetLightType(const LightType type) { _lightData.LightType = type; }
+        LightType GetLightType() const { return _lightData.LightType; }
+
+        void SetIntensity(const float intensity) { _lightData.Intensity = intensity; }
+        float GetIntensity() const { return _lightData.Intensity; }
+
+        void SetColor(const Vector3 color) { _lightData.Color = color; }
+        Vector3 GetColor() const { return _lightData.Color; }
 
     private:
-        float _intensity = 1.f;
-        LightType _lightType = Directional;
-        Vector3 _color = 1.f;
+        LightData _lightData;
     };
 }

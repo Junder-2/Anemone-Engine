@@ -54,7 +54,8 @@ namespace Engine
         SceneSerializer* _sceneSerializer;
         std::vector<UIUpdateWrapper> _uiUpdates;
         void CreateTestScene(int numEntitiesToTest);
-        void CreateFloor();
+        void CreateDefaultFloor();
+        void CreateDefaultLights();
 
         void OnSwitchEditorFocus(InputValue inputValue);
 

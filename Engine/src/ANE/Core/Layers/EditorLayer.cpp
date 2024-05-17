@@ -13,7 +13,6 @@
 #include "ANE/Core/Window.h"
 #include "ANE/Core/Entity/ExampleScripts/CameraController.h"
 #include "ANE/Core/Scene/Components/Components.h"
-#include "ANE/Core/Scene/Components/LightComponent.h"
 #include "Panels/InspectorPanel.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "ANE/Input/EditorInputSystem.h"
@@ -190,7 +189,8 @@ namespace Engine
         ent.AddComponent<CameraComponent>();
         ent.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
-        CreateFloor();
+        CreateDefaultFloor();
+        CreateDefaultLights();
 
         //Get Component from entity
         if (RenderComponent comp; ent.TryGetComponent<RenderComponent>(comp))
@@ -203,7 +203,7 @@ namespace Engine
         _sceneSerializer->Serialize(_activeScene);
     }
 
-    void EditorLayer::CreateFloor()
+    void EditorLayer::CreateDefaultFloor()
     {
         ANE_PROFILE_FUNCTION();
 
@@ -215,6 +215,24 @@ namespace Engine
         floor.AddComponent<RenderComponent>("Plane.obj");
         floor.AddComponent<RigidBodyComponent>(floor, BodyType::Static);
         floor.AddComponent<ColliderComponent>(floor, Vector3(1.f, .1f, 1.f));
+    }
+
+    void EditorLayer::CreateDefaultLights()
+    {
+        ANE_PROFILE_FUNCTION();
+
+        Vector3 ambientColor = Vector3(0.05f, 0.08f, 0.11f);
+        const Vector3 sunAngle = Vector3(50 * FMath::DEGREES_TO_RAD, -30 * FMath::DEGREES_TO_RAD, 0);
+        const Vector3 sunColor = Vector3(1.0f, 0.9f, 0.67f);
+
+        Entity skyLight = _activeScene->Create("Skylight");
+        TransformMatrix& transformMatrix = skyLight.GetComponent<TransformComponent>().Transform;
+        transformMatrix.SetRotation(sunAngle);
+
+        LightComponent& lightComp = skyLight.AddComponent<LightComponent>();
+
+        lightComp.SetColor(sunColor);
+        lightComp.SetIntensity(1.f);
     }
 
     void EditorLayer::OnSwitchEditorFocus(const InputValue inputValue)
