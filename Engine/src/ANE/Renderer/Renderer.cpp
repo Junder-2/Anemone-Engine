@@ -54,6 +54,16 @@ namespace Engine
         return _vulkanRenderer->LoadTexture(texturePath);
     }
 
+    MaterialInstance* Renderer::GetDefaultMaterial()
+    {
+        return _vulkanRenderer->GetDefaultMaterial();
+    }
+
+    MaterialInstance* Renderer::GetDefaultMaterialClone()
+    {
+        return _vulkanRenderer->GetDefaultMaterialClone();
+    }
+
     void Renderer::SubmitDrawCommand(const DrawCommand& command)
     {
         _drawCommands.Commands.push_back(command);

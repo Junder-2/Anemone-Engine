@@ -8,7 +8,7 @@ namespace Engine
         uint32_t NumIndices;
         uint32_t Material;
         uint32_t StartOffset;
-        std::vector<Vertex> Vertices;
+        std::vector<Vulkan::Vertex> Vertices;
         std::vector<unsigned int> Indices;
     };
 
@@ -24,6 +24,6 @@ namespace Engine
 
         uint32_t NumVertices;
         std::vector<Mesh> SubMeshes;
-        VmaMeshBuffers MeshBuffers;
+        Vulkan::VmaMeshBuffers MeshBuffers;
     };
 }

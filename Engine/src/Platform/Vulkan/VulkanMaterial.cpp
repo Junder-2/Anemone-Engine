@@ -12,7 +12,7 @@ using Slang::ComPtr;
 #include "VulkanInitializers.h"
 #include "VulkanUtils.h"
 
-namespace Engine
+namespace Vulkan
 {
     void FilamentMetallicRoughness::BuildPipelines(const VulkanRenderer* renderer)
     {
@@ -51,23 +51,27 @@ namespace Engine
         vkDestroyPipeline(device, Pipeline.Pipeline, allocator);
     }
 
-    MaterialInstance FilamentMetallicRoughness::WriteMaterial(const VulkanRenderer* renderer, const MaterialPass type, const MaterialResources& resources, DescriptorAllocator& descriptorAllocator)
+    MaterialInstance FilamentMetallicRoughness::WriteMaterial(const VulkanRenderer* renderer, const MaterialPass type, const MaterialResources& resources, MaterialConstants* uniforms, DescriptorAllocator& descriptorAllocator)
     {
         const VkDevice device = renderer->GetDevice();
         const VkAllocationCallbacks* allocator = renderer->GetAllocator();
 
         MaterialInstance materialData;
-        materialData.Pipeline = &Pipeline;
+        materialData.ShaderPipeline = &Pipeline;
         materialData.MaterialSet = descriptorAllocator.Allocate(device, MaterialLayout, allocator);
         materialData.PassType = type;
+        materialData.Uniforms = uniforms;
+        materialData.Resources = resources;
 
         constexpr VkImageLayout readOnly = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         constexpr VkDescriptorType combinedSampler = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
         Writer.Clear();
-        Writer.WriteBuffer(0, resources.DataBuffer, sizeof(MaterialConstants), resources.DataBufferOffset, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+        Writer.WriteBuffer(0, resources.Data.Buffer, sizeof(MaterialConstants), resources.DataBufferOffset, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
         Writer.WriteImage(1, resources.ColorImage.ImageView, resources.ColorSampler, readOnly, combinedSampler);
         Writer.WriteImage(2, resources.NormalImage.ImageView, resources.NormalSampler, readOnly, combinedSampler);
         Writer.WriteImage(3, resources.ORMImage.ImageView, resources.ORMSampler, readOnly, combinedSampler);
+        Writer.WriteImage(4, resources.DFGImage.ImageView, resources.DFGSampler, readOnly, combinedSampler);
+        Writer.WriteImage(5, resources.CubeMap.ImageView, resources.CubeMapSampler, readOnly, combinedSampler);
 
         Writer.UpdateSet(device, materialData.MaterialSet);
 
@@ -89,7 +93,7 @@ namespace Engine
         sessionDesc.targets = &targetDesc;
         sessionDesc.targetCount = 1;
         sessionDesc.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR;
-        const char* paths[] = { "../Assets/Shaders/" };
+        const char* paths[] = { ASSET_PATH_SHADERS };
         sessionDesc.searchPaths = paths;
         sessionDesc.searchPathCount = 1;
 
@@ -189,6 +193,8 @@ namespace Engine
             .AddBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) // Color
             .AddBinding(2, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) // Normal
             .AddBinding(3, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) // Occlusion, Roughness, Metallic
+            .AddBinding(4, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) // DFG
+            .AddBinding(5, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) // Cubemap
 
             .Build();
 

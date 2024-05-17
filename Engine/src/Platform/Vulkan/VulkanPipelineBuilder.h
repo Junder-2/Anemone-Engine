@@ -4,8 +4,10 @@
 
 #include "VkBootstrap.h"
 
-namespace Engine
+namespace Vulkan
 {
+    class Shader;
+
     enum BlendMode
     {
         None,

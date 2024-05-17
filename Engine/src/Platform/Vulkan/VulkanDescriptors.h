@@ -3,7 +3,7 @@
 #include <span>
 #include <vulkan/vulkan_core.h>
 
-namespace Engine
+namespace Vulkan
 {
     class DescriptorAllocator
     {

@@ -3,6 +3,9 @@
 
 #include <fstream>
 
+#include "VulkanCommon.h"
+#include "Material/Shader.h"
+
 namespace VulkanUtils
 {
     void TransitionImage(const VkCommandBuffer cmd, const VkImage image, const VkImageLayout currentLayout, const VkImageLayout newLayout)
@@ -118,5 +121,173 @@ namespace VulkanUtils
 
         *outShaderModule = shaderModule;
         return true;
+    }
+
+    void LoadSlangShaders(const char* moduleName, const VkDevice device, const VkAllocationCallbacks* allocator, VkShaderModule* vertShader, VkShaderModule* fragShader)
+    {
+        using namespace Slang;
+
+        ComPtr<slang::IGlobalSession> slangGlobalSession;
+        createGlobalSession(slangGlobalSession.writeRef());
+
+        slang::TargetDesc targetDesc = { };
+        targetDesc.format = SLANG_SPIRV;
+        targetDesc.profile = slangGlobalSession->findProfile("glsl_440");
+        targetDesc.flags = SLANG_TARGET_FLAG_GENERATE_SPIRV_DIRECTLY;
+
+        slang::SessionDesc sessionDesc = { };
+        sessionDesc.targets = &targetDesc;
+        sessionDesc.targetCount = 1;
+        sessionDesc.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR;
+        const char* paths[] = { ASSET_PATH_SHADERS };
+        sessionDesc.searchPaths = paths;
+        sessionDesc.searchPathCount = 1;
+
+        ComPtr<slang::ISession> session;
+        slangGlobalSession->createSession(sessionDesc, session.writeRef());
+
+        ComPtr<slang::IBlob> spirvVertProgram;
+        ComPtr<slang::IBlob> spirvFragProgram;
+        ComPtr<slang::IBlob> diagnosticBlob;
+        slang::IModule* slangModule = session->loadModule(moduleName, diagnosticBlob.writeRef());
+
+        if (!slangModule)
+        {
+            ANE_ELOG_ERROR("Error when loading shader module: {}", moduleName);
+        }
+
+        ComPtr<slang::IEntryPoint> vertEntry;
+        slangModule->findEntryPointByName("vertexMain", vertEntry.writeRef());
+
+        slang::IComponentType* components[] = { slangModule, vertEntry };
+        ComPtr<slang::IComponentType> program;
+        {
+            ComPtr<slang::IBlob> diagnosticsBlob;
+            SlangResult result = session->createCompositeComponentType(
+                components,
+                2,
+                program.writeRef(),
+                diagnosticsBlob.writeRef());
+        }
+
+        {
+            ComPtr<slang::IBlob> diagnosticsBlob;
+            SlangResult result = program->getEntryPointCode(
+                0, 0, spirvVertProgram.writeRef(), diagnosticsBlob.writeRef());
+        }
+
+        ComPtr<slang::IEntryPoint> fragEntry;
+        slangModule->findEntryPointByName("fragmentMain", fragEntry.writeRef());
+
+        slang::IComponentType* components2[] = { slangModule, fragEntry };
+        ComPtr<slang::IComponentType> program2;
+        {
+            ComPtr<slang::IBlob> diagnosticsBlob;
+            SlangResult result = session->createCompositeComponentType(
+                components2,
+                2,
+                program2.writeRef(),
+                diagnosticsBlob.writeRef());
+        }
+
+        {
+            ComPtr<slang::IBlob> diagnosticsBlob;
+            SlangResult result = program2->getEntryPointCode(
+                0, 0, spirvFragProgram.writeRef(), diagnosticsBlob.writeRef());
+        }
+
+        if (!LoadShaderModule(spirvVertProgram, device, allocator, vertShader))
+        {
+            ANE_ELOG_ERROR("Error when building vertex shader module: {}", slangModule->getName());
+        }
+
+        if (!LoadShaderModule(spirvFragProgram, device, allocator, fragShader))
+        {
+            ANE_ELOG_ERROR("Error when building fragment shader module: {}", slangModule->getName());
+        }
+    }
+
+    void LoadSlangShaders(const char* moduleName, const VkDevice device, const VkAllocationCallbacks* allocator, Vulkan::ShaderModule* vertModule, Vulkan::ShaderModule* fragModule)
+    {
+        using namespace Slang;
+
+        ComPtr<slang::IGlobalSession> slangGlobalSession;
+        createGlobalSession(slangGlobalSession.writeRef());
+
+        slang::TargetDesc targetDesc = { };
+        targetDesc.format = SLANG_SPIRV;
+        targetDesc.profile = slangGlobalSession->findProfile("glsl_440");
+        targetDesc.flags = SLANG_TARGET_FLAG_GENERATE_SPIRV_DIRECTLY;
+
+        slang::SessionDesc sessionDesc = { };
+        sessionDesc.targets = &targetDesc;
+        sessionDesc.targetCount = 1;
+        sessionDesc.defaultMatrixLayoutMode = SLANG_MATRIX_LAYOUT_COLUMN_MAJOR;
+        const char* paths[] = { ASSET_PATH_SHADERS };
+        sessionDesc.searchPaths = paths;
+        sessionDesc.searchPathCount = 1;
+
+        ComPtr<slang::ISession> session;
+        slangGlobalSession->createSession(sessionDesc, session.writeRef());
+
+        ComPtr<slang::IBlob> spirvVertProgram;
+        ComPtr<slang::IBlob> spirvFragProgram;
+        ComPtr<slang::IBlob> diagnosticBlob;
+        slang::IModule* slangModule = session->loadModule(moduleName, diagnosticBlob.writeRef());
+
+        if (!slangModule)
+        {
+            ANE_ELOG_ERROR("Error when loading shader module: {}", moduleName);
+        }
+
+        ComPtr<slang::IEntryPoint> vertEntry;
+        slangModule->findEntryPointByName("vertexMain", vertEntry.writeRef());
+
+        slang::IComponentType* components[] = { slangModule, vertEntry };
+        ComPtr<slang::IComponentType> program;
+        {
+            ComPtr<slang::IBlob> diagnosticsBlob;
+            SlangResult result = session->createCompositeComponentType(
+                components,
+                2,
+                program.writeRef(),
+                diagnosticsBlob.writeRef());
+        }
+
+        {
+            ComPtr<slang::IBlob> diagnosticsBlob;
+            SlangResult result = program->getEntryPointCode(
+                0, 0, spirvVertProgram.writeRef(), diagnosticsBlob.writeRef());
+        }
+
+        ComPtr<slang::IEntryPoint> fragEntry;
+        slangModule->findEntryPointByName("fragmentMain", fragEntry.writeRef());
+
+        slang::IComponentType* components2[] = { slangModule, fragEntry };
+        ComPtr<slang::IComponentType> program2;
+        {
+            ComPtr<slang::IBlob> diagnosticsBlob;
+            SlangResult result = session->createCompositeComponentType(
+                components2,
+                2,
+                program2.writeRef(),
+                diagnosticsBlob.writeRef());
+        }
+
+        {
+            ComPtr<slang::IBlob> diagnosticsBlob;
+            SlangResult result = program2->getEntryPointCode(
+                0, 0, spirvFragProgram.writeRef(), diagnosticsBlob.writeRef());
+        }
+
+        if (!LoadShaderModule(spirvVertProgram, device, allocator, &vertModule->Module))
+        {
+            ANE_ELOG_ERROR("Error when building vertex shader module: {}", slangModule->getName());
+        }
+
+        if (!LoadShaderModule(spirvFragProgram, device, allocator, &fragModule->Module))
+        {
+            ANE_ELOG_ERROR("Error when building fragment shader module: {}", slangModule->getName());
+        }
     }
 }

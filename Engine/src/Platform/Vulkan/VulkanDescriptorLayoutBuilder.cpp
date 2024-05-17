@@ -1,7 +1,7 @@
 ﻿#include "anepch.h"
 #include "VulkanDescriptorLayoutBuilder.h"
 
-namespace Engine
+namespace Vulkan
 {
     DescriptorLayoutBuilder::DescriptorLayoutBuilder(VkDevice const& logicalDevice)
     {

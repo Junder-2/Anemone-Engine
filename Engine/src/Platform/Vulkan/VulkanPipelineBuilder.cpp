@@ -1,9 +1,10 @@
 #include "anepch.h"
 #include "VulkanPipelineBuilder.h"
+#include "Material/Shader.h"
 
 #include "VulkanInitializers.h"
 
-namespace Engine
+namespace Vulkan
 {
     VulkanPipelineBuilder::VulkanPipelineBuilder(vkb::Device const& logicalDevice, const VkPipelineLayout pipelineLayout) : VulkanPipelineBuilder(logicalDevice.device, pipelineLayout)
     {

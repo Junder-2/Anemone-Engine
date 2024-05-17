@@ -4,7 +4,7 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
-namespace Engine
+namespace Vulkan
 {
     Assimp::Importer MeshLoader::Importer;
 
@@ -77,13 +77,13 @@ namespace Engine
             vertex.UvX = uv->x;
             vertex.UvY = uv->y;
 
-            bounds.Min.x = fmin(vertex.Position.X, bounds.Min.x);
-            bounds.Min.y = fmin(vertex.Position.Y, bounds.Min.y);
-            bounds.Min.z = fmin(vertex.Position.Z, bounds.Min.z);
+            bounds.Min.X = fmin(vertex.Position.X, bounds.Min.X);
+            bounds.Min.Y = fmin(vertex.Position.Y, bounds.Min.Y);
+            bounds.Min.Z = fmin(vertex.Position.Z, bounds.Min.Z);
 
-            bounds.Max.x = fmin(vertex.Position.X, bounds.Min.x);
-            bounds.Max.y = fmin(vertex.Position.Y, bounds.Min.y);
-            bounds.Max.z = fmin(vertex.Position.Z, bounds.Min.z);
+            bounds.Max.X = fmin(vertex.Position.X, bounds.Min.X);
+            bounds.Max.Y = fmin(vertex.Position.Y, bounds.Min.Y);
+            bounds.Max.Z = fmin(vertex.Position.Z, bounds.Min.Z);
 
             finalMesh.Vertices.push_back(vertex);
         }

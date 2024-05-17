@@ -7,9 +7,11 @@
 #include "ANE/Math/Types/Vector3.h"
 #include "ANE/Math/Types/Vector4.h"
 
-namespace Engine
+namespace Vulkan
 {
+    using namespace Engine;
     class VulkanRenderer;
+    struct MaterialInstance;
 
     enum class MaterialPass : uint8_t
     {
@@ -24,26 +26,19 @@ namespace Engine
         VkPipelineLayout Layout;
     };
 
-    struct MaterialInstance
-    {
-        ShaderPipeline* Pipeline;
-        VkDescriptorSet MaterialSet;
-        MaterialPass PassType;
-    };
-
     struct FilamentMetallicRoughness
     {
     public:
         struct MaterialConstants
         {
-            Vector3 Color; //default value = 1
-            float Normal; // default = 1
-            Vector3 Emission; // 0
-            float Metallic;// 1
-            float Roughness;//0
-            float Reflectance;//1
-            float Height;//1
-            float Occlusion;//1
+            Vector3 Color = 1; // = 1,1,1
+            float Normal = 1; // = 1
+            Vector3 Emission = 0; // = 0,0,0
+            float Metallic = 1; // = 1
+            float Roughness = 0; // = 0
+            float Reflectance = 1; // = 1
+            float Height = 1; // = 1
+            float Occlusion = 1; // = 1
 
             // Padding so we meet 256 byte alignment.
             Vector4 Extra[13];
@@ -61,7 +56,14 @@ namespace Engine
             VmaImage ORMImage;
             VkSampler ORMSampler;
 
-            VkBuffer DataBuffer;
+            VmaImage DFGImage;
+            VkSampler DFGSampler;
+
+            VmaImage CubeMap;
+            VkSampler CubeMapSampler;
+
+            VmaBuffer Data;
+            //VkBuffer DataBuffer;
             uint32_t DataBufferOffset;
         };
 
@@ -70,7 +72,7 @@ namespace Engine
 
         void ClearResources(const VulkanRenderer* renderer);
 
-        MaterialInstance WriteMaterial(const VulkanRenderer* renderer, MaterialPass type, const MaterialResources& resources, DescriptorAllocator& descriptorAllocator);
+        MaterialInstance WriteMaterial(const VulkanRenderer* renderer, MaterialPass type, const MaterialResources& resources, MaterialConstants* uniforms, DescriptorAllocator& descriptorAllocator);
 
     private:
         void LoadShaders(const VulkanRenderer* renderer, VkShaderModule& vertexShader, VkShaderModule& fragmentShader);
@@ -82,5 +84,14 @@ namespace Engine
         VkDescriptorSetLayout MaterialLayout;
 
         DescriptorWriter Writer;
+    };
+
+    struct MaterialInstance
+    {
+        ShaderPipeline* ShaderPipeline;
+        VkDescriptorSet MaterialSet;
+        MaterialPass PassType;
+        FilamentMetallicRoughness::MaterialConstants* Uniforms;
+        FilamentMetallicRoughness::MaterialResources Resources;
     };
 }

@@ -15,6 +15,11 @@
 #include "ANE/Renderer/Draw.h"
 #include "ANE/Renderer/Mesh.h"
 
+namespace Engine
+{
+    struct WindowProperties;
+}
+
 namespace vkb
 {
     struct Instance;
@@ -23,10 +28,8 @@ namespace vkb
     struct Swapchain;
 }
 
-namespace Engine
+namespace Vulkan
 {
-    struct WindowProperties;
-
     struct VulkanFrame
     {
         VkCommandPool CommandPool;
@@ -44,6 +47,10 @@ namespace Engine
         ApplicationData AppData;
         SceneData SceneData;
         FilamentMetallicRoughness::MaterialConstants FilamentData;
+
+        VmaBuffer AppDataBuffer;
+        VmaBuffer SceneDataBuffer;
+        VmaBuffer FilamentDataBuffer;
     };
 
     struct VulkanImmediateBuffer
@@ -85,9 +92,13 @@ namespace Engine
         static VmaMeshBuffers UploadRawMesh(std::span<uint32_t> indices, std::span<Vertex> vertices);
 
         VmaImage LoadTexture(const std::string& texturePath);
+        VmaImage LoadCubeTexture(const std::string& texturePath);
 
         float GetFramerate();
         static ImGuiIO* GetImGuiIO() { return _io; }
+
+        static MaterialInstance* GetDefaultMaterial() { return &_filamentInstance; }
+        MaterialInstance* GetDefaultMaterialClone();
 
         // Vulkan
         static VkDevice GetDevice() { return _device; }
@@ -130,6 +141,8 @@ namespace Engine
         static PipelineWrapper CreatePipeline(const vkb::Device& logicalDevice);
 
         void CreateDefaultResources();
+        void CreateDefaultTextures();
+        void CreateDefaultMaterial();
 
         static void CreateImGuiDescriptorPool();
 
@@ -150,10 +163,11 @@ namespace Engine
         static VmaBuffer CreateBuffer(size_t allocSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage);
         static void DestroyBuffer(const VmaBuffer& buffer);
 
-        static VmaImage CreateImage(VkExtent3D size, VkFormat format, VkImageUsageFlags usage, bool mipmaps = false);
-        static VmaImage CreateImage(const void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, bool mipmaps = false);
+        static VmaImage CreateImage(VkExtent3D size, VkFormat format, VkImageUsageFlags usage, VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D, bool mipmaps = false);
+        static VmaImage CreateImage(const void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D, bool mipmaps = false);
+        static VmaImage CreateCubeImage(const void* data, VkExtent3D size, VkFormat format, VkImageUsageFlags usage, VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_CUBE, bool mipmaps = false);
         static void DestroyImage(const VmaImage& image);
-        static void GenerateMipMaps(const VmaImage& image, VkExtent3D size, uint32_t mipLevels);
+        static void GenerateMipMaps(const VmaImage& image, VkExtent3D size, uint32_t mipLevels, bool cubemap = false);
 
         static void ImmediateSubmit(std::function<void(VkCommandBuffer cmd)>&& function);
 
@@ -237,15 +251,20 @@ namespace Engine
         inline static VmaImage _greyImage;
         inline static VmaImage _normalImage;
         inline static VmaImage _errorImage;
+        inline static VmaImage _blackCubeImage;
 
         inline static VmaImage _colorTex;
         inline static VmaImage _normalTex;
         inline static VmaImage _ormTex;
+        inline static VmaImage _dfgTex;
+        inline static VmaImage _cubeMap;
 
         inline static VkSampler _samplerLinear;
 
         inline static MaterialInstance _filamentInstance;
         inline static FilamentMetallicRoughness _filamentMaterial;
+
+        inline static std::vector<MaterialInstance*> _materialInstances;
 
         // ImGui
         inline static ImGui_ImplVulkanH_Window _mainWindowData;
