@@ -819,7 +819,7 @@ namespace Vulkan
         }
     }
 
-    PipelineWrapper VulkanRenderer::CreatePipeline(const vkb::Device& logicalDevice)
+    void VulkanRenderer::CreatePipeline(const vkb::Device& logicalDevice)
     {
         VkPushConstantRange bufferRange;
         bufferRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
@@ -836,21 +836,24 @@ namespace Vulkan
 
         CHECK_RESULT(vkCreatePipelineLayout(_device, &pipelineLayoutInfo, _allocator, &_pipelineLayout));
 
+        VulkanPipelineBuilder builder{ logicalDevice, _pipelineLayout };
+
         VkShaderModule meshVertShader, meshFragShader;
         LoadSlangShader("Mesh_Diffuse", &meshVertShader, &meshFragShader);
 
-        VulkanPipelineBuilder builder{ logicalDevice, _pipelineLayout };
-        vkb::Result<PipelineWrapper> pipeline = builder
+        vkb::Result<PipelineWrapper> skyPipeline = builder
             .SetShaders(meshVertShader, meshFragShader)
             .SetBlendMode(None)
-            .SetDepthTestOperator(VK_COMPARE_OP_GREATER_OR_EQUAL) // Reverse Z for more precision
+            .SetDepthTestOperator(VK_COMPARE_OP_ALWAYS) // Reverse Z for more precision
+            .SetDepthWrite(false)
 
             .SetColorFormat(_colorImage.ImageFormat)
             .SetDepthFormat(_depthImage.ImageFormat)
 
             .SetAllocationCallbacks(_allocator)
             .Build();
-        _meshPipeline = pipeline->Pipeline;
+
+        _skyPipeline = skyPipeline->Pipeline;
 
         // Cleanup.
         vkDestroyShaderModule(_device, meshFragShader, _allocator);
@@ -867,6 +870,7 @@ namespace Vulkan
             .SetDepthWrite(false)
 
             .SetColorFormat(_colorImage.ImageFormat)
+            .SetDepthFormat(_depthImage.ImageFormat)
             .SetPolygonMode(VK_POLYGON_MODE_LINE)
             .SetTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
 
@@ -881,6 +885,7 @@ namespace Vulkan
             .SetDepthWrite(false)
 
             .SetColorFormat(_colorImage.ImageFormat)
+            .SetDepthFormat(_depthImage.ImageFormat)
             .SetPolygonMode(VK_POLYGON_MODE_LINE)
             .SetTopology(VK_PRIMITIVE_TOPOLOGY_LINE_LIST)
 
@@ -896,12 +901,10 @@ namespace Vulkan
         _mainDeletionQueue.PushFunction([&]
         {
             vkDestroyPipelineLayout(_device, _pipelineLayout, _allocator);
-            vkDestroyPipeline(_device, _meshPipeline, _allocator);
+            vkDestroyPipeline(_device, _skyPipeline, _allocator);
             vkDestroyPipeline(_device, _debugTrianglePipeline, _allocator);
             vkDestroyPipeline(_device, _debugLinePipeline, _allocator);
         });
-
-        return pipeline.value();
     }
 
     void VulkanRenderer::CreateDefaultResources()

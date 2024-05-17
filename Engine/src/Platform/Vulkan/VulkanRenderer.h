@@ -141,7 +141,7 @@ namespace Vulkan
         static void SetupDescriptors();
         static void LoadSlangShader(const char* moduleName, VkShaderModule* vertShader, VkShaderModule* fragShader);
 
-        static PipelineWrapper CreatePipeline(const vkb::Device& logicalDevice);
+        static void CreatePipeline(const vkb::Device& logicalDevice);
 
         void CreateDefaultResources();
         void CreateDefaultTextures();
@@ -217,7 +217,7 @@ namespace Vulkan
         inline static QueueFamilyIndices _queueFamily = (QueueFamilyIndices)-1;
         inline static VkQueue _queue = VK_NULL_HANDLE;
         inline static VkPipelineCache _pipelineCache = VK_NULL_HANDLE;
-        inline static VkPipeline _meshPipeline = VK_NULL_HANDLE;
+        inline static VkPipeline _skyPipeline = VK_NULL_HANDLE;
         inline static VkPipeline _debugTrianglePipeline = VK_NULL_HANDLE;
         inline static VkPipeline _debugLinePipeline = VK_NULL_HANDLE;
         inline static VkPipelineLayout _pipelineLayout;
