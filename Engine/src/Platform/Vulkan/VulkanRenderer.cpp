@@ -20,6 +20,7 @@
 #include "ANE/Core/Application.h"
 #include "ANE/Math/FMath.h"
 #include "ANE/Utilities/API.h"
+#include "ANE/Utilities/ImGuiAne.h"
 
 using Slang::ComPtr;
 
@@ -281,7 +282,7 @@ namespace Vulkan
     {
         IMGUI_CHECKVERSION();
         CreateImGuiDescriptorPool();
-        ImGui::CreateContext();
+        AneImGui::Initialize();
 
         _io = &ImGui::GetIO(); (void)_io;
         _io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
@@ -1351,7 +1352,7 @@ namespace Vulkan
     {
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplSDL2_Shutdown();
-        ImGui::DestroyContext();
+        AneImGui::Cleanup();
     }
 
     VulkanFrame& VulkanRenderer::GetFrame()
