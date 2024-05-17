@@ -62,17 +62,20 @@ namespace Engine::AneImGui
             g.NextTableFieldWidth = CalculateTableFieldWidth();
         }
 
-        const float labelWidth = FMath::Clamp(ImGui::GetColumnWidth() - g.NextTableFieldWidth - 15.f, 10, 100);
-
-        ImGui::BeginHorizontal("Horizontal");
-        ImGui::SetNextItemWidth(labelWidth);
-        ImGui::Text(label);
-        ImGui::Spring(0.5f);
-        if (ImGui::Checkbox(std::format("##{}",label).c_str(), v))
+        const float fieldWidth = CalculateTableFieldWidth() - 30.f;
+        if (BeginLabelField(label))
         {
-            change =  true;
+            if (ImGui::Checkbox(std::format("##{}", label).c_str(), v))
+            {
+                change =  true;
+            }
+
+            // Since we can't set the width of a checkbox, we pad it from the right using a Dummy item.
+            ImGui::SameLine();
+            ImGui::Dummy(ImVec2{fieldWidth, 0});
+
+            EndLabelField();
         }
-        ImGui::EndHorizontal();
 
         EndItem();
 
@@ -556,10 +559,10 @@ namespace Engine::AneImGui
 
         constexpr ImGuiTableFlags constFlags = ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_NoPadOuterX;
 
-        if (ImGui::BeginTable(strId, 2, g.NextTableDecoratorFlags | constFlags))
+        if (ImGui::BeginTable(std::format("{} Table", label).c_str(), 2, g.NextTableDecoratorFlags | constFlags))
         {
-            ImGui::TableSetupColumn("Table Label", ImGuiTableColumnFlags_WidthStretch);
-            ImGui::TableSetupColumn("Table Field");
+            ImGui::TableSetupColumn(std::format("{} Table Label", label).c_str(), ImGuiTableColumnFlags_WidthStretch);
+            ImGui::TableSetupColumn(std::format("{} Table Field", label).c_str());
             ImGui::TableNextRow(ImGuiTableRowFlags_None);
 
             ImGui::TableSetColumnIndex(0);
