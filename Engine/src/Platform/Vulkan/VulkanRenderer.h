@@ -263,6 +263,8 @@ namespace Vulkan
         inline static VmaImage _dfgTex;
         inline static VmaImage _cubeMap;
 
+        inline static VmaMeshAsset _skyMesh;
+
         inline static VkSampler _samplerLinear;
         inline static VkSampler _samplerNearest;
 
