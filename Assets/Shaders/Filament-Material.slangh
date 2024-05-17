@@ -17,13 +17,12 @@ Material SetupMaterial(MaterialProperties params, Fragment frag, float2 uv)
     mat.roughness = ComputeRoughness(perceptualRoughness); // Perceptual roughness is not used anywhere apart from getting roughness.
     mat.occlusion = occlusion;
 
-    //float reflectance = ComputeDielectricF0(params.Reflectance);
-    float reflectance = ComputeDielectricF0(1);
+    float reflectance = ComputeDielectricF0(params.Reflectance);
     mat.f0 = ComputeF0(baseColor, metallic, reflectance);
 
-    //float NoV = saturate(dot(frag.normal, frag.viewDir));
-    //mat.dfg = PrefilteredDFG(perceptualRoughness, NoV);
-    //mat.energyCompensation = 1 + mat.f0 * (1 / mat.dfg.y - 1);
+    float NoV = saturate(dot(frag.normal, frag.viewDir));
+    mat.dfg = PrefilteredDFG(perceptualRoughness, NoV);
+    mat.energyCompensation = 1 + mat.f0 * (1 / mat.dfg.y - 1);
 
     return mat;
 }
