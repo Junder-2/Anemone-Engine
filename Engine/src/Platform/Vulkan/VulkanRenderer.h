@@ -97,8 +97,12 @@ namespace Vulkan
         float GetFramerate();
         static ImGuiIO* GetImGuiIO() { return _io; }
 
+        // Engine defaults.
         static MaterialInstance* GetDefaultMaterial() { return &_filamentInstance; }
         MaterialInstance* GetDefaultMaterialClone();
+
+        static VkSampler GetLinearSampler() { return _samplerLinear; }
+        static VkSampler GetNearestSampler() { return _samplerNearest; }
 
         // Vulkan
         static VkDevice GetDevice() { return _device; }
@@ -182,7 +186,6 @@ namespace Vulkan
 
     public:
         inline static ImVec4 ClearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-        inline static VkSampler _samplerNearest;
 
         inline static Vector3 CameraPosition;
         inline static Matrix4x4 ViewProjection;
@@ -260,6 +263,7 @@ namespace Vulkan
         inline static VmaImage _cubeMap;
 
         inline static VkSampler _samplerLinear;
+        inline static VkSampler _samplerNearest;
 
         inline static MaterialInstance _filamentInstance;
         inline static FilamentMetallicRoughness _filamentMaterial;
