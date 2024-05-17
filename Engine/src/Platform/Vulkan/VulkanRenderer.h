@@ -46,7 +46,6 @@ namespace Vulkan
         DescriptorAllocator Descriptors;
         ApplicationData AppData;
         SceneData SceneData;
-        FilamentMetallicRoughness::MaterialConstants FilamentData;
 
         VmaBuffer AppDataBuffer;
         VmaBuffer SceneDataBuffer;

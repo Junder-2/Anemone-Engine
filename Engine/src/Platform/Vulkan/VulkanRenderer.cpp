@@ -1160,15 +1160,6 @@ namespace Vulkan
         frame.SceneData.SunlightDirection = Vector4(sunDirection, 0);
         frame.SceneData.SunlightColor = Vector4(sunColor, 0);
 
-        frame.FilamentData.Color = Vector3::OneVector();
-        frame.FilamentData.Normal = 1.0f;
-        frame.FilamentData.Emission = Vector3::ZeroVector();
-        frame.FilamentData.Metallic = 0.0f;
-        frame.FilamentData.Roughness = 1.0f;
-        frame.FilamentData.Reflectance = 0.0f;
-        frame.FilamentData.Height = 0.0f;
-        frame.FilamentData.Occlusion = 1.0f;
-
         auto* appUniformData = (ApplicationData*)frame.AppDataBuffer.Allocation->GetMappedData();
         *appUniformData = frame.AppData;
 
