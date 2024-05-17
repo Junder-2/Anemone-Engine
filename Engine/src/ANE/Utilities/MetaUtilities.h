@@ -388,7 +388,7 @@ namespace Engine
 
                 ImGui::TableSetColumnIndex(1);
                 ImGui::PushItemWidth(fieldWidth);
-                if (ImGui::ColorEdit3("##BaseColor", &mpb.Emission.R))
+                if (ImGui::ColorEdit3("##BaseColor", &mpb.Color.R))
                 {
                     isDirty =  true;
                 }
