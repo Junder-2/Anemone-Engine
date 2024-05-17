@@ -4,15 +4,16 @@
 #include "imgui_internal.h"
 #include "ANE/Renderer/Renderer.h"
 #include "Platform/Vulkan/VulkanRenderer.h"
+namespace Engine{
 
-Engine::ContentBrowserPanel::ContentBrowserPanel(EditorLayer* editorLayer)
+ContentBrowserPanel::ContentBrowserPanel(EditorLayer* editorLayer)
 {
     _editorLayer = editorLayer;
     currentDirectory = AssetDirectory;
     Init();
 }
 
-void Engine::ContentBrowserPanel::Init()
+void ContentBrowserPanel::Init()
 {
     m_AssetIconMap["folder"] = LoadTextureAsImGuiImage("UITextures/UIIcons/FolderIcon.png");
     m_AssetIconMap["cpp"] = LoadTextureAsImGuiImage("UITextures/UIIcons/FolderIcon.png");
@@ -20,7 +21,7 @@ void Engine::ContentBrowserPanel::Init()
 }
 
 
-Engine::UIUpdateWrapper Engine::ContentBrowserPanel::OnPanelRender()
+UIUpdateWrapper ContentBrowserPanel::OnPanelRender()
 {
     ANE_DEEP_PROFILE_FUNCTION();
 
@@ -50,7 +51,7 @@ Engine::UIUpdateWrapper Engine::ContentBrowserPanel::OnPanelRender()
     return UILayerPanel::OnPanelRender();
 }
 
-void Engine::ContentBrowserPanel::RenderDirectoryBrowserChild(std::filesystem::path DirectoryPath)
+void ContentBrowserPanel::RenderDirectoryBrowserChild(std::filesystem::path DirectoryPath)
 {
     ANE_DEEP_PROFILE_FUNCTION();
 
@@ -84,7 +85,7 @@ void Engine::ContentBrowserPanel::RenderDirectoryBrowserChild(std::filesystem::p
 
 
 
-void Engine::ContentBrowserPanel::RenderDirectoryContentsBrowserChild()
+void ContentBrowserPanel::RenderDirectoryContentsBrowserChild()
 {
     ANE_DEEP_PROFILE_FUNCTION();
 
@@ -117,7 +118,7 @@ void Engine::ContentBrowserPanel::RenderDirectoryContentsBrowserChild()
         ImGui::EndChild();
     }
 }
-void Engine::ContentBrowserPanel::RenderDirectoryItem(std::filesystem::directory_entry dir_entry)
+void ContentBrowserPanel::RenderDirectoryItem(std::filesystem::directory_entry dir_entry)
 {
     std::string filename = dir_entry.path().filename().string();
 
@@ -146,13 +147,14 @@ void Engine::ContentBrowserPanel::RenderDirectoryItem(std::filesystem::directory
     }
 }
 
-VkDescriptorSet Engine::ContentBrowserPanel::LoadTextureAsImGuiImage(const std::string& texturePath)
+VkDescriptorSet ContentBrowserPanel::LoadTextureAsImGuiImage(const std::string& texturePath)
 {
     const auto image = Engine::Renderer::LoadTexture("UITextures/UIIcons/FolderIcon.png");
-    return ImGui_ImplVulkan_AddTexture(Engine::VulkanRenderer::_samplerNearest, image.ImageView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    return ImGui_ImplVulkan_AddTexture(Vulkan::VulkanRenderer::GetNearestSampler(), image.ImageView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 void Engine::ContentBrowserPanel::RenderDirectoryContentsBrowserChildTopBar(float topBarHeight)
 {
     //All support UI, like searching, navigation and menu's should be rendered in this function
 }
+} //namespace Engine
