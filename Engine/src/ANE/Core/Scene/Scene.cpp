@@ -6,6 +6,7 @@
 #include "ANE/Renderer/Camera.h"
 #include "ANE/Utilities/API.h"
 #include "Components/Components.h"
+#include "Components/LightComponent.h"
 
 namespace Engine
 {
@@ -100,6 +101,20 @@ namespace Engine
     void Scene::SubmitDrawCommands()
     {
         ANE_DEEP_PROFILE_FUNCTION();
+
+        // TODO: Gather more lights for rendering.
+        {
+            const auto view = _registry.view<TransformComponent, LightComponent>();
+            for (const auto entity : view)
+            {
+                auto [transform, light] = view.get<TransformComponent, LightComponent>(entity);
+
+                Renderer::SetSunColor(light.GetColor());
+                Renderer::SetSunDirection(transform.Transform.GetForward());
+
+                break; // We only care about the first dir light.
+            }
+        }
 
         {
             // Sort based on Transform square distance.
