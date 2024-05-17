@@ -4383,6 +4383,66 @@ const char* ImGui::GetVersion()
     return IMGUI_VERSION;
 }
 
+static void WrapMousePosEx(ImGuiAxesMask axes_mask, const ImRect& wrap_rect)
+{
+    ImGuiContext& g = *GImGui;
+    IM_ASSERT(axes_mask == 1 || axes_mask == 2 || axes_mask == (1 | 2));
+    ImVec2 p_mouse = g.IO.MousePos;
+    for (int axis = 0; axis < 2; axis++)
+    {
+        if ((axes_mask & (1 << axis)) == 0)
+            continue;
+        float size = wrap_rect.Max[axis] - wrap_rect.Min[axis];
+        // Needs 1 pixel of padding sometimes, mainly right-side wraparound not working.
+        if (p_mouse[axis] >= wrap_rect.Max[axis] - 1.0f)
+            p_mouse[axis] = wrap_rect.Min[axis] + 2.0f;
+        else if (p_mouse[axis] <= wrap_rect.Min[axis] + 1.0f)
+            p_mouse[axis] = wrap_rect.Max[axis] - 2.0f;
+    }
+    if (p_mouse.x != g.IO.MousePos.x || p_mouse.y != g.IO.MousePos.y)
+        ImGui::TeleportMousePos(p_mouse);
+}
+
+void ImGui::WrapMousePos(ImGuiAxesMask axes_mask)
+{
+    ImGuiContext& g = *GImGui;
+#ifdef IMGUI_HAS_DOCK
+    if (g.IO.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        const int monitor_index = FindPlatformMonitorForPos(g.IO.MousePosPrev);
+        if (monitor_index == -1) return;
+        const ImGuiPlatformMonitor& monitor = g.PlatformIO.Monitors[monitor_index];
+        WrapMousePosEx(axes_mask, ImRect(monitor.MainPos, monitor.MainPos + monitor.MainSize - ImVec2(1.0f, 1.0f)));
+    }
+    else
+#endif
+    {
+        ImGuiViewport* viewport = GetMainViewport();
+        WrapMousePosEx(axes_mask, ImRect(viewport->Pos, viewport->Pos + viewport->Size));
+    }
+}
+
+void ImGui::LockMousePos(ImGuiAxesMask axes_mask)
+{
+    static ImVec2 mouse_pos_when_activated{}; // It's ok to use a static variable here, because only one widget will ever be active at the same time.
+    if (IsItemActivated())
+    {
+        mouse_pos_when_activated = GetMousePos();
+    }
+
+    if (IsItemActive())
+    {
+        SetMouseCursor(ImGuiMouseCursor_None);
+        WrapMousePos(axes_mask);
+    }
+
+    if (IsItemDeactivated())
+    {
+        GetIO().MousePos = mouse_pos_when_activated;
+        GetIO().WantSetMousePos = true;
+    }
+}
+
 ImGuiIO& ImGui::GetIO()
 {
     IM_ASSERT(GImGui != NULL && "No current context. Did you call ImGui::CreateContext() and ImGui::SetCurrentContext() ?");
