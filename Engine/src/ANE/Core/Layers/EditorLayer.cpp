@@ -13,6 +13,7 @@
 #include "ANE/Core/Window.h"
 #include "ANE/Core/Entity/ExampleScripts/CameraController.h"
 #include "ANE/Core/Scene/Components/Components.h"
+#include "ANE/Core/Scene/Components/LightComponent.h"
 #include "Panels/InspectorPanel.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "ANE/Input/EditorInputSystem.h"
@@ -58,6 +59,7 @@ namespace Engine
         UUIDComponent::RegisterComponentMetaData();
         CameraComponent::RegisterComponentMetaData();
         NativeScriptComponent::RegisterComponentMetaData();
+        LightComponent::RegisterComponentMetaData();
 
         _sceneSerializer = new SceneSerializer();
     }

@@ -10,6 +10,8 @@
 
 namespace Engine
 {
+    struct LightComponent;
+
     template <class T>
     void OnValidate(T* obj)
     {
@@ -99,6 +101,9 @@ namespace Engine
                             break;
                         case Hash("ColliderComponent"):
                             selectedEntity.AddComponent<ColliderComponent>(selectedEntity);
+                            break;
+                        case Hash("LightComponent"):
+                            selectedEntity.AddComponent<LightComponent>();
                             break;
                         case Hash("CameraComponent"):
                             selectedEntity.AddComponent<CameraComponent>();

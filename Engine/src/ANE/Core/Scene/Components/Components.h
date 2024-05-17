@@ -8,4 +8,5 @@
 #include "TransformComponent.h"
 #include "CameraComponent.h"
 #include "RigidBodyComponent.h"
+#include "LightComponent.h"
 #include "ColliderComponent.h"
