@@ -10,3 +10,4 @@
 #include "RigidBodyComponent.h"
 #include "LightComponent.h"
 #include "ColliderComponent.h"
+#include "LightComponent.h"
