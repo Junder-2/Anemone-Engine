@@ -97,6 +97,16 @@ namespace Engine
         _vulkanRenderer->CameraPosition = pos;
     }
 
+    void Renderer::SetSunDirection(const Vector3 dir)
+    {
+        _vulkanRenderer->SunDirection = dir;
+    }
+
+    void Renderer::SetSunColor(const Vector3 col)
+    {
+        _vulkanRenderer->SunColor = col;
+    }
+
     void Renderer::FlushDrawCommands()
     {
         _drawCommands.Commands.clear();

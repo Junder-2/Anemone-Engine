@@ -37,6 +37,10 @@ namespace Engine
 
         static void SetCameraPosition(Vector3 pos);
 
+        static void SetSunDirection(Vector3 dir);
+
+        static void SetSunColor(Vector3 col);
+
     private:
         static void FlushDrawCommands();
 
