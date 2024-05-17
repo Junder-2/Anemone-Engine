@@ -7,6 +7,7 @@
 Material SetupMaterial(MaterialProperties params, Fragment frag, float2 uv)
 {
     float4 baseColor = GetColor(params, uv);
+    float3 emissionColor = GetEmission(params, uv);
     float3 orm = GetORM(params, uv); // Occlusion, Roughness, Metallic.
     float occlusion = orm.r;
     float perceptualRoughness = orm.g;
@@ -14,6 +15,7 @@ Material SetupMaterial(MaterialProperties params, Fragment frag, float2 uv)
 
     Material mat;
     mat.diffuseColor = ComputeDiffuseColor(baseColor, metallic);
+    mat.emissiveColor = emissionColor;
     mat.roughness = ComputeRoughness(perceptualRoughness); // Perceptual roughness is not used anywhere apart from getting roughness.
     mat.occlusion = occlusion;
 

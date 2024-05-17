@@ -63,6 +63,7 @@ float4 fragmentMain(Varyings input) : SV_TARGET
     float3 shading = 0;
     shading += EvaluateIBL(material, fragment);
     shading += EvaluateDirectionalLight(material, fragment);
+    shading += material.emissiveColor;
 
     return float4(shading, 1);
 }

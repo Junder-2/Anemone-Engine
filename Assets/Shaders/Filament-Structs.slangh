@@ -4,6 +4,7 @@
 struct Material
 {
     float3 diffuseColor;
+    float3 emissiveColor;
     float roughness;
     float occlusion;
 

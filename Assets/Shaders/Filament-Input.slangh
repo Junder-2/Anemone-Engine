@@ -81,6 +81,11 @@ float4 GetColor(MaterialProperties props, float2 uv)
     return colorMap;
 }
 
+float3 GetEmission(MaterialProperties props, float2 uv)
+{
+    return props.Emission;
+}
+
 float3 GetTangentSpaceNormal(float2 uv)
 {
     return GetTangentSpaceNormal(props, uv);
