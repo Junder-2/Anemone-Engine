@@ -50,7 +50,6 @@ namespace Vulkan
 
         VmaBuffer AppDataBuffer;
         VmaBuffer SceneDataBuffer;
-        VmaBuffer FilamentDataBuffer;
     };
 
     struct VulkanImmediateBuffer
@@ -151,6 +150,7 @@ namespace Vulkan
         static void CreateImGuiDescriptorPool();
 
         inline static void Draw(const WindowProperties& props, const DrawContext& drawCommands);
+        inline static void DrawSky(VkCommandBuffer cmd);
         inline static void DrawGeometry(VkCommandBuffer cmd, const DrawContext& drawCommands);
         inline static void DrawDebugGeometry(VkCommandBuffer cmd, const DrawContext& drawCommands);
         inline static void DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView);

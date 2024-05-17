@@ -718,19 +718,16 @@ namespace Vulkan
             _frameData[i].Descriptors.Init(_device, 1000, frameSizes, _allocator);
             _frameData[i].AppDataBuffer = CreateBuffer(sizeof(ApplicationData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
             _frameData[i].SceneDataBuffer = CreateBuffer(sizeof(SceneData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
-            _frameData[i].FilamentDataBuffer = CreateBuffer(sizeof(FilamentMetallicRoughness::MaterialConstants), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
             _mainDeletionQueue.PushFunction([&, i]
             {
                 DestroyBuffer(_frameData[i].AppDataBuffer);
                 DestroyBuffer(_frameData[i].SceneDataBuffer);
-                DestroyBuffer(_frameData[i].FilamentDataBuffer);
                 _frameData[i].Descriptors.Destroy(_device, _allocator);
             });
         }
     }
 
-    // todo: Nestor is this okay?!?
     void VulkanRenderer::LoadSlangShader(const char* moduleName, VkShaderModule* vertShader, VkShaderModule* fragShader)
     {
         ComPtr<slang::IGlobalSession> slangGlobalSession;
@@ -1175,12 +1172,8 @@ namespace Vulkan
         auto* sceneUniformData = (SceneData*)frame.SceneDataBuffer.Allocation->GetMappedData();
         *sceneUniformData = frame.SceneData;
 
-        auto* filamentData = (FilamentMetallicRoughness::MaterialConstants*)frame.FilamentDataBuffer.Allocation->GetMappedData();
-        *filamentData = frame.FilamentData;
-
         VkDescriptorSet appDescriptor = frame.Descriptors.Allocate(_device, _appDataLayout, _allocator);
         VkDescriptorSet sceneDescriptor = frame.Descriptors.Allocate(_device, _geometryDataLayout, _allocator);
-        VkDescriptorSet imageDescriptor = frame.Descriptors.Allocate(_device, _filamentMaterial.MaterialLayout, _allocator);
 
         // Global descriptor set 1.
         {
@@ -1194,16 +1187,6 @@ namespace Vulkan
             writer.WriteBuffer(0, frame.SceneDataBuffer.Buffer, sizeof(SceneData), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
             writer.UpdateSet(_device, sceneDescriptor);
         }
-        {
-            DescriptorWriter writer;
-            writer.WriteBuffer(0, frame.FilamentDataBuffer.Buffer, sizeof(FilamentMetallicRoughness::MaterialConstants), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-            writer.WriteImage(1, _colorTex.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-            writer.WriteImage(2, _normalTex.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-            writer.WriteImage(3, _ormTex.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-            writer.WriteImage(4, _dfgTex.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-            writer.WriteImage(5, _cubeMap.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-            writer.UpdateSet(_device, imageDescriptor);
-        }
 
         _drawExtent.height = std::min(_swapchainExtent.height, _colorImage.ImageExtent.height);
         _drawExtent.width = std::min(_swapchainExtent.width, _colorImage.ImageExtent.width);
@@ -1216,7 +1199,6 @@ namespace Vulkan
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _filamentInstance.ShaderPipeline->Pipeline);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 0, 1, &appDescriptor, 0, nullptr);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 1, 1, &sceneDescriptor, 0, nullptr);
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _filamentInstance.ShaderPipeline->Layout, 2, 1, &imageDescriptor, 0, nullptr);
 
         VkViewport viewport;
         viewport.x = 0;
