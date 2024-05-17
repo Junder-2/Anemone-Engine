@@ -57,4 +57,4 @@ ConstantBuffer<PushConstants> pushConstants;
 // Each ParameterBlock increments the set index by 1.
 ParameterBlock<AppData> appData;
 ParameterBlock<SceneData> sceneData;
-ParameterBlock<Material> material;
+//ParameterBlock<Material> material;
