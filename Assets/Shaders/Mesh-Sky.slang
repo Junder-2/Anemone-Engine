@@ -1,15 +1,5 @@
 #include "Mesh-Input.slangh"
 
-// Per vertex data.
-/*struct Attributes
-{
-    float3 position : POSITION;
-    float3 normal : NORMAL;
-    float2 uv : UV;
-    float4 color : COLOR;
-};*/
-
-// Data passed from vertex to the next stage.
 struct Varyings
 {
     float4 position : SV_Position;
@@ -17,6 +7,13 @@ struct Varyings
     float3 color;
     float2 uv;
 };
+
+struct SkyData
+{
+    SamplerCube Skybox;
+};
+
+ParameterBlock<SkyData> skyData;
 
 [shader("vertex")]
 Varyings vertexMain(uint vid : SV_VertexID)
@@ -36,13 +33,8 @@ Varyings vertexMain(uint vid : SV_VertexID)
 float4 fragmentMain(Varyings input) : SV_TARGET
 {
     float3 normal = normalize(input.normal);
-    float2 uv = input.uv;
 
-    float4 color = float4(input.color, 1);
+    float4 skyColor = skyData.Skybox.Sample(normal);
 
-    float nDotL = saturate(dot(normal, -sceneData.SunlightDirection.rgb));
-    color.rgb *= nDotL * sceneData.SunlightColor.rgb;
-    color.rgb += sceneData.AmbientColor.rgb;
-
-    return float4(color);
+    return skyColor;
 }

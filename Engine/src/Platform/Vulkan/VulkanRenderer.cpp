@@ -719,19 +719,16 @@ namespace Vulkan
             _frameData[i].Descriptors.Init(_device, 1000, frameSizes, _allocator);
             _frameData[i].AppDataBuffer = CreateBuffer(sizeof(ApplicationData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
             _frameData[i].SceneDataBuffer = CreateBuffer(sizeof(SceneData), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
-            _frameData[i].FilamentDataBuffer = CreateBuffer(sizeof(FilamentMetallicRoughness::MaterialConstants), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
             _mainDeletionQueue.PushFunction([&, i]
             {
                 DestroyBuffer(_frameData[i].AppDataBuffer);
                 DestroyBuffer(_frameData[i].SceneDataBuffer);
-                DestroyBuffer(_frameData[i].FilamentDataBuffer);
                 _frameData[i].Descriptors.Destroy(_device, _allocator);
             });
         }
     }
 
-    // todo: Nestor is this okay?!?
     void VulkanRenderer::LoadSlangShader(const char* moduleName, VkShaderModule* vertShader, VkShaderModule* fragShader)
     {
         ComPtr<slang::IGlobalSession> slangGlobalSession;
@@ -823,7 +820,7 @@ namespace Vulkan
         }
     }
 
-    PipelineWrapper VulkanRenderer::CreatePipeline(const vkb::Device& logicalDevice)
+    void VulkanRenderer::CreatePipeline(const vkb::Device& logicalDevice)
     {
         VkPushConstantRange bufferRange;
         bufferRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
@@ -840,21 +837,25 @@ namespace Vulkan
 
         CHECK_RESULT(vkCreatePipelineLayout(_device, &pipelineLayoutInfo, _allocator, &_pipelineLayout));
 
-        VkShaderModule meshVertShader, meshFragShader;
-        LoadSlangShader("Mesh_Diffuse", &meshVertShader, &meshFragShader);
-
         VulkanPipelineBuilder builder{ logicalDevice, _pipelineLayout };
-        vkb::Result<PipelineWrapper> pipeline = builder
+
+        VkShaderModule meshVertShader, meshFragShader;
+        LoadSlangShader("Mesh_Sky", &meshVertShader, &meshFragShader);
+
+        vkb::Result<PipelineWrapper> skyPipeline = builder
             .SetShaders(meshVertShader, meshFragShader)
             .SetBlendMode(None)
-            .SetDepthTestOperator(VK_COMPARE_OP_GREATER_OR_EQUAL) // Reverse Z for more precision
+            .SetDepthTestOperator(VK_COMPARE_OP_ALWAYS) // Reverse Z for more precision
+            .SetDepthWrite(false)
+            .SetCullMode(VK_CULL_MODE_FRONT_BIT)
 
             .SetColorFormat(_colorImage.ImageFormat)
             .SetDepthFormat(_depthImage.ImageFormat)
 
             .SetAllocationCallbacks(_allocator)
             .Build();
-        _meshPipeline = pipeline->Pipeline;
+
+        _skyPipeline = skyPipeline->Pipeline;
 
         // Cleanup.
         vkDestroyShaderModule(_device, meshFragShader, _allocator);
@@ -869,8 +870,10 @@ namespace Vulkan
             .SetBlendMode(Alpha)
             .SetDepthTestOperator(VK_COMPARE_OP_ALWAYS) // Reverse Z for more precision
             .SetDepthWrite(false)
+            .SetCullMode(VK_CULL_MODE_NONE)
 
             .SetColorFormat(_colorImage.ImageFormat)
+            .SetDepthFormat(_depthImage.ImageFormat)
             .SetPolygonMode(VK_POLYGON_MODE_LINE)
             .SetTopology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
 
@@ -883,8 +886,10 @@ namespace Vulkan
             .SetBlendMode(None) //Alpha doesnt work with lines?
             .SetDepthTestOperator(VK_COMPARE_OP_ALWAYS) // Reverse Z for more precision
             .SetDepthWrite(false)
+            .SetCullMode(VK_CULL_MODE_NONE)
 
             .SetColorFormat(_colorImage.ImageFormat)
+            .SetDepthFormat(_depthImage.ImageFormat)
             .SetPolygonMode(VK_POLYGON_MODE_LINE)
             .SetTopology(VK_PRIMITIVE_TOPOLOGY_LINE_LIST)
 
@@ -900,12 +905,10 @@ namespace Vulkan
         _mainDeletionQueue.PushFunction([&]
         {
             vkDestroyPipelineLayout(_device, _pipelineLayout, _allocator);
-            vkDestroyPipeline(_device, _meshPipeline, _allocator);
+            vkDestroyPipeline(_device, _skyPipeline, _allocator);
             vkDestroyPipeline(_device, _debugTrianglePipeline, _allocator);
             vkDestroyPipeline(_device, _debugLinePipeline, _allocator);
         });
-
-        return pipeline.value();
     }
 
     void VulkanRenderer::CreateDefaultResources()
@@ -917,6 +920,8 @@ namespace Vulkan
         _ormTex = LoadTexture("MetalTiles03_1K_ORM.png");
         _dfgTex = LoadTexture("dfg.png");
         _cubeMap = LoadCubeTexture("cyclorama_hard_light_linear_256.png");
+
+        _skyMesh = LoadModel("Sphere.fbx");
 
         CreateDefaultMaterial();
     }
@@ -1079,6 +1084,8 @@ namespace Vulkan
         frame.DeletionQueue.Flush();
         frame.Descriptors.Clear(_device);
 
+        UpdateGlobalUniforms();
+
         CHECK_RESULT(vkResetFences(_device, 1, &frame.Fence));
 
         const VkCommandBuffer cmd = frame.CommandBuffer;
@@ -1142,46 +1149,44 @@ namespace Vulkan
         _frameIndex++;
     }
 
+    void VulkanRenderer::DrawSky(VkCommandBuffer cmd)
+    {
+        ANE_DEEP_PROFILE_FUNCTION();
+
+        VulkanFrame& frame = GetFrame();
+
+        VkDescriptorSet skyDescriptor = frame.Descriptors.Allocate(_device, _singleImageDataLayout, _allocator);
+        {
+            DescriptorWriter writer;
+            writer.WriteImage(0, _cubeMap.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+            writer.UpdateSet(_device, skyDescriptor);
+        }
+
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _skyPipeline);
+
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 2, 1, &skyDescriptor, 0, nullptr);
+
+        PushConstantBuffer pushConstants;
+        Matrix4x4 modelMat = Matrix4x4::Identity();
+        modelMat.SetPosition(CameraPosition);
+        pushConstants.MVPMatrix = ViewProjection * modelMat; // VP
+        pushConstants.ModelMatrix = Matrix4x4::Identity();
+        pushConstants.VertexBuffer = _skyMesh.MeshBuffers.VertexBufferAddress;
+
+        vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstantBuffer), &pushConstants);
+        vkCmdBindIndexBuffer(cmd, _skyMesh.MeshBuffers.IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
+
+        vkCmdDrawIndexed(cmd, _skyMesh.NumVertices, 1, 0, 0, 0);
+    }
+
     void VulkanRenderer::DrawGeometry(VkCommandBuffer cmd, const DrawContext& drawCommands)
     {
         ANE_DEEP_PROFILE_FUNCTION();
 
         VulkanFrame& frame = GetFrame();
 
-        float time = API::TIME;
-        frame.AppData.Time = time;
-
-        Vector3 ambientColor = Vector3(0.05f, 0.08f, 0.11f);
-        Vector3 sunAngle = Vector3(50 * FMath::DEGREES_TO_RAD, -30 * FMath::DEGREES_TO_RAD, 0);
-        Vector3 sunDirection = Quaternion::FromEulerAngles(sunAngle) * Vector3::ForwardVector();
-        Vector3 sunColor = Vector3(1.0f, 0.9f, 0.67f);
-
-        frame.SceneData.CameraPosition = Vector4(CameraPosition);
-        frame.SceneData.AmbientColor = Vector4(ambientColor, 0);
-        frame.SceneData.SunlightDirection = Vector4(sunDirection, 0);
-        frame.SceneData.SunlightColor = Vector4(sunColor, 0);
-
-        frame.FilamentData.Color = Vector3::OneVector();
-        frame.FilamentData.Normal = 1.0f;
-        frame.FilamentData.Emission = Vector3::ZeroVector();
-        frame.FilamentData.Metallic = 0.0f;
-        frame.FilamentData.Roughness = 1.0f;
-        frame.FilamentData.Reflectance = 0.0f;
-        frame.FilamentData.Height = 0.0f;
-        frame.FilamentData.Occlusion = 1.0f;
-
-        auto* appUniformData = (ApplicationData*)frame.AppDataBuffer.Allocation->GetMappedData();
-        *appUniformData = frame.AppData;
-
-        auto* sceneUniformData = (SceneData*)frame.SceneDataBuffer.Allocation->GetMappedData();
-        *sceneUniformData = frame.SceneData;
-
-        auto* filamentData = (FilamentMetallicRoughness::MaterialConstants*)frame.FilamentDataBuffer.Allocation->GetMappedData();
-        *filamentData = frame.FilamentData;
-
         VkDescriptorSet appDescriptor = frame.Descriptors.Allocate(_device, _appDataLayout, _allocator);
         VkDescriptorSet sceneDescriptor = frame.Descriptors.Allocate(_device, _geometryDataLayout, _allocator);
-        VkDescriptorSet imageDescriptor = frame.Descriptors.Allocate(_device, _filamentMaterial.MaterialLayout, _allocator);
 
         // Global descriptor set 1.
         {
@@ -1195,16 +1200,6 @@ namespace Vulkan
             writer.WriteBuffer(0, frame.SceneDataBuffer.Buffer, sizeof(SceneData), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
             writer.UpdateSet(_device, sceneDescriptor);
         }
-        {
-            DescriptorWriter writer;
-            writer.WriteBuffer(0, frame.FilamentDataBuffer.Buffer, sizeof(FilamentMetallicRoughness::MaterialConstants), 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-            writer.WriteImage(1, _colorTex.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-            writer.WriteImage(2, _normalTex.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-            writer.WriteImage(3, _ormTex.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-            writer.WriteImage(4, _dfgTex.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-            writer.WriteImage(5, _cubeMap.ImageView, _samplerLinear, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-            writer.UpdateSet(_device, imageDescriptor);
-        }
 
         _drawExtent.height = std::min(_swapchainExtent.height, _colorImage.ImageExtent.height);
         _drawExtent.width = std::min(_swapchainExtent.width, _colorImage.ImageExtent.width);
@@ -1214,10 +1209,8 @@ namespace Vulkan
         VkRenderingInfo renderInfo = VulkanInitializers::RenderingInfo(_drawExtent, &colorAttachment, &depthAttachment);
         vkCmdBeginRendering(cmd, &renderInfo);
 
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _filamentInstance.ShaderPipeline->Pipeline);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 0, 1, &appDescriptor, 0, nullptr);
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 1, 1, &sceneDescriptor, 0, nullptr);
-        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _filamentInstance.ShaderPipeline->Layout, 2, 1, &imageDescriptor, 0, nullptr);
 
         VkViewport viewport;
         viewport.x = 0;
@@ -1236,6 +1229,8 @@ namespace Vulkan
         scissor.extent.height = _drawExtent.height;
 
         vkCmdSetScissor(cmd, 0, 1, &scissor);
+
+        DrawSky(cmd);
 
         ShaderPipeline* lastPipeline = nullptr;
         MaterialInstance* lastMaterial = nullptr;
@@ -1320,6 +1315,29 @@ namespace Vulkan
         ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmd);
 
         vkCmdEndRendering(cmd);
+    }
+
+    void VulkanRenderer::UpdateGlobalUniforms()
+    {
+        VulkanFrame& frame = GetFrame();
+
+        frame.AppData.Time = API::TIME;
+
+        auto* appUniformData = (ApplicationData*)frame.AppDataBuffer.Allocation->GetMappedData();
+        *appUniformData = frame.AppData;
+
+        Vector3 ambientColor = Vector3(0.05f, 0.08f, 0.11f);
+        Vector3 sunAngle = Vector3(50 * FMath::DEGREES_TO_RAD, -30 * FMath::DEGREES_TO_RAD, 0);
+        Vector3 sunDirection = Quaternion::FromEulerAngles(sunAngle) * Vector3::ForwardVector();
+        Vector3 sunColor = Vector3(1.0f, 0.9f, 0.67f);
+
+        frame.SceneData.CameraPosition = Vector4(CameraPosition);
+        frame.SceneData.AmbientColor = Vector4(ambientColor, 0);
+        frame.SceneData.SunlightDirection = Vector4(sunDirection, 0);
+        frame.SceneData.SunlightColor = Vector4(sunColor, 0);
+
+        auto* sceneUniformData = (SceneData*)frame.SceneDataBuffer.Allocation->GetMappedData();
+        *sceneUniformData = frame.SceneData;
     }
 
     void VulkanRenderer::CleanupVulkan()
