@@ -125,14 +125,14 @@ namespace Engine
         }
 
         {
-            // Sort based on Transform square distance.
-            const Vector3 camPos = Camera::GetCameraTransform().GetPosition();
-            _registry.sort<TransformComponent>([&](const TransformComponent& lhs, const TransformComponent& rhs)
-            {
-                const float sqrDstA = (camPos - lhs.Transform.GetPosition()).LengthSquare();
-                const float sqrDstB = (camPos - rhs.Transform.GetPosition()).LengthSquare();
-                return sqrDstA < sqrDstB;
-            });
+            // // Sort based on Transform square distance.
+            // const Vector3 camPos = Camera::GetCameraTransform().GetPosition();
+            // _registry.sort<TransformComponent>([&](const TransformComponent& lhs, const TransformComponent& rhs)
+            // {
+            //     const float sqrDstA = (camPos - lhs.Transform.GetPosition()).LengthSquare();
+            //     const float sqrDstB = (camPos - rhs.Transform.GetPosition()).LengthSquare();
+            //     return sqrDstA < sqrDstB;
+            // });
 
             auto view = _registry.view<TransformComponent, RenderComponent>();
             view.use<TransformComponent>(); // Use iteration order of TransformComponent.
