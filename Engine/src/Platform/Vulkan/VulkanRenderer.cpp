@@ -1154,7 +1154,19 @@ namespace Vulkan
 
         VulkanFrame& frame = GetFrame();
 
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, _skyPipeline);
 
+        PushConstantBuffer pushConstants;
+        Matrix4x4 modelMat = Matrix4x4::Identity();
+        modelMat.SetPosition(CameraPosition);
+        pushConstants.MVPMatrix = ViewProjection * modelMat; // VP
+        pushConstants.ModelMatrix = Matrix4x4::Identity();
+        pushConstants.VertexBuffer = _skyMesh.MeshBuffers.VertexBufferAddress;
+
+        vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstantBuffer), &pushConstants);
+        vkCmdBindIndexBuffer(cmd, _skyMesh.MeshBuffers.IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
+
+        vkCmdDrawIndexed(cmd, _skyMesh.NumVertices, 1, 0, 0, 0);
     }
 
     void VulkanRenderer::DrawGeometry(VkCommandBuffer cmd, const DrawContext& drawCommands)
@@ -1207,6 +1219,8 @@ namespace Vulkan
         scissor.extent.height = _drawExtent.height;
 
         vkCmdSetScissor(cmd, 0, 1, &scissor);
+
+        DrawSky(cmd);
 
         ShaderPipeline* lastPipeline = nullptr;
         MaterialInstance* lastMaterial = nullptr;
