@@ -42,18 +42,11 @@ namespace Engine
                 if (ImGui::MenuItem("Create Scene")) UIUpdate.AddPanel(new CreateScenePanel(_editorLayer));
                 if (ImGui::MenuItem("Save Scene")) _editorLayer->SaveScene();
 
-                // if (ImGui::MenuItem("Load Scene"))
-                // {
-                //
-                // } //EnableFlag("CreateSceneWindow");
-
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Debug"))
             {
-                if (ImGui::MenuItem("Input Analysis"))
-                {
-                } //ToggleFlag("ShowDebugOverlay");
+                if (ImGui::MenuItem("Input Analysis")) {} //ToggleFlag("ShowDebugOverlay");
                 if (ImGui::MenuItem("Performance Analysis"))
                 {
                     // Todo: menu
@@ -74,7 +67,8 @@ namespace Engine
 
             if (ImGui::BeginMenu("Entity"))
             {
-                if (ImGui::MenuItem("Create Entity"))
+                if (ImGui::MenuItem("Create Entity")) _editorLayer->CreateEmptyEntity();
+
                 ImGui::EndMenu();
             }
 
