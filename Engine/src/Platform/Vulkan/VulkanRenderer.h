@@ -188,6 +188,8 @@ namespace Vulkan
     public:
         inline static ImVec4 ClearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+        inline static Vector3 SunDirection = -Vector3::UpVector();
+        inline static Vector3 SunColor = Vector3::ZeroVector();
         inline static Vector3 CameraPosition;
         inline static Matrix4x4 ViewProjection;
 

@@ -1333,8 +1333,8 @@ namespace Vulkan
 
         frame.SceneData.CameraPosition = Vector4(CameraPosition);
         frame.SceneData.AmbientColor = Vector4(ambientColor, 0);
-        frame.SceneData.SunlightDirection = Vector4(sunDirection, 0);
-        frame.SceneData.SunlightColor = Vector4(sunColor, 0);
+        frame.SceneData.SunlightDirection = Vector4(SunDirection, 0);
+        frame.SceneData.SunlightColor = Vector4(SunColor, 0);
 
         auto* sceneUniformData = (SceneData*)frame.SceneDataBuffer.Allocation->GetMappedData();
         *sceneUniformData = frame.SceneData;
