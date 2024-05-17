@@ -15,6 +15,11 @@ namespace Engine
     {
         ANE_COMPONENT_INIT(LightComponent)
 
+        static void RegisterComponentMetaData()
+        {
+            entt::meta<LightComponent>()
+                .EDITABLE;
+        }
     private:
         float _intensity = 1.f;
         LightType _lightType = Directional;
