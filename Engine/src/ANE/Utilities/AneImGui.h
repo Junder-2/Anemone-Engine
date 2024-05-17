@@ -20,6 +20,29 @@ namespace Engine::AneImGui
 
     float CalculateTableFieldWidth();
 
+    bool LabelCheckbox(const char* label, bool* v);
+    bool LabelRadioButton(const char* label, bool active);                    // use with e.g. if (RadioButton("one", my_value==1)) { my_value = 1; }
+    bool LabelRadioButton(const char* label, int* v, int vButton);           // shortcut to handle the above pattern when value is an integer
+    bool LabelCombo(const char* label, int* currentItem, const char* const items[], int itemsCount);
+
+    void LabelText(const char* label, const char* value);
+
+    bool LabelInputText(const char* label, char* buf, size_t bufSize, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = nullptr, void* userData = nullptr);
+    bool LabelInputTextMultiline(const char* label, char* buf, size_t bufSize, const ImVec2& size = ImVec2(0, 0), ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = nullptr, void* userData = nullptr);
+    bool LabelInputTextWithHint(const char* label, const char* hint, char* buf, size_t bufSize, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = nullptr, void* userData = nullptr);
+    bool LabelInputTextEx(const char* label, const char* hint, char* buf, int bufSize, const ImVec2& sizeArg, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback = nullptr, void* userData = nullptr);
+    bool LabelInputFloat(const char* label, float* v, float step = 0.0f, float stepFast = 0.0f, const char* format = "%.3f", ImGuiInputTextFlags flags = 0);
+    bool LabelInputFloat2(const char* label, float v[2], const char* format = "%.3f", ImGuiInputTextFlags flags = 0);
+    bool LabelInputFloat3(const char* label, float v[3], const char* format = "%.3f", ImGuiInputTextFlags flags = 0);
+    bool LabelInputFloat4(const char* label, float v[4], const char* format = "%.3f", ImGuiInputTextFlags flags = 0);
+    bool LabelInputInt(const char* label, int* v, int step = 1, int stepFast = 100, ImGuiInputTextFlags flags = 0);
+    bool LabelInputInt2(const char* label, int v[2], ImGuiInputTextFlags flags = 0);
+    bool LabelInputInt3(const char* label, int v[3], ImGuiInputTextFlags flags = 0);
+    bool LabelInputInt4(const char* label, int v[4], ImGuiInputTextFlags flags = 0);
+    bool LabelInputDouble(const char* label, double* v, double step = 0.0, double stepFast = 0.0, const char* format = "%.6f", ImGuiInputTextFlags flags = 0);
+    bool LabelInputScalar(const char* label, ImGuiDataType dataType, void* pData, const void* pStep = nullptr, const void* pStepFast = nullptr, const char* format = nullptr, ImGuiInputTextFlags flags = 0);
+    bool LabelInputScalarN(const char* label, ImGuiDataType dataType, void* pData, int components, const void* pStep = nullptr, const void* pStepFast = nullptr, const char* format = nullptr, ImGuiInputTextFlags flags = 0);
+
     bool LabelDragFloat(const char* label, float* v, float vSpeed = 1.0f, float vMin = 0.0f, float vMax = 0.0f, const char* format = "%.3f", ImGuiSliderFlags flags = 0);     // If v_min >= vMax we have no bound
     bool LabelDragFloat2(const char* label, float v[2], float vSpeed = 1.0f, float vMin = 0.0f, float vMax = 0.0f, const char* format = "%.3f", ImGuiSliderFlags flags = 0);
     bool LabelDragFloat3(const char* label, float v[3], float vSpeed = 1.0f, float vMin = 0.0f, float vMax = 0.0f, const char* format = "%.3f", ImGuiSliderFlags flags = 0);

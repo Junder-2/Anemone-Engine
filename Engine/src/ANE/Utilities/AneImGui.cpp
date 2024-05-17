@@ -1,6 +1,7 @@
 #include "anepch.h"
 #include "AneImGui.h"
 
+#include "imgui_internal.h"
 #include "ANE/Math/FMath.h"
 
 namespace Engine::AneImGui
@@ -46,6 +47,278 @@ namespace Engine::AneImGui
         const float fieldWidth = FMath::Clamp(width * fieldWidthRatio, fieldMinWidth, fieldMaxWidth);
 
         return fieldWidth;
+    }
+
+    bool LabelCheckbox(const char* label, bool* v)
+    {
+        bool change = false;
+
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
+
+        AneImGuiContext& g = *_aneImGui;
+
+        if(g.NextTableFieldWidth < 0)
+        {
+            g.NextTableFieldWidth = CalculateTableFieldWidth();
+        }
+
+        const float labelWidth = FMath::Clamp(ImGui::GetColumnWidth() - g.NextTableFieldWidth - 15.f, 10, 100);
+
+        ImGui::BeginHorizontal("Horizontal");
+        ImGui::SetNextItemWidth(labelWidth);
+        ImGui::Text(label);
+        ImGui::Spring(0.5f);
+        if (ImGui::Checkbox(std::format("##{}",label).c_str(), v))
+        {
+            change =  true;
+        }
+        ImGui::EndHorizontal();
+
+        EndItem();
+
+        ImGui::PopStyleVar();
+
+        return change;
+
+        // Weird layout behaviour
+        // bool change = false;
+        //
+        // ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
+        //
+        // if (BeginLabelField(label))
+        // {
+        //     if (ImGui::Checkbox(std::format("{}",label).c_str(), v))
+        //     {
+        //         change =  true;
+        //     }
+        //
+        //     EndLabelField();
+        // }
+        //
+        // ImGui::PopStyleVar();
+
+        return change;
+    }
+
+    bool LabelRadioButton(const char* label, const bool active)
+    {
+        bool change = false;
+
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
+
+        if (BeginLabelField(label))
+        {
+            if (ImGui::RadioButton(std::format("##{}",label).c_str(), active))
+            {
+                change =  true;
+            }
+
+            EndLabelField();
+        }
+
+        ImGui::PopStyleVar();
+
+        return change;
+    }
+
+    bool LabelRadioButton(const char* label, int* v, const int vButton)
+    {
+        const bool pressed = LabelRadioButton(label, *v == vButton);
+        if (pressed)
+            *v = vButton;
+        return pressed;
+    }
+
+    // Getter for the old Combo() API: const char*[]
+    static const char* Items_ArrayGetter(void* data, int idx)
+    {
+        const char* const* items = (const char* const*)data;
+        return items[idx];
+    }
+
+    bool LabelCombo(const char* label, int* currentItem, const char* const items[], const int itemsCount)
+    {
+        bool change = false;
+
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
+
+        if (BeginLabelField(label))
+        {
+            if (ImGui::Combo(std::format("##{}",label).c_str(), currentItem, items, itemsCount))
+            {
+                change =  true;
+            }
+
+            EndLabelField();
+        }
+
+        ImGui::PopStyleVar();
+
+        return change;
+    }
+
+    void LabelText(const char* label, const char* value)
+    {
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
+
+        AneImGuiContext& g = *_aneImGui;
+
+        if(g.NextTableFieldWidth < 0)
+        {
+            g.NextTableFieldWidth = CalculateTableFieldWidth();
+        }
+
+        const float labelWidth = FMath::Clamp(ImGui::GetColumnWidth() - g.NextTableFieldWidth - 15.f, 10, 100);
+
+        ImGui::AlignTextToFramePadding();
+        ImGui::BeginHorizontal("Horizontal");
+        ImGui::SetNextItemWidth(labelWidth);
+        ImGui::Text(label);
+        ImGui::Spring(0.5f);
+        ImGui::Text(value);
+        ImGui::EndHorizontal();
+
+        EndItem();
+
+        ImGui::PopStyleVar();
+
+        // ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
+        //
+        // if (BeginLabelField(label))
+        // {
+        //     ImGui::Text(value);
+        //
+        //     EndLabelField();
+        // }
+        //
+        // ImGui::PopStyleVar();
+    }
+
+    bool LabelInputText(const char* label, char* buf, const size_t bufSize, const ImGuiInputTextFlags flags, const ImGuiInputTextCallback callback, void* userData)
+    {
+        IM_ASSERT(!(flags & ImGuiInputTextFlags_Multiline)); // call InputTextMultiline()
+        return LabelInputTextEx(label, nullptr, buf, (int)bufSize, ImVec2(0, 0), flags, callback, userData);
+    }
+
+    bool LabelInputTextMultiline(const char* label, char* buf, const size_t bufSize, const ImVec2& size, const ImGuiInputTextFlags flags, const ImGuiInputTextCallback callback, void* userData)
+    {
+        return LabelInputTextEx(label, NULL, buf, (int)bufSize, size, flags | ImGuiInputTextFlags_Multiline, callback, userData);
+    }
+
+    bool LabelInputTextWithHint(const char* label, const char* hint, char* buf, const size_t bufSize, const ImGuiInputTextFlags flags, const ImGuiInputTextCallback callback, void* userData)
+    {
+        IM_ASSERT(!(flags & ImGuiInputTextFlags_Multiline)); // call InputTextMultiline() or  InputTextEx() manually if you need multi-line + hint.
+        return LabelInputTextEx(label, hint, buf, (int)bufSize, ImVec2(0, 0), flags, callback, userData);
+    }
+
+    bool LabelInputTextEx(const char* label, const char* hint, char* buf, const int bufSize, const ImVec2& sizeArg, const ImGuiInputTextFlags flags, const ImGuiInputTextCallback callback, void* userData)
+    {
+        bool change = false;
+
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
+
+        if (BeginLabelField(label))
+        {
+            if (ImGui::InputTextEx(std::format("##{}",label).c_str(), hint, buf, bufSize, sizeArg, flags, callback, userData))
+            {
+                change =  true;
+            }
+
+            EndLabelField();
+        }
+
+        ImGui::PopStyleVar();
+
+        return change;
+    }
+
+    bool LabelInputFloat(const char* label, float* v, float step, float stepFast, const char* format, const ImGuiInputTextFlags flags)
+    {
+        return LabelInputScalar(label, ImGuiDataType_Float, (void*)v, (void*)(step > 0.0f ? &step : nullptr), (void*)(stepFast > 0.0f ? &stepFast : nullptr), format, flags);
+    }
+
+    bool LabelInputFloat2(const char* label, float v[2], const char* format, const ImGuiInputTextFlags flags)
+    {
+        return LabelInputScalarN(label, ImGuiDataType_Float, v, 2, nullptr, nullptr, format, flags);
+    }
+
+    bool LabelInputFloat3(const char* label, float v[3], const char* format, const ImGuiInputTextFlags flags)
+    {
+        return LabelInputScalarN(label, ImGuiDataType_Float, v, 3, nullptr, nullptr, format, flags);
+    }
+
+    bool LabelInputFloat4(const char* label, float v[4], const char* format, const ImGuiInputTextFlags flags)
+    {
+        return LabelInputScalarN(label, ImGuiDataType_Float, v, 4, nullptr, nullptr, format, flags);
+    }
+
+    bool LabelInputInt(const char* label, int* v, int step, int stepFast, const ImGuiInputTextFlags flags)
+    {
+        // Hexadecimal input provided as a convenience but the flag name is awkward. Typically you'd use InputText() to parse your own data, if you want to handle prefixes.
+        const char* format = (flags & ImGuiInputTextFlags_CharsHexadecimal) ? "%08X" : "%d";
+        return LabelInputScalar(label, ImGuiDataType_S32, (void*)v, (void*)(step > 0 ? &step : nullptr), (void*)(stepFast > 0 ? &stepFast : nullptr), format, flags);
+    }
+
+    bool LabelInputInt2(const char* label, int v[2], const ImGuiInputTextFlags flags)
+    {
+        return LabelInputScalarN(label, ImGuiDataType_S32, v, 2, nullptr, nullptr, "%d", flags);
+    }
+
+    bool LabelInputInt3(const char* label, int v[3], const ImGuiInputTextFlags flags)
+    {
+        return LabelInputScalarN(label, ImGuiDataType_S32, v, 3, nullptr, nullptr, "%d", flags);
+    }
+
+    bool LabelInputInt4(const char* label, int v[4], const ImGuiInputTextFlags flags)
+    {
+        return LabelInputScalarN(label, ImGuiDataType_S32, v, 4, nullptr, nullptr, "%d", flags);
+    }
+
+    bool LabelInputDouble(const char* label, double* v, double step, double stepFast, const char* format, const ImGuiInputTextFlags flags)
+    {
+        return LabelInputScalar(label, ImGuiDataType_Double, (void*)v, (void*)(step > 0.0 ? &step : nullptr), (void*)(stepFast > 0.0 ? &stepFast : nullptr), format, flags);
+    }
+
+    bool LabelInputScalar(const char* label, const ImGuiDataType dataType, void* pData, const void* pStep, const void* pStepFast, const char* format, const ImGuiInputTextFlags flags)
+    {
+        bool change = false;
+
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
+
+        if (BeginLabelField(label))
+        {
+            if (ImGui::InputScalar(std::format("##{}",label).c_str(), dataType, pData, pStep, pStepFast, format, flags))
+            {
+                change =  true;
+            }
+
+            EndLabelField();
+        }
+
+        ImGui::PopStyleVar();
+
+        return change;
+    }
+
+    bool LabelInputScalarN(const char* label, const ImGuiDataType dataType, void* pData, const int components, const void* pStep, const void* pStepFast, const char* format, const ImGuiInputTextFlags flags)
+    {
+        bool change = false;
+
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
+
+        if (BeginLabelField(label))
+        {
+            if (ImGui::InputScalarN(std::format("##{}",label).c_str(), dataType, pData, components, pStep, pStepFast, format, flags))
+            {
+                change =  true;
+            }
+
+            EndLabelField();
+        }
+
+        ImGui::PopStyleVar();
+
+        return change;
     }
 
     bool LabelDragFloat(const char* label, float* v, const float vSpeed, const float vMin, const float vMax, const char* format, const ImGuiSliderFlags flags)
