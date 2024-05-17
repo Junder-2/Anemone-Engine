@@ -133,12 +133,12 @@ namespace Engine
             {
                 Vector3 position = collider->GetPosition();
                 Vector3 rotation = collider->GetEulerAngles(true);
-                if (ImGui::DragFloat3("Local Position", &position.X, 0.1f))
+                if (AneImGui::LabelDragFloat3("Local Position", &position.X, 0.1f))
                 {
                     collider->SetPosition(position);
                     propertyWritten = true;
                 }
-                if (ImGui::DragFloat3("Local Rotation", &rotation.X, 0.1f))
+                if (AneImGui::LabelDragFloat3("Local Rotation", &rotation.X, 0.1f))
                 {
                     collider->SetRotation(rotation, true);
                     propertyWritten = true;
@@ -150,7 +150,7 @@ namespace Engine
                     {
                         const auto sphereCollider = reinterpret_cast<SphereCollider*>(collider);
                         float radius = sphereCollider->GetRadius();
-                        if (ImGui::DragFloat("Radius", &radius, 0.1f, FLT_MIN, FLT_MAX))
+                        if (AneImGui::LabelDragFloat("Radius", &radius, 0.1f, FLT_MIN, FLT_MAX))
                         {
                             sphereCollider->SetRadius(radius);
                             propertyWritten = true;
@@ -161,7 +161,7 @@ namespace Engine
                     {
                         const auto boxCollider = reinterpret_cast<BoxCollider*>(collider);
                         Vector3 halfSize = boxCollider->GetHalfSize();
-                        if (ImGui::DragFloat3("Half Size", &halfSize.X, 0.1f, FLT_MIN, FLT_MAX))
+                        if (AneImGui::LabelDragFloat3("Half Size", &halfSize.X, 0.1f, FLT_MIN, FLT_MAX))
                         {
                             boxCollider->SetHalfSize(halfSize);
                             propertyWritten = true;
@@ -173,12 +173,12 @@ namespace Engine
                         const auto capsuleCollider = reinterpret_cast<CapsuleCollider*>(collider);
                         float radius = capsuleCollider->GetRadius();
                         float height = capsuleCollider->GetHeight();
-                        if (ImGui::DragFloat("Radius", &radius, 0.1f, FLT_MIN, FLT_MAX))
+                        if (AneImGui::LabelDragFloat("Radius", &radius, 0.1f, FLT_MIN, FLT_MAX))
                         {
                             capsuleCollider->SetRadius(radius);
                             propertyWritten = true;
                         }
-                        if (ImGui::DragFloat("Height", &height, 0.1f, FLT_MIN, FLT_MAX))
+                        if (AneImGui::LabelDragFloat("Height", &height, 0.1f, FLT_MIN, FLT_MAX))
                         {
                             capsuleCollider->SetHeight(height);
                             propertyWritten = true;
@@ -366,118 +366,45 @@ namespace Engine
 
         bool propertyWritten = false;
 
-        constexpr float fieldWidthRatio = 0.61803398875f; // 1 / Phi.
-        constexpr float fieldMinWidth = 100, fieldMaxWidth = 400;
-        constexpr bool removeTablePadding = true;
-        constexpr bool displayTableBorders = false;
-        if (removeTablePadding) ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
-        constexpr int decoratorFlags = (displayTableBorders ? ImGuiTableFlags_BordersV | ImGuiTableFlags_BordersH : 0) | ImGuiTableFlags_NoPadOuterX;
-
+        if(AneImGui::LabelColorEdit3("Base Color", &mpb.Color.R))
         {
-            const float width = ImGui::GetColumnWidth();
-            const float fieldWidth = FMath::Clamp(width * fieldWidthRatio, fieldMinWidth, fieldMaxWidth);
-
-            AneImGui::SetNextTableFieldWidth(fieldWidth);
-            AneImGui::SetNextTableDecoratorFlags(decoratorFlags);
-
-            if(AneImGui::LabelColorEdit3("Base Color", &mpb.Color.R))
-            {
-                propertyWritten =  true;
-            }
+            propertyWritten =  true;
         }
 
+        if(AneImGui::LabelColorEdit3("Emission Color", &mpb.Emission.R))
         {
-            const float width = ImGui::GetColumnWidth();
-            const float fieldWidth = FMath::Clamp(width * fieldWidthRatio, fieldMinWidth, fieldMaxWidth);
-
-            AneImGui::SetNextTableFieldWidth(fieldWidth);
-            AneImGui::SetNextTableDecoratorFlags(decoratorFlags);
-
-            if(AneImGui::LabelColorEdit3("Emission Color", &mpb.Emission.R))
-            {
-                propertyWritten =  true;
-            }
+            propertyWritten =  true;
         }
 
+        if(AneImGui::LabelSliderFloat("Height", &mpb.Height, 0, 1))
         {
-            const float width = ImGui::GetColumnWidth();
-            const float fieldWidth = FMath::Clamp(width * fieldWidthRatio, fieldMinWidth, fieldMaxWidth);
-
-            AneImGui::SetNextTableFieldWidth(fieldWidth);
-            AneImGui::SetNextTableDecoratorFlags(decoratorFlags);
-
-            if(AneImGui::LabelSliderFloat("Height", &mpb.Height, 0, 1))
-            {
-                propertyWritten =  true;
-            }
+            propertyWritten =  true;
         }
 
+        if(AneImGui::LabelSliderFloat("Metallic", &mpb.Metallic, 0, 1))
         {
-            const float width = ImGui::GetColumnWidth();
-            const float fieldWidth = FMath::Clamp(width * fieldWidthRatio, fieldMinWidth, fieldMaxWidth);
-
-            AneImGui::SetNextTableFieldWidth(fieldWidth);
-            AneImGui::SetNextTableDecoratorFlags(decoratorFlags);
-
-            if(AneImGui::LabelSliderFloat("Metallic", &mpb.Metallic, 0, 1))
-            {
-                propertyWritten =  true;
-            }
+            propertyWritten =  true;
         }
 
+        if(AneImGui::LabelSliderFloat("Normal", &mpb.Normal, 0, 1))
         {
-            const float width = ImGui::GetColumnWidth();
-            const float fieldWidth = FMath::Clamp(width * fieldWidthRatio, fieldMinWidth, fieldMaxWidth);
-
-            AneImGui::SetNextTableFieldWidth(fieldWidth);
-            AneImGui::SetNextTableDecoratorFlags(decoratorFlags);
-
-            if(AneImGui::LabelSliderFloat("Normal", &mpb.Normal, 0, 1))
-            {
-                propertyWritten =  true;
-            }
+            propertyWritten = true;
         }
 
+        if(AneImGui::LabelSliderFloat("Occlusion", &mpb.Occlusion, 0, 1))
         {
-            const float width = ImGui::GetColumnWidth();
-            const float fieldWidth = FMath::Clamp(width * fieldWidthRatio, fieldMinWidth, fieldMaxWidth);
-
-            AneImGui::SetNextTableFieldWidth(fieldWidth);
-            AneImGui::SetNextTableDecoratorFlags(decoratorFlags);
-
-            if(AneImGui::LabelSliderFloat("Occlusion", &mpb.Occlusion, 0, 1))
-            {
-                propertyWritten =  true;
-            }
+            propertyWritten =  true;
         }
 
+        if(AneImGui::LabelSliderFloat("Reflectance", &mpb.Reflectance, 0, 1))
         {
-            const float width = ImGui::GetColumnWidth();
-            const float fieldWidth = FMath::Clamp(width * fieldWidthRatio, fieldMinWidth, fieldMaxWidth);
-
-            AneImGui::SetNextTableFieldWidth(fieldWidth);
-            AneImGui::SetNextTableDecoratorFlags(decoratorFlags);
-
-            if(AneImGui::LabelSliderFloat("Reflectance", &mpb.Reflectance, 0, 1))
-            {
-                propertyWritten =  true;
-            }
+            propertyWritten =  true;
         }
 
+        if(AneImGui::LabelSliderFloat("Roughness", &mpb.Roughness, 0, 1))
         {
-            const float width = ImGui::GetColumnWidth();
-            const float fieldWidth = FMath::Clamp(width * fieldWidthRatio, fieldMinWidth, fieldMaxWidth);
-
-            AneImGui::SetNextTableFieldWidth(fieldWidth);
-            AneImGui::SetNextTableDecoratorFlags(decoratorFlags);
-
-            if(AneImGui::LabelSliderFloat("Roughness", &mpb.Roughness, 0, 1))
-            {
-                propertyWritten =  true;
-            }
+            propertyWritten =  true;
         }
-
-        if (removeTablePadding) ImGui::PopStyleVar();
 
         ImGui::BeginDisabled(matData.HasUniqueMaterial);
         if (ImGui::Button("Create Unique Material"))

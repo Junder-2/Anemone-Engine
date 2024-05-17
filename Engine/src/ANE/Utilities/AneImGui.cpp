@@ -1,6 +1,8 @@
 #include "anepch.h"
 #include "AneImGui.h"
 
+#include "ANE/Math/FMath.h"
+
 namespace Engine::AneImGui
 {
     AneImGuiContext* _aneImGui = nullptr;
@@ -8,6 +10,7 @@ namespace Engine::AneImGui
     AneImGuiContext* Initialize()
     {
         _aneImGui = new AneImGuiContext();
+        EndItem();
         if(ImGui::GetCurrentContext() == nullptr) ImGui::CreateContext();
 
         return _aneImGui;
@@ -32,6 +35,99 @@ namespace Engine::AneImGui
     void SetNextTableFieldWidth(const float fieldWidth)
     {
         _aneImGui->NextTableFieldWidth = fieldWidth;
+    }
+
+    float CalculateTableFieldWidth()
+    {
+        constexpr float fieldWidthRatio = 0.61803398875f; // 1 / Phi.
+        constexpr float fieldMinWidth = 80, fieldMaxWidth = 5000;
+
+        const float width = ImGui::GetColumnWidth();
+        const float fieldWidth = FMath::Clamp(width * fieldWidthRatio, fieldMinWidth, fieldMaxWidth);
+
+        return fieldWidth;
+    }
+
+    bool LabelDragFloat(const char* label, float* v, const float vSpeed, const float vMin, const float vMax, const char* format, const ImGuiSliderFlags flags)
+    {
+        return LabelDragScalar(label, ImGuiDataType_Float, v, vSpeed, &vMin, &vMax, format, flags);
+    }
+
+    bool LabelDragFloat2(const char* label, float v[2], const float vSpeed, const float vMin, const float vMax, const char* format, const ImGuiSliderFlags flags)
+    {
+        return LabelDragScalarN(label, ImGuiDataType_Float, v, 2, vSpeed, &vMin, &vMax, format, flags);
+    }
+
+    bool LabelDragFloat3(const char* label, float v[3], const float vSpeed, const float vMin, const float vMax, const char* format, const ImGuiSliderFlags flags)
+    {
+        return LabelDragScalarN(label, ImGuiDataType_Float, v, 3, vSpeed, &vMin, &vMax, format, flags);
+    }
+
+    bool LabelDragFloat4(const char* label, float v[4], const float vSpeed, const float vMin, const float vMax, const char* format, const ImGuiSliderFlags flags)
+    {
+        return LabelDragScalarN(label, ImGuiDataType_Float, v, 4, vSpeed, &vMin, &vMax, format, flags);
+    }
+
+    bool LabelDragInt(const char* label, int* v, const float vSpeed, const int vMin, const int vMax, const char* format, const ImGuiSliderFlags flags)
+    {
+        return LabelDragScalar(label, ImGuiDataType_S32, v, vSpeed, &vMin, &vMax, format, flags);
+    }
+
+    bool LabelDragInt2(const char* label, int v[2], const float vSpeed, const int vMin, const int vMax, const char* format, const ImGuiSliderFlags flags)
+    {
+        return LabelDragScalarN(label, ImGuiDataType_S32, v, 2, vSpeed, &vMin, &vMax, format, flags);
+    }
+
+    bool LabelDragInt3(const char* label, int v[3], const float vSpeed, const int vMin, const int vMax, const char* format, const ImGuiSliderFlags flags)
+    {
+        return LabelDragScalarN(label, ImGuiDataType_S32, v, 3, vSpeed, &vMin, &vMax, format, flags);
+    }
+
+    bool LabelDragInt4(const char* label, int v[4], const float vSpeed, const int vMin, const int vMax, const char* format, const ImGuiSliderFlags flags)
+    {
+        return LabelDragScalarN(label, ImGuiDataType_S32, v, 4, vSpeed, &vMin, &vMax, format, flags);
+    }
+
+    bool LabelDragScalar(const char* label, const ImGuiDataType dataType, void* pData, const float vSpeed, const void* pMin, const void* pMax, const char* format, const ImGuiSliderFlags flags)
+    {
+        bool change = false;
+
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
+
+        if (BeginLabelField(label))
+        {
+            if (ImGui::DragScalar(std::format("##{}",label).c_str(), dataType, pData, vSpeed, pMin, pMax, format, flags))
+            {
+                change =  true;
+            }
+
+            EndLabelField();
+        }
+
+        ImGui::PopStyleVar();
+
+        return change;
+    }
+
+    bool LabelDragScalarN(const char* label, const ImGuiDataType dataType, void* pData, const int components, const float vSpeed, const void* pMin, const void* pMax, const char* format, const ImGuiSliderFlags flags)
+    {
+        bool change = false;
+
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
+
+        if (BeginLabelField(label))
+        {
+            if (ImGui::DragScalarN(std::format("##{}",label).c_str(), dataType, pData, components, vSpeed, pMin, pMax, format, flags))
+            {
+                change =  true;
+            }
+
+            EndLabelField();
+        }
+
+        ImGui::PopStyleVar();
+
+        return change;
     }
 
     bool LabelSliderFloat(const char* label, float* v, const float vMin, const float vMax, const char* format, const ImGuiSliderFlags flags)
@@ -78,17 +174,19 @@ namespace Engine::AneImGui
     {
         bool change = false;
 
-        if (BeginLabelTable(label))
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
+
+        if (BeginLabelField(label))
         {
             if (ImGui::SliderScalar(std::format("##{}",label).c_str(), dataType, pData, pMin, pMax, format, flags))
             {
                 change =  true;
             }
 
-            ImGui::EndTable();
+            EndLabelField();
         }
 
-        EndItem();
+        ImGui::PopStyleVar();
 
         return change;
     }
@@ -97,17 +195,19 @@ namespace Engine::AneImGui
     {
         bool change = false;
 
-        if (BeginLabelTable(label))
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
+
+        if (BeginLabelField(label))
         {
             if (ImGui::SliderScalarN(std::format("##{}",label).c_str(), dataType, pData, components, pMin, pMax, format, flags))
             {
                 change =  true;
             }
 
-            ImGui::EndTable();
+            EndLabelField();
         }
 
-        EndItem();
+        ImGui::PopStyleVar();
 
         return change;
     }
@@ -121,15 +221,19 @@ namespace Engine::AneImGui
     {
         bool change = false;
 
-        if (BeginLabelTable(label))
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
+
+        if (BeginLabelField(label))
         {
             if (ImGui::ColorEdit4(std::format("##{}",label).c_str(), col, flags))
             {
                 change =  true;
             }
 
-            ImGui::EndTable();
+            EndLabelField();
         }
+
+        ImGui::PopStyleVar();
 
         EndItem();
 
@@ -149,26 +253,37 @@ namespace Engine::AneImGui
     {
         bool change = false;
 
-        if (BeginLabelTable(label))
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
+
+        if (BeginLabelField(label))
         {
             if (ImGui::ColorPicker4(std::format("##{}",label).c_str(), col, flags, refCol))
             {
                 change =  true;
             }
 
-            ImGui::EndTable();
+            EndLabelField();
         }
 
-        EndItem();
+        ImGui::PopStyleVar();
 
         return change;
     }
 
-    bool BeginLabelTable(const char* label, const char* strId)
+    bool BeginLabelField(const char* label, const char* strId)
     {
-        const AneImGuiContext& g = *_aneImGui;
+        AneImGuiContext& g = *_aneImGui;
 
-        if (ImGui::BeginTable(strId, 2, ImGuiTableFlags_SizingFixedSame | g.NextTableDecoratorFlags))
+        if(g.NextTableFieldWidth < 0)
+        {
+            g.NextTableFieldWidth = CalculateTableFieldWidth();
+        }
+
+        const float labelWidth = FMath::Clamp(ImGui::GetColumnWidth() - g.NextTableFieldWidth - 15.f, 10, 100);
+
+        constexpr ImGuiTableFlags constFlags = ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_NoPadOuterX;
+
+        if (ImGui::BeginTable(strId, 2, g.NextTableDecoratorFlags | constFlags))
         {
             ImGui::TableSetupColumn("Table Label", ImGuiTableColumnFlags_WidthStretch);
             ImGui::TableSetupColumn("Table Field");
@@ -176,6 +291,7 @@ namespace Engine::AneImGui
 
             ImGui::TableSetColumnIndex(0);
             ImGui::AlignTextToFramePadding();
+            ImGui::PushItemWidth(labelWidth);
             ImGui::Text(label);
 
             ImGui::TableSetColumnIndex(1);
@@ -183,13 +299,19 @@ namespace Engine::AneImGui
 
             return true;
         }
-        return false;
+
+        return true;
     }
 
+    void EndLabelField()
+    {
+        ImGui::EndTable();
+        EndItem();
+    }
 
     void EndItem()
     {
         _aneImGui->NextTableDecoratorFlags = 0;
-        _aneImGui->NextTableFieldWidth = 0;
+        _aneImGui->NextTableFieldWidth = -1.f;
     }
 }
