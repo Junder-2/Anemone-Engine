@@ -344,6 +344,7 @@ namespace Engine
         if (propertyWritten) field.set(componentData, v);
         return propertyWritten;
     }
+
     inline bool InspectMutableMaterialData(entt::meta_data& field, entt::meta_any& componentData)
     {
         MaterialData matData = field.get(componentData).cast<MaterialData>();
@@ -404,6 +405,28 @@ namespace Engine
         return propertyWritten;
     }
 
+    inline bool InspectMutableLightData(entt::meta_data& field, entt::meta_any& componentData)
+    {
+        LightData lightData = field.get(componentData).cast<LightData>();
+
+        bool propertyWritten = false;
+
+        if(AneImGui::LabelColorEdit3("Light Color", &lightData.Color.R))
+        {
+            propertyWritten = true;
+        }
+
+        if(AneImGui::LabelDragFloat("Intensity", &lightData.Intensity))
+        {
+            propertyWritten = true;
+        }
+
+        //Todo: LightType
+
+        if(propertyWritten) field.set(componentData, lightData);
+        return propertyWritten;
+    }
+
     using FieldInspectorFn = bool (*)(entt::meta_data& field, entt::meta_any& component_data);
 
     inline static std::unordered_map<entt::id_type, FieldInspectorFn> g_mutable_data_inspectors
@@ -418,7 +441,8 @@ namespace Engine
         {entt::type_id<Vector3>().hash(), InspectMutableVector3Field},
         {entt::type_id<Vector4>().hash(), InspectMutableVector4Field},
         {entt::type_id<bool>().hash(), InspectMutableBoolField},
-        {entt::type_id<MaterialData>().hash(), InspectMutableMaterialData}
+        {entt::type_id<MaterialData>().hash(), InspectMutableMaterialData},
+        {entt::type_id<LightData>().hash(), InspectMutableLightData}
     };
 
     inline bool InspectImmutableStringField(entt::meta_data& field, entt::meta_any& componentData)
