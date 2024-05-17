@@ -19,17 +19,17 @@ namespace Engine
     {
         auto v = field.get(componentData).cast<std::string>();
         bool propertyWritten = false;
-        bool writable = field.prop(EDITABLE_HASH).value().cast<bool>();
         char buffer[256] = {};
         const auto error = strcpy_s(buffer, sizeof(buffer), v.c_str());
-        ImGui::AlignTextToFramePadding();
-        ImGui::Text("%s", field.prop("display_name"_hs).value().cast<const char*>());
-        ImGui::SameLine();
-        ImGui::AlignTextToFramePadding();
-        if (ImGui::InputText("##stringfield", buffer, sizeof(buffer)))
+
+        const auto label = field.prop("display_name"_hs).value().cast<const char*>();
+
+        if(AneImGui::LabelInputText(label, buffer, sizeof(buffer)))
         {
-            propertyWritten = field.set(componentData, std::string(buffer));
+            propertyWritten = true;
         }
+
+        if(propertyWritten) field.set(componentData, std::string(buffer));
         return propertyWritten;
     }
     inline bool InspectMutableTextureField(entt::meta_data& field, entt::meta_any& componentData)
@@ -39,26 +39,30 @@ namespace Engine
         bool writable = field.prop(EDITABLE_HASH).value().cast<bool>();
         char buffer[256] = {};
         const auto error = strcpy_s(buffer, sizeof(buffer), v.c_str());
-        ImGui::AlignTextToFramePadding();
-        ImGui::Text("%s", field.prop("display_name"_hs).value().cast<const char*>());
-        ImGui::SameLine();
-        ImGui::AlignTextToFramePadding();
-        if (ImGui::InputText("##stringfield", buffer, sizeof(buffer)))
+
+        const auto label = field.prop("display_name"_hs).value().cast<const char*>();
+
+        if(AneImGui::LabelInputText(label, buffer, sizeof(buffer)))
         {
-            propertyWritten = field.set(componentData, std::string(buffer));
+            propertyWritten = true;
         }
+
+        if(propertyWritten) field.set(componentData, std::string(buffer));
         return propertyWritten;
     }
+
     inline bool InspectMutableBoolField(entt::meta_data& field, entt::meta_any& componentData)
     {
         auto v = field.get(componentData).cast<bool>();
         bool propertyWritten = false;
-        ImGui::Text("%s", field.prop("display_name"_hs).value().cast<const char*>());
-        ImGui::SameLine();
-        if(ImGui::Checkbox("##boolfield",&v))
+        const auto label = field.prop("display_name"_hs).value().cast<const char*>();
+
+        if(AneImGui::LabelCheckbox(label, &v))
         {
-            propertyWritten = field.set(componentData,v);
+            propertyWritten = true;
         }
+
+        if(propertyWritten) field.set(componentData, v);
         return propertyWritten;
     }
 
@@ -69,52 +73,26 @@ namespace Engine
         Vector3 position = v.GetPosition();
         Vector3 scale = v.GetScale();
         Vector3 rotation = v.GetEulerAngles(true);
-        ImGuiInputTextFlags textFlags = ImGuiInputTextFlags_ReadOnly;
-        static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
-        if (ImGui::BeginTable("Transform Values", 2, flags))
+
+        if (AneImGui::LabelDragFloat3("Position", &position.X, 0.1f))
         {
-            ImGui::TableSetupColumn(" Transform", ImGuiTableColumnFlags_WidthStretch);
-
-            ImGui::TableSetupColumn("TransformComponent", ImGuiTableColumnFlags_NoHeaderLabel | ImGuiTableColumnFlags_WidthFixed);
-            ImGui::TableHeadersRow();
-            ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);
-            ImGui::AlignTextToFramePadding();
-
-            if (ImGui::DragFloat3("##Position", &position.X, 0.1f))
-            {
-                v.SetPosition(position);
-                propertyWritten = field.set(componentData, v);
-            }
-            ImGui::TableSetColumnIndex(1);
-
-            ImGui::Text("%s", field.prop("Position"_hs).value().cast<const char*>());
-
-            ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);
-            ImGui::AlignTextToFramePadding();
-
-            if ( ImGui::DragFloat3("##Rotation", &rotation.X, 0.1f))
-            {
-                v.SetRotation(rotation,true);
-                propertyWritten = field.set(componentData, v);
-            }
-            ImGui::TableSetColumnIndex(1);
-            ImGui::Text("%s", field.prop("Rotation"_hs).value().cast<char const*>());
-
-            ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);
-            ImGui::AlignTextToFramePadding();
-
-            if (ImGui::DragFloat3("##Scale", &scale.X, 0.1f))
-            {
-                v.SetScale(scale);
-                propertyWritten = field.set(componentData, v);
-            }
-            ImGui::TableSetColumnIndex(1);
-            ImGui::Text("%s", field.prop("Scale"_hs).value().cast<char const*>());
-            ImGui::EndTable();
+            v.SetPosition(position);
+            propertyWritten = true;
         }
+
+        if (AneImGui::LabelDragFloat3("Rotation", &rotation.X, 0.1f))
+        {
+            v.SetRotation(rotation, true);
+            propertyWritten = true;
+        }
+
+        if (AneImGui::LabelDragFloat3("Scale", &scale.X, 0.1f))
+        {
+            v.SetScale(scale);
+            propertyWritten = true;
+        }
+
+        if(propertyWritten) field.set(componentData, v);
         return propertyWritten;
     }
 
@@ -232,44 +210,44 @@ namespace Engine
 
         const char* bodyTypes[3] {"Static", "Kinematic", "Dynamic"};
 
-        if (ImGui::Checkbox("Active", &isActive))
+        if (AneImGui::LabelCheckbox("Active", &isActive))
         {
             rb->SetActive(isActive);
             propertyWritten = true;
         }
-        if (ImGui::Combo("BodyType", &bodyType, bodyTypes, 3))
+        if (AneImGui::LabelCombo("BodyType", &bodyType, bodyTypes, 3))
         {
             rb->SetBodyType(static_cast<BodyType>(bodyType));
             propertyWritten = true;
         }
-        if (ImGui::Checkbox("Use Gravity", &isGravity))
+        if (AneImGui::LabelCheckbox("Use Gravity", &isGravity))
         {
             rb->SetUseGravity(isGravity);
             propertyWritten = true;
         }
-        if (ImGui::Checkbox("Use Auto Center of Mass", &isAutoCenterOfMass))
+        if (AneImGui::LabelCheckbox("Use Auto Center of Mass", &isAutoCenterOfMass))
         {
             rb->SetAutoCenterOfMass(isAutoCenterOfMass);
             propertyWritten = true;
         }
-        if (ImGui::Checkbox("Use Auto Mass", &isAutoMass))
+        if (AneImGui::LabelCheckbox("Use Auto Mass", &isAutoMass))
         {
             rb->SetAutoMass(isAutoMass);
             propertyWritten = true;
         }
         ImGui::BeginDisabled(isAutoMass);
-        if (ImGui::DragFloat("Mass", &mass, .1f, 0, FLT_MAX))
+        if (AneImGui::LabelDragFloat("Mass", &mass, .1f, 0, FLT_MAX))
         {
             rb->SetMass(mass);
             propertyWritten = true;
         }
         ImGui::EndDisabled();
-        if (ImGui::DragFloat("Damping", &damping, .1f, 0, FLT_MAX))
+        if (AneImGui::LabelDragFloat("Damping", &damping, .1f, 0, FLT_MAX))
         {
             rb->SetDamping(damping);
             propertyWritten = true;
         }
-        if (ImGui::DragFloat("Angular Damping", &angularDamping, .1f, 0, FLT_MAX))
+        if (AneImGui::LabelDragFloat("Angular Damping", &angularDamping, .1f, 0, FLT_MAX))
         {
             rb->SetAngularDamping(angularDamping);
             propertyWritten = true;
@@ -285,13 +263,13 @@ namespace Engine
             Vector3 angularVelocity = rb->GetAngularVelocity();
 
             ImGui::BeginDisabled();
-            ImGui::Checkbox("Sleeping", &isSleeping);
+            AneImGui::LabelCheckbox("Sleeping", &isSleeping);
             ImGui::Spacing();
-            ImGui::DragFloat3("Position", &position.X);
-            ImGui::DragFloat3("Rotation", &rotation.X);
+            AneImGui::LabelDragFloat3("Position", &position.X);
+            AneImGui::LabelDragFloat3("Rotation", &rotation.X);
             ImGui::Spacing();
-            ImGui::DragFloat3("Velocity", &velocity.X);
-            ImGui::DragFloat3("Angular Velocity", &angularVelocity.X);
+            AneImGui::LabelDragFloat3("Velocity", &velocity.X);
+            AneImGui::LabelDragFloat3("Angular Velocity", &angularVelocity.X);
             ImGui::EndDisabled();
 
             ImGui::TreePop();
@@ -301,38 +279,41 @@ namespace Engine
         return propertyWritten;
     }
 
-    inline bool InspectMutableFloat(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool InspectMutableFloat(entt::meta_data& field, entt::meta_any& componentData)
     {
-        auto v = field.get(component_data).cast<float>();
+        auto v = field.get(componentData).cast<float>();
         bool propertyWritten = false;
 
-        if (ImGui::DragFloat(field.prop("display_name"_hs).value().cast<char const*>(), &v, 0.1f))
+        if (AneImGui::LabelDragFloat(field.prop("display_name"_hs).value().cast<char const*>(), &v, 0.1f))
         {
-            propertyWritten = field.set(component_data, v); //insufficient for dirty flag!!!
+            propertyWritten = true;
         }
+
+        if (propertyWritten) field.set(componentData, v);
         return propertyWritten;
-        //ImGui::Text("%d",v);
     }
 
     inline bool InspectMutableMeshAsset(entt::meta_data& field, entt::meta_any& componentData)
     {
         auto v = field.get(componentData).cast<VmaMeshAsset>();
         bool propertyWritten = false;
-        ImGui::Text("%s", field.prop("display_name"_hs).value().cast<const char*>());
-        ImGui::SameLine();
-        ImGui::Text("%s", v.Name.c_str());
+
+        AneImGui::LabelText(field.prop("display_name"_hs).value().cast<const char*>(), v.Name.c_str());
+
         return propertyWritten;
     }
 
-    inline bool InspectMutableVector2Field(entt::meta_data& field, entt::meta_any& component_data)
+    inline bool InspectMutableVector2Field(entt::meta_data& field, entt::meta_any& componentData)
     {
-        auto v = field.get(component_data).cast<Vector2>();
+        auto v = field.get(componentData).cast<Vector2>();
         bool propertyWritten = false;
 
-        if (ImGui::DragFloat2(field.prop("display_name"_hs).value().cast<char const*>(), &v.X, 0.1f))
+        if (AneImGui::LabelDragFloat2(field.prop("display_name"_hs).value().cast<char const*>(), &v.X, 0.1f))
         {
-            propertyWritten = field.set(component_data, v);
+            propertyWritten = true;
         }
+
+        if (propertyWritten) field.set(componentData, v);
         return propertyWritten;
     }
 
@@ -341,10 +322,12 @@ namespace Engine
         auto v = field.get(componentData).cast<Vector3>();
         bool propertyWritten = false;
 
-        if (ImGui::DragFloat3(field.prop("display_name"_hs).value().cast<char const*>(), &v.X, 0.1f))
+        if (AneImGui::LabelDragFloat3(field.prop("display_name"_hs).value().cast<char const*>(), &v.X, 0.1f))
         {
-            propertyWritten = field.set(componentData, v);
+            propertyWritten = true;
         }
+
+        if (propertyWritten) field.set(componentData, v);
         return propertyWritten;
     }
 
@@ -353,10 +336,12 @@ namespace Engine
         auto v = field.get(componentData).cast<Vector4>();
         bool propertyWritten = false;
 
-        if (ImGui::DragFloat4(field.prop("display_name"_hs).value().cast<char const*>(), &v.X, 0.1f))
+        if (AneImGui::LabelDragFloat4(field.prop("display_name"_hs).value().cast<char const*>(), &v.X, 0.1f))
         {
-            propertyWritten = field.set(componentData, v);
+            propertyWritten = true;
         }
+
+        if (propertyWritten) field.set(componentData, v);
         return propertyWritten;
     }
     inline bool InspectMutableMaterialData(entt::meta_data& field, entt::meta_any& componentData)
@@ -440,10 +425,7 @@ namespace Engine
     {
         auto v = field.get(componentData).cast<std::string>();
 
-        ImGui::AlignTextToFramePadding();
-        ImGui::Text("%s", field.prop("display_name"_hs).value().cast<const char*>());
-        ImGui::SameLine();
-        ImGui::Text("%s", v.c_str());
+        AneImGui::LabelText(field.prop("display_name"_hs).value().cast<const char*>(), v.c_str());
 
         return true;
     }
@@ -454,55 +436,27 @@ namespace Engine
         Vector3 position = v.GetPosition();
         Vector3 scale = v.GetScale();
         Vector3 rotation = v.GetEulerAngles(true);
-        ImGuiInputTextFlags textFlags = ImGuiInputTextFlags_ReadOnly;
-        ImGui::Text("%s", "Read Only");
-        static ImGuiTableFlags flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
 
-        if (ImGui::BeginTable("Transform Values", 2, flags))
-        {
-            ImGui::TableSetupColumn(" Transform", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::Text("Read Only");
 
-            ImGui::TableSetupColumn("TransformComponent", ImGuiTableColumnFlags_NoHeaderLabel | ImGuiTableColumnFlags_WidthFixed);
-            ImGui::TableHeadersRow();
-            ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);
-            ImGui::AlignTextToFramePadding();
-            ImGui::BeginDisabled();
-            ImGui::DragFloat3("##position", &position.X, 0.1f);
-            ImGui::EndDisabled();
-            ImGui::TableSetColumnIndex(1);
-            ImGui::Text("%s", field.prop("Position"_hs).value().cast<char const*>());
+        ImGui::BeginDisabled();
+        AneImGui::LabelDragFloat3("Position", &position.X);
+        AneImGui::LabelDragFloat3("Rotation", &rotation.X);
+        AneImGui::LabelDragFloat3("Scale", &scale.X);
+        ImGui::EndDisabled();
 
-            ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);
-            ImGui::AlignTextToFramePadding();
-            ImGui::BeginDisabled();
-            ImGui::DragFloat3("##Rotation", &position.X, 0.1f);
-            ImGui::EndDisabled();
-            ImGui::TableSetColumnIndex(1);
-            ImGui::Text("%s", field.prop("Rotation"_hs).value().cast<char const*>());
-
-            ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);
-            ImGui::AlignTextToFramePadding();
-            ImGui::BeginDisabled();
-            ImGui::DragFloat3("##Scale", &position.X, 0.1f);
-            ImGui::EndDisabled();
-            ImGui::TableSetColumnIndex(1);
-            ImGui::Text("%s", field.prop("Scale"_hs).value().cast<char const*>());
-            ImGui::EndTable();
-        }
         return true;
     }
+
     inline bool InspectImmutableMeshAsset(entt::meta_data& field, entt::meta_any& componentData)
     {
         auto v = field.get(componentData).cast<VmaMeshAsset>();
-        ImGui::Text("%s", field.prop("display_name"_hs).value().cast<const char*>());
-        ImGui::SameLine();
-        ImGui::Text("%s", v.Name.c_str());
+
+        AneImGui::LabelText(field.prop("display_name"_hs).value().cast<const char*>(), v.Name.c_str());
 
         return true;
     }
+
     inline static std::unordered_map<entt::id_type, FieldInspectorFn> _immutableDataInspectors
     {
         {entt::type_id<std::string>().hash(), InspectImmutableStringField},
@@ -513,7 +467,8 @@ namespace Engine
          {entt::type_id<float>().hash(), inspect_float},
          {entt::type_id<Vector2>().hash(), inspect_vector2_field},
          {entt::type_id<Vector3>().hash(), inspect_vector3_field},
-         {entt::type_id<Vector4>().hash(), inspect_vector4_field}*/
+         {entt::type_id<Vector4>().hash(), inspect_vector4_field}
+         */
     };
 
     template <typename ...Args>
