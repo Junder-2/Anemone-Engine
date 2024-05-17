@@ -23,8 +23,9 @@ namespace Engine
 
         void RenderDirectoryBrowserChild(std::filesystem::path DirectoryPath);
         void RenderDirectoryContentsBrowserChildTopBar();
-        bool GetDirEntryIconFromStem(ImTextureID* stemIcon, const std::string& stem);
         void RenderDirectoryContentsBrowserChild();
+        void RenderDirectoryItem(std::filesystem::directory_entry);
+        static VkDescriptorSet LoadTextureAsImGuiImage(const std::string& texturePath);
 
 
     private:
@@ -34,7 +35,8 @@ namespace Engine
         std::filesystem::path currentDirectory;
         std::map<std::string,ImTextureID> m_AssetIconMap;
         ImVec2 _folderIconSize = ImVec2 (12,12);
-        ImVec2 _contentIconSize = ImVec2 (36,36);
+        ImVec2 _contentIconSize = ImVec2 (120,120);
+        ImVec2 _contentGroupSize = ImVec2 (120,200);
 
         inline static const std::filesystem::path AssetDirectory = std::filesystem::path("../Assets/");
     };

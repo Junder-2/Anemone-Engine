@@ -14,10 +14,9 @@ Engine::ContentBrowserPanel::ContentBrowserPanel(EditorLayer* editorLayer)
 
 void Engine::ContentBrowserPanel::Init()
 {
-    auto image = Renderer::LoadTexture("UITextures/UIIcons/FolderIcon.png");
-    auto icon = ImGui_ImplVulkan_AddTexture(VulkanRenderer::_samplerNearest, image.ImageView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    m_AssetIconMap["folder"] = icon;
-    m_AssetIconMap["cpp"] = icon;
+    m_AssetIconMap["folder"] = LoadTextureAsImGuiImage("UITextures/UIIcons/FolderIcon.png");
+    m_AssetIconMap["cpp"] = LoadTextureAsImGuiImage("UITextures/UIIcons/FolderIcon.png");
+
 }
 
 
@@ -55,7 +54,6 @@ void Engine::ContentBrowserPanel::RenderDirectoryBrowserChild(std::filesystem::p
 {
     ANE_DEEP_PROFILE_FUNCTION();
 
-    bool open = false;
     for (auto const& dir_entry : std::filesystem::directory_iterator{DirectoryPath})
     {
         if (dir_entry.is_directory())
@@ -84,29 +82,19 @@ void Engine::ContentBrowserPanel::RenderDirectoryBrowserChild(std::filesystem::p
 }
 
 
-bool Engine::ContentBrowserPanel::GetDirEntryIconFromStem(ImTextureID* stemIcon, const std::string& stem)
-{
-    bool iconPresent = m_AssetIconMap.contains(stem);
-    if (iconPresent)
-    {
-        stemIcon = &m_AssetIconMap[stem];
-    }
-    return iconPresent;
-}
+
 
 void Engine::ContentBrowserPanel::RenderDirectoryContentsBrowserChild()
 {
-    const float topBarHeight = 40.0f;
     ANE_DEEP_PROFILE_FUNCTION();
 
+    const float topBarHeight = 40.0f;
     const float bottomBarHeight = 32.0f;
+
     ImGui::BeginChild("##directory_structure", ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetWindowHeight() - topBarHeight - bottomBarHeight));
     {
         RenderDirectoryContentsBrowserChildTopBar(topBarHeight);
-
         ImGui::Separator();
-
-        ImGui::BeginChild("Scrolling");
         {
             //technically should only ever be one folder selected I believe
             std::vector<std::string>* listOfSelectedFilePathAsString = SelectionManager::GetSelection(context);
@@ -114,59 +102,57 @@ void Engine::ContentBrowserPanel::RenderDirectoryContentsBrowserChild()
             {
                 std::string selectedFilePathAsString = listOfSelectedFilePathAsString->at(0);
                 std::filesystem::path selectedDirectory = std::filesystem::path(selectedFilePathAsString);
-                ImVec2 browserContentIconSize;
-                browserContentIconSize.x = floorf(ImGui::GetContentRegionAvail().x / 4);
-                browserContentIconSize.y = floorf(ImGui::GetContentRegionAvail().x / 3);
-                const ImVec2 item_spacing = ImVec2(20, 20);
-                ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(floorf(item_spacing.x), floorf(item_spacing.y)));
-                int index = 0;
-                int columns = ImGui::GetContentRegionAvail().x /  browserContentIconSize.x ;
-                columns = columns < 1 ? 1 : columns;
-                float curX = 0.0f;
-                ImGui::Columns(columns, nullptr, false);
-                ImGui::NextColumn();
-                int currColumn = 0;
+                int columns = (int)(ImGui::GetContentRegionAvail().x/(_contentGroupSize.x + 25));
+                ImGui::Columns(columns, NULL, false);
                 for (auto const& dir_entry : std::filesystem::directory_iterator{selectedDirectory})
                 {
 
                     if (!dir_entry.is_directory())
                     {
-                        std::string filename = dir_entry.path().filename().string();
-                        ImTextureID stemIcon;
-                        std::string extension = dir_entry.path().extension().generic_string();
-                        if (!extension.empty())
-                        {
-                            extension = extension.substr(1, extension.size());
-                        }
-                        if (m_AssetIconMap.contains(extension))
-                        {
-                            //ImGui::BeginVertical("IconLabel",ImVec2(50,50));
-                            ImGui::BeginDisabled();
-                            ImGui::BeginGroup();
-
-                            ImGui::ImageButton(m_AssetIconMap[extension],_contentIconSize);
-                            ImGui::TextWrapped("%s", dir_entry.path().filename().replace_extension("").string().c_str());
-                            ImGui::EndGroup();
-
-                            ImGui::EndDisabled();
-
-                            //ImGui::EndVertical();
-                        }
-                        ImGui::NextColumn();
-
+                        RenderDirectoryItem(dir_entry);
                     }
-
                 }
-                ImGui::PopStyleVar();
-
             }
-            ImGui::EndChild();
         }
         ImGui::EndChild();
-
     }
 }
-    void Engine::ContentBrowserPanel::RenderDirectoryContentsBrowserChildTopBar(float topBarHeight)
-        {
-            //All support UI, like searching, navigation and menu's should be rendered in this function
-        }
+void Engine::ContentBrowserPanel::RenderDirectoryItem(std::filesystem::directory_entry dir_entry)
+{
+    std::string filename = dir_entry.path().filename().string();
+
+    ImTextureID stemIcon;
+    std::string extension = dir_entry.path().extension().generic_string();
+    if (!extension.empty())
+    {
+        extension = extension.substr(1, extension.size());
+    }
+    if (m_AssetIconMap.contains(extension))
+    {
+        stemIcon = m_AssetIconMap[extension];
+    }
+    else
+    {
+        stemIcon = m_AssetIconMap["folder"];
+    }
+    {
+        ImGui::BeginDisabled();
+        ImGui::BeginGroup();
+        ImGui::ImageButton("Icon",stemIcon,_contentIconSize);
+        ImGui::TextWrapped("%s", dir_entry.path().filename().replace_extension("").string().c_str());
+        ImGui::EndGroup();
+        ImGui::EndDisabled();
+        ImGui::NextColumn();
+    }
+}
+
+VkDescriptorSet Engine::ContentBrowserPanel::LoadTextureAsImGuiImage(const std::string& texturePath)
+{
+    const auto image = Engine::Renderer::LoadTexture("UITextures/UIIcons/FolderIcon.png");
+    return ImGui_ImplVulkan_AddTexture(Engine::VulkanRenderer::_samplerNearest, image.ImageView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+}
+
+void Engine::ContentBrowserPanel::RenderDirectoryContentsBrowserChildTopBar(float topBarHeight)
+{
+    //All support UI, like searching, navigation and menu's should be rendered in this function
+}
