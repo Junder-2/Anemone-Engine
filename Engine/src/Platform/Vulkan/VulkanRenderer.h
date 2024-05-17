@@ -154,6 +154,8 @@ namespace Vulkan
         inline static void DrawDebugGeometry(VkCommandBuffer cmd, const DrawContext& drawCommands);
         inline static void DrawImGui(VkCommandBuffer cmd, VkImageView targetImageView);
 
+        inline static void UpdateGlobalUniforms();
+
         static void CleanupVulkan();
         static void CleanupImGui();
 

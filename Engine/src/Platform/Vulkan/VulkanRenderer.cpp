@@ -1141,30 +1141,22 @@ namespace Vulkan
         _frameIndex++;
     }
 
+    void VulkanRenderer::DrawSky(VkCommandBuffer cmd)
+    {
+        ANE_DEEP_PROFILE_FUNCTION();
+
+        VulkanFrame& frame = GetFrame();
+
+
+    }
+
     void VulkanRenderer::DrawGeometry(VkCommandBuffer cmd, const DrawContext& drawCommands)
     {
         ANE_DEEP_PROFILE_FUNCTION();
 
         VulkanFrame& frame = GetFrame();
 
-        float time = API::TIME;
-        frame.AppData.Time = time;
-
-        Vector3 ambientColor = Vector3(0.05f, 0.08f, 0.11f);
-        Vector3 sunAngle = Vector3(50 * FMath::DEGREES_TO_RAD, -30 * FMath::DEGREES_TO_RAD, 0);
-        Vector3 sunDirection = Quaternion::FromEulerAngles(sunAngle) * Vector3::ForwardVector();
-        Vector3 sunColor = Vector3(1.0f, 0.9f, 0.67f);
-
-        frame.SceneData.CameraPosition = Vector4(CameraPosition);
-        frame.SceneData.AmbientColor = Vector4(ambientColor, 0);
-        frame.SceneData.SunlightDirection = Vector4(sunDirection, 0);
-        frame.SceneData.SunlightColor = Vector4(sunColor, 0);
-
-        auto* appUniformData = (ApplicationData*)frame.AppDataBuffer.Allocation->GetMappedData();
-        *appUniformData = frame.AppData;
-
-        auto* sceneUniformData = (SceneData*)frame.SceneDataBuffer.Allocation->GetMappedData();
-        *sceneUniformData = frame.SceneData;
+        UpdateGlobalUniforms();
 
         VkDescriptorSet appDescriptor = frame.Descriptors.Allocate(_device, _appDataLayout, _allocator);
         VkDescriptorSet sceneDescriptor = frame.Descriptors.Allocate(_device, _geometryDataLayout, _allocator);
@@ -1295,6 +1287,29 @@ namespace Vulkan
         ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmd);
 
         vkCmdEndRendering(cmd);
+    }
+
+    void VulkanRenderer::UpdateGlobalUniforms()
+    {
+        VulkanFrame& frame = GetFrame();
+
+        frame.AppData.Time = API::TIME;
+
+        auto* appUniformData = (ApplicationData*)frame.AppDataBuffer.Allocation->GetMappedData();
+        *appUniformData = frame.AppData;
+
+        Vector3 ambientColor = Vector3(0.05f, 0.08f, 0.11f);
+        Vector3 sunAngle = Vector3(50 * FMath::DEGREES_TO_RAD, -30 * FMath::DEGREES_TO_RAD, 0);
+        Vector3 sunDirection = Quaternion::FromEulerAngles(sunAngle) * Vector3::ForwardVector();
+        Vector3 sunColor = Vector3(1.0f, 0.9f, 0.67f);
+
+        frame.SceneData.CameraPosition = Vector4(CameraPosition);
+        frame.SceneData.AmbientColor = Vector4(ambientColor, 0);
+        frame.SceneData.SunlightDirection = Vector4(sunDirection, 0);
+        frame.SceneData.SunlightColor = Vector4(sunColor, 0);
+
+        auto* sceneUniformData = (SceneData*)frame.SceneDataBuffer.Allocation->GetMappedData();
+        *sceneUniformData = frame.SceneData;
     }
 
     void VulkanRenderer::CleanupVulkan()
