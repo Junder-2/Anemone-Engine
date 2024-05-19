@@ -55,14 +55,6 @@ namespace Engine::AneImGui
 
         ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
 
-        AneImGuiContext& g = *_aneImGui;
-
-        if(g.NextTableFieldWidth < 0)
-        {
-            g.NextTableFieldWidth = CalculateTableFieldWidth();
-        }
-
-        const float fieldWidth = CalculateTableFieldWidth() - 30.f;
         if (BeginLabelField(label))
         {
             if (ImGui::Checkbox(std::format("##{}", label).c_str(), v))
@@ -70,35 +62,10 @@ namespace Engine::AneImGui
                 change =  true;
             }
 
-            // Since we can't set the width of a checkbox, we pad it from the right using a Dummy item.
-            ImGui::SameLine();
-            ImGui::Dummy(ImVec2{fieldWidth, 0});
-
             EndLabelField();
         }
 
-        EndItem();
-
         ImGui::PopStyleVar();
-
-        return change;
-
-        // Weird layout behaviour
-        // bool change = false;
-        //
-        // ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
-        //
-        // if (BeginLabelField(label))
-        // {
-        //     if (ImGui::Checkbox(std::format("{}",label).c_str(), v))
-        //     {
-        //         change =  true;
-        //     }
-        //
-        //     EndLabelField();
-        // }
-        //
-        // ImGui::PopStyleVar();
 
         return change;
     }
@@ -132,13 +99,6 @@ namespace Engine::AneImGui
         return pressed;
     }
 
-    // Getter for the old Combo() API: const char*[]
-    static const char* Items_ArrayGetter(void* data, int idx)
-    {
-        const char* const* items = (const char* const*)data;
-        return items[idx];
-    }
-
     bool LabelCombo(const char* label, int* currentItem, const char* const items[], const int itemsCount)
     {
         bool change = false;
@@ -164,37 +124,13 @@ namespace Engine::AneImGui
     {
         ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
 
-        AneImGuiContext& g = *_aneImGui;
-
-        if(g.NextTableFieldWidth < 0)
+        if (BeginLabelField(label))
         {
-            g.NextTableFieldWidth = CalculateTableFieldWidth();
+            ImGui::Text(value);
+
+            EndLabelField();
         }
-
-        const float labelWidth = FMath::Clamp(ImGui::GetColumnWidth() - g.NextTableFieldWidth - 15.f, 10, 100);
-
-        ImGui::AlignTextToFramePadding();
-        ImGui::BeginHorizontal("Horizontal");
-        ImGui::SetNextItemWidth(labelWidth);
-        ImGui::Text(label);
-        ImGui::Spring(0.5f);
-        ImGui::Text(value);
-        ImGui::EndHorizontal();
-
-        EndItem();
-
         ImGui::PopStyleVar();
-
-        // ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0, 0));
-        //
-        // if (BeginLabelField(label))
-        // {
-        //     ImGui::Text(value);
-        //
-        //     EndLabelField();
-        // }
-        //
-        // ImGui::PopStyleVar();
     }
 
     bool LabelInputText(const char* label, char* buf, const size_t bufSize, const ImGuiInputTextFlags flags, const ImGuiInputTextCallback callback, void* userData)
@@ -511,8 +447,6 @@ namespace Engine::AneImGui
 
         ImGui::PopStyleVar();
 
-        EndItem();
-
         return change;
     }
 
@@ -580,6 +514,12 @@ namespace Engine::AneImGui
 
     void EndLabelField()
     {
+        const float column = ImGui::GetContentRegionMax().x;
+        const float padding = FMath::Min(FMath::Max(column*.25f-40.f, FLT_MIN), 5.f);
+
+        ImGui::SameLine(0, 0);
+        ImGui::Dummy(ImVec2(padding, 0));
+
         ImGui::EndTable();
         EndItem();
     }
