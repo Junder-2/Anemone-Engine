@@ -244,6 +244,9 @@ namespace Engine
 
         if (triggerState == TriggerStarted && blockingAppInputs && Application::Get().GetWindow().IsOverViewport())
         {
+            // Return if user might be performing another action
+            if(ImGui::IsMouseDown(ImGuiMouseButton_Left)) return;
+
             HideMouse();
             blockingAppInputs = false;
         }
