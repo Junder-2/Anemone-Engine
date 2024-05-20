@@ -62,6 +62,10 @@ namespace Engine::AneImGui
                 change =  true;
             }
 
+            // Left align checkbox
+            ImGui::SameLine(0, 0);
+            ImGui::Dummy(ImVec2(_aneImGui->NextTableFieldWidth - ImGui::GetFrameHeight(), 0));
+
             EndLabelField();
         }
 
