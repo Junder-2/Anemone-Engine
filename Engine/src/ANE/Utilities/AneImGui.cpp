@@ -41,7 +41,7 @@ namespace Engine::AneImGui
     float CalculateTableFieldWidth()
     {
         constexpr float fieldWidthRatio = 0.61803398875f; // 1 / Phi.
-        constexpr float fieldMinWidth = 80, fieldMaxWidth = 5000;
+        constexpr float fieldMinWidth = 65, fieldMaxWidth = 5000;
 
         const float width = ImGui::GetColumnWidth();
         const float fieldWidth = FMath::Clamp(width * fieldWidthRatio, fieldMinWidth, fieldMaxWidth);
