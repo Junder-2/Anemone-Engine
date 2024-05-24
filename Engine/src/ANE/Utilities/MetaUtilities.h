@@ -295,10 +295,30 @@ namespace Engine
 
     inline bool InspectMutableMeshAsset(entt::meta_data& field, entt::meta_any& componentData)
     {
-        auto v = field.get(componentData).cast<VmaMeshAsset>();
+        auto v = field.get(componentData).cast<VmaMeshAsset*>();
         bool propertyWritten = false;
 
-        AneImGui::LabelText(field.prop("display_name"_hs).value().cast<const char*>(), v.Name.c_str());
+        //AneImGui::LabelText(field.prop("display_name"_hs).value().cast<const char*>(), v.Name.c_str());
+        char buffer[256] = {};
+        const auto error = strcpy_s(buffer, sizeof(buffer), v->Name.c_str());
+        if(AneImGui::LabelInputText(field.prop("display_name"_hs).value().cast<const char*>(), buffer, sizeof(buffer), ImGuiInputTextFlags_EnterReturnsTrue))
+        {
+            VmaMeshAsset* newMesh = Renderer::LoadModel(buffer);
+            if (newMesh != nullptr)
+            {
+                v = newMesh;
+                propertyWritten = true;
+            }
+            else
+            {
+                ANE_ELOG_WARN("Couldn't find mesh: {}", buffer);
+            }
+        }
+
+        if (propertyWritten)
+        {
+            field.set(componentData, v);
+        }
 
         return propertyWritten;
     }
@@ -435,7 +455,7 @@ namespace Engine
         {entt::type_id<TransformMatrix>().hash(), InspectMutableTransformMatrix},
         {entt::type_id<ColliderComponentData>().hash(), InspectMutableColliders},
         {entt::type_id<RigidBody*>().hash(), InspectMutableRigidBody},
-        {entt::type_id<VmaMeshAsset>().hash(), InspectMutableMeshAsset},
+        {entt::type_id<VmaMeshAsset*>().hash(), InspectMutableMeshAsset},
         {entt::type_id<float>().hash(), InspectMutableFloat},
         {entt::type_id<Vector2>().hash(), InspectMutableVector2Field},
         {entt::type_id<Vector3>().hash(), InspectMutableVector3Field},
