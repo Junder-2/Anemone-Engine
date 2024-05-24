@@ -18,11 +18,11 @@ namespace Engine
 
         static void OnEvent(const Event& e);
 
-        static VmaMeshAsset LoadModel(const std::string& modelPath);
+        static VmaMeshAsset* LoadModel(const std::string& modelPath);
 
         static Vulkan::VmaImage LoadTexture(const std::string& texturePath);
 
-        static VmaMeshAsset GetDefaultMesh();
+        static VmaMeshAsset* GetDefaultMesh();
         static Vulkan::MaterialInstance* GetDefaultMaterial();
         static Vulkan::MaterialInstance* GetDefaultMaterialClone();
 

@@ -114,7 +114,7 @@ namespace Vulkan
         _rebuildSwapchain = true;
     }
 
-    VmaMeshAsset VulkanRenderer::LoadModel(const std::string& modelPath)
+    VmaMeshAsset* VulkanRenderer::LoadModel(const std::string& modelPath)
     {
         if (_loadedModelMap.contains(modelPath))
         {
@@ -124,19 +124,24 @@ namespace Vulkan
         const std::string relativePath = std::string(ASSET_PATH_MESHES).append(modelPath);
 
         const MeshAsset* meshAsset = MeshLoader::LoadMesh(relativePath.c_str());
+        if (meshAsset == nullptr)
+        {
+            //ANE_ELOG_WARN("Unable to load mesh");
+            return nullptr;
+        }
         Mesh mesh = meshAsset->SubMeshes[0]; // Use first submesh for now.
 
         const VmaMeshBuffers meshBuffers = UploadMesh(mesh.Indices, mesh.Vertices);
 
-        VmaMeshAsset vmaMeshAsset;
-        vmaMeshAsset.Name = modelPath;
-        vmaMeshAsset.NumVertices = (uint32_t)mesh.Indices.size();
-        vmaMeshAsset.SubMeshes = meshAsset->SubMeshes;
-        vmaMeshAsset.MeshBuffers = meshBuffers;
+        VmaMeshAsset* vmaMeshAsset = new VmaMeshAsset();
+        vmaMeshAsset->Name = modelPath;
+        vmaMeshAsset->NumVertices = (uint32_t)mesh.Indices.size();
+        vmaMeshAsset->SubMeshes = meshAsset->SubMeshes;
+        vmaMeshAsset->MeshBuffers = meshBuffers;
 
         _mainDeletionQueue.PushFunction([=]
         {
-            const VmaMeshBuffers buffers = vmaMeshAsset.MeshBuffers;
+            const VmaMeshBuffers buffers = vmaMeshAsset->MeshBuffers;
             DestroyBuffer(buffers.IndexBuffer);
             DestroyBuffer(buffers.VertexBuffer);
         });
@@ -1173,12 +1178,12 @@ namespace Vulkan
         modelMat.SetPosition(CameraPosition);
         pushConstants.MVPMatrix = ViewProjection * modelMat; // VP
         pushConstants.ModelMatrix = Matrix4x4::Identity();
-        pushConstants.VertexBuffer = _skyMesh.MeshBuffers.VertexBufferAddress;
+        pushConstants.VertexBuffer = _skyMesh->MeshBuffers.VertexBufferAddress;
 
         vkCmdPushConstants(cmd, _pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstantBuffer), &pushConstants);
-        vkCmdBindIndexBuffer(cmd, _skyMesh.MeshBuffers.IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
+        vkCmdBindIndexBuffer(cmd, _skyMesh->MeshBuffers.IndexBuffer.Buffer, 0, VK_INDEX_TYPE_UINT32);
 
-        vkCmdDrawIndexed(cmd, _skyMesh.NumVertices, 1, 0, 0, 0);
+        vkCmdDrawIndexed(cmd, _skyMesh->NumVertices, 1, 0, 0, 0);
     }
 
     void VulkanRenderer::DrawGeometry(VkCommandBuffer cmd, const DrawContext& drawCommands)

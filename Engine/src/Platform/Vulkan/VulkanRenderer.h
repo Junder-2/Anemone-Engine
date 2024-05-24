@@ -85,7 +85,7 @@ namespace Vulkan
 
         void OnWindowResize();
 
-        VmaMeshAsset LoadModel(const std::string& modelPath);
+        VmaMeshAsset* LoadModel(const std::string& modelPath);
 
         static VmaMeshBuffers UploadRawMesh(std::span<uint32_t> indices, std::span<Vertex> vertices);
 
@@ -96,7 +96,7 @@ namespace Vulkan
         static ImGuiIO* GetImGuiIO() { return _io; }
 
         // Engine defaults.
-        static VmaMeshAsset GetDefaultMesh() { return _cubeMesh; }
+        static VmaMeshAsset* GetDefaultMesh() { return _cubeMesh; }
         static MaterialInstance* GetDefaultMaterial() { return &_filamentInstance; }
         MaterialInstance* GetDefaultMaterialClone();
 
@@ -249,7 +249,7 @@ namespace Vulkan
         inline static VulkanFrame _frameData[MAX_FRAMES_IN_FLIGHT];
         inline static VulkanImmediateBuffer _immBuffer;
 
-        inline static entt::dense_map<std::string, VmaMeshAsset> _loadedModelMap;
+        inline static entt::dense_map<std::string, VmaMeshAsset*> _loadedModelMap;
         inline static entt::dense_map<std::string, VmaImage> _loadedTextureMap;
 
         // Engine resources
@@ -267,9 +267,9 @@ namespace Vulkan
         inline static VmaImage _cubeMap;
 
         // Primitives
-        inline static VmaMeshAsset _cubeMesh;
-        inline static VmaMeshAsset _sphereMesh;
-        inline static VmaMeshAsset _skyMesh;
+        inline static VmaMeshAsset* _cubeMesh;
+        inline static VmaMeshAsset* _sphereMesh;
+        inline static VmaMeshAsset* _skyMesh;
 
         inline static VkSampler _samplerLinear;
         inline static VkSampler _samplerNearest;

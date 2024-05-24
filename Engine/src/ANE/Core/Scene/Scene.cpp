@@ -142,8 +142,8 @@ namespace Engine
 
                 DrawCommand draw = {};
                 draw.ModelMatrix = transform.Transform.GetLocalToWorld();
-                draw.VertexCount = renderer.Model.NumVertices;
-                draw.MeshBuffers = renderer.Model.MeshBuffers;
+                draw.VertexCount = renderer.Model->NumVertices;
+                draw.MeshBuffers = renderer.Model->MeshBuffers;
 
                 draw.Material = renderer.GetMaterial();
 

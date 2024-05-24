@@ -44,7 +44,7 @@ namespace Engine
         _vulkanRenderer->OnWindowResize();
     }
 
-    VmaMeshAsset Renderer::LoadModel(const std::string& modelPath)
+    VmaMeshAsset* Renderer::LoadModel(const std::string& modelPath)
     {
         return _vulkanRenderer->LoadModel(modelPath);
     }
@@ -54,7 +54,7 @@ namespace Engine
         return _vulkanRenderer->LoadTexture(texturePath);
     }
 
-    VmaMeshAsset Renderer::GetDefaultMesh()
+    VmaMeshAsset* Renderer::GetDefaultMesh()
     {
         return _vulkanRenderer->GetDefaultMesh();
     }

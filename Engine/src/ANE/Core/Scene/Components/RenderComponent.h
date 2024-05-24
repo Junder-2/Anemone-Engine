@@ -59,7 +59,7 @@ namespace Engine
         }
 
     public:
-        VmaMeshAsset Model = {};
+        VmaMeshAsset* Model = {};
 
     private:
         MaterialData _materialData;
