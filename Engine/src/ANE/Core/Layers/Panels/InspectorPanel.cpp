@@ -97,7 +97,7 @@ namespace Engine
                             selectedEntity.AddComponent<TransformComponent>();
                             break;
                         case Hash("RenderComponent"):
-                            selectedEntity.AddComponent<RenderComponent>("Suzanne.fbx");
+                            selectedEntity.AddComponent<RenderComponent>("Cube.obj");
                             break;
                         case Hash("ColliderComponent"):
                             selectedEntity.AddComponent<ColliderComponent>(selectedEntity);
