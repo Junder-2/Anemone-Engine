@@ -8,7 +8,7 @@ namespace Vulkan
 {
     Assimp::Importer MeshLoader::Importer;
 
-    MeshAsset MeshLoader::LoadMesh(const char* path)
+    MeshAsset* MeshLoader::LoadMesh(const char* path)
     {
         constexpr int flags =
             aiProcess_FlipWindingOrder | // We're using clockwise winding.
@@ -22,7 +22,7 @@ namespace Vulkan
         return LoadMesh(path, flags);
     }
 
-    MeshAsset MeshLoader::LoadMesh(const char* path, const int flags)
+    MeshAsset* MeshLoader::LoadMesh(const char* path, const int flags)
     {
         const aiScene* scene = Importer.ReadFile(path, flags);
         if (!scene)
@@ -34,21 +34,21 @@ namespace Vulkan
         return InitScene(scene);
     }
 
-    MeshAsset MeshLoader::InitScene(const aiScene* scene)
+    MeshAsset* MeshLoader::InitScene(const aiScene* scene)
     {
-        MeshAsset meshAsset = { };
-        meshAsset.SubMeshes.resize(scene->mNumMeshes);
+        MeshAsset* meshAsset = new MeshAsset();
+        meshAsset->SubMeshes.resize(scene->mNumMeshes);
 
-        for (unsigned int meshIndex = 0; meshIndex < meshAsset.SubMeshes.size(); meshIndex++)
+        for (unsigned int meshIndex = 0; meshIndex < meshAsset->SubMeshes.size(); meshIndex++)
         {
-            meshAsset.SubMeshes[meshIndex].StartOffset = meshAsset.NumVertices;
-            meshAsset.NumVertices += scene->mMeshes[meshIndex]->mNumVertices;
+            meshAsset->SubMeshes[meshIndex].StartOffset = meshAsset->NumVertices;
+            meshAsset->NumVertices += scene->mMeshes[meshIndex]->mNumVertices;
         }
 
-        for (unsigned int meshIndex = 0; meshIndex < meshAsset.SubMeshes.size(); meshIndex++)
+        for (unsigned int meshIndex = 0; meshIndex < meshAsset->SubMeshes.size(); meshIndex++)
         {
             const aiMesh* mesh = scene->mMeshes[meshIndex];
-            meshAsset.SubMeshes[meshIndex] = InitMesh(mesh, scene);
+            meshAsset->SubMeshes[meshIndex] = InitMesh(mesh, scene);
         }
 
         return meshAsset;

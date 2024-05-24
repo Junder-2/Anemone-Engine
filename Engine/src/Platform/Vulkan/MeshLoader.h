@@ -19,15 +19,15 @@ namespace Vulkan
     class MeshLoader
     {
     public:
-        static MeshAsset LoadMesh(const char* path);
+        static MeshAsset* LoadMesh(const char* path);
 
-        static MeshAsset LoadMesh(const char* path, int flags);
+        static MeshAsset* LoadMesh(const char* path, int flags);
 
     public:
         static Assimp::Importer Importer;
 
     private:
-        static MeshAsset InitScene(const aiScene* scene);
+        static MeshAsset* InitScene(const aiScene* scene);
 
         static Mesh InitMesh(const aiMesh* mesh, const aiScene* scene);
     };

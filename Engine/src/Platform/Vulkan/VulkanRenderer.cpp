@@ -123,15 +123,15 @@ namespace Vulkan
 
         const std::string relativePath = std::string(ASSET_PATH_MESHES).append(modelPath);
 
-        const MeshAsset meshAsset = MeshLoader::LoadMesh(relativePath.c_str());
-        Mesh mesh = meshAsset.SubMeshes[0]; // Use first submesh for now.
+        const MeshAsset* meshAsset = MeshLoader::LoadMesh(relativePath.c_str());
+        Mesh mesh = meshAsset->SubMeshes[0]; // Use first submesh for now.
 
         const VmaMeshBuffers meshBuffers = UploadMesh(mesh.Indices, mesh.Vertices);
 
         VmaMeshAsset vmaMeshAsset;
         vmaMeshAsset.Name = modelPath;
         vmaMeshAsset.NumVertices = (uint32_t)mesh.Indices.size();
-        vmaMeshAsset.SubMeshes = meshAsset.SubMeshes;
+        vmaMeshAsset.SubMeshes = meshAsset->SubMeshes;
         vmaMeshAsset.MeshBuffers = meshBuffers;
 
         _mainDeletionQueue.PushFunction([=]
