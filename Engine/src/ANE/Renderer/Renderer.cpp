@@ -54,6 +54,11 @@ namespace Engine
         return _vulkanRenderer->LoadTexture(texturePath);
     }
 
+    VmaMeshAsset Renderer::GetDefaultMesh()
+    {
+        return _vulkanRenderer->GetDefaultMesh();
+    }
+
     MaterialInstance* Renderer::GetDefaultMaterial()
     {
         return _vulkanRenderer->GetDefaultMaterial();

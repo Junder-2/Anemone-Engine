@@ -96,6 +96,7 @@ namespace Vulkan
         static ImGuiIO* GetImGuiIO() { return _io; }
 
         // Engine defaults.
+        static VmaMeshAsset GetDefaultMesh() { return _cubeMesh; }
         static MaterialInstance* GetDefaultMaterial() { return &_filamentInstance; }
         MaterialInstance* GetDefaultMaterialClone();
 
@@ -265,6 +266,9 @@ namespace Vulkan
         inline static VmaImage _dfgTex;
         inline static VmaImage _cubeMap;
 
+        // Primitives
+        inline static VmaMeshAsset _cubeMesh;
+        inline static VmaMeshAsset _sphereMesh;
         inline static VmaMeshAsset _skyMesh;
 
         inline static VkSampler _samplerLinear;

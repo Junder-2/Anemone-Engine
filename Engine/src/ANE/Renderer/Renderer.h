@@ -22,6 +22,7 @@ namespace Engine
 
         static Vulkan::VmaImage LoadTexture(const std::string& texturePath);
 
+        static VmaMeshAsset GetDefaultMesh();
         static Vulkan::MaterialInstance* GetDefaultMaterial();
         static Vulkan::MaterialInstance* GetDefaultMaterialClone();
 
