@@ -103,7 +103,7 @@ void ContentBrowserPanel::RenderDirectoryContentsBrowserChild()
             {
                 std::string selectedFilePathAsString = listOfSelectedFilePathAsString->at(0);
                 std::filesystem::path selectedDirectory = std::filesystem::path(selectedFilePathAsString);
-                int columns = (int)(ImGui::GetContentRegionAvail().x/(_contentGroupSize.x + 25));
+                int columns = ToInt(ImGui::GetContentRegionAvail().x/(_contentGroupSize.x + 25));
                 ImGui::Columns(columns, NULL, false);
                 for (auto const& dir_entry : std::filesystem::directory_iterator{selectedDirectory})
                 {

@@ -48,7 +48,7 @@ namespace Engine
         _imGuiLayer = ImGuiLayer::Create("ImGuiLayer");
         PushLayer(_imGuiLayer);
 
-        const float width = static_cast<float>(_window->GetWindowWidth()), height = static_cast<float>(_window->GetWindowHeight());
+        const float width = ToFloat(_window->GetWindowWidth()), height = ToFloat(_window->GetWindowHeight());
         API::WINDOW_SIZE = Vector2(width, height);
     }
 
@@ -66,7 +66,7 @@ namespace Engine
             const Uint64 timeStep = timeStamp - _lastTimeStamp;
             _lastTimeStamp = timeStamp;
 
-            const float unscaledDeltaTime = static_cast<float>(timeStep) / static_cast<float>(SDL_GetPerformanceFrequency());
+            const float unscaledDeltaTime = ToFloat(timeStep) / ToFloat(SDL_GetPerformanceFrequency());
             const float deltaTime = unscaledDeltaTime * API::TIME_SCALE;
 
             API::TIME_UNSCALED = currUnscaledTime += unscaledDeltaTime;
@@ -150,12 +150,12 @@ namespace Engine
     {
         if(e.IsMainWindow())
         {
-            const float width = static_cast<float>(e.GetWidth()), height = static_cast<float>(e.GetHeight());
+            const float width = ToFloat(e.GetWidth()), height = ToFloat(e.GetHeight());
             API::WINDOW_SIZE = Vector2(width, height);
         }
         else if(e.IsActiveViewport())
         {
-            const float width = static_cast<float>(e.GetWidth()), height = static_cast<float>(e.GetHeight());
+            const float width = ToFloat(e.GetWidth()), height = ToFloat(e.GetHeight());
             API::VIEWPORT_SIZE = Vector2(width, height);
         }
         //ANE_ELOG_DEBUG("new size {0} ({1}, {2})", e.GetWindowIndex(), e.GetWidth(), e.GetHeight());
@@ -165,12 +165,12 @@ namespace Engine
     {
         if(e.IsMainWindow())
         {
-            const float xPos = static_cast<float>(e.GetX()), yPos = static_cast<float>(e.GetY());
+            const float xPos = ToFloat(e.GetX()), yPos = ToFloat(e.GetY());
             API::WINDOW_POS = Vector2(xPos, yPos);
         }
         else if(e.IsActiveViewport())
         {
-            const float xPos = static_cast<float>(e.GetX()), yPos = static_cast<float>(e.GetY());
+            const float xPos = ToFloat(e.GetX()), yPos = ToFloat(e.GetY());
             API::VIEWPORT_POS = Vector2(xPos, yPos);
         }
         //ANE_ELOG_DEBUG("new pos {0} ({1}, {2})",e.GetWindowIndex(), e.GetX(), e.GetY());
@@ -178,7 +178,7 @@ namespace Engine
 
     void Application::OnWindowStateChange(WindowStateChangeEvent& e)
     {
-        ANE_ELOG_DEBUG("window state change {0}", (int)e.GetState());
+        ANE_ELOG_DEBUG("window state change {0}", ToInt(e.GetState()));
     }
 
     void Application::OnWindowFocusChange(WindowFocusChangeEvent& e)

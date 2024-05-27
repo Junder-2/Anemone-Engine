@@ -3,9 +3,9 @@
 
 namespace Engine
 {
-    typedef uint8_t LogLevelCategories;
+    typedef uint8 LogLevelCategories;
 
-    enum class LogLevelCategory : uint8_t
+    enum class LogLevelCategory : uint8
     {
         None = 0,
         Trace = BIT(0),

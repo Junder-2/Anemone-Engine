@@ -26,7 +26,7 @@ namespace Engine
         EventCategoryMouse = BIT(3),
     } EventCategory;
 
-    typedef enum : uint8_t
+    typedef enum : uint8
     {
         WindowMinimized = 0,
         WindowRestored = 1,

@@ -61,7 +61,7 @@ namespace Engine
         /**
         * Gets the bitfield of the button values (each button is two bits)
         */
-        uint16_t GetRawButtonStates() const
+        MouseButtonStates GetRawButtonStates() const
         {
             return _buttonStates;
         }
@@ -94,7 +94,7 @@ namespace Engine
         /**
         * each button is two bits
         */
-        uint16_t _buttonStates = 0;
+        MouseButtonStates _buttonStates = 0;
     };
 
     /**

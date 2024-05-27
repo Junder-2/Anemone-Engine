@@ -129,7 +129,7 @@ namespace Engine
 
         bool needProcessing = false;
 
-        if(_keyboardInputActions[keyCode]->PopulateInput((float)(press ? TriggerStarted : TriggerStopped), &needProcessing))
+        if(_keyboardInputActions[keyCode]->PopulateInput(ToFloat(press ? TriggerStarted : TriggerStopped), &needProcessing))
         {
             KeyboardKeyEvent keyTriggerEvent(_keyboardInputActions[keyCode]->GetInputValue());
             DispatchEvent(keyTriggerEvent);

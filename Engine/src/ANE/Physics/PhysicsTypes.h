@@ -5,9 +5,9 @@ namespace Engine
 {
     const float MIN_PHYS = FMath::EPSILON;
 
-    typedef uint16_t CollisionLayerMask;
+    typedef uint16 CollisionLayerMask;
 
-    enum class CollisionLayer : uint16_t
+    enum class CollisionLayer : uint16
     {
         All = UINT16_MAX,
         Static = BIT(0),
@@ -29,7 +29,7 @@ namespace Engine
     };
     ENUM_CLASS_OPERATORS(CollisionLayer)
 
-    enum class CollisionLayerPreset : uint16_t
+    enum class CollisionLayerPreset : uint16
     {
         All = CollisionLayer::All,
         Default = CollisionLayer::Static | CollisionLayer::Dynamic | CollisionLayer::Player,

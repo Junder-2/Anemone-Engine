@@ -5,16 +5,16 @@ namespace Engine
 {
     struct Mesh
     {
-        uint32_t NumIndices;
-        uint32_t Material;
-        uint32_t StartOffset;
+        uint NumIndices;
+        uint Material;
+        uint StartOffset;
         std::vector<Vulkan::Vertex> Vertices;
         std::vector<unsigned int> Indices;
     };
 
     struct MeshAsset
     {
-        uint32_t NumVertices;
+        uint NumVertices;
         std::vector<Mesh> SubMeshes;
     };
 
@@ -22,7 +22,7 @@ namespace Engine
     {
         std::string Name;
 
-        uint32_t NumVertices;
+        uint NumVertices;
         std::vector<Mesh> SubMeshes;
         Vulkan::VmaMeshBuffers MeshBuffers;
     };

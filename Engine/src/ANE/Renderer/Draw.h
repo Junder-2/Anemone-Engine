@@ -9,14 +9,14 @@ namespace Engine
     {
         Vulkan::MaterialInstance* Material;
         Matrix4x4 ModelMatrix;
-        uint32_t VertexCount;
+        uint VertexCount;
         Vulkan::VmaMeshBuffers MeshBuffers;
     };
 
     struct DebugDrawCommand
     {
         Matrix4x4 ModelMatrix;
-        uint32_t VertexCount;
+        uint VertexCount;
         Vulkan::VmaMeshBuffers MeshBuffers;
         bool LineList;
     };

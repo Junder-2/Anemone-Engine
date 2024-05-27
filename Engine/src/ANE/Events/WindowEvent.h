@@ -55,23 +55,23 @@ namespace Engine
     class WindowResizeEvent final : public Event
     {
     public:
-        WindowResizeEvent(const uint32_t width, const uint32_t height, const uint32_t windowIndex)
+        WindowResizeEvent(const uint width, const uint height, const uint windowIndex)
             : _width(width), _height(height), _windowIndex(windowIndex) {}
 
         EventType GetEventType() const override { return EventType::WindowResize; }
         int GetEventCategories() const override { return (EventCategoryWindow); }
 
-        uint32_t GetWidth() const { return _width; }
-        uint32_t GetHeight() const { return _height; }
+        uint GetWidth() const { return _width; }
+        uint GetHeight() const { return _height; }
 
-        uint32_t GetWindowIndex() const { return _windowIndex; }
+        uint GetWindowIndex() const { return _windowIndex; }
         bool IsMainWindow() const;
         bool IsActiveViewport() const;
 
     private:
-        uint32_t _width;
-        uint32_t _height;
-        uint32_t _windowIndex;
+        uint _width;
+        uint _height;
+        uint _windowIndex;
     };
 
     /**
@@ -80,22 +80,22 @@ namespace Engine
     class WindowMovedEvent final : public Event
     {
     public:
-        WindowMovedEvent(const uint32_t x, const uint32_t y, const uint32_t windowIndex)
+        WindowMovedEvent(const uint x, const uint y, const uint windowIndex)
             : _xPos(x), _yPos(y), _windowIndex(windowIndex) {}
 
         EventType GetEventType() const override { return EventType::WindowMoved; }
         int GetEventCategories() const override { return (EventCategoryWindow); }
 
-        uint32_t GetX() const { return _xPos; }
-        uint32_t GetY() const { return _yPos; }
+        uint GetX() const { return _xPos; }
+        uint GetY() const { return _yPos; }
 
-        uint32_t GetWindowIndex() const { return _windowIndex; }
+        uint GetWindowIndex() const { return _windowIndex; }
         bool IsMainWindow() const;
         bool IsActiveViewport() const;
 
     private:
-        uint32_t _xPos;
-        uint32_t _yPos;
-        uint32_t _windowIndex;
+        uint _xPos;
+        uint _yPos;
+        uint _windowIndex;
     };
 }

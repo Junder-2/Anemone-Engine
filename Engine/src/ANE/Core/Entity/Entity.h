@@ -33,7 +33,7 @@ namespace Engine
 
         operator bool() const { return _entityHandle != entt::null; }
         operator entt::entity() const { return _entityHandle; }
-        operator uint32_t() const { return static_cast<uint32_t>(_entityHandle); }
+        operator uint() const { return ToUInt(_entityHandle); }
 
         bool operator==(const Entity& other) const
         {
@@ -70,7 +70,7 @@ namespace Engine
             return static_cast<std::optional<std::reference_wrapper<T>>>(GetComponent<T>()).value();
         }
 
-        return _sceneHandle->_registry.emplace<T>(_entityHandle, std::forward<Args>(args)...);;
+        return _sceneHandle->_registry.emplace<T>(_entityHandle, std::forward<Args>(args)...);
     }
 
     /**

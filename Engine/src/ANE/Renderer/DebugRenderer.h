@@ -26,7 +26,7 @@ namespace Engine
         static void PushLine(const Vertex& vertex1, const Vertex& vertex2);
         static void PushTriangle(const Vertex& vertex1, const Vertex& vertex2, const Vertex& vertex3);
 
-        static VmaMeshBuffers UploadDebugMesh(std::span<uint32_t> indices, std::span<Vertex> vertices);
+        static VmaMeshBuffers UploadDebugMesh(std::span<uint> indices, std::span<Vertex> vertices);
         static void FetchDrawCommands(std::vector<DebugDrawCommand>& commands);
     private:
         #ifndef ANE_DIST
