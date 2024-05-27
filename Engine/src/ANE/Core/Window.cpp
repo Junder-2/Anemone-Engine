@@ -42,7 +42,7 @@ namespace Engine
         }
 
         constexpr SDL_WindowFlags windowFlags = static_cast<SDL_WindowFlags>(SDL_WINDOW_VULKAN | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-        const int width = static_cast<int>(_windowData.Width), height = static_cast<int>(_windowData.Height);
+        const int width = ToInt(_windowData.Width), height = ToInt(_windowData.Height);
         _windowContext = SDL_CreateWindow(props.Title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, windowFlags);
         _windowData.Id = SDL_GetWindowID(_windowContext);
 
@@ -124,16 +124,16 @@ namespace Engine
                 {
                     const ViewportProperties viewport = GetActiveViewportProperties();
 
-                    const float viewportWidth = static_cast<float>(viewport.Width);
-                    const float viewportHeight = static_cast<float>(viewport.Height);
+                    const float viewportWidth = ToFloat(viewport.Width);
+                    const float viewportHeight = ToFloat(viewport.Height);
 
                     const Vector2 absolutePos = GetAbsoluteMousePos();
 
                     // Convert mouse coord to relative
-                    const float relX = FMath::Saturate(static_cast<float>(event.motion.x) / viewportWidth);
-                    const float relY = FMath::Saturate(static_cast<float>(event.motion.y) / viewportHeight);
-                    const float relDeltaX = (static_cast<float>(event.motion.xrel) / viewportWidth);
-                    const float relDeltaY = (static_cast<float>(event.motion.yrel) / viewportHeight);
+                    const float relX = FMath::Saturate(ToFloat(event.motion.x) / viewportWidth);
+                    const float relY = FMath::Saturate(ToFloat(event.motion.y) / viewportHeight);
+                    const float relDeltaX = (ToFloat(event.motion.xrel) / viewportWidth);
+                    const float relDeltaY = (ToFloat(event.motion.yrel) / viewportHeight);
 
                     inputHandler->ProcessAbsoluteMouseMovement(absolutePos);
                     inputHandler->ProcessMouseMovement(Vector2(relX, relY), Vector2(relDeltaX, relDeltaY));
@@ -167,8 +167,8 @@ namespace Engine
             int newX, newY;
             SDL_GetMouseState(&newX, &newY);
 
-            const float x = FMath::Saturate(static_cast<float>(newX) / static_cast<float>(viewport.Width));
-            const float y = FMath::Saturate(static_cast<float>(newY) / static_cast<float>(viewport.Height));
+            const float x = FMath::Saturate(ToFloat(newX) / ToFloat(viewport.Width));
+            const float y = FMath::Saturate(ToFloat(newY) / ToFloat(viewport.Height));
 
             inputHandler->ProcessAbsoluteMouseMovement(absolutePos);
             inputHandler->ProcessMouseMovement(Vector2(x, y), 0);
@@ -272,10 +272,10 @@ namespace Engine
 
         int newX, newY;
         SDL_GetMouseState(&newX, &newY);
-        newX += static_cast<int>(_windowData.XPos);
-        newY += static_cast<int>(_windowData.YPos);
-        const float x = FMath::Saturate(static_cast<float>(newX) / static_cast<float>(_windowData.Width));
-        const float y = FMath::Saturate(static_cast<float>(newY) / static_cast<float>(_windowData.Height));
+        newX += ToInt(_windowData.XPos);
+        newY += ToInt(_windowData.YPos);
+        const float x = FMath::Saturate(ToFloat(newX) / ToFloat(_windowData.Width));
+        const float y = FMath::Saturate(ToFloat(newY) / ToFloat(_windowData.Height));
 
         return {x, y};
     }

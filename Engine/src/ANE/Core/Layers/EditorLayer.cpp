@@ -264,7 +264,7 @@ namespace Engine
     template <class EntityType>
     void EditorLayer::EntityWidget(EntityType& e, entt::basic_registry<EntityType>& reg, const bool dropTarget)
     {
-        ImGui::PushID(static_cast<int>(entt::to_integral(e)));
+        ImGui::PushID(ToInt(entt::to_integral(e)));
 
         if (reg.valid(e)) ImGui::Text("ID: %d", entt::to_integral(e));
         else ImGui::Text("Invalid Entity");

@@ -5,7 +5,7 @@ namespace Engine
 {
     bool InputAction::PopulateInput(const float input, bool* needProcessing)
     {
-        if (_inputValue.GetIntValue() == (int)input) return false;
+        if (_inputValue.GetIntValue() == ToInt(input)) return false;
 
         _inputValue = input;
 

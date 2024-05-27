@@ -140,18 +140,18 @@ namespace Engine::AneImGui
     bool LabelInputText(const char* label, char* buf, const size_t bufSize, const ImGuiInputTextFlags flags, const ImGuiInputTextCallback callback, void* userData)
     {
         IM_ASSERT(!(flags & ImGuiInputTextFlags_Multiline)); // call InputTextMultiline()
-        return LabelInputTextEx(label, nullptr, buf, (int)bufSize, ImVec2(0, 0), flags, callback, userData);
+        return LabelInputTextEx(label, nullptr, buf, ToInt(bufSize), ImVec2(0, 0), flags, callback, userData);
     }
 
     bool LabelInputTextMultiline(const char* label, char* buf, const size_t bufSize, const ImVec2& size, const ImGuiInputTextFlags flags, const ImGuiInputTextCallback callback, void* userData)
     {
-        return LabelInputTextEx(label, NULL, buf, (int)bufSize, size, flags | ImGuiInputTextFlags_Multiline, callback, userData);
+        return LabelInputTextEx(label, NULL, buf, ToInt(bufSize), size, flags | ImGuiInputTextFlags_Multiline, callback, userData);
     }
 
     bool LabelInputTextWithHint(const char* label, const char* hint, char* buf, const size_t bufSize, const ImGuiInputTextFlags flags, const ImGuiInputTextCallback callback, void* userData)
     {
         IM_ASSERT(!(flags & ImGuiInputTextFlags_Multiline)); // call InputTextMultiline() or  InputTextEx() manually if you need multi-line + hint.
-        return LabelInputTextEx(label, hint, buf, (int)bufSize, ImVec2(0, 0), flags, callback, userData);
+        return LabelInputTextEx(label, hint, buf, ToInt(bufSize), ImVec2(0, 0), flags, callback, userData);
     }
 
     bool LabelInputTextEx(const char* label, const char* hint, char* buf, const int bufSize, const ImVec2& sizeArg, const ImGuiInputTextFlags flags, const ImGuiInputTextCallback callback, void* userData)

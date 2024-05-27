@@ -126,14 +126,14 @@ namespace Engine
         {
             std::vector<uint> indices;
             indices.resize(_debugLineVertices.size());
-            for (int i = 0; i < static_cast<int>(indices.size()); ++i)
+            for (int i = 0; i < ToInt(indices.size()); ++i)
             {
                 indices[i] = i;
             }
 
             DebugDrawCommand draw;
             draw.ModelMatrix = Matrix4x4::Identity();
-            draw.VertexCount = static_cast<uint>(_debugLineVertices.size());
+            draw.VertexCount = ToUInt(_debugLineVertices.size());
             draw.MeshBuffers = UploadDebugMesh(indices, _debugLineVertices);
             draw.LineList = true;
 
@@ -145,14 +145,14 @@ namespace Engine
         {
             std::vector<uint> indices;
             indices.resize(_debugTriangleVertices.size());
-            for (int i = 0; i < static_cast<int>(indices.size()); ++i)
+            for (int i = 0; i < ToInt(indices.size()); ++i)
             {
                 indices[i] = i;
             }
 
             DebugDrawCommand draw;
             draw.ModelMatrix = Matrix4x4::Identity();
-            draw.VertexCount = static_cast<uint>(_debugTriangleVertices.size());
+            draw.VertexCount = ToUInt(_debugTriangleVertices.size());
             draw.MeshBuffers = UploadDebugMesh(indices, _debugTriangleVertices);
             draw.LineList = false;
 

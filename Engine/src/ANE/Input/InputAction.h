@@ -34,7 +34,7 @@ namespace Engine
         */
         int GetIntValue() const
         {
-            return static_cast<int>(_value);
+            return ToInt(_value);
         }
 
         /**

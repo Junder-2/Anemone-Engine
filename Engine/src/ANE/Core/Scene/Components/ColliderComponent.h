@@ -40,7 +40,7 @@ namespace Engine
         }
 
         Collider* GetCollider(int index = 0) const;
-        int GetColliderCount() const { return static_cast<int>(_data.Colliders.size()); }
+        int GetColliderCount() const { return ToInt(_data.Colliders.size()); }
 
         static void RegisterComponentMetaData()
         {

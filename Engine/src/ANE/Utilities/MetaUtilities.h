@@ -200,7 +200,7 @@ namespace Engine
         bool propertyWritten = false;
 
         bool isActive = rb->IsActive();
-        int bodyType = static_cast<int>(rb->GetBodyType());
+        int bodyType = ToInt(rb->GetBodyType());
         bool isGravity = rb->IsGravityEnabled();
         bool isAutoMass = rb->IsAutoMass();
         bool isAutoCenterOfMass = rb->IsAutoCenterOfMass();

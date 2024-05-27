@@ -40,7 +40,7 @@ namespace Engine
         uint XPos = 0;
         uint YPos = 0;
 
-        Vector2 GetCenter() const { return {(float)Width * 0.5f + (float)XPos, (float)Height * 0.5f + (float)YPos}; }
+        Vector2 GetCenter() const { return {ToFloat(Width) * 0.5f + ToFloat(XPos), ToFloat(Height) * 0.5f + ToFloat(YPos)}; }
 
         ViewportProperties& operator=(const WindowProperties& props)
         {
