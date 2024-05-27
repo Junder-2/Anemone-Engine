@@ -259,7 +259,7 @@ namespace Engine
         if(_hasAwokenBodies) return;
 
         // Dirty fix for a bug that crashes when a sleeping body tries to collide
-        for (uint32_t i = 0; i < _world->getNbRigidBodies(); ++i)
+        for (uint i = 0; i < _world->getNbRigidBodies(); ++i)
         {
             _world->getRigidBody(i)->setIsSleeping(false);
         }
@@ -374,7 +374,7 @@ namespace Engine
         _isDebugRendering = enable;
         _world->setIsDebugRenderingEnabled(_isDebugRendering);
 
-        for (uint32_t i = 0; i < _world->getNbRigidBodies(); ++i)
+        for (uint i = 0; i < _world->getNbRigidBodies(); ++i)
         {
             _world->getRigidBody(i)->setIsDebugEnabled(_isDebugRendering);
         }

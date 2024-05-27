@@ -197,8 +197,8 @@ namespace Engine
             {
                 if(!isMainWindow) return;
 
-                const uint32_t newX = static_cast<uint32_t>(windowEvent.data1);
-                const uint32_t newY = static_cast<uint32_t>(windowEvent.data2);
+                const uint newX = ToUInt(windowEvent.data1);
+                const uint newY = ToUInt(windowEvent.data2);
                 if(_windowData.Width == newX && _windowData.Height == newY) break;
 
                 _windowData.Width = newX;
@@ -225,8 +225,8 @@ namespace Engine
             {
                 if(!isMainWindow) return;
 
-                const uint32_t newX = static_cast<uint32_t>(windowEvent.data1);
-                const uint32_t newY = static_cast<uint32_t>(windowEvent.data2);
+                const uint newX = ToUInt(windowEvent.data1);
+                const uint newY = ToUInt(windowEvent.data2);
                 if(_windowData.XPos == newX && _windowData.YPos == newY) break;
 
                 _windowData.XPos = newX;
@@ -311,12 +311,12 @@ namespace Engine
         }
 
         const ImGuiWindow* imGuiWindow = ImGui::FindWindowByID(_activeViewportId);
-        const uint32_t width = static_cast<uint32_t>(FMath::Max(imGuiWindow->ContentSize.x, 1.f)), height = static_cast<uint32_t>(FMath::Max(imGuiWindow->ContentSize.y, 1.f));
-        const uint32_t xPos = static_cast<uint32_t>(imGuiWindow->Pos.x), yPos = static_cast<uint32_t>(imGuiWindow->Pos.y);
+        const uint width = ToUInt(FMath::Max(imGuiWindow->ContentSize.x, 1.f)), height = ToUInt(FMath::Max(imGuiWindow->ContentSize.y, 1.f));
+        const uint xPos = ToUInt(imGuiWindow->Pos.x), yPos = ToUInt(imGuiWindow->Pos.y);
         return ViewportProperties(_activeViewportId, width, height, xPos, yPos);
     }
 
-    void Window::SetActiveViewport(const uint32_t id)
+    void Window::SetActiveViewport(const uint id)
     {
         ANE_PROFILE_FUNCTION();
 
@@ -328,7 +328,7 @@ namespace Engine
         ProcessViewportEvents(_previousViewportProperties);
     }
 
-    void Window::AddViewport(uint32_t id)
+    void Window::AddViewport(uint id)
     {
         ANE_PROFILE_FUNCTION();
 
@@ -337,7 +337,7 @@ namespace Engine
         _viewports.emplace(id);
     }
 
-    void Window::RemoveViewport(const uint32_t id)
+    void Window::RemoveViewport(const uint id)
     {
         ANE_PROFILE_FUNCTION();
 

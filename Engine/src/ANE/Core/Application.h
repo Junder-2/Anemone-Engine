@@ -61,7 +61,7 @@ namespace Engine
 
         static Application* _appInstance;
 
-        uint64_t _lastTimeStamp;
+        uint64 _lastTimeStamp;
         LayerStack _layerStack;
         ImGuiLayer* _imGuiLayer;
     };

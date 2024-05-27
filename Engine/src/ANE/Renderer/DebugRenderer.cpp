@@ -112,7 +112,7 @@ namespace Engine
         #endif
     }
 
-    VmaMeshBuffers DebugRenderer::UploadDebugMesh(const std::span<uint32_t> indices, const std::span<Vertex> vertices)
+    VmaMeshBuffers DebugRenderer::UploadDebugMesh(const std::span<uint> indices, const std::span<Vertex> vertices)
     {
         return VulkanRenderer::UploadRawMesh(indices, vertices);
     }
@@ -124,7 +124,7 @@ namespace Engine
         #ifndef ANE_DIST
         if(!_debugLineVertices.empty())
         {
-            std::vector<uint32_t> indices;
+            std::vector<uint> indices;
             indices.resize(_debugLineVertices.size());
             for (int i = 0; i < static_cast<int>(indices.size()); ++i)
             {
@@ -133,7 +133,7 @@ namespace Engine
 
             DebugDrawCommand draw;
             draw.ModelMatrix = Matrix4x4::Identity();
-            draw.VertexCount = static_cast<uint32_t>(_debugLineVertices.size());
+            draw.VertexCount = static_cast<uint>(_debugLineVertices.size());
             draw.MeshBuffers = UploadDebugMesh(indices, _debugLineVertices);
             draw.LineList = true;
 
@@ -143,7 +143,7 @@ namespace Engine
         }
         if(!_debugTriangleVertices.empty())
         {
-            std::vector<uint32_t> indices;
+            std::vector<uint> indices;
             indices.resize(_debugTriangleVertices.size());
             for (int i = 0; i < static_cast<int>(indices.size()); ++i)
             {
@@ -152,7 +152,7 @@ namespace Engine
 
             DebugDrawCommand draw;
             draw.ModelMatrix = Matrix4x4::Identity();
-            draw.VertexCount = static_cast<uint32_t>(_debugTriangleVertices.size());
+            draw.VertexCount = static_cast<uint>(_debugTriangleVertices.size());
             draw.MeshBuffers = UploadDebugMesh(indices, _debugTriangleVertices);
             draw.LineList = false;
 

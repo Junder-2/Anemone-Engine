@@ -8,7 +8,7 @@ namespace Engine
     /**
     * Type of input source, used to determine the derived class
     */
-    typedef enum : uint8_t
+    typedef enum : uint8
     {
         InputDeviceUndefined,
         InputDeviceKeyboard,
@@ -19,7 +19,7 @@ namespace Engine
     /**
     * Type of input value, used to determine the derived class
     */
-    typedef enum : uint8_t
+    typedef enum : uint8
     {
         InputTypeBoolean,
         InputTypeTrigger,
@@ -62,6 +62,8 @@ namespace Engine
         bool Sign;
     };
 
+    using MouseButtonStates = uint16;
+
     /**
     * The mouse button index
     */
@@ -91,23 +93,23 @@ namespace Engine
     /**
     * Converts mouse button index to corresponding mask
     */
-    inline MouseButtonMask GetMouseButtonMaskFromMouseButton(const int button)
+    inline MouseButtonMask GetMouseButtonMaskFromMouseButton(const int buttonIndex)
     {
-        return static_cast<MouseButtonMask>(TWO_BIT_MASK(button));
+        return static_cast<MouseButtonMask>(TWO_BIT_MASK(buttonIndex));
     }
 
     /**
     * Extracts the trigger value from a combined mouse button value
     */
-    inline TriggerState GetTriggerStateFromMouseButtonState(const uint16_t state, const int button)
+    inline TriggerState GetTriggerStateFromMouseButtonState(const MouseButtonStates state, const int buttonIndex)
     {
-        return static_cast<TriggerState>((state & TWO_BIT_MASK(button)) >> 2*button);
+        return static_cast<TriggerState>((state & TWO_BIT_MASK(buttonIndex)) >> 2*buttonIndex);
     }
 
     /**
     * Converts a trigger value to the corresponding combined value
     */
-    inline uint16_t GetMouseButtonStateFromMouseButton(const TriggerState state, const int button)
+    inline uint16 GetMouseButtonStateFromMouseButton(const TriggerState state, const int button)
     {
         return state << button*2;
     }

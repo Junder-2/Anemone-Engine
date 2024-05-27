@@ -3,7 +3,7 @@
 
 namespace Engine::ColorUtilities
 {
-    inline Vector3 HexToRGB(const uint32_t value)
+    inline Vector3 HexToRGB(const uint value)
     {
         return{
             ((value & 0xff0000) >> 16) / 255.f,

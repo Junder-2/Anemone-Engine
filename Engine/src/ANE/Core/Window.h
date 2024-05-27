@@ -13,16 +13,16 @@ namespace Engine
     struct WindowProperties
     {
         std::string Title;
-        uint32_t Width;
-        uint32_t Height;
+        uint Width;
+        uint Height;
 
-        uint32_t XPos;
-        uint32_t YPos;
+        uint XPos;
+        uint YPos;
 
-        uint32_t Id = 0;
+        uint Id = 0;
         bool VSync;
 
-        WindowProperties(const std::string& title = "ANE Engine", const uint32_t width = 900, const uint32_t height = 500, const bool vSync = true) :
+        WindowProperties(const std::string& title = "ANE Engine", const uint width = 900, const uint height = 500, const bool vSync = true) :
             Title(title), Width(width), Height(height), XPos(0), YPos(0), VSync(vSync) {}
     };
 
@@ -30,15 +30,15 @@ namespace Engine
     struct ViewportProperties
     {
         ViewportProperties() = default;
-        ViewportProperties(const uint32_t id, const uint32_t width, const uint32_t height, const uint32_t xPos = 0, const uint32_t yPos = 0) : Id(id),  Width(width), Height(height), XPos(xPos), YPos(yPos) {}
+        ViewportProperties(const uint id, const uint width, const uint height, const uint xPos = 0, const uint yPos = 0) : Id(id),  Width(width), Height(height), XPos(xPos), YPos(yPos) {}
 
-        uint32_t Id = 0;
+        uint Id = 0;
 
-        uint32_t Width = 0;
-        uint32_t Height = 0;
+        uint Width = 0;
+        uint Height = 0;
 
-        uint32_t XPos = 0;
-        uint32_t YPos = 0;
+        uint XPos = 0;
+        uint YPos = 0;
 
         Vector2 GetCenter() const { return {(float)Width * 0.5f + (float)XPos, (float)Height * 0.5f + (float)YPos}; }
 
@@ -66,9 +66,9 @@ namespace Engine
         void OnUpdate(float deltaTime);
         void SetVSync(bool enabled);
 
-        void SetActiveViewport(uint32_t id);
-        void AddViewport(uint32_t id);
-        void RemoveViewport(uint32_t id);
+        void SetActiveViewport(uint id);
+        void AddViewport(uint id);
+        void RemoveViewport(uint id);
 
         static void SetMouseVisibility(bool enable);
         static bool IsMouseVisible();
@@ -79,13 +79,13 @@ namespace Engine
         bool ImGuiHasFocus() const { return _imGuiHasFocus; }
 
         bool IsVSync() const { return  _windowData.VSync; }
-        uint32_t GetWindowWidth() const { return _windowData.Width; }
-        uint32_t GetWindowHeight() const { return _windowData.Height; }
+        uint GetWindowWidth() const { return _windowData.Width; }
+        uint GetWindowHeight() const { return _windowData.Height; }
         WindowProperties GetWindowProperties() const { return _windowData; }
         SDL_Window* GetWindowContext() const { return _windowContext; }
 
         ViewportProperties GetActiveViewportProperties() const;
-        uint32_t GetViewportId() const { return _activeViewportId; }
+        uint GetViewportId() const { return _activeViewportId; }
         bool IsViewportMainWindow() const { return _activeViewportId == _windowData.Id; }
         bool IsOverViewport() const;
 
@@ -105,9 +105,9 @@ namespace Engine
         SDL_Window* _windowContext;
         WindowProperties _windowData;
 
-        uint32_t _activeViewportId = 0;
-        uint32_t _previousViewportId = 0;
-        entt::dense_set<uint32_t> _viewports;
+        uint _activeViewportId = 0;
+        uint _previousViewportId = 0;
+        entt::dense_set<uint> _viewports;
         ViewportProperties _previousViewportProperties {};
 
         SinglecastDelegate<void(Event&)> _eventDelegate;

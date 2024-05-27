@@ -6,8 +6,8 @@ namespace Engine
     struct Vector3;
     struct Quaternion;
 
-    typedef uint8_t RigidBodyFlags;
-    enum class RigidBodyFlag : uint8_t
+    typedef uint8 RigidBodyFlags;
+    enum class RigidBodyFlag : uint8
     {
         None = 0,
         AutoMass = BIT(0),

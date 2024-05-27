@@ -35,7 +35,7 @@ namespace Engine
         */
         void RegisterKeyboardKey(int keyCode);
 
-        void PopulateKeyStates(const uint8_t* newKeyStates);
+        void PopulateKeyStates(const uint8* newKeyStates);
         void ProcessKey(int keyCode, bool press);
         void ProcessMouseMovement(Vector2 pos, Vector2 delta);
         void ProcessAbsoluteMouseMovement(Vector2 pos);

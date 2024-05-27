@@ -5,9 +5,9 @@
 
 namespace Engine
 {
-    typedef uint8_t TransformDirtyFlags;
+    typedef uint8 TransformDirtyFlags;
 
-    typedef enum : uint8_t
+    typedef enum : uint8
     {
         DirtyPosition = BIT(0),
         DirtyRotation = BIT(1),

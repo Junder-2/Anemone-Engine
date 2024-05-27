@@ -15,7 +15,7 @@ namespace Engine
     {
         PhysicsSystem& physics = GetPhysicsSystem();
 
-        for (uint32_t i = 0; i < callbackData.getNbContactPairs(); ++i)
+        for (uint i = 0; i < callbackData.getNbContactPairs(); ++i)
         {
             ContactPair contactPair = callbackData.getContactPair(i);
             reactphysics3d::Entity entity = contactPair.getBody1()->getEntity();
@@ -29,7 +29,7 @@ namespace Engine
             data.Collider = physics._reactCollider[contactPair.getCollider2()->getEntity()];
 
             data.Contacts.resize(contactPair.getNbContactPoints());
-            for (uint32_t contact = 0; contact < contactPair.getNbContactPoints(); ++contact)
+            for (uint contact = 0; contact < contactPair.getNbContactPoints(); ++contact)
             {
                 auto contactPoint = contactPair.getContactPoint(contact);
                 data.Contacts[contact].Normal = Vector3::Convert(-contactPoint.getWorldNormal());
@@ -45,7 +45,7 @@ namespace Engine
     {
         PhysicsSystem& physics = GetPhysicsSystem();
 
-        for (uint32_t i = 0; i < callbackData.getNbOverlappingPairs(); ++i)
+        for (uint i = 0; i < callbackData.getNbOverlappingPairs(); ++i)
         {
             rp3d::OverlapCallback::OverlapPair contactPair = callbackData.getOverlappingPair(i);
             rp3d::Entity entity = contactPair.getBody1()->getEntity();

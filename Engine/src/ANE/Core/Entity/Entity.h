@@ -33,7 +33,7 @@ namespace Engine
 
         operator bool() const { return _entityHandle != entt::null; }
         operator entt::entity() const { return _entityHandle; }
-        operator uint32_t() const { return static_cast<uint32_t>(_entityHandle); }
+        operator uint() const { return static_cast<uint>(_entityHandle); }
 
         bool operator==(const Entity& other) const
         {
