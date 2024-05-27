@@ -49,9 +49,9 @@ namespace Engine
     inline int ToInt(auto value) { return SCast<int>(value); }
     /** Shortened static_cast<uint> */
     inline uint ToUInt(auto value) { return SCast<uint>(value); }
-    /** Shortened static_cast<int> */
+    /** Shortened static_cast<int64> */
     inline int64 ToInt64(auto value) { return SCast<int64>(value); }
-    /** Shortened static_cast<uint> */
+    /** Shortened static_cast<uint64> */
     inline uint64 ToUInt64(auto value) { return SCast<uint64>(value); }
 }
 
