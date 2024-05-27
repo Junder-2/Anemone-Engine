@@ -24,35 +24,25 @@ namespace Engine
     using uint = unsigned int;
     using uint64 = unsigned long long;
 
-    /** Shortened static_cast */
-    template<typename TargetType>
-    inline extern TargetType SCast(auto source) { return static_cast<TargetType>(source); }
-    /** Shortened reinterpret_cast */
-    template<typename TargetType>
-    inline TargetType RCast(auto source) { return reinterpret_cast<TargetType>(source); }
-    /** Shortened dynamic_cast */
-    template<typename TargetType>
-    inline TargetType Cast(auto source) { return dynamic_cast<TargetType>(source); }
-
     /** Shortened static_cast<float> */
-    inline float ToFloat(auto value) { return SCast<float>(value); }
+    inline float ToFloat(auto value) { return static_cast<float>(value); }
 
     /** Shortened static_cast<int8> */
-    inline int8 ToInt8(auto value) { return SCast<int8>(value); }
+    inline int8 ToInt8(auto value) { return static_cast<int8>(value); }
     /** Shortened static_cast<uint8> */
-    inline uint8 ToUInt8(auto value) { return SCast<uint8>(value); }
+    inline uint8 ToUInt8(auto value) { return static_cast<uint8>(value); }
     /** Shortened static_cast<int16> */
-    inline int16 ToInt16(auto value) { return SCast<int16>(value); }
+    inline int16 ToInt16(auto value) { return static_cast<int16>(value); }
     /** Shortened static_cast<uint16> */
-    inline uint16 ToUInt16(auto value) { return SCast<uint16>(value); }
+    inline uint16 ToUInt16(auto value) { return static_cast<uint16>(value); }
     /** Shortened static_cast<int> */
-    inline int ToInt(auto value) { return SCast<int>(value); }
+    inline int ToInt(auto value) { return static_cast<int>(value); }
     /** Shortened static_cast<uint> */
-    inline uint ToUInt(auto value) { return SCast<uint>(value); }
+    inline uint ToUInt(auto value) { return static_cast<uint>(value); }
     /** Shortened static_cast<int64> */
-    inline int64 ToInt64(auto value) { return SCast<int64>(value); }
+    inline int64 ToInt64(auto value) { return static_cast<int64>(value); }
     /** Shortened static_cast<uint64> */
-    inline uint64 ToUInt64(auto value) { return SCast<uint64>(value); }
+    inline uint64 ToUInt64(auto value) { return static_cast<uint64>(value); }
 }
 
 #include "ANE/Core/Log/Logging.h"
