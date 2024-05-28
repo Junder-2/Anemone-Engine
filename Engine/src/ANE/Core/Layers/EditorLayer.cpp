@@ -26,6 +26,7 @@
 #include "Panels/MainMenuPanel.h"
 #include "Panels/UIUpdateWrapper.h"
 #include "Panels/ViewportPanel.h"
+#include <ImGuizmo.h>
 
 namespace Engine
 {

@@ -1,6 +1,7 @@
 #include "anepch.h"
 #include "AneImGui.h"
 
+#include "Gizmo.h"
 #include "imgui_internal.h"
 #include "ANE/Math/FMath.h"
 
@@ -13,6 +14,7 @@ namespace Engine::AneImGui
         _aneImGui = new AneImGuiContext();
         EndItem();
         if(ImGui::GetCurrentContext() == nullptr) ImGui::CreateContext();
+        if(Gizmos::GetContext() == nullptr) Gizmos::Initialize();
 
         return _aneImGui;
     }
@@ -25,6 +27,7 @@ namespace Engine::AneImGui
     void Cleanup()
     {
         delete _aneImGui;
+        Gizmos::Cleanup();
         ImGui::DestroyContext();
     }
 

@@ -9,7 +9,10 @@
 #include "ANE/Math/Types/Matrix4x4.h"
 #include "Mesh.h"
 #include "Draw.h"
+#include "ANE/Core/Application.h"
+#include "ANE/Core/Window.h"
 #include "ANE/Events/Event.h"
+#include <ImGuizmo.h>
 
 namespace Engine
 {
@@ -79,6 +82,11 @@ namespace Engine
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
+        ImGuizmo::BeginFrame();
+
+        ImGuizmo::SetOrthographic(false);
+        const ViewportProperties viewportRect = Application::Get().GetWindow().GetActiveViewportProperties();
+        ImGuizmo::SetRect(ToFloat(viewportRect.XPos), ToFloat(viewportRect.YPos), ToFloat(viewportRect.Width), ToFloat(viewportRect.Height));
     }
 
     void Renderer::EndUIDataBuffer()
