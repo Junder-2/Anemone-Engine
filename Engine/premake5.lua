@@ -19,6 +19,9 @@ project "Engine"
         "vendor/imgui/backends/imgui_impl_sdl2.cpp",
         "vendor/imgui/backends/imgui_impl_vulkan.cpp",
         "vendor/VMA/include/vk_mem_alloc.h",
+
+        "vendor/ImGuizmo/**.h",
+        "vendor/ImGuizmo/**.cpp",
     }
 
 
@@ -30,6 +33,7 @@ project "Engine"
         "%{IncludeDir.SDL2}",
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.ImGui}/backends",
+        "%{IncludeDir.ImGuizmo}",
         "%{IncludeDir.GLM}",
         "%{IncludeDir.entt}",
         "%{IncludeDir.toml}",
@@ -60,7 +64,7 @@ project "Engine"
         "reactphysics3d",
     }
 
-    filter "files:vendor/imgui/backends/**.cpp or files:vendor/imgui/backends/**.h"
+    filter "files:vendor/imgui/backends/**.cpp or files:vendor/imgui/backends/**.h or files:vendor/ImGuizmo/**.cpp"
         flags { "NoPCH" }
 
     filter "system:windows"

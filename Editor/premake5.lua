@@ -22,6 +22,7 @@ project "Editor"
         "%{IncludeDir.SDL2}",
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.ImGui}/backends",
+        "%{IncludeDir.ImGuizmo}",
         "%{IncludeDir.GLM}",
         "%{IncludeDir.VulkanSDK}",
         "%{IncludeDir.entt}",
