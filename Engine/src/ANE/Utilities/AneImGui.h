@@ -3,7 +3,7 @@
 
 namespace Engine::AneImGui
 {
-    struct AneImGuiContext
+    struct AneImGuiContext // TODO replace pushing methods with one similar to ImGui
     {
         float NextTableFieldWidth;
         ImGuiTableFlags NextTableDecoratorFlags;
