@@ -645,6 +645,7 @@ namespace IMGUIZMO_NAMESPACE
       ScaleLineCircleSize        = 6.0f;
       HatchedAxisLineThickness   = 6.0f;
       CenterCircleSize           = 6.0f;
+      CenterCircleThickness      = 3.0f;
 
       // initialize default colors
       Colors[DIRECTION_X]           = ImVec4(0.666f, 0.000f, 0.000f, 1.000f);
@@ -927,6 +928,8 @@ namespace IMGUIZMO_NAMESPACE
    {
       ImGuiContext& g = *ImGui::GetCurrentContext();
       ImGuiWindow* window = ImGui::FindWindowByName(gContext.mDrawList->_OwnerName);
+      if (g.HoveredWindow == NULL)     // no window hovered
+         return false;
       if (g.HoveredWindow == window)   // Mouse hovering drawlist window
          return true;
       if (g.HoveredWindow != NULL)     // Any other window is hovered
@@ -1386,14 +1389,14 @@ namespace IMGUIZMO_NAMESPACE
                {
                   ImU32 scaleLineColor = GetColorU32(SCALE_LINE);
                   drawList->AddLine(baseSSpace, worldDirSSpaceNoScale, scaleLineColor, gContext.mStyle.ScaleLineThickness);
-                  drawList->AddCircleFilled(worldDirSSpaceNoScale, gContext.mStyle.ScaleLineCircleSize, scaleLineColor);
+                  drawList->AddCircleFilled(worldDirSSpaceNoScale, gContext.mStyle.ScaleLineCircleSize, scaleLineColor, 4);
                }
 
                if (!hasTranslateOnAxis || gContext.mbUsing)
                {
                   drawList->AddLine(baseSSpace, worldDirSSpace, colors[i + 1], gContext.mStyle.ScaleLineThickness);
                }
-               drawList->AddCircleFilled(worldDirSSpace, gContext.mStyle.ScaleLineCircleSize, colors[i + 1]);
+               drawList->AddCircleFilled(worldDirSSpace, gContext.mStyle.ScaleLineCircleSize, colors[i + 1], 4);
 
                if (gContext.mAxisFactor[i] < 0.f)
                {
@@ -1404,7 +1407,7 @@ namespace IMGUIZMO_NAMESPACE
       }
 
       // draw screen cirle
-      drawList->AddCircleFilled(gContext.mScreenSquareCenter, gContext.mStyle.CenterCircleSize, colors[0], 32);
+      drawList->AddCircleFilled(gContext.mScreenSquareCenter, gContext.mStyle.CenterCircleSize, colors[0], 4);
 
       if (gContext.mbUsing && (gContext.mActualID == -1 || gContext.mActualID == gContext.mEditingID) && IsScaleType(type))
       {
@@ -1483,13 +1486,13 @@ namespace IMGUIZMO_NAMESPACE
                }
                */
 #endif
-               drawList->AddCircleFilled(worldDirSSpace, 12.f, colors[i + 1]);
+               drawList->AddCircleFilled(worldDirSSpace, gContext.mStyle.ScaleLineCircleSize, colors[i + 1], 4);
             }
          }
       }
 
       // draw screen cirle
-      drawList->AddCircle(gContext.mScreenSquareCenter, 20.f, colors[0], 32, gContext.mStyle.CenterCircleSize);
+      drawList->AddCircle(gContext.mScreenSquareCenter, gContext.mStyle.CenterCircleSize + gContext.mStyle.CenterCircleThickness/2.f + 15.f, colors[0], 4, gContext.mStyle.CenterCircleThickness);
 
       if (gContext.mbUsing && (gContext.mActualID == -1 || gContext.mActualID == gContext.mEditingID) && IsScaleType(type))
       {
@@ -1932,7 +1935,9 @@ namespace IMGUIZMO_NAMESPACE
 
       vec_t deltaScreen = { io.MousePos.x - gContext.mScreenSquareCenter.x, io.MousePos.y - gContext.mScreenSquareCenter.y, 0.f, 0.f };
       float dist = deltaScreen.Length();
-      if (Contains(op, SCALEU) && dist >= 17.0f && dist < 23.0f)
+      float ringRadius = gContext.mStyle.CenterCircleSize + gContext.mStyle.CenterCircleThickness/2.f + 15.f;
+      float circleHalfThickness = gContext.mStyle.CenterCircleThickness/2.f;
+      if (Contains(op, SCALEU) && dist >= ringRadius - circleHalfThickness - 3.f && dist < ringRadius + circleHalfThickness + 3.f)
       {
          type = MT_SCALE_XYZ;
       }
@@ -2502,7 +2507,7 @@ namespace IMGUIZMO_NAMESPACE
      gContext.mPlaneLimit = value;
    }
 
-   bool Manipulate(const float* view, const float* projection, OPERATION operation, MODE mode, float* matrix, float* deltaMatrix, const float* snap, const float* localBounds, const float* boundsSnap)
+   bool Manipulate(const float* view, const float* projection, OPERATION operation, MODE mode, float* matrix, float* deltaMatrix, const float* snap, const float* rotationSnap, const float* localBounds, const float* boundsSnap)
    {
       // Scale is always local or matrix will be skewed when applying world scale or oriented matrix
       ComputeContext(view, projection, matrix, (operation & SCALE) ? LOCAL : mode);
@@ -2516,7 +2521,7 @@ namespace IMGUIZMO_NAMESPACE
       // behind camera
       vec_t camSpacePosition;
       camSpacePosition.TransformPoint(makeVect(0.f, 0.f, 0.f), gContext.mMVP);
-      if (!gContext.mIsOrthographic && camSpacePosition.z < 0.001f && !gContext.mbUsing)
+      if (!gContext.mIsOrthographic && camSpacePosition.w < 0.001f && !gContext.mbUsing)
       {
          return false;
       }
@@ -2530,7 +2535,7 @@ namespace IMGUIZMO_NAMESPACE
          {
             manipulated = HandleTranslation(matrix, deltaMatrix, operation, type, snap) ||
                           HandleScale(matrix, deltaMatrix, operation, type, snap) ||
-                          HandleRotation(matrix, deltaMatrix, operation, type, snap);
+                          HandleRotation(matrix, deltaMatrix, operation, type, rotationSnap);
          }
       }
 
