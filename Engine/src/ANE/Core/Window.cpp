@@ -312,7 +312,7 @@ namespace Engine
 
         const ImGuiWindow* imGuiWindow = ImGui::FindWindowByID(_activeViewportId);
         const uint width = ToUInt(FMath::Max(imGuiWindow->ContentSize.x, 1.f)), height = ToUInt(FMath::Max(imGuiWindow->ContentSize.y, 1.f));
-        const uint xPos = ToUInt(imGuiWindow->Pos.x), yPos = ToUInt(imGuiWindow->Pos.y);
+        const uint xPos = ToUInt(imGuiWindow->ContentRegionRect.Min.x), yPos = ToUInt(imGuiWindow->ContentRegionRect.Min.y);
         return ViewportProperties(_activeViewportId, width, height, xPos, yPos);
     }
 
