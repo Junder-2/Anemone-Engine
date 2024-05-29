@@ -77,25 +77,31 @@ namespace Engine
     {
         if (ImGui::BeginMenu("Transform"))
         {
-            const char* spaceOptions[2] { "World", "Local" };
-            int currentSpace = _transformSpace;
-
-            if (AneImGui::LabelCombo("Space", &currentSpace, spaceOptions, 2))
             {
-                _transformSpace = static_cast<ImGuizmo::MODE>(currentSpace);
+                const char* spaceOptions[2] { "World", "Local" };
+
+                if (AneImGui::LabelCombo("Space", &_currentTransformSpaceOption, spaceOptions, 2))
+                {
+                    switch (_currentTransformSpaceOption)
+                    {
+                        case 0: SetCurrentTransformSpace(ImGuizmo::WORLD); break;
+                        case 1: SetCurrentTransformSpace(ImGuizmo::LOCAL); break;
+                    }
+                }
             }
 
-            const char* operationOptions[4] { "All", "Translate", "Rotate", "Scale" };
-            int currentOperation = _transformOperation;
-
-            if (AneImGui::LabelCombo("Operation", &currentOperation, operationOptions, 4))
             {
-                switch (currentOperation)
+                const char* operationOptions[4] { "All", "Translate", "Rotate", "Scale" };
+
+                if (AneImGui::LabelCombo("Operation", &_currentTransformOperation, operationOptions, 4))
                 {
-                    case 0: _transformOperation = ImGuizmo::UNIVERSAL; break;
-                    case 1: _transformOperation = ImGuizmo::TRANSLATE; break;
-                    case 2: _transformOperation = ImGuizmo::ROTATE; break;
-                    case 3: _transformOperation = ImGuizmo::SCALE; break;
+                    switch (_currentTransformOperation)
+                    {
+                        case 0: SetCurrentTransformOperation(ImGuizmo::UNIVERSAL); break;
+                        case 1: SetCurrentTransformOperation(ImGuizmo::TRANSLATE); break;
+                        case 2: SetCurrentTransformOperation(ImGuizmo::ROTATE); break;
+                        case 3: SetCurrentTransformOperation(ImGuizmo::SCALE); break;
+                    }
                 }
             }
 
@@ -182,11 +188,11 @@ namespace Engine
         const EditorInputSystem& input = GetEditorInputSystem();
 
         if (input.GetKeyTriggerState(KeyCodeT) == TriggerStarted)
-            _transformOperation = _transformOperation == ImGuizmo::TRANSLATE ? ImGuizmo::UNIVERSAL : ImGuizmo::TRANSLATE;
+            SetCurrentTransformOperation(_transformOperation == ImGuizmo::TRANSLATE ? ImGuizmo::UNIVERSAL : ImGuizmo::TRANSLATE);
         if (input.GetKeyTriggerState(KeyCodeE) == TriggerStarted)
-            _transformOperation = _transformOperation == ImGuizmo::ROTATE ? ImGuizmo::UNIVERSAL : ImGuizmo::ROTATE;
+            SetCurrentTransformOperation(_transformOperation == ImGuizmo::ROTATE ? ImGuizmo::UNIVERSAL : ImGuizmo::ROTATE);
         if (input.GetKeyTriggerState(KeyCodeR) == TriggerStarted)
-            _transformOperation = _transformOperation == ImGuizmo::SCALE ? ImGuizmo::UNIVERSAL : ImGuizmo::SCALE;
+            SetCurrentTransformOperation(_transformOperation == ImGuizmo::SCALE ? ImGuizmo::UNIVERSAL : ImGuizmo::SCALE);
 
         if(input.GetKeyTriggerState(KeyCodeLShift) == TriggerStarted)
             _useSnap = !_useSnap;
@@ -199,11 +205,38 @@ namespace Engine
             Gizmos::PushTransformSpace(_transformSpace);
             Gizmos::PushTransformOperation(_transformOperation);
             Gizmos::PushUseSnap(_useSnap);
-            Gizmos::PushSnapValue(_transformOperation == ImGuizmo::ROTATE ? _snapRotationValues : _snapValues);
+            Gizmos::PushSnapValue(_snapValues);
+            Gizmos::PushRotationSnapValue(_snapRotationValues);
 
             Gizmos::TransformHandle(&selectedEntity.GetComponent<TransformComponent>().Transform);
 
             Gizmos::PopStyle();
+        }
+    }
+
+    void ViewportPanel::SetCurrentTransformSpace(const ImGuizmo::MODE mode)
+    {
+        _transformSpace = mode;
+
+        _currentTransformSpaceOption = 0;
+        switch (_transformSpace)
+        {
+            case ImGuizmo::WORLD: _currentTransformSpaceOption = 0; break;
+            case ImGuizmo::LOCAL: _currentTransformSpaceOption = 1; break;
+        }
+    }
+
+    void ViewportPanel::SetCurrentTransformOperation(const ImGuizmo::OPERATION operation)
+    {
+        _transformOperation = operation;
+
+        _currentTransformOperation = 0;
+        switch (_transformOperation)
+        {
+            case ImGuizmo::UNIVERSAL: _currentTransformOperation = 0; break;
+            case ImGuizmo::TRANSLATE: _currentTransformOperation = 1; break;
+            case ImGuizmo::ROTATE: _currentTransformOperation = 2; break;
+            case ImGuizmo::SCALE: _currentTransformOperation = 3; break;
         }
     }
 }
