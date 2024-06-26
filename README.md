@@ -5,8 +5,22 @@
 </picture>
 
 # Anemone Engine [![License: Apache 2.0][Apache 2 Badge]](https://github.com/Junder-2/Anemone-Engine/blob/main/LICENSE)
-Anemone Engine is a basic 3D Game Engine we are making as our graduation project.
-The main goals with the Anemone Engine is to use Vulkan for rendering and to create a platformer prototype.
+Anemone is a custom game engine built as the graduation project for Futuregames' Programmer course.
+It is designed to support scripting, cross platform rendering, an ECs, and 3D physics and scene management all without requiring a user to write any code.
+
+# Features
+
+## Performant by Default 
+the Anemone Engine has a base game object that is automatically an entity in an ECS. This reduces cache inefficency caused by iterating over hundreds of Game Objects that 
+typical OOP design produces without sacrificing the legibility of the codebase.
+## UI Exposed Variables
+The engine uses the EnTT meta system and the Dear ImGui Library together to provide auto binding of exposed class variables in the inspector. 
+Most primitive types and some custom types are already supported and more can easily be added.
+## Cross platform Rendering
+This C++ engine uses Vulkan, SDL2 and Dear ImGui for its rendering  and input needs.
+## Scripting and Physics
+The anemone engine supports adding scripts as distinct components and can fully simulate physics and scripts in viewport.
+
 # Contributors
 
 * [Petter](https://github.com/Junder-2)
