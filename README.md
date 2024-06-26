@@ -7,7 +7,9 @@
 # Anemone Engine [![License: Apache 2.0][Apache 2 Badge]](https://github.com/Junder-2/Anemone-Engine/blob/main/LICENSE)
 Anemone Engine is a basic 3D Game Engine we are making as our graduation project.
 The main goals with the Anemone Engine is to use Vulkan for rendering and to create a platformer prototype.
+# Contributors
 
+* [Petter](https://libsdl.org/) [(https://github.com/libsdl-org/SDL/blob/main/LICENSE.txt](https://github.com/Junder-2))
 ## Libraries
 * [SDL2](https://libsdl.org/) [![License: Zlib][Zlib Badge]](https://github.com/libsdl-org/SDL/blob/main/LICENSE.txt)
 * [Dear ImGui](https://github.com/ocornut/imgui) [![License: MIT][MIT Badge]](https://github.com/ocornut/imgui/blob/master/LICENSE.txt)
