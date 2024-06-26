@@ -10,6 +10,9 @@ The main goals with the Anemone Engine is to use Vulkan for rendering and to cre
 # Contributors
 
 * [Petter](https://github.com/Junder-2)
+* [Nestor](https://github.com/Nestorboy)
+* [Gustav Carlsberg](https://github.com/Litene)
+* [Kyle Sinclair](https://github.com/Kyle-Sinclair?tab=repositories)
 ## Libraries
 * [SDL2](https://libsdl.org/) [![License: Zlib][Zlib Badge]](https://github.com/libsdl-org/SDL/blob/main/LICENSE.txt)
 * [Dear ImGui](https://github.com/ocornut/imgui) [![License: MIT][MIT Badge]](https://github.com/ocornut/imgui/blob/master/LICENSE.txt)
