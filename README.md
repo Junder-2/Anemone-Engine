@@ -6,12 +6,12 @@
 
 # Anemone Engine [![License: Apache 2.0][Apache 2 Badge]](https://github.com/Junder-2/Anemone-Engine/blob/main/LICENSE)
 Anemone is a custom game engine built as the graduation project for Futuregames' Programmer course.
-It is designed to support scripting, cross platform rendering, an ECs, and 3D physics and scene management all without requiring a user to write any code.
+It is designed to support scripting, cross platform rendering, an ECS, and 3D physics and scene management all without requiring a user to write any code.
 
 # Features
 
 ## Performant by Default 
-the Anemone Engine has a base game object that is automatically an entity in an ECS. This reduces cache inefficency caused by iterating over hundreds of Game Objects that 
+The Anemone Engine has a base game object that is automatically an entity in an ECS. This reduces cache inefficency caused by iterating over hundreds of Game Objects that 
 typical OOP design produces without sacrificing the legibility of the codebase.
 ## UI Exposed Variables
 The engine uses the EnTT meta system and the Dear ImGui Library together to provide auto binding of exposed class variables in the inspector. 
