@@ -7,7 +7,12 @@
 # Anemone Engine [![License: Apache 2.0][Apache 2 Badge]](https://github.com/Junder-2/Anemone-Engine/blob/main/LICENSE)
 Anemone is a custom game engine built as the graduation project for Futuregames' Programmer course.
 It is designed to support scripting, cross platform rendering, an ECS, and 3D physics and scene management all without requiring a user to write any code.
+# Contributors
 
+* [Petter](https://github.com/Junder-2)
+* [Nestor](https://github.com/Nestorboy)
+* [Gustav Carlsberg](https://github.com/Litene)
+* [Kyle Sinclair](https://github.com/Kyle-Sinclair?tab=repositories)
 # Features
 
 ## Performant by Default 
@@ -21,12 +26,7 @@ This C++ engine uses Vulkan, SDL2 and Dear ImGui for its rendering  and input ne
 ## Scripting and Physics
 The anemone engine supports adding scripts as distinct components and can fully simulate physics and scripts in viewport.
 
-# Contributors
 
-* [Petter](https://github.com/Junder-2)
-* [Nestor](https://github.com/Nestorboy)
-* [Gustav Carlsberg](https://github.com/Litene)
-* [Kyle Sinclair](https://github.com/Kyle-Sinclair?tab=repositories)
 ## Libraries
 * [SDL2](https://libsdl.org/) [![License: Zlib][Zlib Badge]](https://github.com/libsdl-org/SDL/blob/main/LICENSE.txt)
 * [Dear ImGui](https://github.com/ocornut/imgui) [![License: MIT][MIT Badge]](https://github.com/ocornut/imgui/blob/master/LICENSE.txt)
