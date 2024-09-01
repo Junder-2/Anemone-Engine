@@ -11,7 +11,7 @@ It is designed to support scripting, cross platform rendering, an ECS, and 3D ph
 
 * [Petter](https://github.com/Junder-2)
 * [Nestor](https://github.com/Nestorboy)
-* [Gustav Carlsberg](https://github.com/Litene)
+* [Gustav Carlberg](https://github.com/Litene)
 * [Kyle Sinclair](https://github.com/Kyle-Sinclair?tab=repositories)
 # Features
 
