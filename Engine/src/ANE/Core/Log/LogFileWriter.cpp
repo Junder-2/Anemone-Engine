@@ -2,6 +2,8 @@
 #include "LogFileWriter.h"
 #include <filesystem>
 #include <string>
+
+#include "LogMessage.h"
 #include "ANE/Utilities/LoggingUtilities.h"
 
 namespace Engine
@@ -34,25 +36,16 @@ namespace Engine
         }
     }
 
-    std::string LogFileWriter::ConstructMessage(LogMessage& msg)
+    std::string LogFileWriter::ConstructMessage(const LogMessage& msg)
     {
         ANE_DEEP_PROFILE_FUNCTION();
 
-        std::string messageBuilder;
-        const std::string levelName = LoggingUtilities::ToString(msg.LevelCategory);
-
-        messageBuilder.append(std::format("[{0} {1}", msg.LoggerName, levelName));
-
-        messageBuilder.append(std::format(" {0}] ", msg.Time));
-
-        messageBuilder.append(std::format("[{0}] ", msg.Source));
-
-        messageBuilder.append(msg.Message);
+        std::string messageBuilder = msg.ConstructMessage(true, true, true, true);
 
         return messageBuilder;
     }
 
-    void LogFileWriter::WriteToFile(LogMessage& msg)
+    void LogFileWriter::WriteToFile(const LogMessage& msg)
     {
         ANE_DEEP_PROFILE_FUNCTION();
 

@@ -2,6 +2,7 @@
 #include "Logging.h"
 
 #include "LogFileWriter.h"
+#include "LogMessage.h"
 #include "LogSink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 
@@ -15,9 +16,9 @@ namespace Engine
     const std::string SOURCE_PATTERN = "%s:%#";
     const std::string TIME_PATTERN = "%T";
 
-    static spdlog::pattern_formatter LoggerNameFormatter(LOGGER_NAME_PATTERN);
-    static spdlog::pattern_formatter SourceFormatter(SOURCE_PATTERN);
-    static spdlog::pattern_formatter TimeFormatter(TIME_PATTERN);
+    spdlog::pattern_formatter Logging::LoggerNameFormatter {LOGGER_NAME_PATTERN};
+    spdlog::pattern_formatter Logging::SourceFormatter {SOURCE_PATTERN};
+    spdlog::pattern_formatter Logging::TimeFormatter {TIME_PATTERN};
 
     LogFileWriter Logging::_writer {};
 
@@ -75,6 +76,21 @@ namespace Engine
         return _registeredLoggers;
     }
 
+    const std::string& Logging::GetRegisteredLoggerName(const LoggerIndex loggerId)
+    {
+        if (loggerId >= _registeredLoggers.size()) return "unknown";
+        return _registeredLoggers[loggerId];
+    }
+
+    LoggerIndex Logging::GetRegisteredLoggerIndex(std::string const& name)
+    {
+        if (const auto it = std::ranges::find(_registeredLoggers, name); it != _registeredLoggers.cend())
+        {
+            return std::distance(_registeredLoggers.begin(), it);
+        }
+        return 0;
+    }
+
     const std::list<LogMessage>& Logging::GetMessages()
     {
         return _logMessages;
@@ -94,40 +110,7 @@ namespace Engine
             _logMessages.pop_back();
         }
 
-        LogMessage newLogMessage;
-
-        LoggerNameFormatter.format(logMsg, newLogMessage.LoggerName);
-        newLogMessage.LoggerName.erase(newLogMessage.LoggerName.length()-2); //spdlog appends linebreaks
-
-        TimeFormatter.format(logMsg, newLogMessage.Time);
-        newLogMessage.Time.erase(newLogMessage.Time.length()-2);
-
-        SourceFormatter.format(logMsg, newLogMessage.Source);
-        newLogMessage.Source.erase(newLogMessage.Source.length()-2);
-
-        newLogMessage.Message = logMsg.payload;
-        switch (logMsg.level)
-        {
-            case spdlog::level::trace:
-                newLogMessage.LevelCategory = LogLevelCategory::Trace;
-            break;
-            case spdlog::level::debug:
-                newLogMessage.LevelCategory = LogLevelCategory::Debug;
-            break;
-            case spdlog::level::info:
-                newLogMessage.LevelCategory = LogLevelCategory::Info;
-            break;
-            case spdlog::level::warn:
-                newLogMessage.LevelCategory = LogLevelCategory::Warn;
-            break;
-            case spdlog::level::err:
-            case spdlog::level::critical:
-                newLogMessage.LevelCategory = LogLevelCategory::Error;
-            break;
-            default:
-                newLogMessage.LevelCategory = LogLevelCategory::None;
-            break;
-        }
+        LogMessage newLogMessage(logMsg);
 
         _writer.WriteToFile(newLogMessage);
 

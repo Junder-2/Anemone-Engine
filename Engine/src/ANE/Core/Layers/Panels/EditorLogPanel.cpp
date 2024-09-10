@@ -4,8 +4,8 @@
 #include <ranges>
 #include "imgui.h"
 #include "imgui_internal.h"
-#include "ANE/Utilities/LoggingUtilities.h"
 #include "ANE/Core/Layers/EditorLayer.h"
+#include "ANE/Core/Log/LogMessage.h"
 #include "ANE/Input/EditorInputSystem.h"
 #include "ANE/Input/Input.h"
 #include "ANE/Math/FMath.h"
@@ -23,13 +23,8 @@ namespace Engine
     {
         _levelFilter = EnumCast(LogLevelCategory::Error | LogLevelCategory::Warn | LogLevelCategory::Info | LogLevelCategory::Debug | LogLevelCategory::Trace);
 
-        for (const auto& loggerName : Logging::GetRegisteredLoggerNames())
-        {
-            if(!_loggerNameFilter.contains(loggerName))
-            {
-                _loggerNameFilter.insert_or_assign(loggerName, true);
-            }
-        }
+        _loggerIdFilter.clear();
+
         _editorLayer = layer;
 
         GetEditorInputSystem().BindMouseScroll(MakeDelegate(this, &EditorLogPanel::OnScroll));
@@ -45,6 +40,11 @@ namespace Engine
 
         if(ImGui::Begin("Log Window", &open))
         {
+            if(_loggerIdFilter.empty()) // Makes sure loggerfilter is populated
+            {
+                ResizeLoggerFilter();
+            }
+
             DrawToolBar();
 
             ImGui::Separator();
@@ -59,7 +59,7 @@ namespace Engine
             for (const LogMessage& logMessage : logMessages | std::views::reverse)
             {
                 if(logMessage.LevelCategory == LogLevelCategory::None) continue;
-                if(!_loggerNameFilter[logMessage.LoggerName]) continue;
+                if(!_loggerIdFilter[logMessage.LoggerNameIndex]) continue;
                 if(!(EnumCast(logMessage.LevelCategory) & _levelFilter)) continue;
 
                 DrawLogMessage(logMessage, messageIndex);
@@ -121,14 +121,12 @@ namespace Engine
 
         ImGui::MenuItem("Loggers filter", nullptr, false, false);
 
-        for (const auto& loggerName : Logging::GetRegisteredLoggerNames())
+        const auto loggerNames = Logging::GetRegisteredLoggerNames();
+
+        for (int i = 0; i < loggerNames.size(); ++i)
         {
-            if(!_loggerNameFilter.contains(loggerName))
-            {
-                _loggerNameFilter.insert_or_assign(loggerName, true);
-            }
-            bool* isActive = &_loggerNameFilter[loggerName];
-            ImGui::Checkbox(loggerName.c_str(), isActive);
+            bool* isActive = reinterpret_cast<bool*>(&_loggerIdFilter[i]); // vector<bool> is encoded is such a way that it cant be referenced
+            ImGui::Checkbox(loggerNames[i].c_str(), isActive);
         }
     }
 
@@ -152,7 +150,7 @@ namespace Engine
             ImGui::PushTextWrapPos(0);
         }
 
-        ImVec4 currentColor = colorError;
+        Vector4 currentColor = colorError;
 
         switch (logMessage.LevelCategory)
         {
@@ -171,42 +169,7 @@ namespace Engine
                 break;
         }
 
-        const std::string levelName = LoggingUtilities::ToString(logMessage.LevelCategory);
-
-        // Right now using append, from searches ostream is slower?
-        std::string fullMessage;
-        if(_displayLoggerName && _displayLevel)
-        {
-            fullMessage.append(std::format("[{0} {1}", logMessage.LoggerName, levelName));
-        }
-        else if(_displayLoggerName)
-        {
-            fullMessage.append(std::format("[{0}", logMessage.LoggerName));
-        }
-        else if(_displayLevel)
-        {
-            fullMessage.append(std::format("[{0}", levelName));
-        }
-
-        if(_displayTime && (_displayLevel || _displayLoggerName))
-        {
-            fullMessage.append(std::format(" {0}] ", logMessage.Time));
-        }
-        else if(_displayTime)
-        {
-            fullMessage.append(std::format("[{0}] ", logMessage.Time));
-        }
-        else if((_displayLevel || _displayLoggerName))
-        {
-            fullMessage.append("] ");
-        }
-
-        if(_displaySource)
-        {
-            fullMessage.append(std::format("[{0}] ", logMessage.Source));
-        }
-
-        fullMessage.append(logMessage.Message);
+        std::string fullMessage = logMessage.ConstructMessage(_displayLoggerName, _displayLevel, _displayTime, _displaySource);
 
         ImGui::TextColored(currentColor, "%s", fullMessage.c_str());
 
@@ -234,7 +197,7 @@ namespace Engine
 
         if (ImGui::IsItemHovered())
         {
-            ImGui::SetTooltip("%s", logMessage.Source.c_str());
+            ImGui::SetTooltip("%s", logMessage.RetrieveSource().c_str());
         }
     }
 
@@ -250,8 +213,18 @@ namespace Engine
 
         if (ImGui::BeginPopup("LoggerNamesPopup"))
         {
+            if (!_loggerNameFilterOpen) // To only update when opening initially
+            {
+                ResizeLoggerFilter();
+                _loggerNameFilterOpen = true;
+            }
+
             ShowLoggerNamePopup();
             ImGui::EndPopup();
+        }
+        else
+        {
+            _loggerNameFilterOpen = false;
         }
 
         ImGui::SameLine();
@@ -318,5 +291,15 @@ namespace Engine
         if(!ImGui::IsMouseHoveringRect(ImVec2(_panelRect.X, _panelRect.Y), ImVec2(_panelRect.Z, _panelRect.W), false)) return;
 
         _autoScroll = false;
+    }
+
+    void EditorLogPanel::ResizeLoggerFilter()
+    {
+        const auto loggerNames = Logging::GetRegisteredLoggerNames();
+
+        if (loggerNames.size() > _loggerIdFilter.size())
+        {
+            _loggerIdFilter.resize(loggerNames.size(), true);
+        }
     }
 }

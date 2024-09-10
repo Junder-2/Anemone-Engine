@@ -7,6 +7,7 @@
 #pragma warning(push, 0)
 #include <spdlog/spdlog.h>
 #include "LoggingTypes.h"
+#include "LogMessage.h"
 #pragma warning(pop)
 
 //todo: write a custom sink for logfilewriter so that you can get a full stacktrace
@@ -43,6 +44,16 @@ namespace Engine
         static const std::vector<std::string>& GetRegisteredLoggerNames();
 
         /**
+        * Returns a name of registered logger by index
+        */
+        static const std::string& GetRegisteredLoggerName(LoggerIndex loggerId);
+
+        /**
+        * Returns a name of registered loggers index by name
+        */
+        static LoggerIndex GetRegisteredLoggerIndex(std::string const& name);
+
+        /**
         * Returns a list of unformatted logging messages
         */
         static const std::list<LogMessage>& GetMessages();
@@ -54,6 +65,11 @@ namespace Engine
     private:
         static std::shared_ptr<spdlog::logger> CreateLogger(const std::string& loggerName);
         static void OnSink(const log_msg& logMsg);
+
+    public:
+        static spdlog::pattern_formatter LoggerNameFormatter;
+        static spdlog::pattern_formatter SourceFormatter;
+        static spdlog::pattern_formatter TimeFormatter;
 
     private:
         inline static std::list<LogMessage> _logMessages{100};
