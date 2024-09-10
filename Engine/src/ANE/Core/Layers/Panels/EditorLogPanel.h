@@ -32,6 +32,7 @@ namespace Engine
 
     private:
         void OnScroll(Vector2 delta);
+        void ResizeLoggerFilter();
 
     private:
         static const Vector4 colorTrace;
@@ -40,7 +41,9 @@ namespace Engine
         static const Vector4 colorError;
 
         LogLevelCategories _levelFilter;
-        entt::dense_map<std::string, bool> _loggerNameFilter;
+        std::vector<uint8> _loggerIdFilter; // vector<bool> cant be used with imgui
+
+        bool _loggerNameFilterOpen;
 
         bool _wrap = true;
         bool _autoScroll = true;

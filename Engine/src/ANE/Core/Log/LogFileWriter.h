@@ -10,11 +10,11 @@ namespace Engine
     {
     public:
         void GetOldestFile(std::filesystem::path& oldestFile) const;
-        void WriteToFile(LogMessage& msg);
+        void WriteToFile(const LogMessage& msg);
 
     private:
         [[nodiscard("Return value not used.")]] int DirectoryCount() const;
-        [[nodiscard("Return value not used.")]] static std::string ConstructMessage(LogMessage& msg);
+        [[nodiscard("Return value not used.")]] static std::string ConstructMessage(const LogMessage& msg);
 
         std::ofstream _outputFile;
         std::string _fileName;

@@ -4,6 +4,7 @@
 namespace Engine
 {
     typedef uint8 LogLevelCategories;
+    typedef uint16 LoggerIndex;
 
     enum class LogLevelCategory : uint8
     {
@@ -15,14 +16,4 @@ namespace Engine
         Error = BIT(4)
     };
     ENUM_CLASS_OPERATORS(LogLevelCategory);
-
-    //log_msg
-    struct LogMessage
-    {
-        std::string Time;
-        std::string Source;
-        std::string LoggerName;
-        LogLevelCategory LevelCategory;
-        std::string Message;
-    };
 }

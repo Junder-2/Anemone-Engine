@@ -16,5 +16,10 @@ namespace Engine
                 default: return "Unknown";
             }
         }
+
+        inline std::string ToLoggerName(const LoggerIndex loggerNameIndex)
+        {
+            return Logging::GetRegisteredLoggerName(loggerNameIndex);
+        }
     }
 }
