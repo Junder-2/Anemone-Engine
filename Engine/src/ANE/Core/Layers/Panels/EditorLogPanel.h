@@ -41,7 +41,7 @@ namespace Engine
         static const Vector4 colorError;
 
         LogLevelCategories _levelFilter;
-        std::vector<uint8> _loggerIdFilter; // vector<bool> cant be used with imgui
+        std::vector<bool> _loggerIdFilter;
 
         bool _loggerNameFilterOpen;
 

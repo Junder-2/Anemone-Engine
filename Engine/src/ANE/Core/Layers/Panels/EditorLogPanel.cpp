@@ -125,8 +125,9 @@ namespace Engine
 
         for (int i = 0; i < loggerNames.size(); ++i)
         {
-            bool* isActive = reinterpret_cast<bool*>(&_loggerIdFilter[i]); // vector<bool> is encoded is such a way that it cant be referenced
-            ImGui::Checkbox(loggerNames[i].c_str(), isActive);
+            bool isActive = _loggerIdFilter[i]; // Needs an intermediary bool. vector<bool> is encoded is such a way that it cant be directly referenced
+            ImGui::Checkbox(loggerNames[i].c_str(), &isActive);
+            _loggerIdFilter[i] = isActive;
         }
     }
 
