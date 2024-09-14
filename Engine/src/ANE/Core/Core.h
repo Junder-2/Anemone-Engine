@@ -48,6 +48,8 @@ namespace Engine
 #include "ANE/Core/Log/Logging.h"
 #include "ANE/Core/Assert.h"
 
+#include "ANE/Math/MathCore.h"
+
 #include "ANE/Debug/Instrumentation.h"
 
 typedef enum

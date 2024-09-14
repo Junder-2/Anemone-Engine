@@ -90,7 +90,7 @@ namespace Engine
 
         constexpr float lookSpeed = (180.f * FMath::DEGREES_TO_RAD);
         const float newPitch = _pitchRadians + lookSpeed * delta.Y;
-        _pitchRadians = FMath::MirrorClamp(newPitch, FMath::Half_PI);
+        _pitchRadians = FMath::MirrorClamp(newPitch, FMath::HALF_PI);
         _yawRadians += lookSpeed * delta.X;
         _transformComponent->Transform.SetRotation(Vector3{_pitchRadians, _yawRadians, 0});
     }

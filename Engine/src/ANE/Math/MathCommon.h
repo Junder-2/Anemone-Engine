@@ -4,16 +4,23 @@
 
 namespace Engine::FMath
 {
-    const float EPSILON = std::numeric_limits<float>::epsilon();
+    template<FloatingType T = float>
+    const T EPSILON = std::numeric_limits<T>::epsilon();
 
-    const float TAU = glm::tau<float>();
-    const float PI = glm::pi<float>();
-    const float Half_PI = glm::half_pi<float>();
+    template<FloatingType T = float>
+    const T TAU = glm::tau<T>();
+    template<FloatingType T = float>
+    const T PI = glm::pi<T>();
+    template<FloatingType T = float>
+    const T HALF_PI = glm::half_pi<float>();
 
-    const float RAD_TO_DEGREES = (180.f/PI);
-    const float DEGREES_TO_RAD = (PI / 180.f);
+    template<FloatingType T = float>
+    const T RAD_TO_DEGREES = (T(180)/PI<T>);
+    template<FloatingType T = float>
+    const T DEGREES_TO_RAD = (PI<T> / T(180));
 
-    inline bool Equal(const float a, const float b, const float epsilon = EPSILON)
+    template<FloatingType T = float>
+    bool Equal(const T a, const T b, const T epsilon = EPSILON<T>)
     {
         return (std::abs(a - b) < epsilon);
     }
