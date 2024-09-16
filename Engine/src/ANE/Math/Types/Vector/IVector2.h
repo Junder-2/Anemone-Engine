@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ANE/Math/Types/Swizzle.h"
 #include "TVector2.h"
 
 namespace Engine::MathTypes
@@ -11,28 +10,33 @@ namespace Engine::MathTypes
         union { T X, Width; };
         union { T Y, Height; };
 
-        GEN_SWIZZLE_VEC2(T, X, Y)
         GEN_VECTOR2(T)
 
-        static TVector ConvertFloor(TVector const& vec);
-        static TVector ConvertRound(TVector const& vec);
-        static TVector ConvertCeil(TVector const& vec);
+        template <NumericType U>
+        static TVector ConvertFloor(TVector<2, U> const& vec);
+        template <NumericType U>
+        static TVector ConvertRound(TVector<2, U> const& vec);
+        template <NumericType U>
+        static TVector ConvertCeil(TVector<2, U> const& vec);
     };
 
     template <IntegerType T>
-    TVector<2, T> TVector<2, T>::ConvertFloor(TVector const& vec)
+    template <NumericType U>
+    TVector<2, T> TVector<2, T>::ConvertFloor(TVector<2, U> const& vec)
     {
         return {static_cast<T>(std::floor(vec.X)), static_cast<T>(std::floor(vec.Y))};
     }
 
     template <IntegerType T>
-    TVector<2, T> TVector<2, T>::ConvertRound(TVector const& vec)
+    template <NumericType U>
+    TVector<2, T> TVector<2, T>::ConvertRound(TVector<2, U> const& vec)
     {
         return {static_cast<T>(std::round(vec.X)), static_cast<T>(std::round(vec.Y))};
     }
 
     template <IntegerType T>
-    TVector<2, T> TVector<2, T>::ConvertCeil(TVector const& vec)
+    template <NumericType U>
+    TVector<2, T> TVector<2, T>::ConvertCeil(TVector<2, U> const& vec)
     {
         return {static_cast<T>(std::ceil(vec.X)), static_cast<T>(std::ceil(vec.Y))};
     }

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ANE/Math/Types/Swizzle.h"
 #include "TVector2.h"
 
 namespace Engine::MathTypes
@@ -11,7 +10,6 @@ namespace Engine::MathTypes
         union { T X, Pitch, Width; };
         union { T Y, Yaw, Height; };
 
-        GEN_SWIZZLE_VEC2(T, X, Y)
         GEN_VECTOR2(T)
 
         void Normalize();

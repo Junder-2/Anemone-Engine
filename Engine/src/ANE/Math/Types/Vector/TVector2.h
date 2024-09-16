@@ -6,18 +6,22 @@
 #include <reactphysics3d/mathematics/Vector2.h>
 #include <imgui.h>
 
+#include "ANE/Math/Types/Swizzle.h"
+
 // General template for TVector
 
-// template<NumericType T>
-// struct TVector<2, T>
-// {
-//     union { T X, Pitch, Width; };
-//     union { T Y, Yaw, Height; };
-//
-//     struct Swizzle
-//     {
-//         GEN_SWIZZLE_VEC2(T, X, Y)
-//     } Swizzle;
+namespace Engine::MathTypes
+{
+    template <NumericType T>
+    struct SwizzleAB
+    {
+        T X, Y;
+
+        SwizzleAB(T a, T b) : X(a), Y(b) {}
+
+        GEN_SWIZZLE_VEC2(T, X, Y)
+    };
+}
 
 
 #define GEN_VECTOR2(T)                                                                                                  \
@@ -34,6 +38,11 @@
     static std::string ToString(const TVector& vec)                                                                     \
     {                                                                                                                   \
         return vec.ToString;                                                                                            \
+    }                                                                                                                   \
+                                                                                                                        \
+    SwizzleAB<T> Swizzle() const                                                                                        \
+    {                                                                                                                   \
+        return SwizzleAB<T>(X, Y);                                                                                      \
     }                                                                                                                   \
                                                                                                                         \
     static const TVector zeroVector {0, 0};                                                                             \
