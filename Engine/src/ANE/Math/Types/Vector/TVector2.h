@@ -32,7 +32,7 @@ namespace Engine::MathTypes
                                                                                                                         \
     std::string ToString() const                                                                                        \
     {                                                                                                                   \
-        return std::format("Vector2({}, {})", std::to_string(X), std::to_string(Y));                                    \
+        return std::format("Vector2({}, {})", X, Y);                                                                    \
     }                                                                                                                   \
                                                                                                                         \
     static std::string ToString(const TVector& vec)                                                                     \
@@ -77,11 +77,11 @@ namespace Engine::MathTypes
                                                                                                                         \
     TVector() : X(0), Y(0) {}                                                                                           \
     TVector(TVector const& v) : X(v.X), Y(v.Y) {}                                                                       \
-    template<NumericType A>                                                                                             \
-    TVector(TVector<2, A> const& v) : X(static_cast<T>(v.X)), Y(static_cast<T>(v.Y)) {}                                 \
-                                                                                                                        \
     TVector(T scalar) : X(scalar), Y(scalar) {}                                                                         \
     TVector(T x, T y) : X(x), Y(y) {}                                                                                   \
+                                                                                                                        \
+    template<NumericType U>                                                                                             \
+    TVector(TVector<2, U> const& v) : X(static_cast<T>(v.X)), Y(static_cast<T>(v.Y)) {}                                 \
                                                                                                                         \
     template<NumericType A, NumericType B>                                                                              \
     TVector(A x, B y) : X(static_cast<T>(x)), Y(static_cast<T>(y)) {}                                                   \
@@ -139,6 +139,11 @@ namespace Engine::MathTypes
         return !(*this == other);                                                                                       \
     }                                                                                                                   \
                                                                                                                         \
+    bool operator<(const TVector& other) const                                                                          \
+    {                                                                                                                   \
+        return (X == other.X ? Y < other.Y : X < other.X);                                                              \
+    }                                                                                                                   \
+                                                                                                                        \
     template<NumericType U>                                                                                             \
     TVector& operator=(TVector<2, U> const& v)                                                                          \
     {                                                                                                                   \
@@ -155,75 +160,66 @@ namespace Engine::MathTypes
         return *this;                                                                                                   \
     }                                                                                                                   \
                                                                                                                         \
-    template<NumericType U>                                                                                             \
-    TVector& operator+=(U scalar)                                                                                       \
+    TVector& operator+=(T scalar)                                                                                       \
     {                                                                                                                   \
-        X += static_cast<T>(scalar);                                                                                    \
-        Y += static_cast<T>(scalar);                                                                                    \
+        X += scalar;                                                                                                    \
+        Y += scalar;                                                                                                    \
         return *this;                                                                                                   \
     }                                                                                                                   \
                                                                                                                         \
-    template<NumericType U>                                                                                             \
-    TVector& operator+=(TVector<2, U> const& v)                                                                         \
+    TVector& operator+=(TVector const& v)                                                                               \
     {                                                                                                                   \
-        X += static_cast<T>(v.X);                                                                                       \
-        Y += static_cast<T>(v.Y);                                                                                       \
+        X += v.X;                                                                                                       \
+        Y += v.Y;                                                                                                       \
         return *this;                                                                                                   \
     }                                                                                                                   \
                                                                                                                         \
-    template<NumericType U>                                                                                             \
-    TVector& operator-=(U scalar)                                                                                       \
+    TVector& operator-=(T scalar)                                                                                       \
     {                                                                                                                   \
-        X -= static_cast<T>(scalar);                                                                                    \
-        Y -= static_cast<T>(scalar);                                                                                    \
+        X -= scalar;                                                                                                    \
+        Y -= scalar;                                                                                                    \
         return *this;                                                                                                   \
     }                                                                                                                   \
                                                                                                                         \
-    template<NumericType U>                                                                                             \
-    TVector& operator-=(TVector<2, U> const& v)                                                                         \
+    TVector& operator-=(TVector const& v)                                                                               \
     {                                                                                                                   \
-        X -= static_cast<T>(v.X);                                                                                       \
-        Y -= static_cast<T>(v.Y);                                                                                       \
+        X -= v.X;                                                                                                       \
+        Y -= v.Y;                                                                                                       \
         return *this;                                                                                                   \
     }                                                                                                                   \
                                                                                                                         \
-    template<NumericType U>                                                                                             \
-    TVector& operator*=(U scalar)                                                                                       \
+    TVector& operator*=(T scalar)                                                                                       \
     {                                                                                                                   \
-        X *= static_cast<T>(scalar);                                                                                    \
-        Y *= static_cast<T>(scalar);                                                                                    \
+        X *= scalar;                                                                                                    \
+        Y *= scalar;                                                                                                    \
         return *this;                                                                                                   \
     }                                                                                                                   \
                                                                                                                         \
-    template<NumericType U>                                                                                             \
-    TVector& operator*=(TVector<2, U> const& v)                                                                         \
+    TVector& operator*=(TVector const& v)                                                                               \
     {                                                                                                                   \
-        X *= static_cast<T>(v.X);                                                                                       \
-        Y *= static_cast<T>(v.Y);                                                                                       \
+        X *= v.X;                                                                                                       \
+        Y *= v.Y;                                                                                                       \
         return *this;                                                                                                   \
     }                                                                                                                   \
                                                                                                                         \
-    template<NumericType U>                                                                                             \
-    TVector& operator/=(U scalar)                                                                                       \
+    TVector& operator/=(T scalar)                                                                                       \
     {                                                                                                                   \
         ANE_EASSERT(abs(scalar) >= FMath::EPSILON);                                                                     \
-        X /= static_cast<T>(scalar);                                                                                    \
-        Y /= static_cast<T>(scalar);                                                                                    \
+        X /= scalar;                                                                                                    \
+        Y /= scalar;                                                                                                    \
         return *this;                                                                                                   \
     }                                                                                                                   \
                                                                                                                         \
-    template<NumericType U>                                                                                             \
-    TVector& operator/=(TVector<2, U> const& v)                                                                         \
+    TVector& operator/=(TVector const& v)                                                                               \
     {                                                                                                                   \
         ANE_EASSERT(abs(v.X) >= FMath::EPSILON);                                                                        \
         ANE_EASSERT(abs(v.Y) >= FMath::EPSILON);                                                                        \
-        X /= static_cast<T>(v.X);                                                                                       \
-        Y /= static_cast<T>(v.Y);                                                                                       \
+        X /= v.X;                                                                                                       \
+        Y /= v.Y;                                                                                                       \
         return *this;                                                                                                   \
     }                                                                                                                   \
                                                                                                                         \
-    template<NumericType U>                                                                                             \
-    friend TVector operator-(TVector<2, U> const& v)                                                                    \
+    friend TVector operator-(TVector const& v)                                                                          \
     {                                                                                                                   \
         return {-v.X, -v.Y};                                                                                            \
     }                                                                                                                   \
@@ -275,45 +271,13 @@ namespace Engine::MathTypes
                                                                                                                         \
     friend TVector operator/(TVector const& v, T scalar)                                                                \
     {                                                                                                                   \
+        ANE_EASSERT(abs(scalar) >= FMath::EPSILON);                                                                     \
         return v /= scalar;                                                                                             \
     }                                                                                                                   \
                                                                                                                         \
     friend TVector operator/(TVector const& v1, TVector const& v2)                                                      \
     {                                                                                                                   \
-        return v1 /= v2;                                                                                                \
+        ANE_EASSERT(abs(v1.X) >= FMath::EPSILON);                                                                       \
+        ANE_EASSERT(abs(v1.Y) >= FMath::EPSILON);                                                                       \
+        return {v1.X / v2.X, v1.Y / v2.Y};                                                                              \
     }
-
-    // template <FloatingType F>
-    // void TVector<2, F>::Normalize()
-    // {
-    //     const float l = Length();
-    //     if (l < FMath::EPSILON) {
-    //         return;
-    //     }
-    //     X /= l;
-    //     Y /= l;
-    // }
-    //
-    // template <FloatingType F>
-    // TVector<2, F> TVector<2, F>::Normalized() const
-    // {
-    //     const float l = Length();
-    //     if (l < FMath::EPSILON) {
-    //         return zeroVector;
-    //     }
-    //     X /= l;
-    //     Y /= l;
-    //     return { X / l, Y / l };
-    // }
-    //
-    // template <FloatingType F>
-    // F TVector<2, F>::Dot(const TVector<2, F>& vec1, const TVector<2, F>& vec2)
-    // {
-    //     return vec1.X * vec2.X + vec1.Y * vec2.Y;
-    // }
-    //
-    // template <FloatingType F>
-    // bool TVector<2, F>::Equal(const TVector<2, F>& vec1, const TVector<2, F>& vec2, const F epsilon)
-    // {
-    //     return FMath::Equal(vec1.X, vec2.X, epsilon) && FMath::Equal(vec1.Y, vec2.Y, epsilon);
-    // }
