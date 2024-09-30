@@ -15,4 +15,5 @@ namespace Engine
     typedef MathTypes::TVector<2, uint> Vector2UInt;
 
     typedef MathTypes::TVector<2, float> Vector2F;
+    typedef MathTypes::TVector<2, double> Vector2D;
 }

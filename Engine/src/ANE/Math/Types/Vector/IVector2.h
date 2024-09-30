@@ -24,20 +24,20 @@ namespace Engine::MathTypes
     template <NumericType U>
     TVector<2, T> TVector<2, T>::ConvertFloor(TVector<2, U> const& vec)
     {
-        return {static_cast<T>(std::floor(vec.X)), static_cast<T>(std::floor(vec.Y))};
+        return { static_cast<T>(std::floor(vec.X)), static_cast<T>(std::floor(vec.Y)) };
     }
 
     template <IntegerType T>
     template <NumericType U>
     TVector<2, T> TVector<2, T>::ConvertRound(TVector<2, U> const& vec)
     {
-        return {static_cast<T>(std::round(vec.X)), static_cast<T>(std::round(vec.Y))};
+        return { static_cast<T>(std::round(vec.X)), static_cast<T>(std::round(vec.Y)) };
     }
 
     template <IntegerType T>
     template <NumericType U>
     TVector<2, T> TVector<2, T>::ConvertCeil(TVector<2, U> const& vec)
     {
-        return {static_cast<T>(std::ceil(vec.X)), static_cast<T>(std::ceil(vec.Y))};
+        return { static_cast<T>(std::ceil(vec.X)), static_cast<T>(std::ceil(vec.Y)) };
     }
 }

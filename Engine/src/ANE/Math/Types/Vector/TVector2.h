@@ -20,12 +20,12 @@ namespace Engine::MathTypes
         SwizzleAB(T a, T b) : X(a), Y(b) {}
 
         GEN_SWIZZLE_VEC2(T, X, Y)
+        GEN_SWIZZLE_VEC2_01(T, X, Y)
     };
 }
 
-
 #define GEN_VECTOR2(T)                                                                                                  \
-    static constexpr int Length()                                                                                       \
+    static constexpr int Count()                                                                                        \
     {                                                                                                                   \
         return 2;                                                                                                       \
     }                                                                                                                   \
@@ -119,13 +119,13 @@ namespace Engine::MathTypes
                                                                                                                         \
     T& operator[](int index)                                                                                            \
     {                                                                                                                   \
-        ANE_EASSERT(index < Length());                                                                                  \
+        ANE_EASSERT(index < Count());                                                                                   \
         return (&X)[index];                                                                                             \
     }                                                                                                                   \
                                                                                                                         \
     T& const operator[](int index) const                                                                                \
     {                                                                                                                   \
-        ANE_EASSERT(index < Length());                                                                                  \
+        ANE_EASSERT(index < Count());                                                                                   \
         return (&X)[index];                                                                                             \
     }                                                                                                                   \
                                                                                                                         \
