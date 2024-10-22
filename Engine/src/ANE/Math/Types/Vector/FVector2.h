@@ -32,6 +32,7 @@ namespace Engine::MathTypes
     void TVector<2, T>::UnsafeNormalize()
     {
         const T l = Magnitude();
+        ANE_EASSERT(l >= FMath::EPSILON);
         X /= l;
         Y /= l;
     }
@@ -40,6 +41,7 @@ namespace Engine::MathTypes
     TVector<2, T> TVector<2, T>::UnsafeNormalized() const
     {
         const T l = Magnitude();
+        ANE_EASSERT(l >= FMath::EPSILON);
         X /= l;
         Y /= l;
         return { X / l, Y / l };
