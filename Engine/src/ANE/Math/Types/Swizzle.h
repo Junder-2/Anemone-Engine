@@ -5,19 +5,19 @@
 namespace Engine::MathTypes
 {
     #define GEN_SWIZZLE_VEC2_ENTRY(T, A, B)             \
-        TVector<2, T> To ## A ## B() const              \
+        TVector<2, T> ## A ## B() const                 \
         {                                               \
             return TVector<2, T>(A, B);                 \
         }
 
     #define GEN_SWIZZLE_VEC3_ENTRY(T, A, B, C)          \
-        TVector<3, T> To ## A ## B ## C() const         \
+        TVector<3, T> ## A ## B ## C() const            \
         {                                               \
             return TVector<3, T>(A, B, C);              \
         }
 
     #define GEN_SWIZZLE_VEC4_ENTRY(T, A, B, C, D)       \
-        TVector<4, T> To ## A ## B ## C ## D() const    \
+        TVector<4, T> ## A ## B ## C ## D() const       \
         {                                               \
             return TVector<4, T>(A, B, C, D);           \
         }
