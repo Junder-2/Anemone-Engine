@@ -5,7 +5,7 @@
 </picture>
 
 # Anemone Engine [![License: Apache 2.0][Apache 2 Badge]](https://github.com/Junder-2/Anemone-Engine/blob/main/LICENSE)
-Anemone is a custom game engine built as the graduation project for Futuregames' Programmer course.
+Anemone is a custom game engine built as in cpp.
 It is designed to support scripting, cross platform rendering, an ECS, and 3D physics and scene management all without requiring a user to write any code.
 # Contributors
 
